@@ -1,0 +1,1 @@
+<h4>{{ $documento->clienteEntidad->nombre}}</h4>
