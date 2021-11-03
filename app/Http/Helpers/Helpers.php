@@ -14,6 +14,7 @@ use App\Compras\Orden;
 use App\Compras\Documento\Documento;
 use App\Compras\Proveedor;
 use App\Mantenimiento\Colaborador\Colaborador;
+use App\Mantenimiento\Empresa\Empresa;
 //Bitacora de actividades
 use Spatie\Activitylog\Contracts\Activity;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Http;
 use App\Mantenimiento\Parametro\Parametro;
 use GuzzleHttp\Client;
 use App\Mantenimiento\Empresa\Facturacion;
+use App\Mantenimiento\Empresa\Numeracion;
 use App\Mantenimiento\Vendedor\Vendedor;
 use App\Pos\Caja;
 use App\Pos\MovimientoCaja;
@@ -1076,6 +1078,18 @@ if (!function_exists('cuadreMovimientoCajaEgresos')) {
     }
 }
 
+if (!function_exists('comprobantes_empresa')) {
+    function comprobantes_empresa()
+    {
+        $comprobantes = Numeracion::where('empresa_id',Empresa::first()->id)->where('estado','ACTIVO')->get();
+        foreach($comprobantes as $arr)
+    {
+        $arr['descripcion'] = $arr->comprobanteDescripcion();
+    }
+        return $comprobantes;
+    }
+}
+
 if (!function_exists('precio_dolar')) {
     function precio_dolar()
     {
@@ -1141,31 +1155,6 @@ if (!function_exists('cuentas_cobrar')) {
         $anio = date_format($fecha_hoy,'Y');
         $total = CuentaCliente::where('estado','!=','ANULADO')->whereMonth('created_at',$mes)->whereYear('created_at',$anio)->sum('saldo');
         return number_format($total,3);
-    }
-}
-
-
-if (!function_exists('ventas_x_mes')) {
-    function ventas_x_mes()
-    {
-        $fecha_actual = Carbon::now();
-
-        $meses_aux = array();
-        for ($i = 0; $i < 6; $i++) {
-            $f_old = (string)date("d-m-Y", strtotime($fecha_actual . "- " . $i . " month"));
-            $m = array("ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC");
-            $f_old = Carbon::parse($f_old);
-            $mes = $m[($f_old->format('n')) - 1];
-            $nombre = $mes . ' ' . $f_old->format('Y');
-            $ob = new stdClass();
-            $ob->fecha = date("d-m-Y", strtotime($fecha_actual . "- " . $i . " month"));
-            $ob->nombre = $nombre;
-            $ob->anio = date("Y", strtotime($fecha_actual . "- " . $i . " month"));
-            $ob->mes = date("m", strtotime($fecha_actual . "- " . $i . " month"));
-            array_push($meses_aux, $ob);
-        }
-
-        return $meses_aux;
     }
 }
 

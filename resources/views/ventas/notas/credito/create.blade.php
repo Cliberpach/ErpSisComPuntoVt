@@ -216,18 +216,25 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <div class="panel panel-primary">
+                                <div class="panel panel-primary" id="panel_detalle">
                                     <div class="panel-heading">
                                         <div class="row">
                                             <div class="col-10">
                                                 <h4><b>Detalles de la nota de @if(isset($nota_venta)) devolución @else crédito @endif</b></h4>
                                             </div>
                                             <div class="col-2 text-right">
-                                                <button type="button" class="btn btn-secondary btn-sm" onclick="actualizarData({{ $documento->id }})"><i class="fa fa-refresh"></i></button>
+                                                <button type="button" class="ladda-button ladda-button-demo btn btn-secondary btn-sm" onclick="actualizarData({{ $documento->id }})" data-style="zoom-in"><i class="fa fa-refresh"></i></button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="panel-body">
+                                    <div class="panel-body ibox-content">
+                                        <div class="sk-spinner sk-spinner-wave">
+                                            <div class="sk-rect1"></div>
+                                            <div class="sk-rect2"></div>
+                                            <div class="sk-rect3"></div>
+                                            <div class="sk-rect4"></div>
+                                            <div class="sk-rect5"></div>
+                                        </div>
                                         <div class="row">
                                             <div class="col-12">
                                                 <div class="table-responsive">
@@ -335,6 +342,8 @@
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <!-- DataTable -->
 <link href="{{asset('Inspinia/css/plugins/dataTables/datatables.min.css')}}" rel="stylesheet">
+<!-- Ladda style -->
+<link href="{{asset('Inspinia/css/plugins/ladda/ladda-themeless.min.css')}}" rel="stylesheet">
 
 @endpush
 
@@ -351,6 +360,11 @@
 <!-- DataTable -->
 <script src="{{asset('Inspinia/js/plugins/dataTables/datatables.min.js')}}"></script>
 <script src="{{asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js')}}"></script>
+
+ <!-- Ladda -->
+ <script src="{{ asset('Inspinia/js/plugins/ladda/spin.min.js') }}"></script>
+ <script src="{{ asset('Inspinia/js/plugins/ladda/ladda.min.js') }}"></script>
+ <script src="{{ asset('Inspinia/js/plugins/ladda/ladda.jquery.min.js') }}"></script>
 
 <script>
 
@@ -470,8 +484,12 @@
     }
 
     function actualizarData(id) {
+        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         let url = '{{ route("ventas.getDetalles",":id") }}';
         url = url.replace(':id',id);
+
+        var l = $( '.ladda-button-demo' ).ladda();
+        l.ladda( 'start' );
 
         dibujarTabla();
         var t = $('.tbl-detalles').DataTable();
@@ -487,6 +505,8 @@
                 agregarTabla(detalles[i]);
             }
             sumaTotal();
+            l.ladda('stop');
+            $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         });
     }
 
@@ -734,13 +754,13 @@
                     else if(result.value.success)
                     {
                         let id = result.value.nota_id;
-                        @if(isset($nota_venta))                        
-                        toastr.success('Nota de devolución creada!','Exito')                                               
+                        @if(isset($nota_venta))
+                        toastr.success('Nota de devolución creada!','Exito')
                         let url_open_pdf = '{{ route("ventas.notas_dev.show", ":id")}}';
                         url_open_pdf = url_open_pdf.replace(':id',id);
                         window.open(url_open_pdf, "Comprobante SISCOM", "width=900, height=600");
-                        @else                        
-                        toastr.success('Nota de crédito creada!','Exito')                        
+                        @else
+                        toastr.success('Nota de crédito creada!','Exito')
                         let url_open_pdf = '{{ route("ventas.notas.show", ":id")}}';
                         url_open_pdf = url_open_pdf.replace(':id',id);
                         window.open(url_open_pdf, "Comprobante SISCOM", "width=900, height=600");

@@ -30,11 +30,11 @@ class NoEnviadosController extends Controller
 
         if($request->fecha_desde && $request->fecha_hasta)
         {
-            $documentos = Documento::where('estado','!=','ANULADO')->wherein('sunat',['0','2'])->where('tipo_venta','!=',129)->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
+            $documentos = Documento::where('estado','!=','ANULADO')->wherein('sunat',['0'])->where('tipo_venta','!=',129)->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
         }
         else
         {
-            $documentos = Documento::where('estado','!=','ANULADO')->wherein('sunat',['0','2'])->where('tipo_venta','!=',129)->orderBy('id', 'desc')->get();
+            $documentos = Documento::where('estado','!=','ANULADO')->wherein('sunat',['0'])->where('tipo_venta','!=',129)->orderBy('id', 'desc')->get();
         }
 
         $hoy = Carbon::now();
@@ -61,6 +61,8 @@ class NoEnviadosController extends Controller
             $fecha_v = $documento->created_at;
             $diff =  $fecha_v->diffInDays($hoy);
 
+            $cantidad_notas = count($documento->notas);
+
             $coleccion->push([
                 'id' => $documento->id,
                 'tipo_venta' => $documento->nombreTipo(),
@@ -79,7 +81,8 @@ class NoEnviadosController extends Controller
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff)
+                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff),
+                'notas' => $cantidad_notas
             ]);
         }
 

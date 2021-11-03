@@ -337,112 +337,106 @@
                         <div class="row">
 
                             <div class="col-lg-12">
-                                <div class="panel panel-primary">
+                                <div class="panel panel-primary" id="panel_detalle">
                                     <div class="panel-heading">
                                         <h4 class=""><b>Detalle de Documento de Compra</b></h4>
                                     </div>
-                                    <div class="panel-body">
-
-
-                                    <div class="row">
-                                                <div class="col-lg-6 col-xs-12 b-r">
-                                                    <div class="form-group row">
-                                                        <div class="col-md-12 col-xs-12">
-                                                            <label class="required">Producto:</label>
-                                                            <select class="select2_form form-control"
-                                                                style="text-transform: uppercase; width:100%" name="producto_id"
-                                                                id="producto_id" onchange="cargarPresentacion(this)">
-                                                                <option></option>
-                                                                @foreach ($productos as $producto)
-                                                                <option value="{{$producto->id}}">{{$producto->nombre}} - {{$producto->codigo_barra}}
-                                                                </option>
-                                                                @endforeach
-                                                            </select>
-                                                            <div class="invalid-feedback"><b><span id="error-producto"></span></b>
-                                                            </div>
+                                    <div class="panel-body ibox-content">
+                                        <div class="sk-spinner sk-spinner-wave">
+                                            <div class="sk-rect1"></div>
+                                            <div class="sk-rect2"></div>
+                                            <div class="sk-rect3"></div>
+                                            <div class="sk-rect4"></div>
+                                            <div class="sk-rect5"></div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-xs-12 b-r">
+                                                <div class="form-group row align-items-end">
+                                                    <div class="col-10 col-md-10">
+                                                        <label class="required">Producto:</label>
+                                                        <select class="select2_form form-control"
+                                                            style="text-transform: uppercase; width:100%" name="producto_id"
+                                                            id="producto_id">
+                                                        </select>
+                                                        <div class="invalid-feedback"><b><span id="error-producto"></span></b>
                                                         </div>
                                                     </div>
-
-                                                    <div class="form-group row">
-                                                        <div class="col-md-6">
-                                                            <label class="required">Costo Flete:</label>
-                                                            <input type="text" id="costo_flete" name="costo_flete" class="form-control">
-                                                            <div class="invalid-feedback"><b><span id="error-costo-flete"></span></b></div>
-                                                        </div>
+                                                    <div class="col-2 col-md-2">
+                                                        <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
                                                     </div>
-
-                                                    <div class="form-group row">
-                                                        <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label class="col-form-label required" for="amount">Precio:</label>
-                                                                <input type="text" id="precio" class="form-control">
-                                                                <div class="invalid-feedback"><b><span id="error-precio"></span></b>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-
-                                                            <label class="col-form-label required">Cantidad:</label>
-                                                            <input type="text" id="cantidad" class="form-control">
-                                                            <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
-                                                            </div>
-
-
-                                                        </div>
-                                                    </div>
-
                                                 </div>
 
-                                                <div class="col-lg-6 col-xs-12">
+                                                <div class="form-group row">
+                                                    <div class="col-md-6">
+                                                        <label class="required">Costo Flete:</label>
+                                                        <input type="text" id="costo_flete" name="costo_flete" class="form-control">
+                                                        <div class="invalid-feedback"><b><span id="error-costo-flete"></span></b></div>
+                                                    </div>
+                                                </div>
 
-                                                    <div class="form-group row" >
-                                                        <div class="col-md-6" id="fecha_vencimiento_campo">
-                                                            <label class="required">Fecha de vencimiento:</label>
-                                                            <div class="input-group date">
-                                                                <span class="input-group-addon">
-                                                                    <i class="fa fa-calendar"></i>
-                                                                </span>
-                                                                <input type="text" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control"  autocomplete="off" readonly>
-                                                                <div class="invalid-feedback"><b><span id="error-fecha_vencimiento"></span></b></div>
-
+                                                <div class="form-group row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="col-form-label required" for="amount">Precio:</label>
+                                                            <input type="text" id="precio" class="form-control">
+                                                            <div class="invalid-feedback"><b><span id="error-precio"></span></b>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-6">
-                                                            <label class="required">Lote:</label>
-                                                            <input type="text" id="lote" name="lote" class="form-control" onkeypress="return mayus(this);">
-                                                            <div class="invalid-feedback"><b><span id="error-lote"></span></b></div>
-                                                        </div>
                                                     </div>
+                                                    <div class="col-md-6">
 
-
-
-                                                    <div class="form-group row">
-                                                        <div class="col-lg-6 col-xs-12">
-                                                            <label class="col-form-label" for="amount">&nbsp;</label> <a class="btn btn-block btn-success " onclick="limpiarDetalle()" style='color:white;'> <i class="fa fa-paint-brush"></i> LIMPIAR</a>
-                                                        </div>
-
-                                                        <div class="col-lg-6 col-xs-12">
-                                                            <label class="col-form-label" for="amount">&nbsp;</label>
-                                                            <a class="btn btn-block btn-warning enviar_producto" style='color:white;'> <i class="fa fa-plus"></i> AGREGAR</a>
+                                                        <label class="col-form-label required">Cantidad:</label>
+                                                        <input type="text" id="cantidad" class="form-control">
+                                                        <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
                                                         </div>
 
 
                                                     </div>
+                                                </div>
 
+                                            </div>
+
+                                            <div class="col-lg-6 col-xs-12">
+
+                                                <div class="form-group row" >
+                                                    <div class="col-md-6" id="fecha_vencimiento_campo">
+                                                        <label class="required">Fecha de vencimiento:</label>
+                                                        <div class="input-group date">
+                                                            <span class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </span>
+                                                            <input type="text" id="fecha_vencimiento" name="fecha_vencimiento" class="form-control"  autocomplete="off" readonly>
+                                                            <div class="invalid-feedback"><b><span id="error-fecha_vencimiento"></span></b></div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="required">Lote:</label>
+                                                        <input type="text" id="lote" name="lote" class="form-control" onkeypress="return mayus(this);">
+                                                        <div class="invalid-feedback"><b><span id="error-lote"></span></b></div>
+                                                    </div>
+                                                </div>
+
+
+
+                                                <div class="form-group row">
+                                                    <div class="col-lg-6 col-xs-12">
+                                                        <label class="col-form-label" for="amount">&nbsp;</label> <a class="btn btn-block btn-success " onclick="limpiarDetalle()" style='color:white;'> <i class="fa fa-paint-brush"></i> LIMPIAR</a>
+                                                    </div>
+
+                                                    <div class="col-lg-6 col-xs-12">
+                                                        <label class="col-form-label" for="amount">&nbsp;</label>
+                                                        <a class="btn btn-block btn-warning enviar_producto" style='color:white;'> <i class="fa fa-plus"></i> AGREGAR</a>
+                                                    </div>
 
 
                                                 </div>
-
 
 
 
                                             </div>
-
-
-
-
-                                            <hr>
-
+                                        </div>
+                                        <hr>
                                         <div class="table-responsive">
                                             <table
                                                 class="table dataTables-orden-detalle table-striped table-bordered table-hover"
@@ -483,12 +477,6 @@
                                                 </tfoot>
                                             </table>
                                         </div>
-
-
-
-
-
-
                                     </div>
                                 </div>
                             </div>
@@ -592,6 +580,8 @@ $(document).ready(function() {
         $("#tipo_cambio").attr("required", true);
         $("#campo_tipo_cambio").addClass("required")
     }
+
+    obtenerProducts();
 
 })
 
@@ -754,40 +744,39 @@ function validarFecha() {
     }
 
     let moneda = $('#moneda').val();
-        let serie_tipo = $('#serie_tipo').val();
-        let numero_tipo = $('#numero_tipo').val();
-        let proveedor_id = $('#proveedor_id').val();
-        let tipo_compra = $('#tipo_compra').val();
+    let serie_tipo = $('#serie_tipo').val();
+    let numero_tipo = $('#numero_tipo').val();
+    let proveedor_id = $('#proveedor_id').val();
+    let tipo_compra = $('#tipo_compra').val();
 
+    $.ajax({
+        dataType: 'json',
+        type: 'post',
+        async: false,
+        url: '{{ route('compras.documento.consulta_update') }}',
+        data: {
+            '_token': $('input[name=_token]').val(),
+            'id': '{{ $documento->id }}',
+            'moneda': $('#moneda').val(),
+            'serie_tipo': $('#serie_tipo').val(),
+            'numero_tipo': $('#numero_tipo').val(),
+            'proveedor_id': $('#proveedor_id').val(),
+            'tipo_compra': $('#tipo_compra').val(),
+        }
+    }).done(function(result) {
+        if(!result.success)
+        {
+            toastr.error('La serie ' + serie_tipo + ' con el numero ' + numero_tipo + ' ya tiene un documento de compra registrado');
+            enviar = false;
+        }
+        else
+        {
+            enviar = true;
+        }
 
-        $.ajax({
-            dataType: 'json',
-            type: 'post',
-            async: false,
-            url: '{{ route('compras.documento.consulta_update') }}',
-            data: {
-                '_token': $('input[name=_token]').val(),
-                'id': '{{ $documento->id }}',
-                'moneda': $('#moneda').val(),
-                'serie_tipo': $('#serie_tipo').val(),
-                'numero_tipo': $('#numero_tipo').val(),
-                'proveedor_id': $('#proveedor_id').val(),
-                'tipo_compra': $('#tipo_compra').val(),
-            }
-        }).done(function(result) {
-            if(!result.success)
-            {
-                toastr.error('La serie ' + serie_tipo + ' con el numero ' + numero_tipo + ' ya tiene un documento de compra registrado');
-                enviar = false;
-            }
-            else
-            {
-                enviar = true;
-            }
+    });
 
-        });
-
-        return enviar;
+    return enviar;
 }
 
 $('#enviar_orden').submit(function(e) {
@@ -1026,23 +1015,23 @@ $(document).on('click', '#borrar_producto', function(event) {
 //Validacion al ingresar tablas
 $(".enviar_producto").click(function() {
     limpiarErrores()
-    var enviar = false;
+    var enviar = true;
     if ($('#producto_id').val() == '') {
         toastr.error('Seleccione Producto.', 'Error');
-        enviar = true;
+        enviar = false;
         $('#producto_id').addClass("is-invalid")
         $('#error-producto').text('El campo Producto es obligatorio.')
     } else {
         var existe = buscarproducto($('#producto_id').val())
         if (existe == true) {
             toastr.error('Producto ya se encuentra ingresado.', 'Error');
-            enviar = true;
+            enviar = false;
         }
     }
     if ($('#precio').val() == '') {
 
         toastr.error('Ingrese el Producto del Producto.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#precio").addClass("is-invalid");
         $('#error-precio').text('El campo Precio es obligatorio.')
@@ -1050,7 +1039,7 @@ $(".enviar_producto").click(function() {
 
     if ($('#cantidad').val() == '') {
         toastr.error('Ingrese cantidad del Producto.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#cantidad").addClass("is-invalid");
         $('#error-cantidad').text('El campo Cantidad es obligatorio.')
@@ -1058,7 +1047,7 @@ $(".enviar_producto").click(function() {
 
     if ($('#costo_flete').val() == '') {
         toastr.error('Ingrese Costo de Flete del Producto.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#costo_flete").addClass("is-invalid");
         $('#error-costo_flete').text('El campo Costo de Flete es obligatorio.')
@@ -1066,7 +1055,7 @@ $(".enviar_producto").click(function() {
 
     if ($('#lote').val() == '') {
         toastr.error('Ingrese el Lote del Producto.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#lote").addClass("is-invalid");
         $('#error-lote').text('El campo Lote es obligatorio.')
@@ -1074,53 +1063,109 @@ $(".enviar_producto").click(function() {
 
     if ($('#fecha_vencimiento').val() == '') {
         toastr.error('Ingrese la Fecha de Vencimiento del Producto.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#fecha_vencimiento").addClass("is-invalid");
         $('#error-fecha_vencimiento').text('El campo Fecha de Vencimiento es obligatorio.')
     }
 
+    let moneda = $('#moneda').val();
+    let serie_tipo = $('#serie_tipo').val();
+    let numero_tipo = $('#numero_tipo').val();
+    let proveedor_id = $('#proveedor_id').val();
+    let tipo_compra = $('#tipo_compra').val();
 
-
-    if (enviar != true) {
-
-        Swal.fire({
-            title: 'Opción Agregar',
-            text: "¿Seguro que desea agregar Producto?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: "#1ab394",
-            confirmButtonText: 'Si, Confirmar',
-            cancelButtonText: "No, Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var descripcion_producto = obtenerproducto($('#producto_id').val())
-                var detalle = {
-                    producto_id: $('#producto_id').val(),
-                    descripcion: descripcion_producto.nombre+' - '+$('#lote').val(),
-                    costo_flete: $('#costo_flete').val(),
-                    precio: $('#precio').val(),
-                    cantidad: $('#cantidad').val(),
-                    lote: $('#lote').val(),
-                    fecha_vencimiento: $('#fecha_vencimiento').val(),
-                }
-                // limpiarDetalle()
-                agregarTabla(detalle);
-                sumaTotal()
-
-            } else if (
-                /* Read more about handling dismissals below */
-                result.dismiss === Swal.DismissReason.cancel
-            ) {
-                swalWithBootstrapButtons.fire(
-                    'Cancelado',
-                    'La Solicitud se ha cancelado.',
-                    'error'
-                )
-            }
-        })
-
+    if(moneda == '')
+    {
+        toastr.error("Seleccionar moneda");
+        enviar = false;
     }
+
+    if(serie_tipo == '')
+    {
+        toastr.error("Completar Serie de documento");
+        enviar = false;
+    }
+
+    if(numero_tipo == '')
+    {
+        toastr.error("Completar Numero de documento");
+        enviar = false;
+    }
+
+    if(proveedor_id == '')
+    {
+        toastr.error("Seleccionar proveedor");
+        enviar = false;
+    }
+
+    if(tipo_compra == '')
+    {
+        toastr.error("Seleccionar tipo de compra");
+        enviar = false;
+    }
+
+    $.ajax({
+        dataType: 'json',
+        type: 'post',
+        async: false,
+        url: '{{ route('compras.documento.consulta_update') }}',
+        data: {
+            '_token': $('input[name=_token]').val(),
+            'id': '{{ $documento->id }}',
+            'moneda': $('#moneda').val(),
+            'serie_tipo': $('#serie_tipo').val(),
+            'numero_tipo': $('#numero_tipo').val(),
+            'proveedor_id': $('#proveedor_id').val(),
+            'tipo_compra': $('#tipo_compra').val(),
+        }
+    }).done(function(result) {
+        if(!result.success)
+        {
+            toastr.error('La serie ' + serie_tipo + ' con el numero ' + numero_tipo + ' ya tiene un documento de compra registrado');
+        }
+        else
+        {
+            if (enviar) {
+                Swal.fire({
+                    title: 'Opción Agregar',
+                    text: "¿Seguro que desea agregar Producto?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: "#1ab394",
+                    confirmButtonText: 'Si, Confirmar',
+                    cancelButtonText: "No, Cancelar",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var descripcion_producto = obtenerproducto($('#producto_id').val())
+                        var detalle = {
+                            producto_id: $('#producto_id').val(),
+                            descripcion: descripcion_producto.nombre+' - '+$('#lote').val(),
+                            costo_flete: $('#costo_flete').val(),
+                            precio: $('#precio').val(),
+                            cantidad: $('#cantidad').val(),
+                            lote: $('#lote').val(),
+                            fecha_vencimiento: $('#fecha_vencimiento').val(),
+                        }
+                        // limpiarDetalle()
+                        agregarTabla(detalle);
+                        sumaTotal()
+
+                    } else if (
+                        /* Read more about handling dismissals below */
+                        result.dismiss === Swal.DismissReason.cancel
+                    ) {
+                        swalWithBootstrapButtons.fire(
+                            'Cancelado',
+                            'La Solicitud se ha cancelado.',
+                            'error'
+                        )
+                    }
+                });
+            }
+        }
+
+    });
 })
 
 function limpiarDetalle() {
@@ -1300,39 +1345,72 @@ function sinIgv(subtotal) {
 
 }
 
-function conIgv(subtotal) {
-    // calular igv (calcular la base)
-    var igv = $('#igv').val()
-    ///////////////////////////////
+    function conIgv(subtotal) {
+        // calular igv (calcular la base)
+        var igv = $('#igv').val()
+        ///////////////////////////////
 
-    if (igv) {
-        var calcularIgv = igv/100
-        var base = subtotal / (1 + calcularIgv)
-        var nuevo_igv = subtotal - base;
-        $('#igv_int').text(igv+'%')
-        $('#subtotal').text(base.toFixed(2))
-        $('#igv_monto').text(nuevo_igv.toFixed(2))
-        $('#total').text(subtotal.toFixed(2))
+        if (igv) {
+            var calcularIgv = igv/100
+            var base = subtotal / (1 + calcularIgv)
+            var nuevo_igv = subtotal - base;
+            $('#igv_int').text(igv+'%')
+            $('#subtotal').text(base.toFixed(2))
+            $('#igv_monto').text(nuevo_igv.toFixed(2))
+            $('#total').text(subtotal.toFixed(2))
 
-    }else{
-        toastr.error('Ingrese Igv.', 'Error');
+        }else{
+            toastr.error('Ingrese Igv.', 'Error');
+        }
+
     }
 
-}
+    $(document).on("change", "#proveedor_razon", function () {
+        id = $(this).val();
+        if($("#proveedor_id").val() != id){
+            $("#proveedor_id").select2('val',id);
+        }
+    });
 
-$(document).on("change", "#proveedor_razon", function () {
-   id = $(this).val();
-   if($("#proveedor_id").val() != id){
-      $("#proveedor_id").select2('val',id);
-   }
-});
+    $(document).on("change", "#proveedor_id", function () {
+        id = $(this).val();
+        if($("#proveedor_razon").val() != id){
+            $("#proveedor_razon").select2('val',id);
+        }
+    });
 
-$(document).on("change", "#proveedor_id", function () {
-   id = $(this).val();
-   if($("#proveedor_razon").val() != id){
-       $("#proveedor_razon").select2('val',id);
-   }
+    function obtenerProducts()
+    {
 
- });
+        $("#producto_id").removeAttr('onchange','cargarPresentacion(this)');
+        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+        $("#producto_id").empty().trigger('change');
+        $.ajax({
+            dataType: 'json',
+            url: '{{ route('compras.documento.getProduct') }}',
+            type: 'get',
+            data: {
+                '_token': $('input[name=_token]').val(),
+            },
+            success: function(data) {
+                if (data.productos.length > 0) {
+                    $('#producto_id').append('<option></option>').trigger('change');
+                    for(var i = 0;i < data.productos.length; i++)
+                    {
+                        var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + ' - ' + data.productos[i].codigo_barra + '</option>';
+                        $('#producto_id').append(newOption).trigger('change');
+                        //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
+                    }
+                    $("#producto_id").attr('onchange','cargarPresentacion(this)');
+                    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+
+                } else {
+                    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+                    $("#producto_id").attr('onchange','cargarPresentacion(this)');
+                    toastr.error('Productos no encontrados.', 'Error');
+                }
+            },
+        })
+    }
 </script>
 @endpush

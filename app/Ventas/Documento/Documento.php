@@ -27,6 +27,7 @@ class Documento extends Model
         'numero_doc',
         'fecha_documento',
         'fecha_atencion',
+        'fecha_vencimiento',
         'sub_total',
         'total_igv',
         'total',

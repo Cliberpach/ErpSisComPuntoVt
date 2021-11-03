@@ -275,14 +275,10 @@ $(document).ready(function() {
                         "<button class='btn btn-info' onclick='xmlElectronico(" +data.id+ ")' title='Detalle'>XML</button>"
                 }
             },
-
             {
                 data: null,
                 className: "text-center letrapequeña",
                 render: function(data) {
-                    //Ruta Detalle
-                    var url_detalle = '{{ route("ventas.documento.show", ":id")}}';
-                    url_detalle = url_detalle.replace(':id', data.id);
 
                     var url_nota = '{{ route("ventas.notas", ":id") }}';
                     url_nota = url_nota.replace(':id', data.id);
@@ -292,12 +288,12 @@ $(document).ready(function() {
 
                     let cadena = "";
 
-                    if(data.sunat === '0' && data.tipo_venta_id != 129) //&& data.dias > 0
+                    if(data.sunat === '0' && data.tipo_venta_id != 129 && data.dias > 0) //&& data.dias > 0
                     {
                         cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }
 
-                    if(data.sunat === '1')
+                    if((data.sunat === '1' || data.notas > 0) && data.sunat != '2')
                     {
                         cadena = cadena  +
                         "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>"

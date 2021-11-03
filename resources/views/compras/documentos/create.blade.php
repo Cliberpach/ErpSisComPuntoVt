@@ -480,29 +480,34 @@
                         <div class="row">
 
                             <div class="col-lg-12">
-                                <div class="panel panel-primary">
+                                <div class="panel panel-primary" id="panel_detalle">
                                     <div class="panel-heading">
                                         <h4 class=""><b>Detalle del Documento de Compra</b></h4>
                                     </div>
-                                    <div class="panel-body">
-
+                                    <div class="panel-body ibox-content">
+                                        <div class="sk-spinner sk-spinner-wave">
+                                            <div class="sk-rect1"></div>
+                                            <div class="sk-rect2"></div>
+                                            <div class="sk-rect3"></div>
+                                            <div class="sk-rect4"></div>
+                                            <div class="sk-rect5"></div>
+                                        </div>
 
                                         <div class="row">
                                             <div class="col-lg-6 col-xs-12 b-r">
-                                                <div class="form-group row">
-                                                    <div class="col-md-12 col-xs-12">
+                                                <div class="form-group row align-items-end">
+                                                    <div class="col-10 col-md-10">
                                                         <label class="required">Producto:</label>
                                                         <select class="select2_form form-control"
                                                             style="text-transform: uppercase; width:100%" name="producto_id"
                                                             id="producto_id" onchange="cargarPresentacion(this)">
-                                                            <option></option>
-                                                            @foreach ($productos as $producto)
-                                                            <option value="{{$producto->id}}">{{$producto->nombre}} - {{$producto->codigo_barra}}
-                                                            </option>
-                                                            @endforeach
+
                                                         </select>
                                                         <div class="invalid-feedback"><b><span id="error-producto"></span></b>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-2 col-md-2">
+                                                        <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
                                                     </div>
                                                 </div>
 
@@ -714,11 +719,13 @@
         $('#fecha_vencimiento').val('{{$fecha_5}}');
         $('#costo_flete').val('0.00');
         $("#igv_check").attr('checked', true);
-        $('#igv_requerido').addClass("required")
-        $('#igv').prop('required', true)
-        $('#igv').val('18')
-        var igv = ($('#igv').val()) + ' %'
-        $('#igv_int').text(igv)
+        $('#igv_requerido').addClass("required");
+        $('#igv').prop('required', true);
+        $('#igv').val('18');
+        var igv = ($('#igv').val()) + ' %';
+        $('#igv_int').text(igv);
+
+        obtenerProducts();
     });
     //Select2
     $(".select2_form").select2({
@@ -1209,37 +1216,37 @@
     //Validacion al ingresar tablas
     $(".enviar_producto").click(function() {
         limpiarErrores()
-        var enviar = false;
+        var enviar = true;
         if ($('#producto_id').val() == '') {
             toastr.error('Seleccione Producto.', 'Error');
-            enviar = true;
+            enviar = false;
             $('#producto_id').addClass("is-invalid")
             $('#error-producto').text('El campo Producto es obligatorio.')
         } else {
             var existe = buscarproducto($('#producto_id').val())
             if (existe == true) {
                 toastr.error('Producto con el mismo lote ya se encuentra ingresado.', 'Error');
-                enviar = true;
+                enviar = false;
             }
         }
 
         if ($('#precio').val() == '') {
             toastr.error('Ingrese el precio del Producto.', 'Error');
-            enviar = true;
+            enviar = false;
             $("#precio").addClass("is-invalid");
             $('#error-precio').text('El campo Precio es obligatorio.')
         }
 
         if ($('#cantidad').val() == '') {
             toastr.error('Ingrese cantidad del Producto.', 'Error');
-            enviar = true;
+            enviar = false;
             $("#cantidad").addClass("is-invalid");
             $('#error-cantidad').text('El campo Cantidad es obligatorio.')
         }
 
         if ($('#costo_flete').val() == '') {
             toastr.error('Ingrese el Costo de Flete del Producto.', 'Error');
-            enviar = true;
+            enviar = false;
 
             $("#costo_flete").addClass("is-invalid");
             $('#error-costo-flete').text('El campo Costo Flete es obligatorio.')
@@ -1247,7 +1254,7 @@
 
         if ($('#lote').val() == '') {
             toastr.error('Ingrese el Lote del Producto.', 'Error');
-            enviar = true;
+            enviar = false;
 
             $("#lote").addClass("is-invalid");
             $('#error-lote').text('El campo Lote es obligatorio.')
@@ -1255,49 +1262,109 @@
 
         if ($('#fecha_vencimiento').val() == '') {
             toastr.error('Ingrese la Fecha de Vencimiento del Producto.', 'Error');
-            enviar = true;
+            enviar = false;
 
             $("#fecha_vencimiento").addClass("is-invalid");
             $('#error-fecha_vencimiento').text('El campo Fecha de Vencimiento es obligatorio.')
         }
-        if (enviar != true) {
-            Swal.fire({
-                title: 'Opción Agregar',
-                text: "¿Seguro que desea agregar Producto?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: "#1ab394",
-                confirmButtonText: 'Si, Confirmar',
-                cancelButtonText: "No, Cancelar",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var descripcion_producto = obtenerproducto($('#producto_id').val())
-                    var detalle = {
-                        producto_id: $('#producto_id').val(),
-                        descripcion: descripcion_producto.nombre+' - '+$('#lote').val(),
-                        costo_flete: $('#costo_flete').val(),
-                        precio: $('#precio').val(),
-                        cantidad: $('#cantidad').val(),
-                        lote: $('#lote').val(),
-                        fecha_vencimiento: $('#fecha_vencimiento').val(),
-                    }
-                    agregarTabla(detalle);
-                    sumaTotal()
-                    limpiarDetalle()
 
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelado',
-                        'La Solicitud se ha cancelado.',
-                        'error'
-                    )
-                }
-            })
+        let moneda = $('#moneda').val();
+        let serie_tipo = $('#serie_tipo').val();
+        let numero_tipo = $('#numero_tipo').val();
+        let proveedor_id = $('#proveedor_id').val();
+        let tipo_compra = $('#tipo_compra').val();
 
+        if(moneda == '')
+        {
+            toastr.error("Seleccionar moneda");
+            enviar = false;
         }
+
+        if(serie_tipo == '')
+        {
+            toastr.error("Completar Serie de documento");
+            enviar = false;
+        }
+
+        if(numero_tipo == '')
+        {
+            toastr.error("Completar Numero de documento");
+            enviar = false;
+        }
+
+        if(proveedor_id == '')
+        {
+            toastr.error("Seleccionar proveedor");
+            enviar = false;
+        }
+
+        if(tipo_compra == '')
+        {
+            toastr.error("Seleccionar tipo de compra");
+            enviar = false;
+        }
+        console.log(enviar)
+        $.ajax({
+            dataType: 'json',
+            type: 'post',
+            async: false,
+            url: '{{ route('compras.documento.consulta_store') }}',
+            data: {
+                '_token': $('input[name=_token]').val(),
+                'moneda': $('#moneda').val(),
+                'serie_tipo': $('#serie_tipo').val(),
+                'numero_tipo': $('#numero_tipo').val(),
+                'proveedor_id': $('#proveedor_id').val(),
+                'tipo_compra': $('#tipo_compra').val(),
+            }
+        }).done(function(result) {
+            if(!result.success)
+            {
+                toastr.error('La serie ' + serie_tipo + ' con el numero ' + numero_tipo + ' ya tiene un documento de compra registrado');
+            }
+            else
+            {
+                if (enviar) {
+                    Swal.fire({
+                        title: 'Opción Agregar',
+                        text: "¿Seguro que desea agregar Producto?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: "#1ab394",
+                        confirmButtonText: 'Si, Confirmar',
+                        cancelButtonText: "No, Cancelar",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var descripcion_producto = obtenerproducto($('#producto_id').val())
+                            var detalle = {
+                                producto_id: $('#producto_id').val(),
+                                descripcion: descripcion_producto.nombre+' - '+$('#lote').val(),
+                                costo_flete: $('#costo_flete').val(),
+                                precio: $('#precio').val(),
+                                cantidad: $('#cantidad').val(),
+                                lote: $('#lote').val(),
+                                fecha_vencimiento: $('#fecha_vencimiento').val(),
+                            }
+                            agregarTabla(detalle);
+                            sumaTotal()
+                            limpiarDetalle()
+
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                                'Cancelado',
+                                'La Solicitud se ha cancelado.',
+                                'error'
+                            )
+                        }
+                    })
+                }
+            }
+
+        });
+
     })
 
     function limpiarDetalle() {
@@ -1482,11 +1549,43 @@
     });
 
     $(document).on("change", "#proveedor_id", function () {
-    id = $(this).val();
-    if($("#proveedor_razon").val() != id){
-        $("#proveedor_razon").select2('val',id);
+        id = $(this).val();
+        if($("#proveedor_razon").val() != id){
+            $("#proveedor_razon").select2('val',id);
+        }
+    });
+
+    function obtenerProducts()
+    {
+
+        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+        $("#producto_id").empty().trigger('change');
+        $.ajax({
+            dataType: 'json',
+            url: '{{ route('compras.documento.getProduct') }}',
+            type: 'get',
+            data: {
+                '_token': $('input[name=_token]').val(),
+            },
+            success: function(data) {
+                if (data.productos.length > 0) {
+                    $('#producto_id').append('<option></option>').trigger('change');
+                    for(var i = 0;i < data.productos.length; i++)
+                    {
+                        var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + ' - ' + data.productos[i].codigo_barra + '</option>';
+                        $('#producto_id').append(newOption).trigger('change');
+                        //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
+                    }
+
+                    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+
+                } else {
+                    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+                    toastr.error('Productos no encontrados.', 'Error');
+                }
+            },
+        })
     }
 
-    });
 </script>
 @endpush

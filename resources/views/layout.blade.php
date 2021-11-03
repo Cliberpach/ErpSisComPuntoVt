@@ -52,6 +52,14 @@
                         <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i
                                 class="fa fa-bars"></i> </a>
                     </div>
+                    <ul class="nav navbar-top-links">
+                        <li>
+                            <a href="{{ route('reporte.producto.informe' )}}" title="PRODUCTO INFORME">
+                                <i class="fa fa-question"></i> PI
+                            </a>
+                        </li>
+
+                    </ul>
                     <ul class="nav navbar-top-links navbar-right">
                         <li>
                             <span class="m-r-sm text-muted welcome-message">Bienvenid@ <b>

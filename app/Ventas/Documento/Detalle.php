@@ -51,14 +51,14 @@ class Detalle extends Model
             $kardex->origen = 'VENTA';
             $kardex->numero_doc = $detalle->documento->numero_doc;
             $kardex->fecha = $detalle->documento->fecha_documento;
-            $kardex->cantidad = $detalle->cantidad;            
+            $kardex->cantidad = $detalle->cantidad;
             $kardex->producto_id = $detalle->lote->producto_id;
             $kardex->descripcion = 'CLIENTES VARIOS';
             $kardex->precio = $detalle->precio_nuevo;
             $kardex->importe = $detalle->precio_nuevo * $detalle->cantidad;
             $kardex->stock = $detalle->lote->producto->stock - $detalle->cantidad;
             $kardex->save();
-            
+
         });
 
         static::updated(function(Detalle $detalle){
@@ -69,7 +69,7 @@ class Detalle extends Model
                 $lote->cantidad = $lote->cantidad + $detalle->cantidad;
                 $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
                 $lote->update();
-            }            
+            }
         });
     }
 }

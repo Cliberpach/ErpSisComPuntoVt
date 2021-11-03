@@ -279,32 +279,34 @@
                         <div class="row">
 
                             <div class="col-lg-12">
-                                <div class="panel panel-primary">
+                                <div class="panel panel-primary" id="panel_detalle">
                                     <div class="panel-heading">
                                         <h4 class=""><b>Detalle de la Orden de
                                                 Compra</b></h4>
                                     </div>
-                                    <div class="panel-body">
+                                    <div class="panel-body ibox-content">
 
+                                        <div class="sk-spinner sk-spinner-wave">
+                                            <div class="sk-rect1"></div>
+                                            <div class="sk-rect2"></div>
+                                            <div class="sk-rect3"></div>
+                                            <div class="sk-rect4"></div>
+                                            <div class="sk-rect5"></div>
+                                        </div>
 
-                                        <div class="row">
-
-                                            <div class="col-md-6">
+                                        <div class="row align-items-end">
+                                            <div class="col-10 col-md-4">
                                                 <label class="required">Producto</label>
                                                 <select class="select2_form form-control"
                                                     style="text-transform: uppercase; width:100%" name="producto_id"
                                                     id="producto_id">
-                                                    <option></option>
-                                                    @foreach ($productos as $producto)
-                                                    <option value="{{$producto->id}}">{{$producto->nombre}} - {{$producto->codigo_barra}}
-                                                    </option>
-                                                    @endforeach
                                                 </select>
                                                 <div class="invalid-feedback"><b><span id="error-producto"></span></b>
                                                 </div>
                                             </div>
-
-
+                                            <div class="col-2 col-md-2">
+                                                <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
+                                            </div>
                                         </div>
 
                                         <div class="row">
@@ -486,6 +488,8 @@ $(document).ready(function() {
         $("#tipo_cambio").attr("required", true);
         $("#campo_tipo_cambio").addClass("required")
     }
+
+    obtenerProducts();
 
 })
 
@@ -746,7 +750,7 @@ $(document).ready(function() {
         $("#igv_check").attr('checked', true);
         $('#igv').attr('disabled', false)
         $('#igv_requerido').addClass("required")
-        $('#igv').prop('required', true)        
+        $('#igv').prop('required', true)
         var igv = ($('#igv').val()) + ' %'
         $('#igv_int').text(igv)
 
@@ -763,7 +767,7 @@ $(document).ready(function() {
     sumaTotal()
     //Controlar Error
     $.fn.DataTable.ext.errMode = 'throw';
-    
+
 })
 
 
@@ -1058,7 +1062,7 @@ function sumaTotal() {
 
     var igv = $('#igv').val()
     if (!igv) {
-        sinIgv(subtotal)   
+        sinIgv(subtotal)
     }else{
         conIgv(subtotal)
     }
@@ -1121,15 +1125,38 @@ $(document).on("change", "#proveedor_id", function () {
        $("#proveedor_razon").select2('val',id);
    }
 
- });
+});
+
+function obtenerProducts()
+{
+
+    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+    $("#producto_id").empty().trigger('change');
+    $.ajax({
+        dataType: 'json',
+        url: '{{ route('compras.documento.getProduct') }}',
+        type: 'get',
+        data: {
+            '_token': $('input[name=_token]').val(),
+        },
+        success: function(data) {
+            if (data.productos.length > 0) {
+                $('#producto_id').append('<option></option>').trigger('change');
+                for(var i = 0;i < data.productos.length; i++)
+                {
+                    var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + ' - ' + data.productos[i].codigo_barra + '</option>';
+                    $('#producto_id').append(newOption).trigger('change');
+                    //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
+                }
+
+                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+
+            } else {
+                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+                toastr.error('Productos no encontrados.', 'Error');
+            }
+        },
+    })
+}
 </script>
-
-
-
-
-
-
-
-
-
 @endpush

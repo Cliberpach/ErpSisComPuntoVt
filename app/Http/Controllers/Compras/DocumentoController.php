@@ -161,6 +161,14 @@ class DocumentoController extends Controller
         }
     }
 
+    public function getProduct()
+    {
+        $productos = Producto::where('estado', 'ACTIVO')->get();
+        return response()->json([
+            'productos' => $productos
+        ]);
+    }
+
     public function store(Request $request){
         $this->authorize('haveaccess','documento_compra.index');
         try
@@ -361,6 +369,23 @@ class DocumentoController extends Controller
         $documento = Documento::findOrFail($id);
         $documento->fecha_emision = Carbon::createFromFormat('d/m/Y', $request->get('fecha_emision'))->format('Y-m-d');
         $documento->fecha_entrega = Carbon::createFromFormat('d/m/Y', $request->get('fecha_entrega'))->format('Y-m-d');
+        $documento->sub_total = (float) $request->get('monto_sub_total');
+            $documento->total_igv = (float) $request->get('monto_total_igv');
+            $documento->total = (float) $request->get('monto_total');
+            //-------------------------------
+            if($request->get('moneda') === 'DOLARES')
+            {
+                $documento->sub_total_soles = (float) $request->get('monto_sub_total') * (float) $request->get('tipo_cambio');
+                $documento->total_igv_soles = (float) $request->get('monto_total_igv') * (float) $request->get('tipo_cambio');
+                $documento->total_soles = (float) $request->get('monto_total') * (float) $request->get('tipo_cambio');
+            }
+            else
+            {
+                $documento->sub_total_soles = (float) $request->get('monto_sub_total');
+                $documento->total_igv_soles = (float) $request->get('monto_total_igv');
+                $documento->total_soles = (float) $request->get('monto_total');
+            }
+            //-------------------------------
         $documento->empresa_id = '1';
         $documento->proveedor_id = $request->get('proveedor_id');
         $documento->modo_compra = $request->get('modo_compra');
@@ -402,6 +427,19 @@ class DocumentoController extends Controller
 
             foreach ($productotabla as $detalle) {
                 $producto = Producto::findOrFail($detalle->producto_id);
+                $precio_soles = $detalle->precio;
+                $costo_flete_soles = $detalle->costo_flete;
+                //-------------------------------
+                if($request->get('moneda') === 'DOLARES')
+                {
+                    $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
+                    $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
+                }
+                else
+                {
+                    $precio_soles = (float) $detalle->precio;
+                    $costo_flete_soles = (float) $detalle->costo_flete;
+                }
                 DocumentoDetalle::create([
                     'documento_id' => $documento->id,
                     'producto_id' => $detalle->producto_id,
@@ -411,7 +449,9 @@ class DocumentoController extends Controller
                     'medida_producto' => $producto->medida,
                     'cantidad' => $detalle->cantidad,
                     'precio' => $detalle->precio,
+                    'precio_soles' => $precio_soles,
                     'costo_flete' => $detalle->costo_flete,
+                    'costo_flete_soles' => $costo_flete_soles,
                     'fecha_vencimiento' =>  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d'),
                     'lote' => $detalle->lote,
                 ]);

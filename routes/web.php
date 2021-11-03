@@ -46,6 +46,7 @@ Route::group([
 ],
 function(){
     Route::get('/home', 'HomeController@index')->name('home');
+    Route::get('/home/dashboard', 'HomeController@dashboard')->name('home.dashboard');
 
     Route::get('logout', 'Auth\LoginController@logout')->name('logout');
 
@@ -278,6 +279,7 @@ function(){
         Route::put('/update/{id}', 'Compras\DocumentoController@update')->name('compras.documento.update');
         Route::get('/destroy/{id}', 'Compras\DocumentoController@destroy')->name('compras.documento.destroy');
         Route::get('/show/{id}','Compras\DocumentoController@show')->name('compras.documento.show');
+        Route::get('/getProduct','Compras\DocumentoController@getProduct')->name('compras.documento.getProduct');
         Route::get('/reporte/{id}','Compras\DocumentoController@report')->name('compras.documento.reporte');
 
         Route::get('/tipoPago/{id}','Compras\DocumentoController@TypePay')->name('compras.documento.tipo_pago.existente');
@@ -468,6 +470,14 @@ function(){
         Route::post('proveedor','ImportExcelController@uploadproveedor')->name('ImportExcel.uploadproveedor');
     });
 
+    // Cosultas - Documentos
+    Route::prefix('consultas/documentos')->group(function(){
+
+        Route::get('index', 'Consultas\DocumentoController@index')->name('consultas.documento.index');
+        Route::post('getTable','Consultas\DocumentoController@getTable')->name('consultas.documento.getTable');
+
+    });
+
     // Cosultas - Ventas - Documentos
     Route::prefix('consultas/ventas/documentos')->group(function(){
 
@@ -577,14 +587,25 @@ function(){
         Route::post('getTable','Consultas\Caja\UtilidadController@getTable')->name('consultas.caja.utilidad.getTable');
 
     });
+
+
+    // Reportes - Producto - informe
+    Route::prefix('reportes/producto')->group(function(){
+
+        Route::get('informe', 'Reportes\ProductoController@informe')->name('reporte.producto.informe');
+        Route::get('llenarCompras/{id}', 'Reportes\ProductoController@llenarCompras')->name('reporte.producto.llenarCompras');
+        Route::get('llenarVentas/{id}', 'Reportes\ProductoController@llenarVentas')->name('reporte.producto.llenarVentas');
+        Route::get('getTable', 'Reportes\ProductoController@getTable')->name('reporte.producto.getTable');
+
+    });
 });
 
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
     //https://www.oratlas.com/lector-online-de-texto
+    return comprobantes_empresa();
 
-    return ventas_x_mes();
     return '<h1>SISCOM</h1>';
     $dif = (int)(8-9);
 

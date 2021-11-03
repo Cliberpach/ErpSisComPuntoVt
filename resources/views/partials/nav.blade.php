@@ -129,6 +129,7 @@
     <a href="#"><i class="fa fa-question-circle"></i> <span class="nav-label">Consulta </span><span
             class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
+        <li class="@yield('consulta-comprobantes-active')"><a href="{{ route('consultas.documento.index') }}">Documentos</a></li>
         <li class="@yield('consulta-ventas-active')">
             <a href="#">Ventas <span class="fa arrow"></span></a>
             <ul class="nav nav-third-level">
