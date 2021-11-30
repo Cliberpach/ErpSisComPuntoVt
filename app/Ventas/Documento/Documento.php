@@ -2,6 +2,7 @@
 
 namespace App\Ventas\Documento;
 
+use App\Mantenimiento\Condicion;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
@@ -22,7 +23,7 @@ class Documento extends Model
         'direccion_cliente',
         'cliente',
         'cliente_id',
-
+        'condicion_id',
         'moneda',
         'numero_doc',
         'fecha_documento',
@@ -36,7 +37,6 @@ class Documento extends Model
         'igv',
         'igv_check',
         'tipo_venta',
-        'forma_pago',
         'cotizacion_venta',
         'sunat',
         'envio_sunat',
@@ -59,6 +59,10 @@ class Documento extends Model
         return $this->hasMany('App\Ventas\Nota','documento_id');
     }
 
+    public function condicion()
+    {
+        return $this->belongsTo('App\Mantenimiento\Condicion', 'condicion_id');
+    }
 
     public function empresaEntidad()
     {
@@ -128,11 +132,11 @@ class Documento extends Model
 
     public function formaPago(): string
     {
-        $venta = forma_pago()->where('id', $this->forma_pago)->first();
-        if (is_null($venta))
+        $condicion = Condicion::where('id', $this->condicion_id)->first();
+        if (is_null($condicion))
             return "-";
         else
-            return strval($venta->simbolo);
+            return strval($condicion->descripcion.' '.($condicion->dias > 0 ? $condicion->dias.' dias' : ''));
     }
 
     public function simboloMoneda(): string
@@ -162,9 +166,9 @@ class Documento extends Model
     protected static function booted()
     {
         static::created(function(Documento $documento){
-            //CREAR LOTE PRODUCTO
-            $modo = TablaDetalle::find($documento->forma_pago);
-            if($modo->simbolo === 'CREDITO' || $modo->simbolo === 'credito' || $modo->simbolo === 'CRÉDITO' || $modo->simbolo === 'crédito')
+            //CREAR CUENTA CLIENTE
+            $condicion = Condicion::find($documento->condicion_id);
+            if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
             {
                 $cuenta_cliente = new CuentaCliente();
                 $cuenta_cliente->cotizacion_documento_id = $documento->id;
@@ -178,23 +182,55 @@ class Documento extends Model
         });
 
         static::updated(function(Documento $documento){
-            //ANULAR LOTE producto
             if($documento->cuenta)
-            {
-                $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
-                $cuenta_cliente->numero_doc = $documento->numero_doc;
-                $cuenta_cliente->update();
-            }
+           {
+               $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+               $cuenta_cliente->cotizacion_documento_id = $documento->id;
+               $cuenta_cliente->numero_doc = $documento->numero_doc;
+               $cuenta_cliente->fecha_doc = $documento->fecha_documento;
+               $cuenta_cliente->monto = $documento->total;
+               $cuenta_cliente->acta = 'DOCUMENTO VENTA';
+               $cuenta_cliente->saldo = $documento->total;
+               $cuenta_cliente->update();
+
+               if($cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto') > 0)
+               {
+                   $cuenta_cliente->saldo =  $cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto');
+               }
+               else
+               {
+                   $cuenta_cliente->saldo = 0;
+                   $cuenta_cliente->estado = 'PAGADO';
+               }
+
+               $cuenta_cliente->update();
+           }
+           else
+           {
+               $condicion = Condicion::find($documento->condicion_id);
+               if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
+               {
+                   $cuenta_cliente = new CuentaCliente();
+                   $cuenta_cliente->cotizacion_documento_id = $documento->id;
+                   $cuenta_cliente->numero_doc = $documento->numero_doc;
+                   $cuenta_cliente->fecha_doc = $documento->fecha_documento;
+                   $cuenta_cliente->monto = $documento->total;
+                   $cuenta_cliente->acta = 'DOCUMENTO VENTA';
+                   $cuenta_cliente->saldo = $documento->total;
+                   $cuenta_cliente->save();
+               }
+           }
 
         });
 
         static::deleted(function(Documento $documento){
-            //ANULAR LOTE producto
-            if($documento->cuenta)
-            {
-                $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
-                $cuenta_cliente->delete();
-            }
+           //ANULAR CUENTA
+           if($documento->cuenta)
+           {
+               $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+               $cuenta_cliente->estado = 'ANULADO';
+               $cuenta_cliente->update();
+           }
 
         });
 

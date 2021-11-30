@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Ventas;
 use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Ventas\Cliente;
 use App\Ventas\Cotizacion;
@@ -50,9 +51,10 @@ class CotizacionController extends Controller
         $empresas = Empresa::where('estado', 'ACTIVO')->get();
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $fecha_hoy = Carbon::now()->toDateString();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
         //$lotes = LoteProducto::where('estado', '1')->distinct()->get(['producto_id']);
         $lotes = Producto::where('estado','ACTIVO')->get();
-        return view('ventas.cotizaciones.create', compact('empresas', 'clientes', 'fecha_hoy', 'lotes'));
+        return view('ventas.cotizaciones.create', compact('empresas', 'clientes', 'fecha_hoy', 'lotes', 'condiciones'));
     }
 
     public function store(Request $request)
@@ -61,6 +63,7 @@ class CotizacionController extends Controller
         $rules = [
             'empresa' => 'required',
             'cliente' => 'required',
+            'condicion_id' => 'required',
             'fecha_documento' => 'required',
             'fecha_atencion' => 'nullable',
             'igv' => 'required_if:igv_check,==,on|numeric|digits_between:1,3',
@@ -69,6 +72,7 @@ class CotizacionController extends Controller
         $message = [
             'empresa.required' => 'El campo Empresa es obligatorio',
             'cliente.required' => 'El campo Cliente es obligatorio',
+            'condicion_id.required' => 'El campo condicion es obligatorio',
             'moneda' => 'El campo Moneda es obligatorio',
             'fecha_documento.required' => 'El campo Fecha de Documento es obligatorio',
             'igv.required_if' => 'El campo Igv es obligatorio.',
@@ -86,6 +90,7 @@ class CotizacionController extends Controller
         $cotizacion = new Cotizacion();
         $cotizacion->empresa_id = $request->get('empresa');
         $cotizacion->cliente_id = $request->get('cliente');
+        $cotizacion->condicion_id = $request->get('condicion_id');
         $cotizacion->vendedor_id = $request->get('vendedor');
         $cotizacion->moneda = 4;
         $cotizacion->fecha_documento = $request->get('fecha_documento');
@@ -134,6 +139,7 @@ class CotizacionController extends Controller
         $cotizacion = Cotizacion::findOrFail($id);
         $empresas = Empresa::where('estado', 'ACTIVO')->get();
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
         $fecha_hoy = Carbon::now()->toDateString();
         //$lotes = LoteProducto::where('estado', '1')->distinct()->get(['producto_id']);
         $lotes = Producto::where('estado','ACTIVO')->get();
@@ -144,8 +150,9 @@ class CotizacionController extends Controller
             'empresas' => $empresas,
             'clientes' => $clientes,
             'fecha_hoy' => $fecha_hoy,
+            'condiciones' => $condiciones,
             'lotes' => $lotes,
-            'detalles' => $detalles 
+            'detalles' => $detalles
         ]);
     }
 
@@ -155,6 +162,7 @@ class CotizacionController extends Controller
         $rules = [
             'empresa' => 'required',
             'cliente' => 'required',
+            'condicion_id' => 'required',
             'fecha_documento' => 'required',
             'fecha_atencion' => 'nullable',
             'igv' => 'required_if:igv_check,==,on|numeric|digits_between:1,3',
@@ -163,6 +171,7 @@ class CotizacionController extends Controller
         $message = [
             'empresa.required' => 'El campo Empresa es obligatorio',
             'cliente.required' => 'El campo Cliente es obligatorio',
+            'condicion_id.required' => 'El campo condicion es obligatorio',
             'moneda' => 'El campo Moneda es obligatorio',
             'fecha_documento.required' => 'El campo Fecha de Documento es obligatorio',
             'igv.required_if' => 'El campo Igv es obligatorio.',
@@ -179,6 +188,7 @@ class CotizacionController extends Controller
         $cotizacion =  Cotizacion::findOrFail($id);
         $cotizacion->empresa_id = $request->get('empresa');
         $cotizacion->cliente_id = $request->get('cliente');
+        $cotizacion->condicion_id = $request->get('condicion_id');
         $cotizacion->vendedor_id = $request->get('vendedor');
         $cotizacion->fecha_documento = $request->get('fecha_documento');
         $cotizacion->fecha_atencion = $request->get('fecha_atencion');
@@ -258,13 +268,14 @@ class CotizacionController extends Controller
         $nombre_completo = $cotizacion->user->empleado->persona->apellido_paterno.' '.$cotizacion->user->empleado->persona->apellido_materno.' '.$cotizacion->user->empleado->persona->nombres;
         $presentaciones = presentaciones();
         $detalles = CotizacionDetalle::where('cotizacion_id',$id)->where('estado','ACTIVO')->get();
-
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
 
 
         return view('ventas.cotizaciones.show', [
             'cotizacion' => $cotizacion,
             'detalles' => $detalles,
             'presentaciones' => $presentaciones,
+            'condiciones' => $condiciones,
             'nombre_completo' => $nombre_completo
         ]);
     }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Mantenimiento\Condicion;
 use Illuminate\Database\Seeder;
 use App\Mantenimiento\Tabla\Detalle;
 use App\Ventas\TipoPago;
@@ -1233,7 +1234,7 @@ class TablaDetalleSeeder extends Seeder
         $detalle->editable = 1;
         $detalle->save();
 
-        
+
         //Turnos
         $detalle = new Detalle();
         $detalle->descripcion = "MAÑANA";
@@ -1348,6 +1349,8 @@ class TablaDetalleSeeder extends Seeder
         $detalle->editable = 1;
         $detalle->save();
 
+        //---------TIPO PAGO-----------
+
         $tipo = new TipoPago();
         $tipo->descripcion = "EFECTIVO";
         $tipo->simbolo = 'EFECTIVO';
@@ -1368,6 +1371,17 @@ class TablaDetalleSeeder extends Seeder
         $tipo->estado = 'ACTIVO';
         $tipo->editable = 1;
         $tipo->save();
+
+        //----------CONDICION------------
+        $condicion = new Condicion();
+        $condicion->descripcion = 'CONTADO';
+        $condicion->dias = 0;
+        $condicion->save();
+
+        $condicion = new Condicion();
+        $condicion->descripcion = 'CRÉDITO';
+        $condicion->dias = 10;
+        $condicion->save();
 
     }
 }

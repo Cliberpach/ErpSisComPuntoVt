@@ -110,15 +110,19 @@
     </div>
 </div>
 
+@include('ventas.documentos.modalVentas')
+@include('ventas.documentos.modalPago')
+@include('ventas.documentos.modalPagoShow')
+
 @stop
 @push('styles')
 <!-- DataTable -->
 <link href="{{asset('Inspinia/css/plugins/dataTables/datatables.min.css')}}" rel="stylesheet">
+<link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <style>
     .letrapequeña {
         font-size: 11px;
     }
-
 </style>
 @endpush
 
@@ -126,9 +130,17 @@
 <!-- DataTable -->
 <script src="{{asset('Inspinia/js/plugins/dataTables/datatables.min.js')}}"></script>
 <script src="{{asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js')}}"></script>
-
+<!-- Select2 -->
+<script src="{{ asset('Inspinia/js/plugins/select2/select2.full.min.js') }}"></script>
 <script>
 $(document).ready(function() {
+
+    $(".select2_form").select2({
+            placeholder: "SELECCIONAR",
+            allowClear: true,
+            height: '200px',
+            width: '100%',
+    });
 
     // DataTables
     $('.dataTables-documento').DataTable({
@@ -229,11 +241,11 @@ $(document).ready(function() {
                 render: function(data) {
                     switch (data.estado) {
                         case "PENDIENTE":
-                            return "<span class='badge badge-warning' d-block>" + data.estado +
+                            return "<span class='badge badge-danger' d-block>" + data.estado +
                                 "</span>";
                             break;
                         case "PAGADA":
-                            return "<span class='badge badge-danger' d-block>" + data.estado +
+                            return "<span class='badge badge-primary verPago' style='cursor: pointer;' d-block>" + data.estado +
                                 "</span>";
                             break;
                         case "ADELANTO":
@@ -271,8 +283,8 @@ $(document).ready(function() {
                 data: null,
                 className: "text-center letrapequeña",
                 render: function(data) {
-                    return "<button class='btn btn-info btn-pdf mb-1' title='Detalle'>PDF</button>" +
-                        "<button class='btn btn-info' onclick='xmlElectronico(" +data.id+ ")' title='Detalle'>XML</button>"
+                    return "<button class='btn btn-info btn-pdf mb-1' title='PDF'>PDF</button>" +
+                        "<button class='btn btn-info' onclick='xmlElectronico(" +data.id+ ")' title='XML'>XML</button>"
                 }
             },
             {
@@ -288,12 +300,12 @@ $(document).ready(function() {
 
                     let cadena = "";
 
-                    if(data.sunat === '0' && data.tipo_venta_id != 129 && data.dias > 0) //&& data.dias > 0
+                    if(data.sunat == '0' && data.tipo_venta_id != 129 && data.dias > 0) //&& data.dias > 0
                     {
                         cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }
 
-                    if((data.sunat === '1' || data.notas > 0) && data.sunat != '2')
+                    if((data.sunat === '1' || data.notas > 0))
                     {
                         cadena = cadena  +
                         "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>"
@@ -306,10 +318,22 @@ $(document).ready(function() {
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_devolucion +"'  title='Devoluciones'><i class='fa fa-file-o'></i> Devoluciones</a>" ;
                     }
 
-                    if(data.sunat === '2')
+                    if(data.sunat == '2')
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
+                    }
+
+                    if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')
+                    {
+                        cadena = cadena +
+                        "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
+                    }
+
+                    if(data.code == '1033' && data.regularize == '1')
+                    {
+                        cadena = cadena +
+                        "<button type='button' class='btn btn-sm btn-primary-cdr m-1' onclick='cdr(" + data.id + ")' title='CDR'>CDR</button>";
                     }
 
                     return cadena;
@@ -488,6 +512,56 @@ function xmlElectronico(id) {
 
 }
 
+function cdr(id) {
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger',
+        },
+        buttonsStyling: false
+    })
+
+    Swal.fire({
+        title: "Opción Regularizar CDR",
+        text: "¿Seguro que desea regularizar CDR?",
+        showCancelButton: true,
+        icon: 'info',
+        confirmButtonColor: "#1ab394",
+        confirmButtonText: 'Si, Confirmar',
+        cancelButtonText: "No, Cancelar",
+        // showLoaderOnConfirm: true,
+    }).then((result) => {
+        if (result.value) {
+
+            var url = '{{ route("ventas.documento.cdr", ":id")}}';
+            url = url.replace(':id',id);
+
+            window.location.href = url
+
+            Swal.fire({
+                title: '¡Cargando!',
+                type: 'info',
+                text: 'Regularizando CDR',
+                showConfirmButton: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading()
+                }
+            })
+
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            swalWithBootstrapButtons.fire(
+                'Cancelado',
+                'La Solicitud se ha cancelado.',
+                'error'
+            )
+        }
+    })
+
+}
+
 function  guia(id) {
     Swal.fire({
         title: 'Opción Guia de Remision',
@@ -568,6 +642,107 @@ function enviarSunat(id , sunat) {
 
 }
 
+$(".dataTables-documento").on('click','.pagar',function(){
+    var data = $(".dataTables-documento").dataTable().fnGetData($(this).closest('tr'));
+    $('.ventas-title').html(data.cliente);
+    $('#modal_ventas').modal('show');
+
+    initTable(data.cliente_id, data.condicion_id);
+});
+
+$(".dataTables-documento").on('click','.verPago',function(){
+    var data = $(".dataTables-documento").dataTable().fnGetData($(this).closest('tr'));
+    $('#modal_pago_show .pago-title').html(data.numero_doc);
+    $('#modal_pago_show #monto_venta').val(data.total);
+    $('#modal_pago_show #venta_id').val(data.id);
+    $('#modal_pago_show #div_cuentas').addClass('d-none');
+    if(data.ruta_pago)
+    {
+        let ruta = data.ruta_pago;
+        ruta = ruta.replace('public','');
+        ruta = 'storage'+ruta;
+        let ruta_final = "{{asset(':ruta')}}";
+        ruta_final = ruta_final.replace(':ruta', ruta);
+        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+        $imagenPrevisualizacion.src = ruta_final;
+    }
+    else
+    {
+        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+        $imagenPrevisualizacion.src = "{{asset('img/default.png')}}";
+    }
+
+    if(data.cuenta_id)
+    {
+        $('#modal_pago_show #div_cuentas').removeClass('d-none');
+        initCuentasShow(data.empresa_id,data.cuenta_id);
+    }
+    $('#modal_pago_show #modo_pago').val(data.tipo_pago).trigger('change.select2');
+    if(data.tipo_pago != 1)
+    {
+        $('#modal_pago_show #efectivo').val(data.efectivo);
+        $('#modal_pago_show #importe').val(data.importe);
+    }
+    else
+    {
+        $('#modal_pago_show #efectivo').val('0.00');
+        $('#modal_pago_show #importe').val(data.importe);
+    }
+
+    $('#modal_pago_show .pago-subtitle').html(data.cliente);
+    $('#modal_pago_show').modal('show');
+});
+
+function initCuentasShow(empresa_id,cuenta_id)
+{
+    $("#cuenta_id_show").empty().trigger('change');
+    let timerInterval;
+    Swal.fire({
+        title: 'Cargando...',
+        icon: 'info',
+        customClass: {
+            container: 'my-swal'
+        },
+        timer: 10,
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+            Swal.stopTimer();
+            $.ajax({
+                dataType : 'json',
+                type : 'post',
+                url : '{{ route('ventas.documento.getCuentas') }}',
+                data : {'_token': $('input[name=_token]').val(), 'empresa_id': empresa_id},
+                success: function(response) {
+                    if (response.success) {
+                        if (response.cuentas.length > 0) {
+                            $('#cuenta_id_show').append('<option></option>').trigger('change');
+                            for(var i = 0;i < response.cuentas.length; i++)
+                            {
+                                var newOption = '<option value="'+response.cuentas[i].id+'">'+response.cuentas[i].descripcion + ': ' + response.cuentas[i].num_cuenta +'</option>';
+                                $('#cuenta_id_show').append(newOption).trigger('change');
+                            }
+
+                            $('#cuenta_id_show').val(cuenta_id).trigger('change.select2');
+
+                        } else {
+                            //toastr.error('CuentaS no encontradas.', 'Error');
+                        }
+                        timerInterval = 0;
+                        Swal.resumeTimer();
+                    } else {
+                        timerInterval = 0;
+                        Swal.resumeTimer();
+                    }
+                }
+            });
+        },
+        willClose: () => {
+            clearInterval(timerInterval)
+        }
+    });
+}
+
 @if(!empty($sunat_exito))
     Swal.fire({
         icon: 'success',
@@ -591,8 +766,6 @@ function enviarSunat(id , sunat) {
 @if(Session::has('documento_id'))
     let doc = '{{ Session::get("documento_id")}}';
     let id = doc+'-100';
-
-    console.log(id);
 
     var url = '{{ route("ventas.documento.comprobante", ":id")}}';
     url = url.replace(':id', id);

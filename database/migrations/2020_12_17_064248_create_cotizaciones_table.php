@@ -19,9 +19,10 @@ class CreateCotizacionesTable extends Migration
             $table->foreign('empresa_id')->references('id')->on('empresas')->onDelete('cascade');
             $table->unsignedInteger('cliente_id');
             $table->foreign('cliente_id')->references('id')->on('clientes')->onDelete('cascade');
-            
+            $table->foreignId('condicion_id')->nullable()->constrained()->onDelete('SET NULL');
+
             $table->unsignedInteger('vendedor_id')->nullable();
-            
+
             $table->date('fecha_documento');
             $table->date('fecha_atencion')->nullable();
 

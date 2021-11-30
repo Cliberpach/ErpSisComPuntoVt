@@ -84,26 +84,7 @@
                             </div>
                             <div class="col-lg-12 col-xs-12">
                                 <div class="row">
-                                    <div class="col-lg-4 col-xs-12 select-required">
-                                        <label class="required">Cliente</label>
-                                        <select id="cliente" name="cliente"
-                                            class="select2_form form-control {{ $errors->has('cliente') ? ' is-invalid' : '' }}"
-                                            onchange="obtenerTipo(this)" required>
-                                            <option></option>
-                                            @foreach ($clientes as $cliente)
-                                                <option value="{{ $cliente->id }}"
-                                                    {{ old('cliente') == $cliente->id ? 'selected' : '' }}>
-                                                    {{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @if ($errors->has('cliente'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('cliente') }}</strong>
-                                            </span>
-                                        @endif
-                                    </div>
-                                    <div class="col-lg-3 col-xs-12">
+                                    <div class="col-lg-4 col-xs-12">
                                         <label class="required">Fecha de Atención</label>
                                         <div class="input-group date">
                                             <span class="input-group-addon">
@@ -120,7 +101,7 @@
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="col-lg-2 col-xs-12">
+                                    <div class="col-lg-4 col-xs-12">
                                         <div class="form-group">
                                             <label id="igv_requerido">IGV (%):</label>
                                             <div class="input-group">
@@ -141,7 +122,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-3 col-xs-12">
+                                    <div class="col-lg-4 col-xs-12">
                                         <div class="form-group">
                                             <label class="">Vendedor</label>
                                             <select id="vendedor" name="vendedor" class="select2_form form-control">
@@ -153,6 +134,46 @@
                                                 @endforeach
                                             </select>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6 col-xs-12 select-required">
+                                        <label class="required">Cliente</label>
+                                        <select id="cliente" name="cliente"
+                                            class="select2_form form-control {{ $errors->has('cliente') ? ' is-invalid' : '' }}"
+                                            onchange="obtenerTipo(this)" required>
+                                            <option></option>
+                                            @foreach ($clientes as $cliente)
+                                                <option value="{{ $cliente->id }}"
+                                                    {{ old('cliente') == $cliente->id ? 'selected' : '' }}>
+                                                    {{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @if ($errors->has('cliente'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('cliente') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="col-lg-6 col-xs-12">
+                                        <label class="required">Condición</label>
+                                        <select id="condicion_id" name="condicion_id"
+                                            class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                            required>
+                                            <option></option>
+                                            @foreach ($condiciones as $condicion)
+                                                <option value="{{ $condicion->id }}"
+                                                    {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
+                                                    {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @if ($errors->has('condicion_id'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('condicion_id') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                                 <!-- OBTENER TIPO DE CLIENTE -->

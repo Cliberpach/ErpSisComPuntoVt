@@ -14,6 +14,8 @@ use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Pos\DetalleMovimientoVentaCaja;
 use App\Pos\MovimientoCaja;
 use App\Ventas\Cliente;
+use App\Mantenimiento\Condicion;
+use App\Mantenimiento\Empresa\Banco;
 use App\Ventas\Cotizacion;
 use App\Ventas\CotizacionDetalle;
 use App\Ventas\Documento\Detalle;
@@ -74,20 +76,38 @@ class DocumentoController extends Controller
 
             $cantidad_notas = count($documento->notas);
 
+            $code = '-';
+            if(!empty($documento->getRegularizeResponse))
+            {
+                $json_data = json_decode($documento->getRegularizeResponse, false);
+                $code = $json_data->code;
+            }
+
             $coleccion->push([
                 'id' => $documento->id,
                 'tipo_venta' => $documento->nombreTipo(),
                 'tipo_venta_id' => $documento->tipo_venta,
-                'tipo_pago' => $documento->tipo_pago,
+                'empresa' => $documento->empresaEntidad->razon_social,
+                'tipo_pago' => $documento->tipo_pago_id,
                 'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
                 'serie' => $documento->serie,
                 'correlativo' => $documento->correlativo,
                 'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
                 'empresa' => $documento->empresa,
+                'empresa_id' => $documento->empresa_id,
+                'cliente_id' => $documento->cliente_id,
                 'cotizacion_venta' =>  $documento->cotizacion_venta,
                 'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
-                'estado' => $documento->estado,
+                'estado' => $documento->estado_pago,
+                'condicion' => $documento->condicion->descripcion,
+                'condicion_id' => $documento->condicion_id,
+                'ruta_pago' => $documento->ruta_pago,
+                'cuenta_id' => $documento->banco_empresa_id,
+                'importe' => $documento->importe,
+                'efectivo' => $documento->efectivo,
                 'sunat' => $documento->sunat,
+                'regularize' => $documento->regularize,
+                'code' => $code,
                 'otros' => 'S/. '.number_format($otros, 2, '.', ''),
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
@@ -100,6 +120,142 @@ class DocumentoController extends Controller
         return DataTables::of($coleccion)->toJson();
     }
 
+    public function getDocumentClient(Request $request)
+    {
+        $documentos = Documento::where('estado','!=','ANULADO')->where('cliente_id', $request->cliente_id)->where('estado_pago', 'PENDIENTE')->where('condicion_id', $request->condicion_id)->orderBy('id', 'desc')->get();
+        $coleccion = collect([]);
+
+        $hoy = Carbon::now();
+        foreach($documentos as $documento){
+
+            $transferencia = 0.00;
+            $otros = 0.00;
+            $efectivo = 0.00;
+
+            if($documento->tipo_pago_id)
+            {
+                if ($documento->tipo_pago_id == 1) {
+                    $efectivo = $documento->importe;
+                }
+                else if ($documento->tipo_pago_id == 2){
+                    $transferencia = $documento->importe ;
+                    $efectivo = $documento->efectivo;
+                }
+                else {
+                    $otros = $documento->importe;
+                    $efectivo = $documento->efectivo;
+                }
+            }
+
+            $fecha_v = $documento->created_at;
+            $diff =  $fecha_v->diffInDays($hoy);
+
+            $cantidad_notas = count($documento->notas);
+
+            $coleccion->push([
+                'id' => $documento->id,
+                'tipo_venta' => $documento->nombreTipo(),
+                'tipo_venta_id' => $documento->tipo_venta,
+                'empresa' => $documento->empresaEntidad->razon_social,
+                'tipo_pago' => $documento->tipo_pago_id,
+                'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
+                'serie' => $documento->serie,
+                'correlativo' => $documento->correlativo,
+                'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
+                'empresa' => $documento->empresa,
+                'empresa_id' => $documento->empresa_id,
+                'cotizacion_venta' =>  $documento->cotizacion_venta,
+                'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
+                'estado' => $documento->estado_pago,
+                'condicion' => $documento->condicion->descripcion,
+                'sunat' => $documento->sunat,
+                'otros' => 'S/. '.number_format($otros, 2, '.', ''),
+                'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
+                'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
+                'total' => number_format($documento->total, 2, '.', ''),
+                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff),
+                'notas' => $cantidad_notas
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'ventas' => $coleccion
+        ]);
+    }
+
+    public function storePago(Request $request)
+    {
+        try
+        {
+            DB::beginTransaction();
+            $data = $request->all();
+
+            $rules = [
+                'tipo_pago_id'=> 'required',
+                'efectivo'=> 'required',
+                'importe'=> 'required',
+
+            ];
+
+            $message = [
+                'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
+                'importe.required' => 'El campo importe es obligatorio.',
+                'efectivo.required' => 'El campo efectivo es obligatorio.'
+            ];
+
+            $validator =  Validator::make($data, $rules, $message);
+
+            if ($validator->fails()) {
+                $clase = $validator->getMessageBag()->toArray();
+                $cadena = "";
+                foreach($clase as $clave => $valor) {
+                    $cadena =  $cadena . "$valor[0] ";
+                }
+
+                Session::flash('error_store_pago',$cadena);
+                DB::rollBack();
+                return redirect()->route('ventas.documento.index');
+            }
+
+            $documento = Documento::find($request->venta_id);
+
+            $documento->tipo_pago_id = $request->get('tipo_pago_id');
+            $documento->importe = $request->get('importe');
+            $documento->efectivo = $request->get('efectivo');
+            $documento->estado_pago = 'PAGADA';
+            $documento->banco_empresa_id = $request->get('cuenta_id');
+            if($request->hasFile('imagen')){
+                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'pagos'))) {
+                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'pagos'));
+                }
+                $documento->ruta_pago = $request->file('imagen')->store('public/pagos');
+            }
+            $documento->update();
+
+
+
+            DB::commit();
+            Session::flash('success','Documento pagado con exito.');
+            return redirect()->route('ventas.documento.index');
+        }
+        catch(Exception $e)
+        {
+            DB::rollBack();
+            Session::flash('error',$e->getMessage());
+            return redirect()->route('ventas.documento.index');
+        }
+    }
+
+    public function getCuentas(Request $request)
+    {
+        $cuentas = Banco::where('empresa_id',$request->empresa_id)->get();
+        return response()->json([
+            'success' => true,
+            'cuentas' => $cuentas
+        ]);
+    }
+
     public function create(Request $request)
     {
         $this->authorize('haveaccess','documento_venta.index');
@@ -107,6 +263,7 @@ class DocumentoController extends Controller
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $fecha_hoy = Carbon::now()->toDateString();
         $productos = Producto::where('estado', 'ACTIVO')->get();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
 
         $cotizacion = '';
         $detalles = '';
@@ -176,6 +333,7 @@ class DocumentoController extends Controller
                 'empresas' => $empresas,
                 'clientes' => $clientes,
                 'productos' => $productos,
+                'condiciones' => $condiciones,
                 'lotes' => $nuevoDetalle,
                 'errores' => $errores,
                 'fecha_hoy' => $fecha_hoy,
@@ -188,6 +346,7 @@ class DocumentoController extends Controller
                 'empresas' => $empresas,
                 'clientes' => $clientes,
                 'productos' => $productos,
+                'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
             ]);
         }
@@ -318,7 +477,7 @@ class DocumentoController extends Controller
                 'fecha_documento_campo'=> 'required',
                 'fecha_atencion_campo'=> 'required',
                 'tipo_venta'=> 'required',
-                'forma_pago'=> 'required',
+                'condicion_id'=> 'required',
                 'tipo_pago_id'=> 'nullable',
                 'efectivo'=> 'required',
                 'importe'=> 'required',
@@ -332,7 +491,7 @@ class DocumentoController extends Controller
             $message = [
                 'fecha_documento_campo.required' => 'El campo Fecha de Emisión es obligatorio.',
                 'tipo_venta.required' => 'El campo tipo de venta es obligatorio.',
-                'forma_pago.required' => 'El campo forma de pago es obligatorio.',
+                'condicion_id.required' => 'El campo condición de pago es obligatorio.',
                 //'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
                 'importe.required' => 'El campo importe es obligatorio.',
                 'efectivo.required' => 'El campo efectivo es obligatorio.',
@@ -370,6 +529,11 @@ class DocumentoController extends Controller
             //CLIENTE
             $cliente = Cliente::findOrFail($request->get('cliente_id'));
 
+            //CONDICION
+            $cadena = explode('-',$request->get('condicion_id'));
+            $condicion = Condicion::findOrFail($cadena[0]);
+            $documento->condicion_id = $condicion->id;
+
             $documento->tipo_documento_cliente =  $cliente->tipo_documento;
             $documento->documento_cliente =  $cliente->documento;
             $documento->direccion_cliente =  $cliente->direccion;
@@ -377,7 +541,6 @@ class DocumentoController extends Controller
             $documento->cliente_id = $request->get('cliente_id'); //OBTENER TIENDA DEL CLIENTE
 
             $documento->tipo_venta = $request->get('tipo_venta');
-            $documento->forma_pago = $request->get('forma_pago');
             $documento->observacion = $request->get('observacion');
             $documento->user_id = auth()->user()->id;
             $documento->sub_total = $request->get('monto_sub_total');
@@ -463,7 +626,7 @@ class DocumentoController extends Controller
                     $envio_ = self::sunat_valida($documento->id);
                     $documento->envio_sunat = '1';
                 }
-                $vp = self::venta_comprobante($documento->id);
+                //$vp = self::venta_comprobante($documento->id);
                 $ve = self::venta_email($documento->id);
                 Session::flash('success','Documento de venta creado.');
 
@@ -474,7 +637,7 @@ class DocumentoController extends Controller
             }
             else{
                 DB::commit();
-                $vp = self::venta_comprobante($documento->id);
+                //$vp = self::venta_comprobante($documento->id);
                 $ve = self::venta_email($documento->id);
                 Session::flash('success','Documento de venta creado.');
                 return response()->json([

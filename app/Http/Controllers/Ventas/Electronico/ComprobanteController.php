@@ -298,4 +298,40 @@ class ComprobanteController extends Controller
         }
 
     }
+
+    public function cdr($id)
+    {
+
+        try
+        {
+            $documento = Documento::findOrFail($id);
+            $json_data = json_decode($documento->getRegularizeResponse, false);
+            if($documento->regularize == '1' && $json_data->code == '1033')
+            {
+                $documento->regularize = '0';
+                $documento->sunat = '1';
+                $documento->update();
+                Session::flash('success','Documento de Venta regularizado con exito.');
+                return view('ventas.documentos.index',[
+
+                    'id_sunat' => $documento->serie.'-'.$documento->correlativo,
+                    'descripcion_sunat' => 'CDR regularizado.',
+                    'notas_sunat' => '',
+                    'sunat_exito' => true
+
+                ])->with('sunat_exito', 'success');
+            }
+            else
+            {
+                Session::flash('error','Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
+                return redirect()->route('ventas.documento.index')->with('sunat_existe', 'error');
+            }
+        }
+        catch(Exception $e)
+        {
+            Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
+            return redirect()->route('ventas.documento.index');
+        }
+
+    }
 }

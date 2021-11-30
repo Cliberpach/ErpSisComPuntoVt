@@ -184,17 +184,33 @@
 
                                 <div class="form-group row">
                                     <div class="col-lg-6 col-xs-12 select-required">
-                                        <label class="required">Forma de pago</label>
-                                        <select name="forma_pago" id="forma_pago"
-                                            class="select2_form form-control {{ $errors->has('forma_pago') ? ' is-invalid' : '' }}"
-                                            style="text-transform: uppercase; width:100%" value="{{ old('forma_pago') }}" required>
-                                            <option value=""></option>
-                                            @foreach (forma_pago() as $pago)
-                                                <option value="{{ $pago->id }}"
-                                                    {{ $pago->descripcion === 'CONTADO' ? 'selected' : '' }}>
-                                                    {{ $pago->descripcion }}</option>
+                                        @if (!empty($cotizacion))
+                                        <label class="required">Condición</label>
+                                        <select id="condicion_id" name="condicion_id"
+                                            class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                            required disabled>
+                                            <option></option>
+                                            @foreach ($condiciones as $condicion)
+                                                <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
+                                                    {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }}>
+                                                    {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                </option>
                                             @endforeach
                                         </select>
+                                        @else
+                                        <label class="required">Condición</label>
+                                        <select id="condicion_id" name="condicion_id"
+                                            class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                            required>
+                                            <option></option>
+                                            @foreach ($condiciones as $condicion)
+                                                <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
+                                                    {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
+                                                    {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @endif
                                     </div>
                                     <div class="col-lg-6 col-xs-12" id="fecha_vencimiento">
                                         <label class="required">Fecha de vencimiento</label>
@@ -445,7 +461,6 @@
 </div>
 @include('ventas.documentos.modal')
 @include('ventas.documentos.modalLote')
-@include('ventas.documentos.modalPago')
 @include('ventas.documentos.modalCliente')
 @stop
 
@@ -595,13 +610,8 @@
     });
 
     $(document).ready(function() {
+        changeFormaPago();
         $(".select2_form").select2({
-            placeholder: "SELECCIONAR",
-            allowClear: true,
-            width: '100%',
-        });
-
-        $("#forma_pago").select2({
             placeholder: "SELECCIONAR",
             allowClear: true,
             width: '100%',
@@ -625,6 +635,20 @@
             })
         @endif
     });
+
+    function changeFormaPago()
+    {
+        let condicion_id = $('#condicion_id').val();
+        let cadena = condicion_id.split('-');
+        if(cadena[1] == 'CONTADO')
+        {
+            $('#fecha_vencimiento').addClass('d-none');
+        }
+        else
+        {
+            $('#fecha_vencimiento').removeClass('d-none');
+        }
+    }
 
     function obtenerProducto(id) {
         // Consultamos nuestra BBDD
@@ -1147,11 +1171,11 @@
 
     function validarTipo() {
 
-        var enviar = false
+        var enviar = true
 
         if ($('#tipo_cliente_documento').val() == '0' && $('#tipo_venta').val() == 'FACTURA') {
             toastr.error('El tipo de documento del cliente es diferente a RUC.', 'Error');
-            enviar = true;
+            enviar = false;
         }
         return enviar
 
@@ -1172,7 +1196,23 @@
             $('#monto_venta').val(total);
             $('#importe_venta').val(total);
             let forma_pago = $('#forma_pago').val();
-            if(convertFloat(forma_pago) === 161)
+            let condicion_id = $('#condicion_id').val();
+            let cadena = condicion_id.split('-');
+            if(cadena[1] != 'CONTADO')
+            {
+                $('#importe_form').val(0.00);
+                $('#efectivo_form').val(0.00);
+                $('#tipo_pago_id').val('');
+                enviarVenta();
+            }
+            else
+            {
+                $('#importe_form').val(0.00);
+                $('#efectivo_form').val(0.00);
+                $('#tipo_pago_id').val('');
+                enviarVenta();
+            }
+            /*if(convertFloat(forma_pago) === 161)
             {
                 $('#importe_form').val(0.00);
                 $('#efectivo_form').val(0.00);
@@ -1183,7 +1223,7 @@
             {
                 $('#modal_pago').modal('show');
                 $('#modo_pago').val('1-EFECTIVO').trigger('change.select2');
-            }
+            }*/
         }
     });
 
@@ -1227,7 +1267,7 @@
         let correcto = true;
         let moneda = $('#moneda').val();
         let observacion = $('#observacion').val();
-        let forma_pago = $('#forma_pago').val();
+        let condicion_id = $('#condicion_id').val();
         let fecha_documento_campo = $('#fecha_documento_campo').val();
         let fecha_atencion_campo = $('#fecha_atencion_campo').val();
         let fecha_vencimiento_campo = $('#fecha_vencimiento_campo').val();
@@ -1246,9 +1286,9 @@
             correcto = false;
             toastr.error('El campo moneda es requerido.');
         }
-        if (forma_pago == null || forma_pago == '') {
+        if (condicion_id == null || condicion_id == '') {
             correcto = false;
-            toastr.error('El campo forma de pago es requerido.');
+            toastr.error('El campo condicion de pago es requerido.');
         }
         if (fecha_documento_campo == null || fecha_documento_campo == '') {
             correcto = false;
@@ -1454,7 +1494,7 @@
 
                 var tipo = validarTipo();
 
-                if (tipo == false) {
+                if (tipo) {
                     cargarProductos();
                     //CARGAR DATOS TOTAL
                     $('#monto_sub_total').val($('#subtotal').text())
@@ -1467,6 +1507,7 @@
                     document.getElementById("fecha_atencion_campo").disabled = false;
                     document.getElementById("empresa_id").disabled = false;
                     document.getElementById("cliente_id").disabled = false;
+                    document.getElementById("condicion_id").disabled = false;
                     //HABILITAR EL CARGAR PAGINA
                     //$('#asegurarCierre').val(2)
                     //$('#enviar_documento').submit();
@@ -1537,6 +1578,14 @@
                             {
                                 let mensaje = sHtmlErrores(result.value.data.mensajes);
                                 toastr.error(mensaje);
+                                $('#asegurarCierre').val(1);
+                                document.getElementById("moneda").disabled = true;
+                                document.getElementById("observacion").disabled = true;
+                                document.getElementById("fecha_documento_campo").disabled = true;
+                                document.getElementById("fecha_atencion_campo").disabled = true;
+                                document.getElementById("empresa_id").disabled = true;
+                                document.getElementById("cliente_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                             }
                             else if(result.value.success)
                             {
@@ -1553,6 +1602,7 @@
                             }
                             else
                             {
+                                $('#asegurarCierre').val(1);
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
@@ -1563,6 +1613,13 @@
                                     showConfirmButton: false,
                                     timer: 2500
                                 });
+                                document.getElementById("moneda").disabled = true;
+                                document.getElementById("observacion").disabled = true;
+                                document.getElementById("fecha_documento_campo").disabled = true;
+                                document.getElementById("fecha_atencion_campo").disabled = true;
+                                document.getElementById("empresa_id").disabled = true;
+                                document.getElementById("cliente_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                             }
                         }
                     });
@@ -1603,7 +1660,6 @@
 <script>
     window.onbeforeunload = function() {
         //DEVOLVER CANTIDADES
-        console.log($('#asegurarCierre').val())
         if ($('#asegurarCierre').val() == 1) {
             devolverCantidades()
         }

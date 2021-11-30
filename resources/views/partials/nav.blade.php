@@ -200,6 +200,9 @@
         @can('haveaccess', 'empresa.index')
         <li class="@yield('empresas-active')"><a href="{{ route('mantenimiento.empresas.index') }}">Empresas</a></li>
         @endcan
+        @can('haveaccess','condicion.index')
+            <li class="@yield('condicion-active')"><a href="{{ route('mantenimiento.condiciones.index') }}">Condiciones de Pago</a></li>
+            @endcan
         @can('haveaccess', 'tabla.index')
         <li class="@yield('tablas-active')"><a href="{{ route('mantenimiento.tabla.general.index') }}">Tablas Generales</a></li>
         @endcan

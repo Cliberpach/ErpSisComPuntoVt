@@ -111,6 +111,15 @@ function(){
         Route::get('obtenerNumeracion/{id}','Mantenimiento\Empresa\EmpresaController@obtenerNumeracion')->name('mantenimiento.empresas.obtenerNumeracion');
 
     });
+    //Condiciones
+    Route::prefix('mantenimiento/condiciones')->group(function() {
+        Route::get('index', 'Mantenimiento\CondicionController@index')->name('mantenimiento.condiciones.index');
+        Route::get('getRepository','Mantenimiento\CondicionController@getRepository')->name('mantenimiento.condiciones.getRepository');
+        Route::post('store', 'Mantenimiento\CondicionController@store')->name('mantenimiento.condiciones.store');
+        Route::get('destroy/{id}', 'Mantenimiento\CondicionController@destroy')->name('mantenimiento.condiciones.destroy');
+        Route::put('update', 'Mantenimiento\CondicionController@update')->name('mantenimiento.condiciones.update');
+        Route::post('condicion/exist', 'Mantenimiento\CondicionController@exist')->name('mantenimiento.condiciones.exist');
+    });
     // Ubigeo
     Route::prefix('mantenimiento/ubigeo')->group(function() {
         Route::post('/provincias', 'Mantenimiento\Ubigeo\UbigeoController@provincias')->name('mantenimiento.ubigeo.provincias');
@@ -358,6 +367,10 @@ function(){
         //Route::get('comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
         Route::get('xml/{id}','Ventas\DocumentoController@xml')->name('ventas.documento.xml');
 
+        Route::post('getDocumentClient','Ventas\DocumentoController@getDocumentClient')->name('ventas.getDocumentClient');
+        Route::post('/storePago', 'Ventas\DocumentoController@storePago')->name('ventas.documento.storePago');
+        Route::post('/getCuentas', 'Ventas\DocumentoController@getCuentas')->name('ventas.documento.getCuentas');
+
         Route::post('cantidad', 'Ventas\DocumentoController@quantity')->name('ventas.documento.cantidad');
         Route::post('devolver/cantidad', 'Ventas\DocumentoController@returnQuantity')->name('ventas.documento.devolver.cantidades');
         Route::post('obtener/lote', 'Ventas\DocumentoController@returnLote')->name('ventas.documento.obtener.lote');
@@ -373,6 +386,7 @@ function(){
         Route::get('/', 'Ventas\Electronico\ComprobanteController@index')->name('ventas.comprobantes');
         Route::get('getVouchers','Ventas\Electronico\ComprobanteController@getVouchers')->name('ventas.getVouchers');
         Route::get('sunat/{id}','Ventas\Electronico\ComprobanteController@sunat')->name('ventas.documento.sunat');
+        Route::get('cdr/{id}','Ventas\Electronico\ComprobanteController@cdr')->name('ventas.documento.cdr');
     });
 
     //GUIAS DE REMISION

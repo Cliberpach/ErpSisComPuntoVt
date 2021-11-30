@@ -10,6 +10,7 @@ class Cotizacion extends Model
     protected $fillable = [
         'empresa_id',
         'cliente_id',
+        'condicion_id',
         'fecha_documento',
         'fecha_atencion',
         'sub_total',
@@ -24,6 +25,11 @@ class Cotizacion extends Model
     public function empresa()
     {
         return $this->belongsTo('App\Mantenimiento\Empresa\Empresa', 'empresa_id');
+    }
+
+    public function condicion()
+    {
+        return $this->belongsTo('App\Mantenimiento\Condicion', 'condicion_id');
     }
 
     public function cliente()
