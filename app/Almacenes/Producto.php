@@ -43,6 +43,10 @@ class Producto extends Model
     {
         return $this->hasMany('App\Almacenes\ProductoDetalle');
     }
+    public function tipoCliente()
+    {
+        return $this->hasMany('App\Almacenes\TipoCliente','producto_id', 'id');
+    }
     public function getDescripcionCompleta()
     {
         return $this->codigo.' - '.$this->nombre;

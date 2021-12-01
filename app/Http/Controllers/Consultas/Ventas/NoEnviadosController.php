@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use App\Events\DocumentoNumeracion;
+use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Pos\DetalleMovimientoVentaCaja;
 use App\Ventas\Cliente;
@@ -18,6 +19,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Luecano\NumeroALetras\NumeroALetras;
+use Yajra\DataTables\Facades\DataTables;
 
 class NoEnviadosController extends Controller
 {
@@ -75,13 +77,13 @@ class NoEnviadosController extends Controller
                 'empresa' => $documento->empresa,
                 'cotizacion_venta' =>  $documento->cotizacion_venta,
                 'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
-                'estado' => $documento->estado,
+                'estado' => $documento->estado_pago,
                 'sunat' => $documento->sunat,
                 'otros' => 'S/. '.number_format($otros, 2, '.', ''),
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff),
+                'dias' => (int)(5 - $diff < 0 ? 0  : 5 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -329,24 +331,20 @@ class NoEnviadosController extends Controller
 
     public function edit($id)
     {
-        $this->authorize('haveaccess','documento_compra.index');
+        $this->authorize('haveaccess','documento_venta.index');
         $empresas = Empresa::where('estado', 'ACTIVO')->get();
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $productos = Producto::where('estado', 'ACTIVO')->get();
         $documento = Documento::findOrFail($id);
         $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->with(['lote','lote.producto'])->get();
-        foreach($detalles as $detalle)
-        {
-            $lote = LoteProducto::find($detalle->lote_id);
-            $lote->cantidad_logica = $lote->cantidad_logica - $detalle->cantidad;
-            $lote->update();
-        }
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
         return view('consultas.ventas.documentos_no.edit',[
             'documento' => $documento,
             'detalles' => $detalles,
             'empresas' => $empresas,
             'clientes' => $clientes,
-            'productos' => $productos
+            'productos' => $productos,
+            'condiciones' => $condiciones,
         ]);
     }
 
@@ -362,8 +360,8 @@ class NoEnviadosController extends Controller
             $rules = [
                 'fecha_documento_campo'=> 'required',
                 'fecha_atencion_campo'=> 'required',
-                'tipo_venta'=> 'required',
-                'forma_pago'=> 'required',
+                //'tipo_venta'=> 'required',
+                'condicion_id'=> 'required',
                 'tipo_pago_id'=> 'nullable',
                 'efectivo'=> 'required',
                 'importe'=> 'required',
@@ -376,8 +374,8 @@ class NoEnviadosController extends Controller
 
             $message = [
                 'fecha_documento_campo.required' => 'El campo Fecha de Emisión es obligatorio.',
-                'tipo_venta.required' => 'El campo tipo de venta es obligatorio.',
-                'forma_pago.required' => 'El campo forma de pago es obligatorio.',
+                //'tipo_venta.required' => 'El campo tipo de venta es obligatorio.',
+                'condicion_id.required' => 'El campo condición de pago es obligatorio.',
                 //'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
                 'importe.required' => 'El campo importe es obligatorio.',
                 'efectivo.required' => 'El campo efectivo es obligatorio.',
@@ -403,6 +401,7 @@ class NoEnviadosController extends Controller
             }
 
             $documento = Documento::find($id);
+            $monto = $documento->total;
             $documento->fecha_documento = $request->get('fecha_documento_campo');
             $documento->fecha_atencion =  $request->get('fecha_atencion_campo');
             $documento->fecha_vencimiento =  $request->get('fecha_vencimiento_campo');
@@ -415,29 +414,39 @@ class NoEnviadosController extends Controller
             //CLIENTE
             $cliente = Cliente::findOrFail($request->get('cliente_id'));
 
+            //CONDICION
+            $cadena = explode('-',$request->get('condicion_id'));
+            $condicion = Condicion::findOrFail($cadena[0]);
+            $documento->condicion_id = $condicion->id;
+
             $documento->tipo_documento_cliente =  $cliente->tipo_documento;
             $documento->documento_cliente =  $cliente->documento;
             $documento->direccion_cliente =  $cliente->direccion;
             $documento->cliente =  $cliente->nombre;
             $documento->cliente_id = $request->get('cliente_id');
 
-            $documento->tipo_venta = $request->get('tipo_venta');
-            $documento->forma_pago = $request->get('forma_pago');
+            //$documento->tipo_venta = $request->get('tipo_venta');
+            //$documento->forma_pago = $request->get('forma_pago');
             $documento->observacion = $request->get('observacion');
-            $documento->user_id = auth()->user()->id;
+            //$documento->user_id = auth()->user()->id;
             $documento->sub_total = $request->get('monto_sub_total');
             $documento->total_igv = $request->get('monto_total_igv');
             $documento->total = $request->get('monto_total');
             $documento->igv = $request->get('igv') ? $request->get('igv') : 18;
             $documento->moneda = 1;
 
-            $documento->tipo_pago_id = $request->get('tipo_pago_id');
-            $documento->importe = $request->get('importe');
-            $documento->efectivo = $request->get('efectivo');
+            if($monto != $request->get('monto_total'))
+            {
+                $documento->tipo_pago_id = $request->get('tipo_pago_id');
+                $documento->importe = $request->get('importe');
+                $documento->efectivo = $request->get('efectivo');
+                $documento->estado_pago = 'PENDIENTE';
+            }
 
             if ($request->get('igv_check') == "on") {
                 $documento->igv_check = "1";
-            };
+            }
+
             $numero_doc = $documento->id;
             $documento->numero_doc = 'VENTA-'.$numero_doc;
             $documento->update();
@@ -448,6 +457,9 @@ class NoEnviadosController extends Controller
             $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id',$id)->get();
             foreach($detalles as $item)
             {
+                // $lote = LoteProducto::findOrFail($item->lote_id);
+                // $lote->cantidad =  $lote->cantidad + $item->cantidad;
+                // $lote->update();
                 $item->estado = 'ANULADO';
                 $item->update();
             }
@@ -457,6 +469,7 @@ class NoEnviadosController extends Controller
                 {
                     $lote = LoteProducto::findOrFail($producto->lote_id);
                     $detalle = Detalle::find($producto->detalle_id);
+                    $cantidad = $detalle->cantidad;
                     $detalle->codigo_producto = $lote->producto->codigo;
                     $detalle->unidad = $lote->producto->getMedida();
                     $detalle->nombre_producto = $lote->producto->nombre;
@@ -473,6 +486,14 @@ class NoEnviadosController extends Controller
                     $detalle->update();
 
                     $lote->cantidad =  $lote->cantidad - $producto->cantidad;
+                    if($producto->cantidad - $cantidad >= 0)
+                    {
+                        $lote->cantidad_logica =  $lote->cantidad_logica - $cantidad;
+                    }
+                    else
+                    {
+                        $lote->cantidad_logica =  $lote->cantidad_logica + (($cantidad - $producto->cantidad) - $cantidad);
+                    }
                     $lote->update();
                 }
                 else
@@ -528,9 +549,8 @@ class NoEnviadosController extends Controller
         }
     }
 
-    public function getLot()
+    public function getLot($id)
     {
-        $this->authorize('haveaccess','nota_salida.index');
         return datatables()->query(
             DB::table('lote_productos')
             ->join('productos_clientes','productos_clientes.producto_id','=','lote_productos.producto_id')
@@ -547,6 +567,47 @@ class NoEnviadosController extends Controller
             ->orderBy('lote_productos.id','ASC')
             ->where('productos_clientes.estado','ACTIVO')
         )->toJson();
+    }
+
+    public function getLotRecientes($id)
+    {
+        $detalles = Detalle::where('estado','ACTIVO')->where('documento_id', $id)->get();
+        $colecction = collect([]);
+        foreach($detalles as $detalle)
+        {
+            $precio_soles = 0;
+            if(!empty($detalle->lote->detalle_compra))
+            {
+                $precio_soles = $detalle->lote->detalle_compra->precio_soles;
+            }
+
+            $colecction->push([
+                'id' => $detalle->lote->id,
+                'detalle_id' => $detalle->id,
+                'precio_soles' => $precio_soles,
+                'precio_nuevo' => $detalle->precio_nuevo,
+                'precio_inicial' => $detalle->precio_inicial,
+                'precio_unitario' => $detalle->precio_unitario,
+                'valor_unitario' => $detalle->valor_unitario,
+                'valor_venta' => $detalle->valor_venta,
+                'dinero' => $detalle->dinero,
+                'descuento' => $detalle->descuento,
+                'nombre' => $detalle->lote->producto->nombre,
+                'codigo_barra' => $detalle->lote->producto->codigo_barra,
+                'cliente' => $detalle->lote->producto->tipoCliente->where('cliente', 121)->first()->cliente,
+                'monto' => $detalle->lote->producto->tipoCliente->where('cliente', 121)->first()->monto,
+                'moneda' => $detalle->lote->producto->tipoCliente->where('cliente', 121)->first()->moneda,
+                'unidad_producto' => $detalle->lote->producto->getMedida(),
+                'descripcion' => $detalle->lote->producto->categoria->descripcion,
+                'fecha_venci' => $detalle->lote->fecha_vencimiento,
+                'codigo_lote' => $detalle->lote->codigo_lote,
+                'cantidad' => $detalle->lote->cantidad,
+                'cantidad_logica' => $detalle->cantidad,
+            ]);
+
+
+        }
+        return DataTables::of($colecction)->make(true);
     }
 
     //CAMBIAR CANTIDAD LOGICA DEL LOTE
@@ -583,65 +644,50 @@ class NoEnviadosController extends Controller
         $cantidades = $data['cantidades'];
         $productosJSON = $cantidades;
         $productotabla = json_decode($productosJSON);
+
+        $detalles_aux = $data['detalles'];
+        $productos = $detalles_aux;
+        $detalles = json_decode($productos);
+
         $mensaje = '';
         foreach ($productotabla as $detalle) {
-            //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
-            $lote = LoteProducto::findOrFail($detalle->lote_id);
-            $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
-            //$lote->cantidad =  $lote->cantidad_logica;
-            $lote->estado = '1';
-            $lote->update();
-            $mensaje = 'Cantidad devuelta';
-        };
-
-        return $mensaje;
-    }
-
-    //DEVOLVER CANTIDAD LOGICA AL CERRAR VENTANA EDIT
-    public function returnQuantityEdit(Request $request)
-    {
-        $data = $request->all();
-        $cantidades = $data['cantidades'];
-        $productosJSON = $cantidades;
-        $productotabla = json_decode($productosJSON);
-        $mensaje = '';
-        foreach ($productotabla as $detalle) {
-            //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
-            $lote = LoteProducto::findOrFail($detalle->lote_id);
-            if($detalle->detalle_id != 0)
+            $cont = 0;
+            $existe = false;
+            $indice =  -1;
+            while($cont < count($detalles))
             {
-                $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
-            }else
-            {
-                $detalle_venta = Detalle::find($detalle->detalle_id);
-                if($detalle_venta)
+                if($detalles[$cont]->id == $detalle->detalle_id)
                 {
-                    $lote->cantidad_logica = ($lote->cantidad_logica + $detalle->cantidad) - $detalle_venta->cantidad;
+                    $existe = true;
+                    $indice = $cont;
+                    $cont = count($detalles);
                 }
+                $cont = $cont + 1;
             }
 
-            $lote->update();
+            if($existe)
+            {
+                if($indice >= 0)
+                {
+                    $lot = $detalles[$indice];
 
-            $mensaje = 'Cantidad devuelta';
-        };
-
-        return $mensaje;
-    }
-
-    //DEVOLVER CANTIDAD LOGICA DEL LOTE ELIMINADO
-    public function returnQuantityLoteInicio(Request $request)
-    {
-        $data = $request->all();
-        $cantidades = $data['cantidades'];
-        $productosJSON = $cantidades;
-        $productotabla = json_decode($productosJSON);
-        $mensaje = '';
-        foreach ($productotabla as $detalle) {
-            //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
-            $lote = LoteProducto::findOrFail($detalle->lote_id);
-            $lote->cantidad_logica = $lote->cantidad_logica - $detalle->cantidad;
-            $lote->estado = '1';
-            $lote->update();
+                    if($detalle->cantidad - $lot->cantidad > 0)
+                    {
+                        $lote = LoteProducto::findOrFail($lot->lote_id);
+                        $lote->cantidad_logica = $lote->cantidad_logica + ($detalle->cantidad - $lot->cantidad);
+                        $lote->estado = '1';
+                        $lote->update();
+                    }
+                }
+            }
+            else
+            {
+                //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
+                $lote = LoteProducto::findOrFail($detalle->lote_id);
+                $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
+                $lote->estado = '1';
+                $lote->update();
+            }
             $mensaje = 'Cantidad devuelta';
         };
 

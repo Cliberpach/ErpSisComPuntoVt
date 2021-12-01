@@ -1,8 +1,8 @@
-<div class="modal inmodal" id="modal_lote" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal inmodal" id="modal_lote_recientes" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content animated bounceInRight">
             <div class="modal-header">
-                <button type="button" onclick="limpiarModallote()" class="close" data-dismiss="modal">
+                <button type="button" onclick="limpiarModalloteReciente()" class="close" data-dismiss="modal">
                     <span aria-hidden="true">&times;</span>
                     <span class="sr-only">Close</span>
                 </button>
@@ -12,11 +12,11 @@
             </div>
             <div class="modal-body">
                 <div class="form-group m-l">
-                    <span><b>Instrucciones:</b> Doble click en el registro del producto a vender.</span>
+                    <span><b>Instrucciones:</b> Doble click en detalle para regresar a edición.</span>
                 </div>
                 <div class="form-group">
                     <div class="table-responsive m-t">
-                        <table class="table dataTables-lotes table-bordered" style="width:100%; text-transform:uppercase;" id="table_lotes">
+                        <table class="table dataTables-lotes-recientes table-bordered" style="width:100%; text-transform:uppercase;" id="table_lotes_recientes">
                             <thead>
                             <tr>
                                 <th class="text-center"></th>
@@ -28,7 +28,6 @@
                                 <th class="text-center">COD. BARRA</th>
                                 <th class="text-center">PREC.VENTA</th>
                                 <th class="text-center">PREC.COMPRA</th>
-
                             </tr>
                             </thead>
                             <tbody>
@@ -58,19 +57,13 @@
 <link href="{{asset('Inspinia/css/plugins/dataTables/datatables.min.css')}}" rel="stylesheet">
 <style>
 
-    @media (min-width: 992px){
-        .modal-lg {
-            max-width: 1200px;
-        }
-    }
-
-    #table_lotes div.dataTables_wrapper div.dataTables_filter{
+    #table_lotes_recientes div.dataTables_wrapper div.dataTables_filter{
         text-align: left !important;
     }
-    #table_lotes tr[data-href] {
+    #table_lotes_recientes tr[data-href] {
         cursor: pointer;
     }
-    #table_lotes tbody .fila_lote.selected {
+    #table_lotes_recientes tbody .fila_lote_recientes.selected {
         /* color: #151515 !important;*/
         font-weight: 400;
         color: white !important;
@@ -78,7 +71,7 @@
         /* background-color: #CFCFCF !important; */
     }
 
-    #modal_lote  div.dataTables_wrapper div.dataTables_filter{
+    #modal_lote_recientes  div.dataTables_wrapper div.dataTables_filter{
         text-align:left !important;
     }
 
@@ -89,10 +82,10 @@
             text-align:left;
         }
 
-        #table_lotes_filter{
+        #table_lotes_recientes_filter{
             text-align: left;
         }
-        #table_lotes  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+        #table_lotes_recientes  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
             float:left;
             margin: 10px 0;
             white-space: nowrap;
@@ -102,7 +95,7 @@
 
     @media only screen and (min-width: 428px) and (max-width: 1190px) {
         /* Para tables: */
-        #modal_lote div.dataTables_filter input {
+        #modal_lote_recientes div.dataTables_filter input {
             width: 175% !important;
             display: inline-block !important;
         }
@@ -110,7 +103,7 @@
 
     @media only screen and (max-width: 428px) {
         /* Para celular: */
-        #modal_lote  div.dataTables_filter input {
+        #modal_lote_recientes  div.dataTables_filter input {
             width: 100% !important;
             display: inline-block !important;
         }
@@ -118,7 +111,7 @@
 
     @media only screen and (min-width: 1190px) {
 
-        #modal_lote div.dataTables_filter input {
+        #modal_lote_recientes div.dataTables_filter input {
             width: 363% !important;
             display: inline-block !important;
         }
@@ -132,36 +125,34 @@
 <script>
 
 
-function obtenerLotesproductos(tipo_cliente) {
+function obtenerLotesproductosRecientes() {
     //RUTA LOTES PRODUCTOS
-    var url = '{{ route("ventas.getLot", ":id")}}';
-    url = url.replace(':id', tipo_cliente);
+    var url = '{{ route("consultas.ventas.documento.no.getLotRecientes", ":id")}}';
+    url = url.replace(':id', '{{ $documento->id }}');
     //ELIMINAR EL DATATABLE PARA VOLVER A INSTANCIARLO
-    $(".dataTables-lotes").dataTable().fnDestroy();
+    $(".dataTables-lotes-recientes").dataTable().fnDestroy();
     //INSTANCIAR DATATABLE
-    var lotes = $('.dataTables-lotes').DataTable({
+    var lotes = $('.dataTables-lotes-recientes').DataTable({
         "dom":
                 "<'row'<'col-sm-12 col-md-12 col-lg-12'f>>" +
                 "<'row'<'col-sm-12'tr>>"+
                 "<'row justify-content-between'<'col information-content p-0'i><''p>>",
 
         "bPaginate": true,
-        "serverSide":true,
         "processing":true,
         "ajax": url,
         "columns": [
-            {data: 'id', className: "text-center", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
-            {data: 'nombre', className: "text-left", name:"productos.nombre", sWidth: '35%' },
-            {data: 'unidad_producto', className: "text-center", name:"tabladetalles.simbolo", sWidth: '5%' },
-            {data: 'codigo_lote', className: "text-center", name:"lote_productos.codigo_lote", sWidth: '15%' },
-            {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento", sWidth: '5%' },
-            {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
-            {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
-            {data: 'monto', className: "text-center", name:"productos_clientes.monto", sWidth: '10%' },
+            {data: 'id', className: "text-center",visible: false, sWidth: '0%'},
+            {data: 'nombre', className: "text-left", sWidth: '35%' },
+            {data: 'unidad_producto', className: "text-center", sWidth: '5%' },
+            {data: 'codigo_lote', className: "text-center", sWidth: '15%' },
+            {data: 'fecha_venci', className: "text-center", sWidth: '5%' },
+            {data: 'cantidad_logica', className: "text-center", sWidth: '10%' },
+            {data: 'codigo_barra', className: "text-center", sWidth: '15%' },
+            {data: 'monto', className: "text-center", sWidth: '10%' },
             {
                 data: null,
                 className: "text-center letrapequeña",
-                name:"compra_documento_detalles.precio_soles",
                 sWidth: '5%',
                 render: function(data) {
                     if (data.precio_soles == null) {
@@ -181,7 +172,7 @@ function obtenerLotesproductos(tipo_cliente) {
                     "url": "{{asset('Spanish.json')}}"
         },
         createdRow: function(row, data, dataIndex, cells) {
-            $(row).addClass('fila_lote');
+            $(row).addClass('fila_lote_recientes');
             $(row).attr('data-href', "");
         },
 
@@ -192,76 +183,62 @@ function obtenerLotesproductos(tipo_cliente) {
 $(document).ready(function() {
 
     $('buttons-html5').removeClass('.btn-default');
-    $('#table_lotes_wrapper').removeClass('');
+    $('#table_lotes_recientes_wrapper').removeClass('');
 
-    $('.dataTables-lotes tbody').on( 'click', 'tr', function () {
-            $('.dataTables-lotes').DataTable().$('tr.selected').removeClass('selected');
+    $('.dataTables-lotes-recientes tbody').on( 'click', 'tr', function () {
+            $('.dataTables-lotes-recientes').DataTable().$('tr.selected').removeClass('selected');
             $(this).addClass('selected');
     } );
 
     //DOBLE CLICK EN LOTES
-    $ ('.dataTables-lotes'). on ('dblclick', 'tbody td', function () {
-        var lote =  $('.dataTables-lotes').DataTable();
+    $ ('.dataTables-lotes-recientes'). on ('dblclick', 'tbody td', function () {
+        var lote =  $('.dataTables-lotes-recientes').DataTable();
         var data = lote.row(this).data();
-        ingresarProducto(data)
+        ingresarProductoRecientes(data)
     });
 
 })
 
-function ingresarProducto(producto) {
-    //LIMPIAR ERRORES AL INGRESAR PRODUCTO LOTE
-    limpiarErrores()
-    //HABILITAR CAMPOS DEL PRODUCTO
-    $('#precio').prop('disabled' , false)
-    $('#cantidad').prop('disabled' , false)
-    $('#btn_agregar_detalle').prop('disabled' , false)
-    //INGRESAR DATOS DEL PRODUCTO A LOS CAMPOS
-    $('#precio').val(evaluarPrecioigv(producto))
-    $('#cantidad').val(producto.cantidad_logica)
-    $('#producto_unidad').val(producto.unidad_producto)
-    $('#producto_id').val(producto.id)
-    $('#producto_lote').val(producto.nombre+' - '+ producto.codigo_lote)
-    //AGREGAR LIMITE A LA CANTIDAD SEGUN EL LOTE SELECCIONADO
-    $("#cantidad").attr({
-        "max" : producto.cantidad_logica,
-        "min" : 1,
-    });
-    $("#precio").attr({
-        "min" : 1,
-    });
-    document.getElementById('cantidad').focus()
-    setTimeout(function() { $('input[name="cantidad"]').focus() }, 10);
-    //LIMPIAR MODAL
-    limpiarModallote()
-}
-
-function evaluarPrecioigv(producto) {
-    if ( producto.moneda == 1 ) {
-        //PRODUCTO SIN IGV
-        if ( producto.igv == '0' ) {
-            var precio = Number(producto.monto * 0.18) + Number(producto.monto)
-            return Number(precio).toFixed(2)
-        }else{
-            //PRODUCTO CON IGV
-            var precio = producto.monto
-            return Number(precio).toFixed(2)
-        }
-    }else{
-        toastr.error('Precio registrado diferente a Soles (S/.).', 'Error');
-        return 0.00
+function ingresarProductoRecientes(producto) {
+    var enviar = false;
+    var existe = buscarProducto(producto.id)
+    if (existe == true) {
+        toastr.error('Producto ya se encuentra ingresado.', 'Error');
+        enviar = true;
     }
+
+    let detalle = {
+        lote_id: producto.id,
+        unidad: producto.unidad_producto,
+        producto: producto.nombre,
+        precio_unitario: producto.precio_unitario,
+        valor_unitario: producto.valor_unitario,
+        valor_venta: producto.valor_venta,
+        cantidad: producto.cantidad_logica,
+        precio_inicial: producto.precio_inicial,
+        dinero: producto.dinero,
+        descuento: producto.descuento,
+        precio_nuevo: producto.precio_nuevo,
+        detalle_id: producto.detalle_id,
+    }
+    if (enviar != true) {
+        agregarTabla(detalle);
+        sumaTotal();
+        $('#asegurarCierre').val(1);
+    }
+    limpiarModalloteReciente()
 }
 
-function limpiarModallote() {
+function limpiarModalloteReciente() {
     //ACTUALIZAR DATATABLE
-    $('.dataTables-lotes').DataTable().ajax.reload();
+    obtenerLotesproductosRecientes();
     //CERRAR MODAL
-    $('#modal_lote').modal('hide');
+    $('#modal_lote_recientes').modal('hide');
 }
 //AL ABRIR EL MODAL SE DEBE DE ACTUALIZAR EL DATATABLE
-$('#modal_lote').on('show.bs.modal', function(e) {
+$('#modal_lote_recientes').on('show.bs.modal', function(e) {
     //ACTUALIZAR DATATABLE
-    $('.dataTables-lotes').DataTable().ajax.reload();
+    obtenerLotesproductosRecientes();
 });
 
 

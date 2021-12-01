@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers\Consultas;
 
+use App\Almacenes\LoteProducto;
+use App\Almacenes\Producto;
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Condicion;
+use App\Mantenimiento\Empresa\Empresa;
+use App\Ventas\Cliente;
+use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 use App\Ventas\Guia;
 use App\Ventas\Nota;
@@ -41,8 +47,10 @@ class DocumentoController extends Controller
                     'tipo_doc' => $doc->descripcionTipo(),
                     'numero' => $doc->serie . '-' . $doc->correlativo,
                     'total' => $doc->total,
+                    'cliente' => $doc->cliente,
                     'fecha' => Carbon::parse($doc->fecha_documento)->format( 'd/m/Y'),
-                    'estado' => $doc->estado,
+                    'estado' => $doc->estado_pago,
+                    'convertir' => $doc->convertir,
                     'tipo' => $tipo
                 ]);
             }
@@ -69,8 +77,10 @@ class DocumentoController extends Controller
                     'tipo_doc' => 'NOTA DE CRÉDITO',
                     'numero' => $doc->serie . '-' . $doc->correlativo,
                     'total' => $doc->mtoImpVenta,
+                    'cliente' => $doc->cliente,
                     'fecha' => Carbon::parse($doc->fechaEmision)->format( 'd/m/Y'),
                     'estado' => $doc->estado,
+                    'convertir' => '0',
                     'tipo' => $tipo
                 ]);
             }
@@ -97,8 +107,10 @@ class DocumentoController extends Controller
                     'tipo_doc' => 'GUÍA DE REMISIÓN',
                     'numero' => $doc->serie . '-' . $doc->correlativo,
                     'total' => '-',
+                    'cliente' => $doc->documento->cliente,
                     'fecha' => Carbon::parse($doc->created_at)->format( 'd/m/Y'),
                     'estado' => $doc->estado,
+                    'convertir' => '0',
                     'tipo' => $tipo
                 ]);
             }
@@ -116,5 +128,26 @@ class DocumentoController extends Controller
                 'documentos' => $coleccion
             ]);
         }
+    }
+
+    public function convertir($id)
+    {
+        $this->authorize('haveaccess','documento_venta.index');
+        $empresas = Empresa::where('estado', 'ACTIVO')->get();
+        $clientes = Cliente::where('estado', 'ACTIVO')->get();
+        $productos = Producto::where('estado', 'ACTIVO')->get();
+        $documento = Documento::findOrFail($id);
+        $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->with(['lote','lote.producto'])->get();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
+        $fecha_hoy = Carbon::now()->toDateString();
+        return view('consultas.documentos.convertir',[
+            'documento' => $documento,
+            'detalles' => $detalles,
+            'empresas' => $empresas,
+            'clientes' => $clientes,
+            'productos' => $productos,
+            'fecha_hoy' => $fecha_hoy,
+            'condiciones' => $condiciones
+        ]);
     }
 }

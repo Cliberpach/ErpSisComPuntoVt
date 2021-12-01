@@ -76,6 +76,8 @@ class CreateCotizacionDocumentoTable extends Migration
 
             $table->string('ruta_comprobante_archivo')->nullable();
             $table->string('nombre_comprobante_archivo')->nullable();
+
+            $table->BigInteger('convertir')->nullable();
             $table->timestamps();
         });
     }

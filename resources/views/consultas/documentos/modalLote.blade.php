@@ -28,7 +28,6 @@
                                 <th class="text-center">COD. BARRA</th>
                                 <th class="text-center">PREC.VENTA</th>
                                 <th class="text-center">PREC.COMPRA</th>
-
                             </tr>
                             </thead>
                             <tbody>
@@ -134,7 +133,7 @@
 
 function obtenerLotesproductos(tipo_cliente) {
     //RUTA LOTES PRODUCTOS
-    var url = '{{ route("ventas.getLot", ":id")}}';
+    var url = '{{ route("consultas.ventas.documento.no.getLot", ":id")}}';
     url = url.replace(':id', tipo_cliente);
     //ELIMINAR EL DATATABLE PARA VOLVER A INSTANCIARLO
     $(".dataTables-lotes").dataTable().fnDestroy();
@@ -219,7 +218,7 @@ function ingresarProducto(producto) {
     $('#precio').val(evaluarPrecioigv(producto))
     $('#cantidad').val(producto.cantidad_logica)
     $('#producto_unidad').val(producto.unidad_producto)
-    $('#producto_id').val(producto.id)
+    $('#lote_id').val(producto.id)
     $('#producto_lote').val(producto.nombre+' - '+ producto.codigo_lote)
     //AGREGAR LIMITE A LA CANTIDAD SEGUN EL LOTE SELECCIONADO
     $("#cantidad").attr({
@@ -239,11 +238,11 @@ function evaluarPrecioigv(producto) {
     if ( producto.moneda == 1 ) {
         //PRODUCTO SIN IGV
         if ( producto.igv == '0' ) {
-            var precio = Number(producto.monto * 0.18) + Number(producto.monto)
+            var precio = Number(producto.precio_venta * 0.18) + Number(producto.precio_venta)
             return Number(precio).toFixed(2)
         }else{
             //PRODUCTO CON IGV
-            var precio = producto.monto
+            var precio = producto.precio_venta
             return Number(precio).toFixed(2)
         }
     }else{

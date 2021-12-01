@@ -59,12 +59,12 @@
                             style="text-transform:uppercase">
                             <thead>
                                 <tr>
-                                    <th class="text-center">TIPO</th>
+                                    <th class="text-center">CLIENTE</th>
                                     <th class="text-center"># DOC</th>
                                     <th class="text-center">FECHA</th>
                                     <th class="text-center">MONTO</th>
                                     <th class="text-center">ESTADO</th>
-                                    <th class="text-center">VISTA</th>
+                                    <th class="text-center">OPCIONES</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -216,7 +216,7 @@
             "data": documentos,
             "columns": [
                 {
-                    data: 'tipo_doc'
+                    data: 'cliente'
                 },
                 {
                     data: 'numero',
@@ -267,6 +267,9 @@
                         let url_nota = '{{ route("ventas.notas.show", ":id")}}';
                         url_nota = url_nota.replace(':id', data.id);
 
+                        let url_convertir = '{{ route("consultas.documento.convertir", ":id")}}';
+                        url_convertir = url_convertir.replace(':id', data.id);
+
                         let cadena = "";
 
                         if(data.tipo < 130)
@@ -276,7 +279,12 @@
 
                         if(data.tipo == 130)
                         {
-                            cadena =  cadena + "<a class='btn btn-sm btn-info' href='"+ url_nota +"' target='_blank' title='Vista'><i class='fa fa-eye'></i> </a>";
+                            cadena =  cadena + "<a class='btn btn-sm btn-info m-1' href='"+ url_nota +"' target='_blank' title='Vista'><i class='fa fa-eye'></i> </a>";
+                        }
+
+                        if(data.tipo == 129 && (data.convertir == '' || data.convertir == null))
+                        {
+                            cadena = cadena + "<a class='btn btn-sm btn-warning m-1' href='"+ url_convertir +"' title='Convertir'><i class='fa fa-exchange'></i> </a>"
                         }
 
                         return cadena;

@@ -1,8 +1,7 @@
 @extends('layout') @section('content')
 
 @section('consulta-active', 'active')
-@section('consulta-ventas-active', 'active')
-@section('consulta-ventas-documento-no-active', 'active')
+@section('consulta-comprobantes-active', 'active')
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-12">
@@ -54,7 +53,7 @@
                                                 </span>
                                                 <input type="date" id="fecha_documento_campo" name="fecha_documento_campo"
                                                     class="form-control input-required{{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}"
-                                                    value="{{ old('fecha_documento_campo', $documento->fecha_documento) }}" autocomplete="off"
+                                                    value="{{ old('fecha_documento_campo', $fecha_hoy) }}" autocomplete="off"
                                                     required readonly>
 
                                                 @if ($errors->has('fecha_documento_campo'))
@@ -74,8 +73,8 @@
 
                                             <input type="date" id="fecha_atencion_campo" name="fecha_atencion_campo"
                                                     class="form-control input-required {{ $errors->has('fecha_atencion_campo') ? ' is-invalid' : '' }}"
-                                                    value="{{ old('fecha_atencion_campo', $documento->fecha_atencion) }}" autocomplete="off" required
-                                                    readonly disabled>
+                                                    value="{{ old('fecha_atencion_campo', $fecha_hoy) }}" autocomplete="off" required
+                                                    readonly>
 
                                             @if ($errors->has('fecha_atencion_campo'))
                                                 <span class="invalid-feedback" role="alert">
@@ -92,11 +91,11 @@
                                         <select
                                             class="select2_form form-control {{ $errors->has('tipo_venta') ? ' is-invalid' : '' }}"
                                             style="text-transform: uppercase; width:100%" value="{{ old('tipo_venta', $documento->tipo_venta) }}"
-                                            name="tipo_venta" id="tipo_venta" required onchange="consultarSeguntipo()" disabled required>
+                                            name="tipo_venta" id="tipo_venta" required onchange="consultarSeguntipo()" required>
                                             <option></option>
 
                                             @foreach (tipos_venta() as $tipo)
-                                                @if ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS')
+                                                @if (($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS') && $tipo->id != 129)
                                                     <option value="{{ $tipo->id }}" @if (old('tipo_venta') == $tipo->id) {{ 'selected' }} @endif  {{ $tipo->id == $documento->tipo_venta ? 'selected' : '' }}>
                                                         {{ $tipo->nombre }}</option>
                                                 @endif
@@ -144,7 +143,7 @@
                                         <label class="required">Condición</label>
                                         <select id="condicion_id" name="condicion_id"
                                             class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                            required disabled>
+                                            required onchange="changeFormaPago()">
                                             <option></option>
                                             @foreach ($condiciones as $condicion)
                                                 <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
@@ -163,7 +162,7 @@
                                             <input type="date" id="fecha_vencimiento_campo" name="fecha_vencimiento_campo"
                                                 class="form-control input-required" autocomplete="off"
                                                 {{ $errors->has('fecha_vencimiento_campo') ? ' is-invalid' : '' }}
-                                                value="{{ old('fecha_vencimiento_campo', $documento->fecha_vencimiento) }}" required>
+                                                value="{{ old('fecha_vencimiento_campo', $fecha_hoy) }}" required>
                                             @if ($errors->has('fecha_vencimiento_campo'))
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $errors->first('fecha_vencimiento_campo') }}</strong>
@@ -206,6 +205,8 @@
                                 <input type="checkbox" id="igv_check" name="igv_check" class="d-none" checked>
                                 <!-- OBTENER TIPO DE CLIENTE -->
                                 <input type="hidden" class="form-control" name="" id="tipo_cliente">
+                                <!-- OPCION CONVERTIR PARA DEVOLVER STOCK -->
+                                <input type="hidden" class="form-control" name="convertir" value="{{ $documento->id }}">
                                 <!-- OBTENER DATOS DEL PRODUCTO -->
                                 <input type="hidden" class="form-control" name="" id="presentacion_producto">
                                 <input type="hidden" class="form-control" name="" id="codigo_nombre_producto">
@@ -241,7 +242,7 @@
                                 </div>
                                 <div class="panel-body">
 
-                                    <div class="row">
+                                    <div class="row d-none">
                                         <div class="col-lg-6 col-xs-12">
                                             <label class="col-form-label required">Producto:</label>
                                             <div class="input-group">
@@ -293,7 +294,7 @@
 
 
                                     </div>
-                                    <div class="row">
+                                    <div class="row d-none">
                                         <div class="col-12">
                                             <button  type="button" class="btn btn-info" id="buscarLotesRecientes"
                                             data-toggle="modal" data-target="#modal_lote_recientes">Buscar lotes recientes</button>
@@ -583,6 +584,7 @@
     });
 
     $(document).ready(function() {
+        changeFormaPago();
         $(".select2_form").select2({
             placeholder: "SELECCIONAR",
             allowClear: true,
@@ -628,10 +630,7 @@
                     data: null,
 
                     render: function(data, type, row) {
-                        return "<div class='btn-group'>" +
-                            "<a class='btn btn-sm btn-warning btn-edit' style='color:white'>"+ "<i class='fa fa-pencil'></i>"+"</a>" +
-                            "<a class='btn btn-sm btn-danger btn-delete' style='color:white'>"+"<i class='fa fa-trash'></i>"+"</a>"+
-                            "</div>";
+                        return "-";
                     }
 
                 },
@@ -921,7 +920,7 @@
         var data = table.rows().data();
         data.each(function(value, index) {
             let fila = {
-                lote_id: value[0],
+                producto_id: value[0],
                 unidad: value[3],
                 valor_unitario: value[5],
                 precio_unitario: value[6],
@@ -1373,7 +1372,6 @@
                     document.getElementById("fecha_atencion_campo").disabled = false;
                     document.getElementById("empresa_id").disabled = false;
                     document.getElementById("cliente_id").disabled = false;
-                    document.getElementById("condicion_id").disabled = false;
                     //HABILITAR EL CARGAR PAGINA
                 }
                 else
@@ -1406,8 +1404,7 @@
                         body: JSON.stringify(datos) // convertimos el objeto a texto
                     };
 
-                    var url = '{{ route("consultas.ventas.documento.no.update",":id") }}';
-                    url = url.replace(":id","{{ $documento->id }}")
+                    var url = '{{ route("ventas.documento.store") }}';
                     var textAlert = "¿Seguro que desea guardar cambios?";
                     Swal.fire({
                         title: 'Opción Guardar',
@@ -1450,16 +1447,19 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
-                                document.getElementById("cliente_id").disabled = true;
-                                document.getElementById("condicion_id").disabled = true;
                             }
                             else if(result.value.success)
                             {
-                                toastr.success('¡Documento de venta modificado!','Exito')
+                                toastr.success('¡Documento de venta creado!','Exito')
+
+                                let id = result.value.documento_id;
+                                var url_open_pdf = '{{ route("ventas.documento.comprobante", ":id")}}';
+                                url_open_pdf = url_open_pdf.replace(':id',id+'-100');
+                                window.open(url_open_pdf,'Comprobante SISCOM','location=1, status=1, scrollbars=1,width=900, height=600');
 
                                 $('#asegurarCierre').val(2);
 
-                                location = "{{ route('consultas.ventas.documento.no.index') }}";
+                                location = "{{ route('ventas.documento.index') }}";
                             }
                             else
                             {
@@ -1479,8 +1479,6 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
-                                document.getElementById("cliente_id").disabled = true;
-                                document.getElementById("condicion_id").disabled = true;
                             }
                         }
                     });

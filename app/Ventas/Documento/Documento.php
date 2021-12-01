@@ -45,6 +45,8 @@ class Documento extends Model
         'serie',
         'ruta_comprobante_archivo',
         'nombre_comprobante_archivo',
+
+        'convertir'
     ];
 
 

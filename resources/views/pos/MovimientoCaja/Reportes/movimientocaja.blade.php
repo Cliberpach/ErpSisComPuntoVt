@@ -275,7 +275,6 @@
         <table class="tbl-detalles text-uppercase" cellpadding="8" cellspacing="0">
             <thead>
                 <tr>
-                    <th style="text-align: center; border-right: 2px solid #52BE80;">TIPO DOC</th>
                     <th style="text-align: center;border-right: 2px solid #52BE80">NUMERO</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">CLIENTE</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
@@ -286,41 +285,9 @@
             </thead>
             <tbody>
                 @foreach ($movimiento->detalleMovimientoVentas as $ventas)
-                    @if ($ventas->documento->condicion_id == 1)
-                        <tr>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
-                                {{ $ventas->documento->nombreDocumento() }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
-                                {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
-                                {{ $ventas->documento->clienteEntidad->nombre }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
-                                {{ $ventas->documento->total }}
-                            </td>
-                            @if ($ventas->documento->tipo_pago_id == 1)
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">
-                                    {{ $ventas->documento->importe }}</td>
-                            @elseif ($ventas->documento->tipo_pago_id==2)
-                                <td style="text-align: center; border-right: 2px solid #52BE80">
-                                    {{ $ventas->documento->importe }}</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">
-                                    {{ $ventas->documento->efectivo }}</td>
-                            @elseif ($ventas->documento->tipo_pago_id==3)
-                                <td style="text-align: center; border-right: 2px solid #52BE80"></td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">
-                                    {{ $ventas->documento->importe }}</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">
-                                    {{ $ventas->documento->efectivo }}</td>
-                            @endif
-                        </tr>
-                    @else
-                        @foreach ($ventas->documento->cuenta->detalles as $cuentaCliente)
+                    @if ($ventas->documento->estado_pago == 'PAGADA')
+                        @if ($ventas->documento->condicion_id == 1)
                             <tr>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">
-                                    {{ $ventas->documento->nombreDocumento() }}</td>
                                 <td style="text-align: center; border-right: 2px solid #52BE80">
                                     {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
                                 <td style="text-align: center; border-right: 2px solid #52BE80">
@@ -328,28 +295,65 @@
                                 <td style="text-align: center; border-right: 2px solid #52BE80">
                                     {{ $ventas->documento->total }}
                                 </td>
-                                @if ($cuentaCliente->tipo_pago_id == 1)
+                                @if ($ventas->documento->tipo_pago_id == 1)
                                     <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $cuentaCliente->efectivo }}</td>
-                                @elseif ($cuentaCliente->tipo_pago_id==2)
+                                        {{ $ventas->documento->importe }}</td>
+                                @elseif ($ventas->documento->tipo_pago_id==2)
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $cuentaCliente->importe }}</td>
+                                        {{ $ventas->documento->importe }}</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $cuentaCliente->efectivo }}</td>
-                                @elseif ($cuentaCliente->tipo_pago_id==3)
+                                        {{ $ventas->documento->efectivo }}</td>
+                                @elseif ($ventas->documento->tipo_pago_id==3)
                                     <td style="text-align: center; border-right: 2px solid #52BE80"></td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $cuentaCliente->importe }}</td>
+                                        {{ $ventas->documento->importe }}</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $cuentaCliente->efectivo }}</td>
+                                        {{ $ventas->documento->efectivo }}</td>
+                                @else
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                 @endif
                             </tr>
-                        @endforeach
+                        @else
+                            @foreach ($ventas->documento->cuenta->detalles as $cuentaCliente)
+                                <tr>
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">
+                                        {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">
+                                        {{ $ventas->documento->clienteEntidad->nombre }}</td>
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">
+                                        {{ $ventas->documento->total }}
+                                    </td>
+                                    @if ($cuentaCliente->tipo_pago_id == 1)
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                                            {{ $cuentaCliente->efectivo }}</td>
+                                    @elseif ($cuentaCliente->tipo_pago_id==2)
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                                            {{ $cuentaCliente->importe }}</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                                            {{ $cuentaCliente->efectivo }}</td>
+                                    @elseif ($cuentaCliente->tipo_pago_id==3)
+                                        <td style="text-align: center; border-right: 2px solid #52BE80"></td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                                            {{ $cuentaCliente->importe }}</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                                            {{ $cuentaCliente->efectivo }}</td>
+                                    @else
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                                    @endif
+                                </tr>
+                            @endforeach
+                        @endif
                     @endif
-
                 @endforeach
             </tbody>
         </table>

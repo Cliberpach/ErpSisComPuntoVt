@@ -501,8 +501,6 @@ class DocumentoController extends Controller
                 'igv.required_if' => 'El campo Igv es obligatorio.',
                 'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
                 'igv.numeric' => 'El campo Igv debe se numérico.',
-
-
             ];
 
 
@@ -564,7 +562,7 @@ class DocumentoController extends Controller
             $documento->numero_doc = 'VENTA-'.$numero_doc;
             $documento->update();
             //Llenado de los articulos
-            $productosJSON = $request->get('productos_tabla[]');
+            $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
             foreach ($productotabla as $producto) {
                 $lote = LoteProducto::findOrFail($producto->producto_id);
@@ -591,6 +589,23 @@ class DocumentoController extends Controller
                     $lote->cantidad_logica =  0;
                 }
                 $lote->update();
+            }
+
+            if($request->convertir)
+            {
+                $doc_a_convertir = Documento::find($request->convertir);
+                $doc_a_convertir->convertir = $documento->id;
+                $doc_a_convertir->update();
+
+                $documento = Documento::find($documento->id);
+                $documento->convertir = $doc_a_convertir->id;
+                $documento->update();
+
+                foreach ($productotabla as $producto) {
+                    $lote = LoteProducto::findOrFail($producto->producto_id);
+                    $lote->cantidad =  $lote->cantidad + $producto->cantidad;
+                    $lote->update();
+                }
             }
 
             $detalle = new DetalleMovimientoVentaCaja();
@@ -627,7 +642,7 @@ class DocumentoController extends Controller
                     $documento->envio_sunat = '1';
                 }
                 //$vp = self::venta_comprobante($documento->id);
-                $ve = self::venta_email($documento->id);
+                //$ve = self::venta_email($documento->id);
                 Session::flash('success','Documento de venta creado.');
 
                 return response()->json([
@@ -638,32 +653,22 @@ class DocumentoController extends Controller
             else{
                 DB::commit();
                 //$vp = self::venta_comprobante($documento->id);
-                $ve = self::venta_email($documento->id);
+                //$ve = self::venta_email($documento->id);
                 Session::flash('success','Documento de venta creado.');
                 return response()->json([
                     'success' => true,
                     'documento_id'=> $documento->id
                 ]);
-                //return redirect()->route('ventas.documento.index')->with('documento_id', $documento->id);
             }
         }
         catch(Exception $e)
         {
-            $productosJSON = $request->get('productos_tabla[]');
-            $productotabla = json_decode($productosJSON);
             DB::rollBack();
-            /*foreach ($productotabla as $producto) {
-                $lote = LoteProducto::findOrFail($producto->producto_id);
-                $lote->cantidad_logica =  $lote->cantidad_logica + $producto->cantidad;
-                $lote->update();
-            }*/
-            //Session::flash('error', (string) $e->getMessage());
             return response()->json([
                 'success' => false,
                 'mensaje'=> $e->getMessage(), //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
                 'excepcion' => $e->getMessage()
             ]);
-            //return redirect()->route('ventas.documento.index');
         }
     }
 
@@ -1594,7 +1599,7 @@ class DocumentoController extends Controller
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->select('compra_documento_detalles.precio_soles','lote_productos.*','productos.nombre','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
+            ->select('compra_documento_detalles.precio_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
                     'productos_clientes.monto','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')

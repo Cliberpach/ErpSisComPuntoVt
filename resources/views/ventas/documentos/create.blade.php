@@ -188,7 +188,7 @@
                                         <label class="required">Condición</label>
                                         <select id="condicion_id" name="condicion_id"
                                             class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                            required disabled>
+                                            required disabled onchange="changeFormaPago()>
                                             <option></option>
                                             @foreach ($condiciones as $condicion)
                                                 <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
@@ -201,7 +201,7 @@
                                         <label class="required">Condición</label>
                                         <select id="condicion_id" name="condicion_id"
                                             class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                            required>
+                                            required onchange="changeFormaPago()">
                                             <option></option>
                                             @foreach ($condiciones as $condicion)
                                                 <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
@@ -292,7 +292,7 @@
                                 <input type="hidden" class="form-control" name="" id="presentacion_producto">
                                 <input type="hidden" class="form-control" name="" id="codigo_nombre_producto">
                                 <!-- LLENAR DATOS EN UN ARRAY -->
-                                <input type="hidden" class="form-control" id="productos_tabla" name="productos_tabla[]">
+                                <input type="hidden" class="form-control" id="productos_tabla" name="productos_tabla">
                                 <!-- TIPO PAGO -->
                                 <input type="hidden" class="form-control" name="tipo_pago_id" id="tipo_pago_id">
                                 <!-- EFECTIVO -->
@@ -914,6 +914,32 @@
         $('#cantidad').prop('disabled' , true)
     }
 
+    function obtenerMonto(producto_id) {
+        if (producto_id.length > 0) {
+            var tipo = $('#tipo_cliente_documento').val()
+            $.get('/almacenes/productos/obtenerProducto/' + producto_id, function(data) {
+                for (var i = 0; i < data.cliente_producto.length; i++)
+                {
+                    //SOLO SOLES LOS MONTOS
+                    if (data.cliente_producto[i].cliente == tipo && data.cliente_producto[i].moneda == '1') {
+                        if (data.cliente_producto[i].igv == '0') {
+                            var monto = Number(data.cliente_producto[i].monto * 0.18) + Number(data
+                                .cliente_producto[i].monto)
+                            $('#precio').val(Number(monto).toFixed(2))
+
+                        } else {
+                            var monto = data.cliente_producto[i].monto
+                            $('#precio').val(Number(monto).toFixed(2))
+
+                        }
+                    }
+                }
+            });
+        }
+
+
+    }
+
     //AGREGAR EL DETALLE A LA TABLA
     function agregarTabla($detalle) {
         var t = $('.dataTables-detalle-documento').DataTable();
@@ -1195,7 +1221,6 @@
             let total = $('#monto_total').val();
             $('#monto_venta').val(total);
             $('#importe_venta').val(total);
-            let forma_pago = $('#forma_pago').val();
             let condicion_id = $('#condicion_id').val();
             let cadena = condicion_id.split('-');
             if(cadena[1] != 'CONTADO')
@@ -1584,8 +1609,9 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
+                                @if (!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
-                                document.getElementById("condicion_id").disabled = true;
+                                @endif
                             }
                             else if(result.value.success)
                             {
@@ -1618,8 +1644,9 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
+                                @if (!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
-                                document.getElementById("condicion_id").disabled = true;
+                                @endif
                             }
                         }
                     });
