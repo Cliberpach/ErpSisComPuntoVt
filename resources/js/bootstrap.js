@@ -37,8 +37,22 @@ window.Echo = new Echo({
     broadcaster: 'pusher',
     key: 'ASDASF2121',
     wsHost: window.location.hostname,
-    wsPort: 6001,
+    wssPort: 6001,
+    encrypted:false,
+    disableStats:true,
     enabledTransports: ['ws', 'wss'],
+    //forceTLS:false,
+});
+/* En el local
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+    wsPort: 6001,
     forceTLS:false,
     disableStats: true,
 });
+
+*/
+
