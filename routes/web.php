@@ -598,6 +598,5 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    $dato = 'Actualizar';
-    broadcast(new VentasCajaEvent($dato));
+    return 'SISTEMA';
 });
