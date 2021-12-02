@@ -71105,11 +71105,24 @@ window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: 'ASDASF2121',
   wsHost: window.location.hostname,
-  wsPort: 6001,
-  enabledTransports: ['ws', 'wss'],
-  forceTLS: false,
-  disableStats: true
+  wssPort: 6001,
+  encrypted: false,
+  disableStats: true,
+  enabledTransports: ['ws', 'wss'] //forceTLS:false,
+
 });
+/* En el local
+
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+    wsPort: 6001,
+    forceTLS:false,
+    disableStats: true,
+});
+
+*/
 
 /***/ }),
 
@@ -71269,8 +71282,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /var/www/ErpSisComPuntoVt/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /var/www/ErpSisComPuntoVt/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! D:\ErpSisComPuntoVt_DEV\ErpSisComPuntoVt\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! D:\ErpSisComPuntoVt_DEV\ErpSisComPuntoVt\resources\sass\app.scss */"./resources/sass/app.scss");
 
 
 /***/ })
