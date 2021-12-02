@@ -190,7 +190,7 @@
                                 <div class="col-12 col-md-6 br">
                                     <div class="form-group d-none">
                                         <label class="col-form-label required">Venta</label>
-                                        <input type="text" class="form-control" id="venta_id" name="venta_id" readonly>
+                                        <input type="text" class="form-control" v-model="form.venta_id" id="venta_id" name="venta_id" readonly>
                                     </div>
                                     <div class="form-group">
                                         <label class="col-form-label required">Tipo Pago</label>
@@ -198,11 +198,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label class="col-form-label required">Monto</label>
-                                        <input type="text" class="form-control" id="monto_venta" name="monto_venta" onkeypress="return filterFloat(event, this);" readonly>
+                                        <input type="text" class="form-control" v-model="form.monto_venta" id="monto_venta" name="monto_venta" onkeypress="return filterFloat(event, this);" readonly>
                                     </div>
                                     <div class="form-group|">
                                         <label class="col-form-label required">Efectivo</label>
-                                        <input type="text" value="0.00" class="form-control" id="efectivo" name="efectivo" onkeypress="return filterFloat(event, this);" onkeyup="changeEfectivo(this)">
+                                        <input type="text" class="form-control" v-model="form.efectivo" id="efectivo" name="efectivo" onkeypress="return filterFloat(event, this);" onkeyup="changeEfectivo(this)">
                                     </div>
                                     <div class="form-group">
                                         <label class="col-form-label required">Modo de pago</label>
@@ -215,7 +215,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label  class="col-form-label required">Importe</label>
-                                        <input type="text" class="form-control" id="importe" name="importe" onkeypress="return filterFloat(event, this);" onkeyup="changeImporte(this)">
+                                        <input type="text" class="form-control" id="importe" v-model="form.importe" name="importe" onkeypress="return filterFloat(event, this);" onkeyup="changeImporte(this)">
                                     </div>
                                     <div class="form-group d-none" id="div_cuentas">
                                         <label class="col-form-label">Cuentas</label>

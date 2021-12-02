@@ -58068,7 +58068,44 @@ var render = function() {
                 [
                   _c("div", { staticClass: "row" }, [
                     _c("div", { staticClass: "col-12 col-md-6 br" }, [
-                      _vm._m(6),
+                      _c("div", { staticClass: "form-group d-none" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Venta")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.venta_id,
+                              expression: "form.venta_id"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "venta_id",
+                            name: "venta_id",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form.venta_id },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "venta_id",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
                       _vm._v(" "),
                       _c("div", { staticClass: "form-group" }, [
                         _c(
@@ -58109,9 +58146,85 @@ var render = function() {
                         })
                       ]),
                       _vm._v(" "),
-                      _vm._m(7),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Monto")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.monto_venta,
+                              expression: "form.monto_venta"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "monto_venta",
+                            name: "monto_venta",
+                            onkeypress: "return filterFloat(event, this);",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form.monto_venta },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "monto_venta",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
                       _vm._v(" "),
-                      _vm._m(8),
+                      _c("div", { staticClass: "form-group|" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Efectivo")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.efectivo,
+                              expression: "form.efectivo"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "efectivo",
+                            name: "efectivo",
+                            onkeypress: "return filterFloat(event, this);",
+                            onkeyup: "changeEfectivo(this)"
+                          },
+                          domProps: { value: _vm.form.efectivo },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "efectivo",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
                       _vm._v(" "),
                       _c(
                         "div",
@@ -58141,7 +58254,41 @@ var render = function() {
                         1
                       ),
                       _vm._v(" "),
-                      _vm._m(9),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Importe")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.importe,
+                              expression: "form.importe"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "importe",
+                            name: "importe",
+                            onkeypress: "return filterFloat(event, this);",
+                            onkeyup: "changeImporte(this)"
+                          },
+                          domProps: { value: _vm.form.importe },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(_vm.form, "importe", $event.target.value)
+                            }
+                          }
+                        })
+                      ]),
                       _vm._v(" "),
                       _c(
                         "div",
@@ -58173,13 +58320,13 @@ var render = function() {
                       )
                     ]),
                     _vm._v(" "),
-                    _vm._m(10)
+                    _vm._m(6)
                   ])
                 ]
               )
             ]),
             _vm._v(" "),
-            _vm._m(11)
+            _vm._m(7)
           ])
         ])
       ]
@@ -58538,85 +58685,6 @@ var staticRenderFns = [
       _c("h4", { staticClass: "modal-title pago-title" }),
       _vm._v(" "),
       _c("small", { staticClass: "font-bold pago-subtitle" })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group d-none" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Venta")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { type: "text", id: "venta_id", name: "venta_id", readonly: "" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Monto")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          type: "text",
-          id: "monto_venta",
-          name: "monto_venta",
-          onkeypress: "return filterFloat(event, this);",
-          readonly: ""
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group|" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Efectivo")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          type: "text",
-          value: "0.00",
-          id: "efectivo",
-          name: "efectivo",
-          onkeypress: "return filterFloat(event, this);",
-          onkeyup: "changeEfectivo(this)"
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Importe")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          type: "text",
-          id: "importe",
-          name: "importe",
-          onkeypress: "return filterFloat(event, this);",
-          onkeyup: "changeImporte(this)"
-        }
-      })
     ])
   },
   function() {
