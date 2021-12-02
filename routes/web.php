@@ -301,6 +301,15 @@ function(){
         Route::get('/destroy/{id}', 'Ventas\ClienteController@destroy')->name('ventas.cliente.destroy');
         Route::post('/getDocumento', 'Ventas\ClienteController@getDocumento')->name('ventas.cliente.getDocumento');
         Route::post('/getCustomer', 'Ventas\ClienteController@getCustomer')->name('ventas.cliente.getcustomer');
+        //Tiendas
+        Route::get('tiendas/index/{id}', 'Ventas\TiendaController@index')->name('clientes.tienda.index');
+        Route::get('tiendas/getShop/{id}','Ventas\TiendaController@getShop')->name('clientes.tienda.shop');
+        Route::get('tiendas/create/{id}', 'Ventas\TiendaController@create')->name('clientes.tienda.create');
+        Route::post('tiendas/store/', 'Ventas\TiendaController@store')->name('clientes.tienda.store');
+        Route::put('tiendas/update/{id}', 'Ventas\TiendaController@update')->name('clientes.tienda.update');
+        Route::get('tiendas/destroy/{id}', 'Ventas\TiendaController@destroy')->name('clientes.tienda.destroy');
+        Route::get('tiendas/show/{id}', 'Ventas\TiendaController@show')->name('clientes.tienda.show');
+        Route::get('tiendas/actualizar/{id}', 'Ventas\TiendaController@edit')->name('clientes.tienda.edit');
     });
     // Cotizaciones
     Route::prefix('ventas/cotizaciones')->group(function() {
@@ -598,5 +607,6 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    return 'SISTEMA';
+    $dato = 'Actualizar';
+    broadcast(new VentasCajaEvent($dato));
 });
