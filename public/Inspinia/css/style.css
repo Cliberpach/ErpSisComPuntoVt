@@ -4032,7 +4032,7 @@ a.forum-item-title:hover {
 .payments-method .panel-heading i {
   font-size: 26px;
 }
-/* Select2 custom styles */
+/* Select2 custom styles
 .select2-container--default .select2-selection--single,
 .select2-container--default .select2-selection--multiple {
   border-color: #e7eaec;
@@ -4040,9 +4040,9 @@ a.forum-item-title:hover {
 .select-required .select2-container--default .select2-selection--single,
 .select-required .select2-container--default .select2-selection--multiple {
   background-color: #D1F2EB !important;
-}
+}*/
 
-.input-required 
+.input-required
 {
     background-color: #D1F2EB !important;
 }

@@ -11,6 +11,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{asset('img/siscom.ico')}}" />
 
+    @yield('vue-css')
+
     <link href="{{asset('Inspinia/css/bootstrap.min.css')}}" rel="stylesheet">
     <link href="{{asset('Inspinia/font-awesome/css/font-awesome.css')}}" rel="stylesheet">
 
@@ -31,7 +33,7 @@
     <link href="{{asset('css/style.css')}}" rel="stylesheet">
 
 </head>
-
+@routes
 <body>
     <div id="">
         <nav class="navbar-default navbar-static-side" role="navigation">
@@ -115,6 +117,8 @@
         </div>
 
     </div>
+
+    @yield('vue-js')
 
     <!-- Mainly scripts -->
     <script src="{{asset('Inspinia/js/jquery-3.1.1.min.js')}}"></script>

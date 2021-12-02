@@ -27,7 +27,9 @@
                                 <th class="text-center">CANTID.</th>
                                 <th class="text-center">COD. BARRA</th>
                                 <th class="text-center">PREC.VENTA</th>
+                                @if ($fullaccess)
                                 <th class="text-center">PREC.COMPRA</th>
+                                @endif
 
                             </tr>
                             </thead>
@@ -157,7 +159,9 @@ function obtenerLotesproductos(tipo_cliente) {
             {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento", sWidth: '5%' },
             {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
             {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
+            @if ($fullaccess)
             {data: 'monto', className: "text-center", name:"productos_clientes.monto", sWidth: '10%' },
+            @endif
             {
                 data: null,
                 className: "text-center letrapequeña",

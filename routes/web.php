@@ -2,6 +2,7 @@
 
 use App\Almacenes\Kardex;
 use App\Almacenes\LoteProducto;
+use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Almacenes\NotaSalidadController;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Pos\MovimientoCaja;
@@ -267,14 +268,6 @@ function(){
         Route::get('nuevodocumento/{id}','Compras\OrdenController@newdocument')->name('compras.orden.nuevodocumento');
         Route::get('confirmarEliminar/{id}','Compras\OrdenController@confirmDestroy')->name('compras.orden.confirmDestroy');
         Route::get('dolar','Compras\OrdenController@dolar')->name('compras.orden.dolar');
-
-        //Pagos
-        Route::get('pagos/index/{id}', 'Compras\PagoController@index')->name('compras.pago.index');
-        Route::get('getPay/{id}','Compras\PagoController@getPay')->name('getPay');
-        Route::get('pagos/create/{id}', 'Compras\PagoController@create')->name('compras.pago.create');
-        Route::post('pagos/store/', 'Compras\PagoController@store')->name('compras.pago.store');
-        Route::get('pagos/destroy/', 'Compras\PagoController@destroy')->name('compras.pago.destroy');
-        Route::get('pagos/show/', 'Compras\PagoController@show')->name('compras.pago.show');
     });
     //Documentos
     Route::prefix('compras/documentos')->group(function(){
@@ -381,6 +374,17 @@ function(){
         Route::get('getLot/{id}','Ventas\DocumentoController@getLot')->name('ventas.getLot');
         Route::post('vouchersAvaible','Ventas\DocumentoController@vouchersAvaible')->name('ventas.vouchersAvaible');
     });
+
+    //VENTAS-CAJA
+    Route::prefix('ventas/caja')->group(function(){
+
+        Route::get('index', 'Ventas\CajaController@index')->name('ventas.caja.index');
+        Route::get('getDocument','Ventas\CajaController@getDocument')->name('ventas.caja.getDocument');
+        Route::post('getDocumentClient','Ventas\CajaController@getDocumentClient')->name('ventas.caja.getDocumentClient');
+
+        Route::post('/storePago', 'Ventas\CajaController@storePago')->name('ventas.caja.storePago');
+    });
+
     //COMPROBANTES ELECTRONICOS
     Route::prefix('comprobantes/electronicos')->group(function(){
         Route::get('/', 'Ventas\Electronico\ComprobanteController@index')->name('ventas.comprobantes');
@@ -620,15 +624,6 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    //https://www.oratlas.com/lector-online-de-texto
-    return comprobantes_empresa();
-
-    return '<h1>SISCOM</h1>';
-    $dif = (int)(8-9);
-
-    $doc = Documento::find(3);
-    //$json_data = json_encode($doc->getCdrResponse,false);
-    //$json_data = json_decode($json_data, false);
-    $json_data = json_decode($doc->getCdrResponse, false);
-    return $json_data->code;
+    $dato = 'Actualizar';
+    broadcast(new VentasCajaEvent($dato));
 });

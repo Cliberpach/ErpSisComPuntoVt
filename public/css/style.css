@@ -161,6 +161,10 @@ select.form-control:not([size]):not([multiple]) {
 
 }
 
+.letrapequeña {
+    font-size: 11px;
+}
+
 
 
 

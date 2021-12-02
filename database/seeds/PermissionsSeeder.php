@@ -93,7 +93,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Almacenes permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Almacén',
             'slug'=>'almacen.index',
@@ -101,7 +101,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Categoria permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Categoria',
             'slug'=>'categoria.index',
@@ -109,7 +109,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Kardex producto permission
-        
+
         Permission::create([
             'name'  => 'Consulta kardex producto',
             'slug'=>'kardex_producto.index',
@@ -117,7 +117,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Lote Produco permission
-        
+
         Permission::create([
             'name'  => 'Consulta Lote Producto',
             'slug'=>'lote_producto.index',
@@ -125,7 +125,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Marca permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Marca',
             'slug'=>'marca.index',
@@ -133,7 +133,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Producto permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Producto',
             'slug'=>'producto.index',
@@ -141,7 +141,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Nota Ingreso permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Notas de Ingreso',
             'slug'=>'nota_ingreso.index',
@@ -149,7 +149,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Nota Salida permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Notas de Salida',
             'slug'=>'nota_salida.index',
@@ -157,7 +157,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Tipo Cliente permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Tipos de Cliente',
             'slug'=>'tipo_cliente.index',
@@ -165,7 +165,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Orden compra permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Ordenes de Compra',
             'slug'=>'orden_compra.index',
@@ -173,7 +173,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Documento de compra permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Documentos de compra',
             'slug'=>'documento_compra.index',
@@ -181,7 +181,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Proveedor permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Proveedores',
             'slug'=>'proveedor.index',
@@ -189,7 +189,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Cuenta proveedor permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Cuentas de proveedor',
             'slug'=>'cuenta_proveedor.index',
@@ -197,7 +197,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Colaborador permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Colaboradores',
             'slug'=>'colaborador.index',
@@ -205,7 +205,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Empresa permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Empresas',
             'slug'=>'empresa.index',
@@ -213,7 +213,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Personas permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor de Personas',
             'slug'=>'persona.index',
@@ -221,7 +221,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Tabla permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Tablas General',
             'slug'=>'tabla.index',
@@ -229,7 +229,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Vendedor permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Vendedores',
             'slug'=>'vendedor.index',
@@ -237,7 +237,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Caja permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Cajas',
             'slug'=>'caja.index',
@@ -245,7 +245,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Movimiento Caja permission
-        
+
         Permission::create([
             'name'  => 'Listar Movimientos Caja',
             'slug'=>'movimiento_caja.index',
@@ -259,7 +259,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Cliente permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Clientes',
             'slug'=>'cliente.index',
@@ -267,7 +267,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Cotizacion permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Cotizaciones',
             'slug'=>'cotizacion.index',
@@ -275,7 +275,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Egreso permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Egresos',
             'slug'=>'egreso.index',
@@ -283,15 +283,23 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Documento Venta permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Documentos Venta',
             'slug'=>'documento_venta.index',
-            'description'=>'El usuario puede acceder al mantenedor de Dpcumentos de Venta'
+            'description'=>'El usuario puede acceder al mantenedor de Documentos de Venta'
+        ]);
+
+        //Venta Caja permission
+
+        Permission::create([
+            'name'  => 'Mantenedor Venjas Caja',
+            'slug'=>'ventascaja.index',
+            'description'=>'El usuario puede acceder al mantenedor de Ventas Caja'
         ]);
 
         //Cuenta Cliente permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Cuentas Cliente',
             'slug'=>'cuenta_cliente.index',
@@ -299,7 +307,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Guia permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Guias de Remision',
             'slug'=>'guia.index',
@@ -307,7 +315,7 @@ class PermissionsSeeder extends Seeder
         ]);
 
         //Nota Electronica permission
-        
+
         Permission::create([
             'name'  => 'Mantenedor Notas Electronicas',
             'slug'=>'nota_electronica.index',

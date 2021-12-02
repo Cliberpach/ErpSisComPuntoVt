@@ -7,6 +7,7 @@ use App\Almacenes\Producto;
 use App\Events\ComprobanteRegistrado;
 use App\Events\DocumentoNumeracion;
 use App\Events\NotaRegistrada;
+use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Mantenimiento\Empresa\Numeracion;
@@ -32,6 +33,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 use App\Ventas\ErrorVenta;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 //CONVERTIR DE NUMEROS A LETRAS
 use Luecano\NumeroALetras\NumeroALetras;
@@ -265,6 +267,22 @@ class DocumentoController extends Controller
         $productos = Producto::where('estado', 'ACTIVO')->get();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
 
+        $fullaccess = false;
+
+        if(count(Auth::user()->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count(Auth::user()->roles))
+            {
+                if(Auth::user()->roles[$cont]['full-access'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count(Auth::user()->roles);
+                }
+                $cont = $cont + 1;
+            }
+        }
+
         $cotizacion = '';
         $detalles = '';
         if($request->get('cotizacion')){
@@ -291,6 +309,7 @@ class DocumentoController extends Controller
                     'lotes' => $nuevoDetalle,
                     'errores' => $errores,
                     'fecha_hoy' => $fecha_hoy,
+                    'fullaccess' => $fullaccess,
                 ]);
             }
             //COMPROBACION DE LOTES SI LAS CANTIDADES ENVIADAS SON IGUALES A LAS SOLICITADAS
@@ -337,6 +356,7 @@ class DocumentoController extends Controller
                 'lotes' => $nuevoDetalle,
                 'errores' => $errores,
                 'fecha_hoy' => $fecha_hoy,
+                'fullaccess' => $fullaccess,
             ]);
 
         }
@@ -348,6 +368,7 @@ class DocumentoController extends Controller
                 'productos' => $productos,
                 'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
+                'fullaccess' => $fullaccess,
             ]);
         }
     }
@@ -635,6 +656,8 @@ class DocumentoController extends Controller
 
             if((int)$documento->tipo_venta === 127 || (int)$documento->tipo_venta === 128)
             {
+                $dato =  'Actualizar';
+                broadcast(new VentasCajaEvent($dato));
                 DB::commit();
                 if($request->envio_sunat)
                 {
@@ -651,6 +674,8 @@ class DocumentoController extends Controller
                 ]);
             }
             else{
+                $dato =  'Actualizar';
+                broadcast(new VentasCajaEvent($dato));
                 DB::commit();
                 //$vp = self::venta_comprobante($documento->id);
                 //$ve = self::venta_email($documento->id);

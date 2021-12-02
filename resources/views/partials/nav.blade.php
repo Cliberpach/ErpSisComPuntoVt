@@ -62,7 +62,7 @@
 </li>
 @endcan
 
-@can('restore', [Auth::user(),['cliente.index','cotizacion.index','documento_venta.index','guia.index']])
+@can('restore', [Auth::user(),['cliente.index','cotizacion.index','documento_venta.index','ventascaja.index','guia.index']])
 <li class="@yield('ventas-active')">
     <a href="#"><i class="fa fa-signal"></i> <span class="nav-label">Ventas</span><span
             class="fa arrow"></span></a>
@@ -75,6 +75,9 @@
         @endcan
         @can('haveaccess', 'documento_venta.index')
         <li class="@yield('documento-active')"><a href="{{ route('ventas.documento.index') }}">Doc. Venta</a></li>
+        @endcan
+        @can('haveaccess', 'ventascaja.index')
+        <li class="@yield('ventas-caja-active')"><a href="{{ route('ventas.caja.index') }}">Caja</a></li>
         @endcan
         @can('haveaccess', 'guia.index')
         <li class="@yield('guias-remision-active')"><a href="{{ route('ventas.guiasremision.index') }}">Guias de Remision</a></li>
