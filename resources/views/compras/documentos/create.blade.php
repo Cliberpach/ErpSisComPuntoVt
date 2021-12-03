@@ -905,53 +905,78 @@
         e.preventDefault();
         var correcto = validarFecha();
 
+
         if (correcto) {
-            Swal.fire({
-                title: 'Opción Guardar',
-                text: "¿Seguro que desea guardar cambios?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: "#1ab394",
-                confirmButtonText: 'Si, Confirmar',
-                cancelButtonText: "No, Cancelar",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $('#monto_sub_total').val($('#subtotal').text())
-                    $('#monto_total_igv').val($('#igv_monto').text())
-                    $('#monto_total').val($('#total').text())
-
-                    @if (!empty($orden))
-                        var validar = montosFlete()
-                        if (validar == true) {
-                            cargarproductos()
-                            document.getElementById("modo_compra").disabled = false;
-                            document.getElementById("igv_check").disabled = false;
-                            document.getElementById("moneda").disabled = false;
-                            document.getElementById("observacion").disabled = false;
-                            document.getElementById("proveedor_razon").disabled = false;
-                            document.getElementById("proveedor_id").disabled = false;
-                            document.getElementById("fecha_documento_campo").disabled = false;
-                            document.getElementById("fecha_entrega_campo").disabled = false;
-
-                            this.submit();
-                        }
-
-                    @else
-                        cargarproductos()
-                        this.submit();
-                    @endif
-
-                } else if (
-                    /* Read more about handling dismissals below */
-                    result.dismiss === Swal.DismissReason.cancel
-                ) {
-                    swalWithBootstrapButtons.fire(
-                        'Cancelado',
-                        'La Solicitud se ha cancelado.',
-                        'error'
-                    )
+            $.ajax({
+                dataType: 'json',
+                type: 'post',
+                async: false,
+                url: '{{ route('compras.documento.consulta_store') }}',
+                data: {
+                    '_token': $('input[name=_token]').val(),
+                    'moneda': $('#moneda').val(),
+                    'serie_tipo': $('#serie_tipo').val(),
+                    'numero_tipo': $('#numero_tipo').val(),
+                    'proveedor_id': $('#proveedor_id').val(),
+                    'tipo_compra': $('#tipo_compra').val(),
                 }
-            })
+            }).done(function(result) {
+                if(!result.success)
+                {
+                    toastr.error('La serie ' + serie_tipo + ' con el numero ' + numero_tipo + ' ya tiene un documento de compra registrado');
+                }
+                else
+                {
+                    Swal.fire({
+                        title: 'Opción Guardar',
+                        text: "¿Seguro que desea guardar cambios?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: "#1ab394",
+                        confirmButtonText: 'Si, Confirmar',
+                        cancelButtonText: "No, Cancelar",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $('#monto_sub_total').val($('#subtotal').text())
+                            $('#monto_total_igv').val($('#igv_monto').text())
+                            $('#monto_total').val($('#total').text())
+
+                            @if (!empty($orden))
+                                var validar = montosFlete()
+                                if (validar == true) {
+                                    cargarproductos()
+                                    document.getElementById("modo_compra").disabled = false;
+                                    document.getElementById("igv_check").disabled = false;
+                                    document.getElementById("moneda").disabled = false;
+                                    document.getElementById("observacion").disabled = false;
+                                    document.getElementById("proveedor_razon").disabled = false;
+                                    document.getElementById("proveedor_id").disabled = false;
+                                    document.getElementById("fecha_documento_campo").disabled = false;
+                                    document.getElementById("fecha_entrega_campo").disabled = false;
+
+                                    this.submit();
+                                }
+
+                            @else
+                                cargarproductos()
+                                this.submit();
+                            @endif
+
+                        } else if (
+                            /* Read more about handling dismissals below */
+                            result.dismiss === Swal.DismissReason.cancel
+                        ) {
+                            swalWithBootstrapButtons.fire(
+                                'Cancelado',
+                                'La Solicitud se ha cancelado.',
+                                'error'
+                            )
+                        }
+                    })
+                }
+
+            });
+
         }
 
     })
@@ -1302,7 +1327,6 @@
             toastr.error("Seleccionar tipo de compra");
             enviar = false;
         }
-        console.log(enviar)
         $.ajax({
             dataType: 'json',
             type: 'post',

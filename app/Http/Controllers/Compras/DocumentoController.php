@@ -609,7 +609,8 @@ class DocumentoController extends Controller
         }
 
         return response()->json([
-            'success' => $success
+            'success' => $success,
+            'compras' => $compras
         ]);
     }
 

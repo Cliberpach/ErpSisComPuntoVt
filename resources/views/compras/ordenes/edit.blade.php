@@ -190,7 +190,7 @@
                                         <select
                                             class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
                                             style="text-transform: uppercase; width:100%"
-                                            value="{{old('moneda',$orden->moneda)}}" name="moneda" id="moneda" required>
+                                            value="{{old('moneda',$orden->moneda)}}" name="moneda" id="moneda" onchange="cambioMoneda(this)" required>
                                             <option></option>
                                             @foreach ($monedas as $moneda)
                                             <option value="{{$moneda->descripcion}}" @if(old('moneda',$orden->
@@ -627,6 +627,24 @@ function validarFecha() {
     }
 
     return enviar
+}
+
+function cambioMoneda(b)
+{
+    if(b.value == 'DOLARES')
+    {
+        $.ajax({
+            dataType: 'json',
+            type: 'get',
+            url: '{{route("compras.orden.dolar")}}',
+        }).done(function(result) {
+            $('#tipo_cambio').val(result.venta);
+        });
+    }
+    else
+    {
+        $('#tipo_cambio').val('');
+    }
 }
 
 $('#enviar_orden').submit(function(e) {
