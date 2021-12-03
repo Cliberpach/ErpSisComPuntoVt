@@ -192,7 +192,7 @@
                                         <label class="col-form-label required">Venta</label>
                                         <input type="text" class="form-control" v-model="form.venta_id" id="venta_id" name="venta_id" readonly>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group d-none">
                                         <label class="col-form-label required">Tipo Pago</label>
                                         <input type="text" class="form-control" id="tipo_pago_id" name="tipo_pago_id" v-model="form.tipo_pago_id" readonly>
                                     </div>
@@ -202,7 +202,7 @@
                                     </div>
                                     <div class="form-group|">
                                         <label class="col-form-label required">Efectivo</label>
-                                        <input type="text" class="form-control" v-model="form.efectivo" id="efectivo" name="efectivo" onkeypress="return filterFloat(event, this);" onkeyup="changeEfectivo(this)">
+                                        <input type="text" class="form-control" v-model="form.efectivo" id="efectivo" name="efectivo" onkeypress="return filterFloat(event, this);" @keyup="changeEfectivo()">
                                     </div>
                                     <div class="form-group">
                                         <label class="col-form-label required">Modo de pago</label>
@@ -215,7 +215,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label  class="col-form-label required">Importe</label>
-                                        <input type="text" class="form-control" id="importe" v-model="form.importe" name="importe" onkeypress="return filterFloat(event, this);" onkeyup="changeImporte(this)">
+                                        <input type="text" class="form-control" id="importe" v-model="form.importe" name="importe" onkeypress="return filterFloat(event, this);" @keyup="changeImporte()">
                                     </div>
                                     <div class="form-group d-none" id="div_cuentas">
                                         <label class="col-form-label">Cuentas</label>
@@ -226,13 +226,17 @@
                                             @input="setSelectedCuenta"
                                         ></v-select>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="col-form-label required">Cuenta</label>
+                                        <input type="text" class="form-control" id="cuenta_id" name="cuenta_id" v-model="form.cuenta_id" readonly>
+                                    </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label id="imagen_label">Imagen:</label>
 
                                         <div class="custom-file">
-                                            <input id="imagen" type="file" name="imagen" class="custom-file-input"   accept="image/*">
+                                            <input id="imagen" type="file" name="imagen" class="custom-file-input" @change="changeImage()" accept="image/*">
 
                                             <label for="imagen" id="imagen_txt"
                                                 class="custom-file-label selected">Seleccionar</label>
@@ -244,7 +248,7 @@
                                     <div class="form-group row justify-content-center">
                                         <div class="col-6 align-content-center">
                                             <div class="row justify-content-end">
-                                                <a href="javascript:void(0);" id="limpiar_imagen">
+                                                <a href="javascript:void(0);" id="limpiar_imagen" @click="limpiarImagen()">
                                                     <span class="badge badge-danger">x</span>
                                                 </a>
                                             </div>
@@ -268,6 +272,77 @@
                         <div class="col-md-6 text-right">
                             <button type="submit" class="btn btn-primary btn-sm" form="pago_venta"><i class="fa fa-save"></i> Guardar</button>
                             <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal inmodal" id="modal_pago_show" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content animated bounceInRight">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title pago-title"></h4>
+                        <small class="font-bold pago-subtitle"></small>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-12 col-md-6 br">
+                                <div class="form-group d-none">
+                                    <label class="col-form-label required">Venta</label>
+                                    <input type="text" class="form-control" id="venta_id" name="venta_id" disabled>
+                                </div>
+                                <div class="form-group d-none">
+                                    <label class="col-form-label required">Tipo Pago</label>
+                                    <input type="text" class="form-control" id="tipo_pago_id" name="tipo_pago_id" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-form-label required">Monto</label>
+                                    <input type="text" class="form-control" id="monto_venta" name="monto_venta" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-form-label required">Efectivo</label>
+                                    <input type="text" value="0.00" class="form-control" id="efectivo" name="efectivo" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-form-label required">Modo de pago</label>
+                                    <select name="modo_pago" id="modo_pago" class="select2_form form-control" disabled>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label  class="col-form-label required">Importe</label>
+                                    <input type="text" class="form-control" id="importe" name="importe" disabled>
+                                </div>
+                                <div class="form-group d-none" id="div_cuentas">
+                                    <label class="col-form-label">Cuentas</label>
+                                    <select name="cuenta_id" id="cuenta_id_show" class="select2_form form-control" disabled>
+                                        <option></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label id="imagen_label">Imagen:</label>
+                                </div>
+                                <div class="form-group row justify-content-center">
+                                    <div class="col-6 align-content-center">
+                                        <div class="row justify-content-center">
+                                            <p>
+                                                <img class="imagen" src="/img/default.png" alt="IMG">
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="col-md-6 text-right">
+                            <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
                         </div>
                     </div>
                 </div>
@@ -335,6 +410,8 @@ export default {
             $('#modal_pago').modal('show');
             $this.tipo_pago = 'EFECTIVO';
             $this.form.tipo_pago_id = '1';
+            $('#efectivo').attr('readonly', true);
+            $('#importe').attr('readonly', true);
             $this.initCuentas(data.empresa_id);
         });
     },
@@ -679,47 +756,102 @@ export default {
         setSelectedPago: function(value)
         {
             let $this = this;
+            let monto = $this.form.monto_venta;
+            let importe = $this.form.importe;
+            let efectivo = $this.efectivo;
+            let suma = convertFloat(importe) + convertFloat(efectivo);
+            $this.cuenta = '';
+            $this.form.cuenta_id = null;
+            $('#efectivo').attr('readonly', false);
+            $('#importe').attr('readonly', false);
             if(value != null)
             {
                 $this.form.tipo_pago_id = value.code;
+                $this.tipo_pago = value.label;
+                if(value.label == 'EFECTIVO')
+                {
+                    $('#efectivo').attr('readonly', true);
+                    $('#importe').attr('readonly', true);
+                    $this.form.efectivo = '0.00';
+                    $this.form.importe = monto;
+                }
+
+                if(value.label == 'TRANSFERENCIA')
+                {
+                    $('#div_cuentas').removeClass('d-none');
+                }else{
+                    $('#div_cuentas').addClass('d-none');
+                }
             }
             else
             {
                 $this.form.tipo_pago_id = null;
             }
-            // let monto = $('#monto_venta').val();
-            // let importe = $('#importe').val();
-            // let efectivo = $('#efectivo').val();
-            // let suma = convertFloat(importe) + convertFloat(efectivo);
-            // $('#cuenta_id').val('').trigger('change.select2');
-            // $('#efectivo').attr('readonly', false);
-            // $('#importe').attr('readonly', false);
-            // if(b.value != '')
-            // {
-            //     let cadena = b.value.split('-');
-            //     if(cadena[1] == 'EFECTIVO')
-            //     {
-            //         $('#efectivo').attr('readonly', true);
-            //         $('#importe').attr('readonly', true);
-            //         $('#efectivo').val('0.00');
-            //         $('#importe').val(monto);
-            //     }
-            //     $('#tipo_pago_id').val(cadena[0]);
 
-            //     if(cadena[1] == 'TRANSFERENCIA')
-            //     {
-            //         $('#div_cuentas').removeClass('d-none');
-            //     }else{
-            //         $('#div_cuentas').addClass('d-none');
-            //     }
-            // }else{
-            //     $('#tipo_pago_id').val('');
-            // }
-
+        },
+        changeEfectivo: function()
+        {
+            let $this = this;
+            let modo = $this.tipo_pago;
+            let monto = convertFloat($this.form.monto_venta);
+            let efectivo = convertFloat($this.form.efectivo);
+            let importe = $this.form.importe;
+            if(modo != 'EFECTIVO')
+            {
+                let diferencia = monto - efectivo;
+                $this.form.importe = diferencia.toFixed(2);
+            }
+        },
+        changeImporte: function()
+        {
+            let $this = this;
+            let modo = $this.tipo_pago;
+            let monto = convertFloat($this.form.monto_venta);
+            let importe = convertFloat($this.form.importe);
+            let efectivo = $this.form.efectivo;
+            if(modo != 'EFECTIVO')
+            {
+                let diferencia = monto - importe;
+                $this.form.efectivo = diferencia.toFixed(2);
+            }
+        },
+        changeImage: function()
+        {
+            var fileInput = document.getElementById('imagen');
+            var filePath = fileInput.value;
+            var allowedExtensions = /(.jpg|.jpeg|.png)$/i;
+            let $imagenPrevisualizacion = document.querySelector(".imagen");
+            if (allowedExtensions.exec(filePath)) {
+                var userFile = document.getElementById('imagen');
+                userFile.src = URL.createObjectURL(event.target.files[0]);
+                this.form.image = event.target.files[0]
+                console.log(this.form.image)
+                var data = userFile.src;
+                $imagenPrevisualizacion.src = data;
+                let fileName = $('#imagen').val().split('\\').pop();
+                $('#imagen').next('.custom-file-label').addClass("selected").html(fileName);
+            } else {
+                this.form.image = null
+                toastr.error('Extensión inválida, formatos admitidos (.jpg . jpeg . png)', 'Error');
+                $('.imagen').attr("src", "/img/default.png")
+            }
+        },
+        limpiarImagen: function()
+        {
+            $('.imagen').attr("src", "/img/default.png")
+            var fileName = "Seleccionar"
+            $('.custom-file-label').addClass("selected").html(fileName);
+            $('#imagen').val('')
+            this.form.image = null
         },
         setSelectedCuenta: function(value)
         {
-
+            let $this = this;
+            if(value != null)
+            {
+                $this.form.cuenta_id = value.code;
+                $this.cuenta = value.label;
+            }
         }
     },
     updated() {

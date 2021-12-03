@@ -312,7 +312,7 @@ class DocumentoController extends Controller
     {
         $this->authorize('haveaccess','documento_compra.index');
         $empresas = Empresa::where('estado','ACTIVO')->get();
-        $detalles = DocumentoDetalle::where('documento_id',$id)->get();
+        $detalles = DocumentoDetalle::where('documento_id', $id)->where('estado','ACTIVO')->get();
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
         $documento = Documento::findOrFail($id);
         $productos = producto::where('estado','ACTIVO')->get();
@@ -407,54 +407,39 @@ class DocumentoController extends Controller
         $productosJSON = $request->get('productos_tabla');
         $productotabla = json_decode($productosJSON[0]);
         if ($productotabla) {
-            DocumentoDetalle::where('documento_id', $documento->id)->delete();
-
-            foreach($documento->lotes as $lot)
-            {
-                MovimientoAlmacen::where('lote_id', $lot->id)->where('producto_id', $lot->producto_id)->where('compra_documento_id', $lot->compra_documento_id)->where('nota', 'COMPRA')->where('movimiento', 'INGRESO')->delete();
-                $lote = LoteProducto::find($lot->id);
-                $producto_id = $lote->producto_id;
-                $lote->estado = '0';
-                $lote->update();
-
-                //RECORRER DETALLE NOTAS
-                $cantidadProductos = LoteProducto::where('producto_id',$producto_id)->where('estado','1')->sum('cantidad');
-                //ACTUALIZAR EL STOCK DEL PRODUCTO
-                $producto = Producto::findOrFail($lote->producto_id);
-                $producto->stock = $cantidadProductos ? $cantidadProductos : 0.00;
-                $producto->update();
-            }
-
             foreach ($productotabla as $detalle) {
-                $producto = Producto::findOrFail($detalle->producto_id);
-                $precio_soles = $detalle->precio;
-                $costo_flete_soles = $detalle->costo_flete;
-                //-------------------------------
-                if($request->get('moneda') === 'DOLARES')
+                if($detalle->detalle_id == 0)
                 {
-                    $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
-                    $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
+                    $producto = Producto::findOrFail($detalle->producto_id);
+                    $precio_soles = $detalle->precio;
+                    $costo_flete_soles = $detalle->costo_flete;
+                    //-------------------------------
+                    if($request->get('moneda') === 'DOLARES')
+                    {
+                        $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
+                        $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
+                    }
+                    else
+                    {
+                        $precio_soles = (float) $detalle->precio;
+                        $costo_flete_soles = (float) $detalle->costo_flete;
+                    }
+                    DocumentoDetalle::create([
+                        'documento_id' => $documento->id,
+                        'producto_id' => $detalle->producto_id,
+                        'descripcion_producto' => $producto->nombre,
+                        'presentacion_producto' => '-',
+                        'codigo_producto' => $producto->codigo,
+                        'medida_producto' => $producto->medida,
+                        'cantidad' => $detalle->cantidad,
+                        'precio' => $detalle->precio,
+                        'precio_soles' => $precio_soles,
+                        'costo_flete' => $detalle->costo_flete,
+                        'costo_flete_soles' => $costo_flete_soles,
+                        'fecha_vencimiento' =>  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d'),
+                        'lote' => $detalle->lote,
+                    ]);
                 }
-                else
-                {
-                    $precio_soles = (float) $detalle->precio;
-                    $costo_flete_soles = (float) $detalle->costo_flete;
-                }
-                DocumentoDetalle::create([
-                    'documento_id' => $documento->id,
-                    'producto_id' => $detalle->producto_id,
-                    'descripcion_producto' => $producto->nombre,
-                    'presentacion_producto' => '-',
-                    'codigo_producto' => $producto->codigo,
-                    'medida_producto' => $producto->medida,
-                    'cantidad' => $detalle->cantidad,
-                    'precio' => $detalle->precio,
-                    'precio_soles' => $precio_soles,
-                    'costo_flete' => $detalle->costo_flete,
-                    'costo_flete_soles' => $costo_flete_soles,
-                    'fecha_vencimiento' =>  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d'),
-                    'lote' => $detalle->lote,
-                ]);
             }
         }
         //Registro de actividad
@@ -471,6 +456,13 @@ class DocumentoController extends Controller
         $documento = Documento::findOrFail($id);
         $documento->estado = 'ANULADO';
         $documento->update();
+
+        $detalles = DocumentoDetalle::where('documento_id', $documento->id)->where('estado','ACTIVO')->get();
+        foreach($detalles as $item)
+        {
+            $item->estado = 'ANULADO';
+            $item->update();
+        }
         //Registro de actividad
         $descripcion = "SE ELIMINÓ EL DOCUMENTO DE COMPRA CON LA FECHA DE EMISION: ". Carbon::parse($documento->fecha_emision)->format('d/m/y');
         $gestion = "DOCUMENTO DE COMPRA";

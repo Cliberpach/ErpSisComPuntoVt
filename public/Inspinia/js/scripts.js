@@ -68,7 +68,7 @@ function convertFloat(number)
     var numero = parseFloat(number);
     if(isNaN(numero))
     {
-        numero = parseFloat('1');
+        numero = parseFloat('0');
     }
 
     return numero;

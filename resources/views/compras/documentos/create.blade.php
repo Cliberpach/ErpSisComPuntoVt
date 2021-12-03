@@ -718,13 +718,6 @@
         $('#lote').val('LT-{{ $fecha_actual }}');
         $('#fecha_vencimiento').val('{{$fecha_5}}');
         $('#costo_flete').val('0.00');
-        $("#igv_check").attr('checked', true);
-        $('#igv_requerido').addClass("required");
-        $('#igv').prop('required', true);
-        $('#igv').val('18');
-        var igv = ($('#igv').val()) + ' %';
-        $('#igv_int').text(igv);
-
         obtenerProducts();
     });
     //Select2
@@ -1129,7 +1122,13 @@
                 obtenerTabla()
                 sumaTotal()
             @endif
-
+        @else
+        $("#igv_check").attr('checked', true);
+        $('#igv_requerido').addClass("required");
+        $('#igv').prop('required', true);
+        $('#igv').val('18');
+        var igv = ($('#igv').val()) + ' %';
+        $('#igv_int').text(igv);
         @endif
     })
 
@@ -1473,7 +1472,7 @@
     function buscarproducto(id) {
         var existe = false;
         table.rows().data().each(function(el, index) {
-            (el[0] == id && $('#lote').val() == el[9]) ? existe = true : ''
+            (el[0] == id) ? existe = true : ''
         });
         return existe
     }
@@ -1498,16 +1497,18 @@
     }
 
     function sinIgv(subtotal) {
-        var calcularIgv = 18/100
-        var base = subtotal / (1 + calcularIgv)
-        var nuevo_igv = subtotal - base;
-        $('#igv_int').text(18+'%')
-        $('#subtotal').text(base.toFixed(2))
-        $('#igv_monto').text(nuevo_igv.toFixed(2))
-        $('#total').text(subtotal.toFixed(2))
+        // calular igv (calcular la base)
+        var igv =  subtotal * 0.18
+        var total = subtotal + igv
+        $('#igv_int').text('18%')
+        $('#subtotal').text(subtotal.toFixed(2))
+        $('#igv_monto').text(igv.toFixed(2))
+        $('#total').text(total.toFixed(2))
+
     }
 
     function conIgv(subtotal) {
+        // CALCULAR IGV (BASE)
         var igv = $('#igv').val()
         if (igv) {
             var calcularIgv = igv/100
@@ -1517,10 +1518,37 @@
             $('#subtotal').text(base.toFixed(2))
             $('#igv_monto').text(nuevo_igv.toFixed(2))
             $('#total').text(subtotal.toFixed(2))
+
         }else{
             toastr.error('Ingrese Igv.', 'Error');
         }
+
     }
+
+    // function sinIgv(subtotal) {
+    //     var calcularIgv = 18/100
+    //     var base = subtotal / (1 + calcularIgv)
+    //     var nuevo_igv = subtotal - base;
+    //     $('#igv_int').text(18+'%')
+    //     $('#subtotal').text(base.toFixed(2))
+    //     $('#igv_monto').text(nuevo_igv.toFixed(2))
+    //     $('#total').text(subtotal.toFixed(2))
+    // }
+
+    // function conIgv(subtotal) {
+    //     var igv = $('#igv').val()
+    //     if (igv) {
+    //         var calcularIgv = igv/100
+    //         var base = subtotal / (1 + calcularIgv)
+    //         var nuevo_igv = subtotal - base;
+    //         $('#igv_int').text(igv+'%')
+    //         $('#subtotal').text(base.toFixed(2))
+    //         $('#igv_monto').text(nuevo_igv.toFixed(2))
+    //         $('#total').text(subtotal.toFixed(2))
+    //     }else{
+    //         toastr.error('Ingrese Igv.', 'Error');
+    //     }
+    // }
 
     function obtenerTabla() {
         @if (!empty($orden))

@@ -327,6 +327,7 @@
 
 
                                 <input type="hidden" id="productos_tabla" name="productos_tabla[]">
+                                <input type="hidden" id="productos_detalle" name="productos_detalle[]" value="{{$detalles}}">
 
                             </div>
 
@@ -520,7 +521,7 @@
 </div>
 
 
-@include('compras.documentos.modal')
+@include('compras.documentos.modalEdit')
 
 @stop
 
@@ -858,11 +859,18 @@ $(document).ready(function() {
 
                 "targets": [1],
                 className: "text-center",
-                render: function(data, type, row) {
-                    return "<div class='btn-group'>" +
+                render: function(row, type, data) {
+                    if(data[10] == 0)
+                    {
+                        return "<div class='btn-group'>" +
                         "<a class='btn btn-warning btn-sm modificarDetalle' id='editar_producto' style='color:white;' title='Modificar'><i class='fa fa-edit'></i></a>" +
                         "<a class='btn btn-danger btn-sm' id='borrar_producto' style='color:white;' title='Eliminar'><i class='fa fa-trash'></i></a>" +
                         "</div>";
+                    }
+                    else
+                    {
+                        return '-';
+                    }
                 }
             },
             {
@@ -902,8 +910,11 @@ $(document).ready(function() {
                 className: "text-center",
                 visible: false
             },
-
-
+            {
+                "targets": [10],
+                "visible": false,
+                "searchable": false
+            },
 
         ],
     });
@@ -944,7 +955,8 @@ function obtenerTabla() {
         "{{$detalle->precio}}",
         ("{{$detalle->precio}}" * "{{$detalle->cantidad}}").toFixed(2),
         "{{$detalle->lote}}",
-        '1'
+        '1',
+        '{{$detalle->id}}'
     ]).draw(false);
     @endforeach
 }
@@ -1146,6 +1158,7 @@ $(".enviar_producto").click(function() {
                             cantidad: $('#cantidad').val(),
                             lote: $('#lote').val(),
                             fecha_vencimiento: $('#fecha_vencimiento').val(),
+                            detalle_id: 0,
                         }
                         // limpiarDetalle()
                         agregarTabla(detalle);
@@ -1255,7 +1268,8 @@ function agregarTabla($detalle) {
         $detalle.precio,
         ($detalle.cantidad * $detalle.precio).toFixed(2),
         $detalle.lote,
-        editable($detalle.editable)
+        editable($detalle.editable),
+        $detalle.detalle_id
     ]).draw(false);
     cargarproductos()
 
@@ -1273,7 +1287,7 @@ function editable(editable) {
 function buscarproducto(id) {
     var existe = false;
     table.rows().data().each(function(el, index) {
-        (el[0] == id && $('#lote').val() == el[9]) ? existe = true : ''
+        (el[0] == id) ? existe = true : ''
     });
     return existe
 }
@@ -1293,6 +1307,7 @@ function cargarproductos() {
             precio: value[6],
             fecha_vencimiento: value[4],
             lote: value[8],
+            detalle_id: value[10]
         };
 
         productos.push(fila);
@@ -1332,24 +1347,20 @@ function sumaTotal() {
     }
 }
 
-function sinIgv(subtotal) {
-    // calular igv (calcular la base)
-    let igv = 18;
-    var calcularIgv = igv/100
-    var base = subtotal / (1 + calcularIgv)
-    var nuevo_igv = subtotal - base;
-    $('#igv_int').text(igv+'%')
-    $('#subtotal').text(base.toFixed(2))
-    $('#igv_monto').text(nuevo_igv.toFixed(2))
-    $('#total').text(subtotal.toFixed(2))
+    function sinIgv(subtotal) {
+        // calular igv (calcular la base)
+        var igv =  subtotal * 0.18
+        var total = subtotal + igv
+        $('#igv_int').text('18%')
+        $('#subtotal').text(subtotal.toFixed(2))
+        $('#igv_monto').text(igv.toFixed(2))
+        $('#total').text(total.toFixed(2))
 
-}
+    }
 
     function conIgv(subtotal) {
-        // calular igv (calcular la base)
+        // CALCULAR IGV (BASE)
         var igv = $('#igv').val()
-        ///////////////////////////////
-
         if (igv) {
             var calcularIgv = igv/100
             var base = subtotal / (1 + calcularIgv)
@@ -1364,6 +1375,39 @@ function sinIgv(subtotal) {
         }
 
     }
+
+    // function sinIgv(subtotal) {
+    //     // calular igv (calcular la base)
+    //     let igv = 18;
+    //     var calcularIgv = igv/100
+    //     var base = subtotal / (1 + calcularIgv)
+    //     var nuevo_igv = subtotal - base;
+    //     $('#igv_int').text(igv+'%')
+    //     $('#subtotal').text(base.toFixed(2))
+    //     $('#igv_monto').text(nuevo_igv.toFixed(2))
+    //     $('#total').text(subtotal.toFixed(2))
+
+    // }
+
+    // function conIgv(subtotal) {
+    //     // calular igv (calcular la base)
+    //     var igv = $('#igv').val()
+    //     ///////////////////////////////
+
+    //     if (igv) {
+    //         var calcularIgv = igv/100
+    //         var base = subtotal / (1 + calcularIgv)
+    //         var nuevo_igv = subtotal - base;
+    //         $('#igv_int').text(igv+'%')
+    //         $('#subtotal').text(base.toFixed(2))
+    //         $('#igv_monto').text(nuevo_igv.toFixed(2))
+    //         $('#total').text(subtotal.toFixed(2))
+
+    //     }else{
+    //         toastr.error('Ingrese Igv.', 'Error');
+    //     }
+
+    // }
 
     $(document).on("change", "#proveedor_razon", function () {
         id = $(this).val();

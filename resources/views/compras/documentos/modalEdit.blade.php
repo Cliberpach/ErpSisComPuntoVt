@@ -259,8 +259,23 @@ $(".editarRegistro").click(function() {
 function actualizarTabla(i) {
     var table = $('.dataTables-orden-detalle').DataTable();
     table.row(i).remove().draw();
-    var descripcion_producto = obtenerproducto($('#producto_id_editar').val())
-    var presentacion_producto = obtenerPresentacion($('#presentacion_editar').val())
+    var descripcion_producto = obtenerproducto($('#producto_id_editar').val());
+    var presentacion_producto = obtenerPresentacion($('#presentacion_editar').val());
+    let producto_id = $('#producto_id_editar').val();
+
+    let detalles = JSON.parse($("#productos_detalle").val());
+    let detalle_id = 0;
+    let cont = 0;
+    while(cont < detalles.length)
+    {
+        if(detalles[cont].producto_id == producto_id)
+        {
+            detalle_id = detalles[cont].id;
+            cont = detalles.length;
+        }
+        cont =  cont + 1;
+    }
+
     var detalle = {
         producto_id: $('#producto_id_editar').val(),
         descripcion: descripcion_producto.nombre+' - '+$('#lote_editar').val(),
@@ -269,7 +284,8 @@ function actualizarTabla(i) {
         cantidad: $('#cantidad_editar').val(),
         lote: $('#lote_editar').val(),
         fecha_vencimiento: $('#fecha_vencimiento_editar').val(),
-        editable : '1'
+        editable : '1',
+        detalle_id: detalle_id
     }
     agregarTabla(detalle);
 
@@ -384,6 +400,7 @@ function tablaPrincipal() {
                 el[7],
                 el[8],
                 el[9],
+                el[10]
         ]).draw(false);
     });
 }

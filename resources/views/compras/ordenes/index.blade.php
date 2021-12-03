@@ -32,7 +32,7 @@
                         style="text-transform:uppercase">
                             <thead>
                                 <tr>
-                                    
+
                                     <th colspan="3" class="text-center">FECHAS</th>
                                     <th colspan="3" class="text-center">ORDEN DE COMPRA</th>
                                     <th colspan="1" class="text-center"></th>
@@ -195,7 +195,7 @@ $(document).ready(function() {
                     }
                 },
             },
-            
+
             {
                 data: null,
                 className: "text-center",
@@ -207,10 +207,6 @@ $(document).ready(function() {
                     //Ruta Modificar
                     var url_editar = '{{ route("compras.orden.edit", ":id")}}';
                     url_editar = url_editar.replace(':id', data.id);
-
-                    //Ruta Pago
-                    var url_pago = '{{ route("compras.pago.index", ":id")}}';
-                    url_pago = url_pago.replace(':id', data.id);
 
 
 
@@ -225,7 +221,6 @@ $(document).ready(function() {
                         "<li class='dropdown-divider'></li>" +
                         "<li><a class='dropdown-item' onclick='enviado(" + data.id +
                         ")' title='Ordenes Enviadas'><b><i class='fa fa-send'></i> Enviados</a></b></li>" +
-                        "<li class='d-none'><a class='dropdown-item' href='"+url_pago+"' title='Pagos'><b><i class='fa fa-money'></i> Pagos</a></b></li>" +
                         "<li><a class='dropdown-item' onclick='documento("+data.id+")' title='Documento'><b><i class='fa fa-file'></i> Documento</a></b></li>" +
                         "<li><a class='dropdown-item' onclick='concretada(" + data.id +
                         ")' title='Concretada'><b><i class='fa fa-check'></i> Concretada</a></b></li>"
@@ -328,7 +323,7 @@ function concretada(id) {
 
 function enviado(id) {
 
-    $("#modal_listar_enviados").on("shown.bs.modal", function () { 
+    $("#modal_listar_enviados").on("shown.bs.modal", function () {
         $.get('/compras/ordenes/consultaEnvios/' + id, function(data) {
         if (data.length > 0) {
             enviado_usuario.style.display = "";
@@ -383,7 +378,7 @@ function documento(id) {
 
 
 @if(!empty($id))
-   
+
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',
@@ -407,7 +402,7 @@ function documento(id) {
             url_nuevo = url_nuevo.replace(':id', "{{$id}}");
             $(location).attr('href', url_nuevo);
 
-                
+
         } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel
@@ -421,7 +416,7 @@ function documento(id) {
     })
 @endif
 
-@if (!empty($id_eliminar)) 
+@if (!empty($id_eliminar))
 
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
@@ -446,7 +441,7 @@ function documento(id) {
             url_nuevo = url_nuevo.replace(':id', "{{$id_eliminar}}");
             $(location).attr('href', url_nuevo);
 
-                
+
         } else if (
             /* Read more about handling dismissals below */
             result.dismiss === Swal.DismissReason.cancel

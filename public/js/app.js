@@ -2222,6 +2222,81 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2281,6 +2356,8 @@ __webpack_require__.r(__webpack_exports__);
       $('#modal_pago').modal('show');
       $this.tipo_pago = 'EFECTIVO';
       $this.form.tipo_pago_id = '1';
+      $('#efectivo').attr('readonly', true);
+      $('#importe').attr('readonly', true);
       $this.initCuentas(data.empresa_id);
     });
   },
@@ -2561,41 +2638,95 @@ __webpack_require__.r(__webpack_exports__);
     },
     setSelectedPago: function setSelectedPago(value) {
       var $this = this;
+      var monto = $this.form.monto_venta;
+      var importe = $this.form.importe;
+      var efectivo = $this.efectivo;
+      var suma = convertFloat(importe) + convertFloat(efectivo);
+      $this.cuenta = '';
+      $this.form.cuenta_id = null;
+      $('#efectivo').attr('readonly', false);
+      $('#importe').attr('readonly', false);
 
       if (value != null) {
         $this.form.tipo_pago_id = value.code;
+        $this.tipo_pago = value.label;
+
+        if (value.label == 'EFECTIVO') {
+          $('#efectivo').attr('readonly', true);
+          $('#importe').attr('readonly', true);
+          $this.form.efectivo = '0.00';
+          $this.form.importe = monto;
+        }
+
+        if (value.label == 'TRANSFERENCIA') {
+          $('#div_cuentas').removeClass('d-none');
+        } else {
+          $('#div_cuentas').addClass('d-none');
+        }
       } else {
         $this.form.tipo_pago_id = null;
-      } // let monto = $('#monto_venta').val();
-      // let importe = $('#importe').val();
-      // let efectivo = $('#efectivo').val();
-      // let suma = convertFloat(importe) + convertFloat(efectivo);
-      // $('#cuenta_id').val('').trigger('change.select2');
-      // $('#efectivo').attr('readonly', false);
-      // $('#importe').attr('readonly', false);
-      // if(b.value != '')
-      // {
-      //     let cadena = b.value.split('-');
-      //     if(cadena[1] == 'EFECTIVO')
-      //     {
-      //         $('#efectivo').attr('readonly', true);
-      //         $('#importe').attr('readonly', true);
-      //         $('#efectivo').val('0.00');
-      //         $('#importe').val(monto);
-      //     }
-      //     $('#tipo_pago_id').val(cadena[0]);
-      //     if(cadena[1] == 'TRANSFERENCIA')
-      //     {
-      //         $('#div_cuentas').removeClass('d-none');
-      //     }else{
-      //         $('#div_cuentas').addClass('d-none');
-      //     }
-      // }else{
-      //     $('#tipo_pago_id').val('');
-      // }
-
+      }
     },
-    setSelectedCuenta: function setSelectedCuenta(value) {}
+    changeEfectivo: function changeEfectivo() {
+      var $this = this;
+      var modo = $this.tipo_pago;
+      var monto = convertFloat($this.form.monto_venta);
+      var efectivo = convertFloat($this.form.efectivo);
+      var importe = $this.form.importe;
+
+      if (modo != 'EFECTIVO') {
+        var diferencia = monto - efectivo;
+        $this.form.importe = diferencia.toFixed(2);
+      }
+    },
+    changeImporte: function changeImporte() {
+      var $this = this;
+      var modo = $this.tipo_pago;
+      var monto = convertFloat($this.form.monto_venta);
+      var importe = convertFloat($this.form.importe);
+      var efectivo = $this.form.efectivo;
+
+      if (modo != 'EFECTIVO') {
+        var diferencia = monto - importe;
+        $this.form.efectivo = diferencia.toFixed(2);
+      }
+    },
+    changeImage: function changeImage() {
+      var fileInput = document.getElementById('imagen');
+      var filePath = fileInput.value;
+      var allowedExtensions = /(.jpg|.jpeg|.png)$/i;
+      var $imagenPrevisualizacion = document.querySelector(".imagen");
+
+      if (allowedExtensions.exec(filePath)) {
+        var userFile = document.getElementById('imagen');
+        userFile.src = URL.createObjectURL(event.target.files[0]);
+        this.form.image = event.target.files[0];
+        console.log(this.form.image);
+        var data = userFile.src;
+        $imagenPrevisualizacion.src = data;
+        var fileName = $('#imagen').val().split('\\').pop();
+        $('#imagen').next('.custom-file-label').addClass("selected").html(fileName);
+      } else {
+        this.form.image = null;
+        toastr.error('Extensión inválida, formatos admitidos (.jpg . jpeg . png)', 'Error');
+        $('.imagen').attr("src", "/img/default.png");
+      }
+    },
+    limpiarImagen: function limpiarImagen() {
+      $('.imagen').attr("src", "/img/default.png");
+      var fileName = "Seleccionar";
+      $('.custom-file-label').addClass("selected").html(fileName);
+      $('#imagen').val('');
+      this.form.image = null;
+    },
+    setSelectedCuenta: function setSelectedCuenta(value) {
+      var $this = this;
+
+      if (value != null) {
+        $this.form.cuenta_id = value.code;
+        $this.cuenta = value.label;
+      }
+    }
   },
   updated: function updated() {
     this.$nextTick(function () {});
@@ -58107,7 +58238,7 @@ var render = function() {
                         })
                       ]),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-group" }, [
+                      _c("div", { staticClass: "form-group d-none" }, [
                         _c(
                           "label",
                           { staticClass: "col-form-label required" },
@@ -58207,11 +58338,13 @@ var render = function() {
                             type: "text",
                             id: "efectivo",
                             name: "efectivo",
-                            onkeypress: "return filterFloat(event, this);",
-                            onkeyup: "changeEfectivo(this)"
+                            onkeypress: "return filterFloat(event, this);"
                           },
                           domProps: { value: _vm.form.efectivo },
                           on: {
+                            keyup: function($event) {
+                              return _vm.changeEfectivo()
+                            },
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
@@ -58275,11 +58408,13 @@ var render = function() {
                             type: "text",
                             id: "importe",
                             name: "importe",
-                            onkeypress: "return filterFloat(event, this);",
-                            onkeyup: "changeImporte(this)"
+                            onkeypress: "return filterFloat(event, this);"
                           },
                           domProps: { value: _vm.form.importe },
                           on: {
+                            keyup: function($event) {
+                              return _vm.changeImporte()
+                            },
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
@@ -58317,20 +58452,139 @@ var render = function() {
                           })
                         ],
                         1
-                      )
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Cuenta")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form.cuenta_id,
+                              expression: "form.cuenta_id"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "cuenta_id",
+                            name: "cuenta_id",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form.cuenta_id },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form,
+                                "cuenta_id",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
                     ]),
                     _vm._v(" "),
-                    _vm._m(6)
+                    _c("div", { staticClass: "col-12 col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { id: "imagen_label" } }, [
+                          _vm._v("Imagen:")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "custom-file" }, [
+                          _c("input", {
+                            staticClass: "custom-file-input",
+                            attrs: {
+                              id: "imagen",
+                              type: "file",
+                              name: "imagen",
+                              accept: "image/*"
+                            },
+                            on: {
+                              change: function($event) {
+                                return _vm.changeImage()
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "label",
+                            {
+                              staticClass: "custom-file-label selected",
+                              attrs: { for: "imagen", id: "imagen_txt" }
+                            },
+                            [_vm._v("Seleccionar")]
+                          ),
+                          _vm._v(" "),
+                          _vm._m(6)
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass: "form-group row justify-content-center"
+                        },
+                        [
+                          _c(
+                            "div",
+                            { staticClass: "col-6 align-content-center" },
+                            [
+                              _c(
+                                "div",
+                                { staticClass: "row justify-content-end" },
+                                [
+                                  _c(
+                                    "a",
+                                    {
+                                      attrs: {
+                                        href: "javascript:void(0);",
+                                        id: "limpiar_imagen"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.limpiarImagen()
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c(
+                                        "span",
+                                        { staticClass: "badge badge-danger" },
+                                        [_vm._v("x")]
+                                      )
+                                    ]
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _vm._m(7)
+                            ]
+                          )
+                        ]
+                      )
+                    ])
                   ])
                 ]
               )
             ]),
             _vm._v(" "),
-            _vm._m(7)
+            _vm._m(8)
           ])
         ])
       ]
-    )
+    ),
+    _vm._v(" "),
+    _vm._m(9)
   ])
 }
 var staticRenderFns = [
@@ -58691,64 +58945,29 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-12 col-md-6" }, [
-      _c("div", { staticClass: "form-group" }, [
-        _c("label", { attrs: { id: "imagen_label" } }, [_vm._v("Imagen:")]),
+    return _c("div", { staticClass: "invalid-feedback" }, [
+      _c("b", [_c("span", { attrs: { id: "error-imagen" } })])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row justify-content-center" }, [
+      _c("p", [
+        _c("img", {
+          staticClass: "imagen",
+          attrs: { src: "/img/default.png", alt: "" }
+        }),
         _vm._v(" "),
-        _c("div", { staticClass: "custom-file" }, [
-          _c("input", {
-            staticClass: "custom-file-input",
-            attrs: {
-              id: "imagen",
-              type: "file",
-              name: "imagen",
-              accept: "image/*"
-            }
-          }),
-          _vm._v(" "),
-          _c(
-            "label",
-            {
-              staticClass: "custom-file-label selected",
-              attrs: { for: "imagen", id: "imagen_txt" }
-            },
-            [_vm._v("Seleccionar")]
-          ),
-          _vm._v(" "),
-          _c("div", { staticClass: "invalid-feedback" }, [
-            _c("b", [_c("span", { attrs: { id: "error-imagen" } })])
-          ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "form-group row justify-content-center" }, [
-        _c("div", { staticClass: "col-6 align-content-center" }, [
-          _c("div", { staticClass: "row justify-content-end" }, [
-            _c(
-              "a",
-              { attrs: { href: "javascript:void(0);", id: "limpiar_imagen" } },
-              [_c("span", { staticClass: "badge badge-danger" }, [_vm._v("x")])]
-            )
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "row justify-content-center" }, [
-            _c("p", [
-              _c("img", {
-                staticClass: "imagen",
-                attrs: { src: "/img/default.png", alt: "" }
-              }),
-              _vm._v(" "),
-              _c("input", {
-                attrs: {
-                  id: "url_imagen",
-                  name: "url_imagen",
-                  type: "hidden",
-                  value: ""
-                }
-              })
-            ])
-          ])
-        ])
+        _c("input", {
+          attrs: {
+            id: "url_imagen",
+            name: "url_imagen",
+            type: "hidden",
+            value: ""
+          }
+        })
       ])
     ])
   },
@@ -58787,6 +59006,219 @@ var staticRenderFns = [
         )
       ])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "modal inmodal",
+        attrs: {
+          id: "modal_pago_show",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c("div", { staticClass: "modal-dialog modal-lg" }, [
+          _c("div", { staticClass: "modal-content animated bounceInRight" }, [
+            _c("div", { staticClass: "modal-header" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "close",
+                  attrs: { type: "button", "data-dismiss": "modal" }
+                },
+                [
+                  _c("span", { attrs: { "aria-hidden": "true" } }, [
+                    _vm._v("×")
+                  ]),
+                  _vm._v(" "),
+                  _c("span", { staticClass: "sr-only" }, [_vm._v("Close")])
+                ]
+              ),
+              _vm._v(" "),
+              _c("h4", { staticClass: "modal-title pago-title" }),
+              _vm._v(" "),
+              _c("small", { staticClass: "font-bold pago-subtitle" })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "modal-body" }, [
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-12 col-md-6 br" }, [
+                  _c("div", { staticClass: "form-group d-none" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Venta")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        id: "venta_id",
+                        name: "venta_id",
+                        disabled: ""
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group d-none" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Tipo Pago")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        id: "tipo_pago_id",
+                        name: "tipo_pago_id",
+                        disabled: ""
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Monto")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        id: "monto_venta",
+                        name: "monto_venta",
+                        disabled: ""
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Efectivo")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        value: "0.00",
+                        id: "efectivo",
+                        name: "efectivo",
+                        disabled: ""
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Modo de pago")
+                    ]),
+                    _vm._v(" "),
+                    _c("select", {
+                      staticClass: "select2_form form-control",
+                      attrs: {
+                        name: "modo_pago",
+                        id: "modo_pago",
+                        disabled: ""
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Importe")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        id: "importe",
+                        name: "importe",
+                        disabled: ""
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "form-group d-none",
+                      attrs: { id: "div_cuentas" }
+                    },
+                    [
+                      _c("label", { staticClass: "col-form-label" }, [
+                        _vm._v("Cuentas")
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "select",
+                        {
+                          staticClass: "select2_form form-control",
+                          attrs: {
+                            name: "cuenta_id",
+                            id: "cuenta_id_show",
+                            disabled: ""
+                          }
+                        },
+                        [_c("option")]
+                      )
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-12 col-md-6" }, [
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { attrs: { id: "imagen_label" } }, [
+                      _vm._v("Imagen:")
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "form-group row justify-content-center" },
+                    [
+                      _c("div", { staticClass: "col-6 align-content-center" }, [
+                        _c(
+                          "div",
+                          { staticClass: "row justify-content-center" },
+                          [
+                            _c("p", [
+                              _c("img", {
+                                staticClass: "imagen",
+                                attrs: { src: "/img/default.png", alt: "IMG" }
+                              })
+                            ])
+                          ]
+                        )
+                      ])
+                    ]
+                  )
+                ])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "modal-footer" }, [
+              _c("div", { staticClass: "col-md-6 text-right" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-danger btn-sm",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cerrar")]
+                )
+              ])
+            ])
+          ])
+        ])
+      ]
+    )
   }
 ]
 render._withStripped = true
@@ -71101,6 +71533,8 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
+/*En el servidor*/
+
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: 'ASDASF2121',
@@ -71111,7 +71545,7 @@ window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   enabledTransports: ['ws', 'wss'] //forceTLS:false,
 
 });
-/* En el local
+/*En el local
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
@@ -71120,9 +71554,7 @@ window.Echo = new Echo({
     wsPort: 6001,
     forceTLS:false,
     disableStats: true,
-});
-
-*/
+});*/
 
 /***/ }),
 
