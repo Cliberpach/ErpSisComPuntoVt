@@ -185,12 +185,13 @@
                         <small class="font-bold pago-subtitle"></small>
                     </div>
                     <div class="modal-body">
-                        <form action="" id="pago_venta" method="POST" enctype="multipart/form-data">
+                        <form v-on:submit.prevent="submitFormularioPago()" id="pago_venta" method="POST" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-12 col-md-6 br">
                                     <div class="form-group d-none">
                                         <label class="col-form-label required">Venta</label>
                                         <input type="text" class="form-control" v-model="form.venta_id" id="venta_id" name="venta_id" readonly>
+                                        <input type="hidden" name="_token">
                                     </div>
                                     <div class="form-group d-none">
                                         <label class="col-form-label required">Tipo Pago</label>
@@ -226,7 +227,7 @@
                                             @input="setSelectedCuenta"
                                         ></v-select>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group d-none">
                                         <label class="col-form-label required">Cuenta</label>
                                         <input type="text" class="form-control" id="cuenta_id" name="cuenta_id" v-model="form.cuenta_id" readonly>
                                     </div>
@@ -270,7 +271,7 @@
                             <i class="fa fa-exclamation-circle leyenda-required"></i> <small class="leyenda-required">Los campos marcados con asterisco (<label class="required"></label>) son obligatorios.</small>
                         </div>
                         <div class="col-md-6 text-right">
-                            <button type="submit" class="btn btn-primary btn-sm" form="pago_venta"><i class="fa fa-save"></i> Guardar</button>
+                            <button type="submit" class="btn btn-primary btn-sm" form="pago_venta" :disabled="iPagando == 1"><i class="fa fa-save"></i> Guardar</button>
                             <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                         </div>
                     </div>
@@ -309,9 +310,8 @@
                                     <input type="text" value="0.00" class="form-control" id="efectivo" name="efectivo" disabled>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-form-label required">Modo de pago</label>
-                                    <select name="modo_pago" id="modo_pago" class="select2_form form-control" disabled>
-                                    </select>
+                                        <label class="col-form-label required">Modo de pago</label>
+                                        <input type="text" class="form-control" v-model="form_show.tipo_pago" disabled>
                                 </div>
                                 <div class="form-group">
                                     <label  class="col-form-label required">Importe</label>
@@ -319,9 +319,7 @@
                                 </div>
                                 <div class="form-group d-none" id="div_cuentas">
                                     <label class="col-form-label">Cuentas</label>
-                                    <select name="cuenta_id" id="cuenta_id_show" class="select2_form form-control" disabled>
-                                        <option></option>
-                                    </select>
+                                    <input type="text" class="form-control" v-model="form_show.cuenta" disabled>
                                 </div>
                             </div>
                             <div class="col-12 col-md-6">
@@ -351,6 +349,7 @@
     </div>
 </template>
 <script>
+import Axios from "axios";
 import "datatables.net-bs4";
 import "datatables.net-buttons-bs4";
 export default {
@@ -362,6 +361,7 @@ export default {
             ventas: [],
             desc_pagos: [],
             cuentas: [],
+            cuentas_show: [],
             value_pagos: [],
             options: [],
             tipo_pago: null,
@@ -375,7 +375,18 @@ export default {
                 cuenta_id: null,
                 image: null,
 
-            }
+            },
+            form_show: {
+                venta_id: null,
+                tipo_pago: null,
+                importe: null,
+                efectivo: null,
+                monto_venta: null,
+                cuenta: null,
+                image: null,
+
+            },
+            iPagando: 0
         };
     },
     mounted() {
@@ -413,6 +424,50 @@ export default {
             $('#efectivo').attr('readonly', true);
             $('#importe').attr('readonly', true);
             $this.initCuentas(data.empresa_id);
+        });
+
+        $this.table.on('click','.verPago',function(){
+            let data = $this.table.row($(this).closest("tr")).data();
+            $('#modal_pago_show .pago-title').html(data.numero_doc);
+            $('#modal_pago_show #monto_venta').val(data.total);
+            $('#modal_pago_show #venta_id').val(data.id);
+            $('#modal_pago_show #div_cuentas').addClass('d-none');
+            let $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+            console.log(data);
+            if(data.ruta_pago)
+            {
+                let ruta = data.ruta_pago;
+                ruta = ruta.replace('public','');
+                ruta = 'storage'+ruta;
+                let ruta_final = "/"+ruta;
+                ruta_final = ruta_final.replace(':ruta', ruta);
+                $imagenPrevisualizacion.src = ruta_final;
+            }
+            else
+            {
+                $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+                $imagenPrevisualizacion.src = "/img/default.png";
+            }
+
+            if(data.cuenta_id)
+            {
+                $('#modal_pago_show #div_cuentas').removeClass('d-none');
+                $this.form_show.cuenta = data.cuenta_desc;
+            }
+            $this.form_show.tipo_pago = data.tipo_pago_desc;
+            if(data.tipo_pago != 1)
+            {
+                $('#modal_pago_show #efectivo').val(data.efectivo);
+                $('#modal_pago_show #importe').val(data.importe);
+            }
+            else
+            {
+                $('#modal_pago_show #efectivo').val('0.00');
+                $('#modal_pago_show #importe').val(data.importe);
+            }
+
+            $('#modal_pago_show .pago-subtitle').html(data.cliente);
+            $('#modal_pago_show').modal('show');
         });
     },
     methods: {
@@ -753,6 +808,52 @@ export default {
                 }
             });
         },
+        initCuentasShow:function(empresa_id)
+        {
+            let $this = this;
+            $this.cuentas_show = [];
+            let timerInterval;
+            Swal.fire({
+                title: 'Cargando...',
+                icon: 'info',
+                customClass: {
+                    container: 'my-swal'
+                },
+                timer: 10,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    Swal.stopTimer();
+                    $.ajax({
+                        dataType : 'json',
+                        type : 'post',
+                        url : route('ventas.documento.getCuentas'),
+                        data : {'_token': $('input[name=_token]').val(), 'empresa_id': empresa_id},
+                        success: function(response) {
+                            if (response.success) {
+                                if (response.cuentas.length > 0) {
+                                    for(var i = 0;i < response.cuentas.length; i++)
+                                    {
+                                        let newOption = {'code': response.cuentas[i].id, 'label': response.cuentas[i].descripcion + ': ' + response.cuentas[i].num_cuenta};
+                                        $this.cuentas_show.push(newOption);
+                                    }
+
+                                } else {
+                                }
+                                timerInterval = 0;
+                                Swal.resumeTimer();
+                            } else {
+                                timerInterval = 0;
+                                Swal.resumeTimer();
+                            }
+                        }
+                    });
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                }
+            });
+        },
         setSelectedPago: function(value)
         {
             let $this = this;
@@ -852,6 +953,33 @@ export default {
                 $this.form.cuenta_id = value.code;
                 $this.cuenta = value.label;
             }
+        },
+        submitFormularioPago: function()
+        {
+            let $this = this;
+            let frm = document.getElementById('pago_venta');
+            let formData = new FormData(frm);
+            // formData.forEach(function(value, key){
+            //     console.log(key)
+            //     console.log(value);
+            // });
+            $this.iPagando = 1;
+            axios.post(route('ventas.caja.storePago'), formData)
+            .then(response => {
+                let respuesta = response.data;
+                if (respuesta.result == 'success') {
+                    toastr.success(respuesta.mensaje)
+                    location.reload()
+                } else {
+                    let sHtmlMensaje = sHtmlErrores(respuesta.data.errors);
+                    toastr.error(sHtmlMensaje);
+                    $this.iPagando = 0;
+                }
+            })
+            .catch(error => {
+                let sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
+                toastr.error(sHtmlMensaje);
+            }).then(() => $this.iPagando = 0);
         }
     },
     updated() {

@@ -1941,10 +1941,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! datatables.net-bs4 */ "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js");
-/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! datatables.net-buttons-bs4 */ "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.js");
-/* harmony import */ var datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! datatables.net-bs4 */ "./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js");
+/* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! datatables.net-buttons-bs4 */ "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.js");
+/* harmony import */ var datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_2__);
 //
 //
 //
@@ -2295,8 +2297,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2308,6 +2309,7 @@ __webpack_require__.r(__webpack_exports__);
       ventas: [],
       desc_pagos: [],
       cuentas: [],
+      cuentas_show: [],
       value_pagos: [],
       options: [],
       tipo_pago: null,
@@ -2320,7 +2322,17 @@ __webpack_require__.r(__webpack_exports__);
         monto_venta: null,
         cuenta_id: null,
         image: null
-      }
+      },
+      form_show: {
+        venta_id: null,
+        tipo_pago: null,
+        importe: null,
+        efectivo: null,
+        monto_venta: null,
+        cuenta: null,
+        image: null
+      },
+      iPagando: 0
     };
   },
   mounted: function mounted() {
@@ -2359,6 +2371,45 @@ __webpack_require__.r(__webpack_exports__);
       $('#efectivo').attr('readonly', true);
       $('#importe').attr('readonly', true);
       $this.initCuentas(data.empresa_id);
+    });
+    $this.table.on('click', '.verPago', function () {
+      var data = $this.table.row($(this).closest("tr")).data();
+      $('#modal_pago_show .pago-title').html(data.numero_doc);
+      $('#modal_pago_show #monto_venta').val(data.total);
+      $('#modal_pago_show #venta_id').val(data.id);
+      $('#modal_pago_show #div_cuentas').addClass('d-none');
+      var $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+      console.log(data);
+
+      if (data.ruta_pago) {
+        var ruta = data.ruta_pago;
+        ruta = ruta.replace('public', '');
+        ruta = 'storage' + ruta;
+        var ruta_final = "/" + ruta;
+        ruta_final = ruta_final.replace(':ruta', ruta);
+        $imagenPrevisualizacion.src = ruta_final;
+      } else {
+        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+        $imagenPrevisualizacion.src = "/img/default.png";
+      }
+
+      if (data.cuenta_id) {
+        $('#modal_pago_show #div_cuentas').removeClass('d-none');
+        $this.form_show.cuenta = data.cuenta_desc;
+      }
+
+      $this.form_show.tipo_pago = data.tipo_pago_desc;
+
+      if (data.tipo_pago != 1) {
+        $('#modal_pago_show #efectivo').val(data.efectivo);
+        $('#modal_pago_show #importe').val(data.importe);
+      } else {
+        $('#modal_pago_show #efectivo').val('0.00');
+        $('#modal_pago_show #importe').val(data.importe);
+      }
+
+      $('#modal_pago_show .pago-subtitle').html(data.cliente);
+      $('#modal_pago_show').modal('show');
     });
   },
   methods: {
@@ -2636,6 +2687,55 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
+    initCuentasShow: function initCuentasShow(empresa_id) {
+      var $this = this;
+      $this.cuentas_show = [];
+      var timerInterval;
+      Swal.fire({
+        title: 'Cargando...',
+        icon: 'info',
+        customClass: {
+          container: 'my-swal'
+        },
+        timer: 10,
+        allowOutsideClick: false,
+        didOpen: function didOpen() {
+          Swal.showLoading();
+          Swal.stopTimer();
+          $.ajax({
+            dataType: 'json',
+            type: 'post',
+            url: route('ventas.documento.getCuentas'),
+            data: {
+              '_token': $('input[name=_token]').val(),
+              'empresa_id': empresa_id
+            },
+            success: function success(response) {
+              if (response.success) {
+                if (response.cuentas.length > 0) {
+                  for (var i = 0; i < response.cuentas.length; i++) {
+                    var newOption = {
+                      'code': response.cuentas[i].id,
+                      'label': response.cuentas[i].descripcion + ': ' + response.cuentas[i].num_cuenta
+                    };
+                    $this.cuentas_show.push(newOption);
+                  }
+                } else {}
+
+                timerInterval = 0;
+                Swal.resumeTimer();
+              } else {
+                timerInterval = 0;
+                Swal.resumeTimer();
+              }
+            }
+          });
+        },
+        willClose: function willClose() {
+          clearInterval(timerInterval);
+        }
+      });
+    },
     setSelectedPago: function setSelectedPago(value) {
       var $this = this;
       var monto = $this.form.monto_venta;
@@ -2726,6 +2826,33 @@ __webpack_require__.r(__webpack_exports__);
         $this.form.cuenta_id = value.code;
         $this.cuenta = value.label;
       }
+    },
+    submitFormularioPago: function submitFormularioPago() {
+      var $this = this;
+      var frm = document.getElementById('pago_venta');
+      var formData = new FormData(frm); // formData.forEach(function(value, key){
+      //     console.log(key)
+      //     console.log(value);
+      // });
+
+      $this.iPagando = 1;
+      axios.post(route('ventas.caja.storePago'), formData).then(function (response) {
+        var respuesta = response.data;
+
+        if (respuesta.result == 'success') {
+          toastr.success(respuesta.mensaje);
+          location.reload();
+        } else {
+          var sHtmlMensaje = sHtmlErrores(respuesta.data.errors);
+          toastr.error(sHtmlMensaje);
+          $this.iPagando = 0;
+        }
+      })["catch"](function (error) {
+        var sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
+        toastr.error(sHtmlMensaje);
+      }).then(function () {
+        return $this.iPagando = 0;
+      });
     }
   },
   updated: function updated() {
@@ -58190,10 +58317,15 @@ var render = function() {
                 "form",
                 {
                   attrs: {
-                    action: "",
                     id: "pago_venta",
                     method: "POST",
                     enctype: "multipart/form-data"
+                  },
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.submitFormularioPago()
+                    }
                   }
                 },
                 [
@@ -58235,6 +58367,10 @@ var render = function() {
                               )
                             }
                           }
+                        }),
+                        _vm._v(" "),
+                        _c("input", {
+                          attrs: { type: "hidden", name: "_token" }
                         })
                       ]),
                       _vm._v(" "),
@@ -58454,7 +58590,7 @@ var render = function() {
                         1
                       ),
                       _vm._v(" "),
-                      _c("div", { staticClass: "form-group" }, [
+                      _c("div", { staticClass: "form-group d-none" }, [
                         _c(
                           "label",
                           { staticClass: "col-form-label required" },
@@ -58578,13 +58714,141 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _vm._m(8)
+            _c("div", { staticClass: "modal-footer" }, [
+              _vm._m(8),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-6 text-right" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary btn-sm",
+                    attrs: {
+                      type: "submit",
+                      form: "pago_venta",
+                      disabled: _vm.iPagando == 1
+                    }
+                  },
+                  [_c("i", { staticClass: "fa fa-save" }), _vm._v(" Guardar")]
+                ),
+                _vm._v(" "),
+                _vm._m(9)
+              ])
+            ])
           ])
         ])
       ]
     ),
     _vm._v(" "),
-    _vm._m(9)
+    _c(
+      "div",
+      {
+        staticClass: "modal inmodal",
+        attrs: {
+          id: "modal_pago_show",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c("div", { staticClass: "modal-dialog modal-lg" }, [
+          _c("div", { staticClass: "modal-content animated bounceInRight" }, [
+            _vm._m(10),
+            _vm._v(" "),
+            _c("div", { staticClass: "modal-body" }, [
+              _c("div", { staticClass: "row" }, [
+                _c("div", { staticClass: "col-12 col-md-6 br" }, [
+                  _vm._m(11),
+                  _vm._v(" "),
+                  _vm._m(12),
+                  _vm._v(" "),
+                  _vm._m(13),
+                  _vm._v(" "),
+                  _vm._m(14),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group" }, [
+                    _c("label", { staticClass: "col-form-label required" }, [
+                      _vm._v("Modo de pago")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.form_show.tipo_pago,
+                          expression: "form_show.tipo_pago"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: { type: "text", disabled: "" },
+                      domProps: { value: _vm.form_show.tipo_pago },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
+                          }
+                          _vm.$set(
+                            _vm.form_show,
+                            "tipo_pago",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _vm._m(15),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    {
+                      staticClass: "form-group d-none",
+                      attrs: { id: "div_cuentas" }
+                    },
+                    [
+                      _c("label", { staticClass: "col-form-label" }, [
+                        _vm._v("Cuentas")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.form_show.cuenta,
+                            expression: "form_show.cuenta"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", disabled: "" },
+                        domProps: { value: _vm.form_show.cuenta },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.form_show,
+                              "cuenta",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _vm._m(16)
+              ])
+            ]),
+            _vm._v(" "),
+            _vm._m(17)
+          ])
+        ])
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -58975,35 +59239,13 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-footer" }, [
-      _c("div", { staticClass: "col-md-6 text-left" }, [
-        _c("i", { staticClass: "fa fa-exclamation-circle leyenda-required" }),
-        _vm._v(" "),
-        _c("small", { staticClass: "leyenda-required" }, [
-          _vm._v("Los campos marcados con asterisco ("),
-          _c("label", { staticClass: "required" }),
-          _vm._v(") son obligatorios.")
-        ])
-      ]),
+    return _c("div", { staticClass: "col-md-6 text-left" }, [
+      _c("i", { staticClass: "fa fa-exclamation-circle leyenda-required" }),
       _vm._v(" "),
-      _c("div", { staticClass: "col-md-6 text-right" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-primary btn-sm",
-            attrs: { type: "submit", form: "pago_venta" }
-          },
-          [_c("i", { staticClass: "fa fa-save" }), _vm._v(" Guardar")]
-        ),
-        _vm._v(" "),
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-danger btn-sm",
-            attrs: { type: "button", "data-dismiss": "modal" }
-          },
-          [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cancelar")]
-        )
+      _c("small", { staticClass: "leyenda-required" }, [
+        _vm._v("Los campos marcados con asterisco ("),
+        _c("label", { staticClass: "required" }),
+        _vm._v(") son obligatorios.")
       ])
     ])
   },
@@ -59012,213 +59254,167 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c(
-      "div",
+      "button",
       {
-        staticClass: "modal inmodal",
-        attrs: {
-          id: "modal_pago_show",
-          tabindex: "-1",
-          role: "dialog",
-          "aria-hidden": "true"
-        }
+        staticClass: "btn btn-danger btn-sm",
+        attrs: { type: "button", "data-dismiss": "modal" }
       },
-      [
-        _c("div", { staticClass: "modal-dialog modal-lg" }, [
-          _c("div", { staticClass: "modal-content animated bounceInRight" }, [
-            _c("div", { staticClass: "modal-header" }, [
-              _c(
-                "button",
-                {
-                  staticClass: "close",
-                  attrs: { type: "button", "data-dismiss": "modal" }
-                },
-                [
-                  _c("span", { attrs: { "aria-hidden": "true" } }, [
-                    _vm._v("×")
-                  ]),
-                  _vm._v(" "),
-                  _c("span", { staticClass: "sr-only" }, [_vm._v("Close")])
-                ]
-              ),
-              _vm._v(" "),
-              _c("h4", { staticClass: "modal-title pago-title" }),
-              _vm._v(" "),
-              _c("small", { staticClass: "font-bold pago-subtitle" })
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "modal-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-12 col-md-6 br" }, [
-                  _c("div", { staticClass: "form-group d-none" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Venta")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        id: "venta_id",
-                        name: "venta_id",
-                        disabled: ""
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group d-none" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Tipo Pago")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        id: "tipo_pago_id",
-                        name: "tipo_pago_id",
-                        disabled: ""
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Monto")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        id: "monto_venta",
-                        name: "monto_venta",
-                        disabled: ""
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Efectivo")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        value: "0.00",
-                        id: "efectivo",
-                        name: "efectivo",
-                        disabled: ""
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Modo de pago")
-                    ]),
-                    _vm._v(" "),
-                    _c("select", {
-                      staticClass: "select2_form form-control",
-                      attrs: {
-                        name: "modo_pago",
-                        id: "modo_pago",
-                        disabled: ""
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Importe")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        id: "importe",
-                        name: "importe",
-                        disabled: ""
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    {
-                      staticClass: "form-group d-none",
-                      attrs: { id: "div_cuentas" }
-                    },
-                    [
-                      _c("label", { staticClass: "col-form-label" }, [
-                        _vm._v("Cuentas")
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "select",
-                        {
-                          staticClass: "select2_form form-control",
-                          attrs: {
-                            name: "cuenta_id",
-                            id: "cuenta_id_show",
-                            disabled: ""
-                          }
-                        },
-                        [_c("option")]
-                      )
-                    ]
-                  )
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col-12 col-md-6" }, [
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { attrs: { id: "imagen_label" } }, [
-                      _vm._v("Imagen:")
-                    ])
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "form-group row justify-content-center" },
-                    [
-                      _c("div", { staticClass: "col-6 align-content-center" }, [
-                        _c(
-                          "div",
-                          { staticClass: "row justify-content-center" },
-                          [
-                            _c("p", [
-                              _c("img", {
-                                staticClass: "imagen",
-                                attrs: { src: "/img/default.png", alt: "IMG" }
-                              })
-                            ])
-                          ]
-                        )
-                      ])
-                    ]
-                  )
-                ])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "modal-footer" }, [
-              _c("div", { staticClass: "col-md-6 text-right" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-danger btn-sm",
-                    attrs: { type: "button", "data-dismiss": "modal" }
-                  },
-                  [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cerrar")]
-                )
-              ])
+      [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cancelar")]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: { type: "button", "data-dismiss": "modal" }
+        },
+        [
+          _c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")]),
+          _vm._v(" "),
+          _c("span", { staticClass: "sr-only" }, [_vm._v("Close")])
+        ]
+      ),
+      _vm._v(" "),
+      _c("h4", { staticClass: "modal-title pago-title" }),
+      _vm._v(" "),
+      _c("small", { staticClass: "font-bold pago-subtitle" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group d-none" }, [
+      _c("label", { staticClass: "col-form-label required" }, [
+        _vm._v("Venta")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: { type: "text", id: "venta_id", name: "venta_id", disabled: "" }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group d-none" }, [
+      _c("label", { staticClass: "col-form-label required" }, [
+        _vm._v("Tipo Pago")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          id: "tipo_pago_id",
+          name: "tipo_pago_id",
+          disabled: ""
+        }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", { staticClass: "col-form-label required" }, [
+        _vm._v("Monto")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          id: "monto_venta",
+          name: "monto_venta",
+          disabled: ""
+        }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", { staticClass: "col-form-label required" }, [
+        _vm._v("Efectivo")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          value: "0.00",
+          id: "efectivo",
+          name: "efectivo",
+          disabled: ""
+        }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "form-group" }, [
+      _c("label", { staticClass: "col-form-label required" }, [
+        _vm._v("Importe")
+      ]),
+      _vm._v(" "),
+      _c("input", {
+        staticClass: "form-control",
+        attrs: { type: "text", id: "importe", name: "importe", disabled: "" }
+      })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col-12 col-md-6" }, [
+      _c("div", { staticClass: "form-group" }, [
+        _c("label", { attrs: { id: "imagen_label" } }, [_vm._v("Imagen:")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "form-group row justify-content-center" }, [
+        _c("div", { staticClass: "col-6 align-content-center" }, [
+          _c("div", { staticClass: "row justify-content-center" }, [
+            _c("p", [
+              _c("img", {
+                staticClass: "imagen",
+                attrs: { src: "/img/default.png", alt: "IMG" }
+              })
             ])
           ])
         ])
-      ]
-    )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-footer" }, [
+      _c("div", { staticClass: "col-md-6 text-right" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-danger btn-sm",
+            attrs: { type: "button", "data-dismiss": "modal" }
+          },
+          [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cerrar")]
+        )
+      ])
+    ])
   }
 ]
 render._withStripped = true
@@ -71533,28 +71729,28 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
-/*En el servidor*/
+/*En el servidor
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+    wssPort: 6001,
+    encrypted:false,
+    disableStats:true,
+    enabledTransports: ['ws', 'wss'],
+    //forceTLS:false,
+});*/
+
+/*En el local*/
 
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: 'ASDASF2121',
   wsHost: window.location.hostname,
-  wssPort: 6001,
-  encrypted: false,
-  disableStats: true,
-  enabledTransports: ['ws', 'wss'] //forceTLS:false,
-
+  wsPort: 6001,
+  forceTLS: false,
+  disableStats: true
 });
-/*En el local
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: 'ASDASF2121',
-    wsHost: window.location.hostname,
-    wsPort: 6001,
-    forceTLS:false,
-    disableStats: true,
-});*/
 
 /***/ }),
 

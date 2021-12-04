@@ -66,6 +66,7 @@ class CajaController extends Controller
                 'tipo_venta_id' => $documento->tipo_venta,
                 'empresa' => $documento->empresaEntidad->razon_social,
                 'tipo_pago' => $documento->tipo_pago_id,
+                'tipo_pago_desc' => $documento->tipo_pago->descripcion,
                 'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
                 'serie' => $documento->serie,
                 'correlativo' => $documento->correlativo,
@@ -80,6 +81,7 @@ class CajaController extends Controller
                 'condicion_id' => $documento->condicion_id,
                 'ruta_pago' => $documento->ruta_pago,
                 'cuenta_id' => $documento->banco_empresa_id,
+                'cuenta_desc' => $documento->banco_empresa_id ? $documento->bancoPagado->descripcion.':'.$documento->bancoPagado->num_cuenta : '-',
                 'importe' => $documento->importe,
                 'efectivo' => $documento->efectivo,
                 'sunat' => $documento->sunat,
@@ -185,15 +187,20 @@ class CajaController extends Controller
             $validator =  Validator::make($data, $rules, $message);
 
             if ($validator->fails()) {
-                $clase = $validator->getMessageBag()->toArray();
+                /*$clase = $validator->getMessageBag()->toArray();
                 $cadena = "";
                 foreach($clase as $clave => $valor) {
                     $cadena =  $cadena . "$valor[0] ";
-                }
+                }*/
 
-                Session::flash('error_store_pago',$cadena);
+                //Session::flash('error_store_pago',$cadena);
                 DB::rollBack();
-                return redirect()->route('ventas.caja.index');
+                //return redirect()->route('ventas.caja.index');
+                return response()->json([
+                    'result' => 'warning',
+                    'mensaje' => 'Ocurrió un error de validación.',
+                    'data' => array('errors' => $validator->getMessageBag()->toArray()),
+                ]);
             }
 
             $documento = Documento::find($request->venta_id);
@@ -214,14 +221,19 @@ class CajaController extends Controller
 
 
             DB::commit();
-            Session::flash('success','Documento pagado con exito.');
-            return redirect()->route('ventas.caja.index');
+            return response()->json([
+                'result' => 'success',
+                'mensaje' => 'Pago realizado exitosamente.',
+            ]);
         }
         catch(Exception $e)
         {
             DB::rollBack();
-            Session::flash('error',$e->getMessage());
-            return redirect()->route('ventas.caja.index');
+            return response()->json([
+                'result' => 'success',
+                'mensaje' => 'Pago realizado exitosamente.',
+                'data' => array('errors' => array('error' => [$e->getMessage()])),
+            ]);
         }
     }
 }

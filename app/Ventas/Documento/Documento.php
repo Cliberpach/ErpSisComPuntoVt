@@ -42,6 +42,7 @@ class Documento extends Model
         'envio_sunat',
         'getCdrResponse',
         'correlativo',
+        'banco_empresa_id',
         'serie',
         'ruta_comprobante_archivo',
         'nombre_comprobante_archivo',
@@ -64,6 +65,11 @@ class Documento extends Model
     public function condicion()
     {
         return $this->belongsTo('App\Mantenimiento\Condicion', 'condicion_id');
+    }
+
+    public function bancoPagado()
+    {
+        return $this->belongsTo('App\Mantenimiento\Empresa\Banco', 'banco_empresa_id');
     }
 
     public function empresaEntidad()
