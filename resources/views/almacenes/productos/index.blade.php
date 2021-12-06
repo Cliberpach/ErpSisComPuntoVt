@@ -41,8 +41,6 @@
                                     <th class="text-center">MARCA</th>
                                     <th class="text-center">CATEGORIA</th>
                                     <th class="text-center">STOCK</th>
-                                    <th class="text-center">P.V. MIN</th>
-                                    <th class="text-center">P.V. MAX</th>
                                     <th class="text-center">ACCIONES</th>
                                 </tr>
                             </thead>
@@ -129,14 +127,6 @@
                 },
                 {
                     data: 'stock',
-                    className: "text-center"
-                },
-                {
-                    data: 'precio_venta_minimo',
-                    className: "text-center"
-                },
-                {
-                    data: 'precio_venta_maximo',
                     className: "text-center"
                 },
                 {

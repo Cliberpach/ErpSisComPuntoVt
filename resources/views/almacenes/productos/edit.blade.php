@@ -168,10 +168,10 @@
                                         @endif
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <div class="form-group row d-none">
                                     <div class="col-lg-6 col-xs-12">
                                         <label class="required">Precio venta mínimo</label>
-                                        <input type="text" id="precio_venta_minimo" name="precio_venta_minimo" class="form-control {{ $errors->has('precio_venta_minimo') ? ' is-invalid' : '' }}" value="{{ old('precio_venta_minimo', $producto->precio_venta_minimo) }}" maxlength="15" onkeypress="return filterFloat(event, this);" required>
+                                        <input type="text" id="precio_venta_minimo" name="precio_venta_minimo" class="form-control {{ $errors->has('precio_venta_minimo') ? ' is-invalid' : '' }}" value="{{ old('precio_venta_minimo', $producto->precio_venta_minimo) }}" maxlength="15" onkeypress="return filterFloat(event, this);">
                                         @if ($errors->has('precio_venta_minimo'))
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $errors->first('precio_venta_minimo') }}</strong>
@@ -180,7 +180,7 @@
                                     </div>
                                     <div class="col-lg-6 col-xs-12">
                                         <label class="required">Precio venta máximo</label>
-                                        <input type="precio_venta_maximo" id="precio_venta_maximo" name="precio_venta_maximo" class="form-control {{ $errors->has('precio_venta_maximo') ? ' is-invalid' : '' }}" value="{{ old('precio_venta_maximo', $producto->precio_venta_maximo) }}" maxlength="15" onkeypress="return filterFloat(event, this);" required>
+                                        <input type="precio_venta_maximo" id="precio_venta_maximo" name="precio_venta_maximo" class="form-control {{ $errors->has('precio_venta_maximo') ? ' is-invalid' : '' }}" value="{{ old('precio_venta_maximo', $producto->precio_venta_maximo) }}" maxlength="15" onkeypress="return filterFloat(event, this);">
                                         @if ($errors->has('precio_venta_maximo'))
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $errors->first('precio_venta_maximo') }}</strong>
@@ -253,9 +253,9 @@
                                                 <div class="invalid-feedback"><b><span id="error-moneda"></span></b></div>
                                             </div>
                                             <div class="col-md-2">
-                                                <label class="required">Monto</label>
-                                                <input type="text" id="monto" name="monto" class="form-control">
-                                                <div class="invalid-feedback"><b><span id="error-monto"></span></b></div>
+                                                <label class="required">Porcentaje</label>
+                                                <input type="text" id="porcentaje" name="porcentaje" class="form-control">
+                                                <div class="invalid-feedback"><b><span id="error-porcentaje"></span></b></div>
                                             </div>
 
                                             <div class="col-md-3">
@@ -279,7 +279,7 @@
                                                         <th class="text-center">ACCIONES</th>
                                                         <th class="text-center">CLIENTE</th>
                                                         <th class="text-center">MONEDA</th>
-                                                        <th class="text-center">MONTO</th>
+                                                        <th class="text-center">PORCENTAJE</th>
 
                                                     </tr>
                                                 </thead>
@@ -454,7 +454,7 @@
 
     <script>
 
-        $('#monto').keyup(function() {
+        $('#porcentaje').keyup(function() {
             var val = $(this).val();
             if (isNaN(val)) {
                 val = val.replace(/[^0-9\.]/g, '');
@@ -464,7 +464,7 @@
             $(this).val(val);
         });
 
-        $('#monto_editar').keyup(function() {
+        $('#porcentaje_editar').keyup(function() {
             var val = $(this).val();
             if (isNaN(val)) {
                 val = val.replace(/[^0-9\.]/g, '');
@@ -533,7 +533,7 @@
             $('#indice').val(table.row($(this).parents('tr')).index());
             $('#cliente_id_editar').val(data[1]).trigger('change');
             $('#moneda_id_editar').val(data[4]).trigger('change');
-            $('#monto_editar').val(data[3]);
+            $('#porcentaje_editar').val(data[3]);
             $('#modal_editar_cliente').modal('show');
         })
 
@@ -595,13 +595,13 @@
                 }
             }
 
-            if ($('#monto').val() == '') {
+            if ($('#porcentaje').val() == '') {
 
-                toastr.error('Ingrese el monto del tipo de cliente.', 'Error');
+                toastr.error('Ingrese el porcentaje del tipo de cliente.', 'Error');
                 enviar = true;
 
-                $("#monto").addClass("is-invalid");
-                $('#error-monto').text('El campo Monto es obligatorio.')
+                $("#porcentaje").addClass("is-invalid");
+                $('#error-porcentaje').text('El campo porcentaje es obligatorio.')
             }
 
             if ($('#moneda_cliente').val() == '') {
@@ -636,7 +636,7 @@
 
                         var detalle = {
                             cliente: $('#cliente').val(),
-                            monto: $('#monto').val(),
+                            porcentaje: $('#porcentaje').val(),
                             moneda: $('#moneda_cliente').val(),
                             id_moneda: $('#moneda_cliente').val(),
                         }
@@ -676,7 +676,7 @@
                 '',
                 detalle.cliente,
                 cargarMoneda(detalle.moneda),
-                Number(detalle.monto).toFixed(2),
+                Number(detalle.porcentaje).toFixed(2),
                 detalle.moneda,
 
             ]).draw(false);
@@ -720,15 +720,15 @@
         }
 
         function limpiarDetalle() {
-            $('#monto').val('')
+            $('#porcentaje').val('')
             $('#cliente').val($('#cliente option:first-child').val()).trigger('change');
             $('#moneda_cliente').val($('#moneda_cliente option:first-child').val()).trigger('change');
 
         }
 
         function limpiarErrores() {
-            $('#monto').removeClass("is-invalid")
-            $('#error-monto').text('')
+            $('#porcentaje').removeClass("is-invalid")
+            $('#error-porcentaje').text('')
 
             $('#cliente').removeClass("is-invalid")
             $('#error-cliente').text('')
@@ -744,7 +744,7 @@
                 '',
                 "{{$cliente->tipocliente()}}",
                 cargarMoneda("{{$cliente->moneda}}"),
-                "{{$cliente->monto}}",
+                "{{$cliente->porcentaje}}",
                 "{{$cliente->moneda}}",
 
             ]).draw(false);

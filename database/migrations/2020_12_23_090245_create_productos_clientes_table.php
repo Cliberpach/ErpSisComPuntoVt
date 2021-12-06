@@ -14,18 +14,18 @@ class CreateProductosClientesTable extends Migration
     public function up()
     {
         Schema::create('productos_clientes', function (Blueprint $table) {
-            
+
             $table->Increments('id');
             $table->string('cliente');
-            $table->unsignedDecimal('monto', 15, 2);
-            
+            $table->unsignedDecimal('monto', 15, 2)->nullable();
+            $table->unsignedDecimal('porcentaje', 15, 2)->nullable();
             $table->unsignedInteger('producto_id');
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
 
             $table->string('moneda');
-            
+
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
-            
+
             $table->timestamps();
         });
     }

@@ -10,6 +10,7 @@ class TipoCliente extends Model
     protected $fillable = [
         'cliente',
         'monto',
+        'porcentaje',
         'producto_id',
         'moneda',
         'estado'

@@ -1441,7 +1441,8 @@ function sumaTotal() {
                     $('#producto_id').append('<option></option>').trigger('change');
                     for(var i = 0;i < data.productos.length; i++)
                     {
-                        var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + ' - ' + data.productos[i].codigo_barra + '</option>';
+                        let codigo = data.productos[i].codigo_barra ? (' - ' + data.productos[i].codigo_barra) : '';
+                        var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + codigo + '</option>';
                         $('#producto_id').append(newOption).trigger('change');
                         //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
                     }

@@ -1161,9 +1161,13 @@
         let subtotal = total / (1 + (igv / 100));
         let igv_calculado = total - subtotal;
         $('#igv_int').text(igv + '%')
-        $('#subtotal').text((Math.round(subtotal * 10) / 10).toFixed(2))
-        $('#igv_monto').text((Math.round(igv_calculado * 10) / 10).toFixed(2))
-        $('#total').text((Math.round(total * 10) / 10).toFixed(2))
+        // $('#subtotal').text((Math.round(subtotal * 10) / 10).toFixed(2))
+        // $('#igv_monto').text((Math.round(igv_calculado * 10) / 10).toFixed(2))
+        // $('#total').text((Math.round(total * 10) / 10).toFixed(2))
+
+        $('#subtotal').text((subtotal).toFixed(2))
+        $('#igv_monto').text((igv_calculado).toFixed(2))
+        $('#total').text((total).toFixed(2))
         //Math.round(fDescuento * 10) / 10
     }
 

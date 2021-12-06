@@ -40,6 +40,14 @@ class CreateCompraDocumentoDetallesTable extends Migration
             $table->unsignedDecimal('precio_soles', 15,4)->nullable();
             $table->unsignedDecimal('precio_inicial_soles', 15, 4)->nullable();
             $table->unsignedDecimal('costo_flete_soles', 15, 4)->nullable();
+
+            $table->unsignedDecimal('precio_dolares', 15,4)->nullable();
+            $table->unsignedDecimal('precio_inicial_dolares', 15, 4)->nullable();
+            $table->unsignedDecimal('costo_flete_dolares', 15, 4)->nullable();
+
+            $table->unsignedDecimal('precio_mas_igv_soles', 15,4)->nullable();
+            $table->unsignedDecimal('precio_mas_igv_dolares', 15,4)->nullable();
+
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();
         });

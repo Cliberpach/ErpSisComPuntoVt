@@ -30,8 +30,8 @@ class CreateProductosTable extends Migration
             $table->unsignedDecimal('stock', 15, 2)->default(0);
             $table->unsignedDecimal('stock_minimo', 15, 2);
             $table->unsignedDecimal('precio_compra', 15, 2)->nullable();
-            $table->unsignedDecimal('precio_venta_minimo', 15, 2);
-            $table->unsignedDecimal('precio_venta_maximo', 15, 2);
+            $table->unsignedDecimal('precio_venta_minimo', 15, 2)->nullable();
+            $table->unsignedDecimal('precio_venta_maximo', 15, 2)->nullable();
             $table->unsignedDecimal('peso_producto', 15, 2)->default(0);
             $table->boolean('igv');
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');

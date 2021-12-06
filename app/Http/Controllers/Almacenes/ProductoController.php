@@ -72,8 +72,8 @@ class ProductoController extends Controller
             'almacen' => 'required',
             'medida' => 'required',
             'stock_minimo' => 'required|numeric',
-            'precio_venta_minimo' => 'required|numeric',
-            'precio_venta_maximo' => 'required|numeric',
+            'precio_venta_minimo' => 'numeric|nullable',
+            'precio_venta_maximo' => 'numeric|nullable',
             'igv' => 'required|boolean',
         ];
 
@@ -89,10 +89,6 @@ class ProductoController extends Controller
             'medida.required' => 'El campo Unidad de medida es obligatorio',
             'stock_minimo.required' => 'El campo Stock mínimo es obligatorio',
             'stock_minimo.numeric' => 'El campo Stock mínimo debe ser numérico',
-            'precio_venta_minimo.required' => 'El campo Precio de venta mínimo es obligatorio',
-            'precio_venta_minimo.numeric' => 'El campo Precio de venta mínimo debe ser numérico',
-            'precio_venta_maximo.required' => 'El campo Precio de venta máximo es obligatorio',
-            'precio_venta_máximo.numeric' => 'El campo Precio de venta máximo debe ser numérico',
             'igv.required' => 'El campo IGV es obligatorio',
             'igv.boolean' => 'El campo IGV debe ser SI o NO',
             'detalles.required' => 'Debe exitir al menos un detalle del producto',
@@ -130,6 +126,7 @@ class ProductoController extends Controller
                 TipoCliente::create([
                     'producto_id' => $producto->id,
                     'cliente' => $cliente->cliente,
+                    'porcentaje' => $cliente->monto_igv,
                     'monto' => $cliente->monto_igv,
                     'moneda' => $cliente->id_moneda,
                 ]);
@@ -157,6 +154,7 @@ class ProductoController extends Controller
         $clientes = TipoCliente::where('estado','ACTIVO')->where('producto_id',$id)->get();
         $categorias = Categoria::where('estado', 'ACTIVO')->get();
         $almacenes = Almacen::where('estado', 'ACTIVO')->get();
+
         return view('almacenes.productos.edit', [
             'producto' => $producto,
             'marcas' => $marcas,
@@ -183,8 +181,6 @@ class ProductoController extends Controller
             'categoria' => 'required',
             'almacen' => 'required',
             'medida' => 'required',
-            'precio_venta_minimo' => 'required|numeric',
-            'precio_venta_maximo' => 'required|numeric',
             'igv' => 'required|boolean',
         ];
 
@@ -199,10 +195,6 @@ class ProductoController extends Controller
             'medida.required' => 'El campo Unidad de Medida es obligatorio',
             'stock_minimo.required' => 'El campo Stock mínimo es obligatorio',
             'stock_minimo.numeric' => 'El campo Stock mínimo debe ser numérico',
-            'precio_venta_minimo.required' => 'El campo Precio de venta mínimo es obligatorio',
-            'precio_venta_minimo.numeric' => 'El campo Precio de venta mínimo debe ser numérico',
-            'precio_venta_maximo.required' => 'El campo Precio de venta máximo es obligatorio',
-            'precio_venta_máximo.numeric' => 'El campo Precio de venta máximo debe ser numérico',
             'igv.required' => 'El campo IGV es obligatorio',
             'igv.boolean' => 'El campo IGV debe ser SI o NO',
             'codigo_barra.unique' => 'El campo Código de Barra debe de ser único.',
@@ -246,6 +238,7 @@ class ProductoController extends Controller
                 TipoCliente::create([
                     'producto_id' => $producto->id,
                     'cliente' => $clientetipo,
+                    'porcentaje' => $cliente->monto_igv,
                     'monto' => $cliente->monto_igv,
                     'moneda' => $cliente->id_moneda,
                 ]);

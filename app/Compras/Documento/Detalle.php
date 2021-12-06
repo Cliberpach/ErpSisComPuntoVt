@@ -24,6 +24,9 @@ class Detalle extends Model
         'medida_producto',
         'cantidad',
 
+        'precio_mas_igv_soles',
+        'precio_mas_igv_dolares',
+
         'precio',
         'precio_inicial',
         'costo_flete',
@@ -31,6 +34,10 @@ class Detalle extends Model
         'precio_soles',
         'precio_inicial_soles',
         'costo_flete_soles',
+
+        'precio_dolares',
+        'precio_inicial_dolares',
+        'costo_flete_dolares',
 
         'lote',
         'lote_id',

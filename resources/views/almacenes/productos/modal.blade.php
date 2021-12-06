@@ -44,9 +44,9 @@
                         </div>
 
                         <div class="col-md-4">
-                            <label class="required" for="amount">Monto</label>
-                            <input type="text" id="monto_editar" class="form-control">
-                            <div class="invalid-feedback"><b><span id="error-monto_editar"></span></b></div>
+                            <label class="required" for="amount">Porcentaje</label>
+                            <input type="text" id="porcentaje_editar" class="form-control">
+                            <div class="invalid-feedback"><b><span id="error-porcentaje_editar"></span></b></div>
                         </div>
 
                     </div>
@@ -78,9 +78,9 @@
 <script>
 
     function limpiarErroresRegistro() {
-        $('#monto_editar').removeClass("is-invalid")
-        $('#error-monto_editar').text('')
-        
+        $('#porcentaje_editar').removeClass("is-invalid")
+        $('#error-porcentaje_editar').text('')
+
         $('#moneda_id_editar').removeClass("is-invalid")
         $('#error-moneda_id_editar').text('')
     }
@@ -90,13 +90,13 @@ $(".editarRegistro").click(function() {
     limpiarErroresRegistro()
     var enviar = false;
 
-    if ($('#monto_editar').val() == '') {
+    if ($('#porcentaje_editar').val() == '') {
 
-        toastr.error('Ingrese el Monto del tipo de cliente.', 'Error');
+        toastr.error('Ingrese el Porcentaje del tipo de cliente.', 'Error');
         enviar = true;
 
-        $("#monto_editar").addClass("is-invalid");
-        $('#error-monto_editar').text('El campo Monto es obligatorio.')
+        $("#porcentaje_editar").addClass("is-invalid");
+        $('#error-porcentaje_editar').text('El campo porcentaje es obligatorio.')
     }
 
     if ($('#moneda_id_editar').val() == '') {
@@ -156,7 +156,7 @@ function actualizarTabla(i) {
     table.row(i).remove().draw();
     var detalle = {
         cliente: $('#cliente_id_editar').val(),
-        monto: $('#monto_editar').val(),
+        porcentaje: $('#porcentaje_editar').val(),
         moneda: $('#moneda_id_editar').val(),
         id_moneda: $('#moneda_id_editar').val(),
     }
@@ -170,8 +170,8 @@ function limpiar() {
     $('#moneda_id_editar').removeClass("is-invalid")
     $('#error-moneda_id_editar').text('')
 
-    $('#monto_editar').removeClass("is-invalid")
-    $('#error-monto_editar').text('')
+    $('#porcentaje_editar').removeClass("is-invalid")
+    $('#error-porcentaje_editar').text('')
 
     $('#modal_editar_cliente').modal('hide');
 }
