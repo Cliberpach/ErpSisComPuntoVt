@@ -26,7 +26,7 @@ class CreateDetalleOrdenesTable extends Migration
                 ->onDelete('cascade');
 
             $table->BigInteger('cantidad');
-            $table->unsignedDecimal('precio', 15,2);
+            $table->unsignedDecimal('precio', 15,4);
             $table->timestamps();
         });
     }

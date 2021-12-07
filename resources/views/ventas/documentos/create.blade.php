@@ -35,6 +35,7 @@
                 <div class="ibox-content">
 
                     <input type="hidden" id='asegurarCierre'>
+                    <input type="hidden" id='dolar' value="{{$dolar}}">
                     <form action="" method="POST" id="enviar_documento">
                         {{ csrf_field() }}
 

@@ -27,9 +27,9 @@ class CreateCompraDocumentoDetallesTable extends Migration
             $table->string('medida_producto');
 
             $table->BigInteger('cantidad');
-            $table->date('fecha_vencimiento');
+            $table->date('fecha_vencimiento')->nullable();
 
-            $table->string('lote');
+            $table->string('lote')->nullable();
             $table->unsignedInteger('lote_id')->unsigned()->nullable();
             $table->foreign('lote_id')->references('id')->on('lote_productos')->onDelete('cascade');
 

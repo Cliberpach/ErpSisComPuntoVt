@@ -558,12 +558,13 @@ class NoEnviadosController extends Controller
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->select('compra_documento_detalles.precio_soles','lote_productos.*','productos.nombre','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
-                    'productos_clientes.monto','categorias.descripcion', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci'))
+            ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
+            ->select('compra_documentos.moneda as moneda_compra','compra_documentos.igv as igv_compra','compra_documento_detalles.precio_soles','compra_documento_detalles.precio as precio_compra','compra_documento_detalles.precio_mas_igv_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
+                    'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')
-            ->where('productos_clientes.cliente','121')
-            ->where('productos_clientes.moneda','1')
+            ->where('productos_clientes.cliente',$id) //TIPO DE CLIENTE CONSUMIDOR TABLA DETALLE (121)
+            ->where('productos_clientes.moneda','1') // TABLA DETALLE SOLES(1)
             ->orderBy('lote_productos.id','ASC')
             ->where('productos_clientes.estado','ACTIVO')
         )->toJson();
@@ -595,7 +596,7 @@ class NoEnviadosController extends Controller
                 'nombre' => $detalle->lote->producto->nombre,
                 'codigo_barra' => $detalle->lote->producto->codigo_barra,
                 'cliente' => $detalle->lote->producto->tipoCliente->where('cliente', 121)->first()->cliente,
-                'monto' => $detalle->lote->producto->tipoCliente->where('cliente', 121)->first()->monto,
+                'monto' => $detalle->precio_nuevo,
                 'moneda' => $detalle->lote->producto->tipoCliente->where('cliente', 121)->first()->moneda,
                 'unidad_producto' => $detalle->lote->producto->getMedida(),
                 'descripcion' => $detalle->lote->producto->categoria->descripcion,

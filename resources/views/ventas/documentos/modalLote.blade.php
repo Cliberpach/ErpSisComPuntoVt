@@ -137,6 +137,7 @@
 function obtenerLotesproductos(tipo_cliente) {
     //RUTA LOTES PRODUCTOS
     var url = '{{ route("ventas.getLot", ":id")}}';
+    console.log(tipo_cliente);
     url = url.replace(':id', tipo_cliente);
     //ELIMINAR EL DATATABLE PARA VOLVER A INSTANCIARLO
     $(".dataTables-lotes").dataTable().fnDestroy();
@@ -160,11 +161,52 @@ function obtenerLotesproductos(tipo_cliente) {
             {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
             {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
             @if ($fullaccess)
-            {data: 'monto', className: "text-center", name:"productos_clientes.monto", sWidth: '10%' },
+            {
+                data: null,
+                className: "text-center",
+                name:"compra_documento_detalles.precio_mas_igv_soles",
+                sWidth: '10%',
+                render: function(data) {
+                    if (data.precio_mas_igv_soles == null) {
+                        return '0.00';
+                    }else{
+                        let cambio = $('#dolar').val();
+                        let precio = 0;
+                        let precio_ = data.precio_compra;
+                        let porcentaje = 0;
+                        let porcentaje_ = data.porcentaje;
+                        if(data.moneda_compra == 'DOLARES')
+                        {
+                            if(data.igv_compra == 1)
+                            {
+                                precio = precio_ * cambio;
+                            }
+                            else
+                            {
+                                precio = (precio_ * cambio * 1.18)
+                                porcentaje  = precio * (porcentaje_ / 100)
+                            }
+                        }
+                        else
+                        {
+                            if(data.igv_compra == 1)
+                            {
+                                precio = precio_;
+                            }
+                            else
+                            {
+                                precio = (precio_ * 1.18)
+                                porcentaje  = precio * (porcentaje_ / 100)
+                            }
+                        }
+                        return convertFloat(precio + porcentaje).toFixed(2);
+                    }
+                }
+            },
             @endif
             {
                 data: null,
-                className: "text-center letrapequeña",
+                className: "text-center",
                 name:"compra_documento_detalles.precio_soles",
                 sWidth: '5%',
                 render: function(data) {
@@ -240,7 +282,7 @@ function ingresarProducto(producto) {
 }
 
 function evaluarPrecioigv(producto) {
-    if ( producto.moneda == 1 ) {
+    /*if ( producto.moneda == 1 ) {
         //PRODUCTO SIN IGV
         if ( producto.igv == '0' ) {
             var precio = Number(producto.monto * 0.18) + Number(producto.monto)
@@ -253,6 +295,40 @@ function evaluarPrecioigv(producto) {
     }else{
         toastr.error('Precio registrado diferente a Soles (S/.).', 'Error');
         return 0.00
+    }*/
+    if (producto.precio_mas_igv_soles == null) {
+        return '0.00';
+    }else{
+        let cambio = $('#dolar').val();
+        let precio = 0;
+        let precio_ = producto.precio_compra;
+        let porcentaje = 0;
+        let porcentaje_ = producto.porcentaje;
+        if(producto.moneda_compra == 'DOLARES')
+        {
+            if(producto.igv_compra == 1)
+            {
+                precio = precio_ * cambio;
+            }
+            else
+            {
+                precio = (precio_ * cambio * 1.18)
+                porcentaje  = precio * (porcentaje_ / 100)
+            }
+        }
+        else
+        {
+            if(producto.igv_compra == 1)
+            {
+                precio = precio_;
+            }
+            else
+            {
+                precio = (precio_ * 1.18)
+                porcentaje  = precio * (porcentaje_ / 100)
+            }
+        }
+        return convertFloat(precio + porcentaje).toFixed(2);
     }
 }
 

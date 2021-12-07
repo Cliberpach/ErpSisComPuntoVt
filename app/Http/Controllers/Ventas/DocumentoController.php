@@ -114,7 +114,7 @@ class DocumentoController extends Controller
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff),
+                'dias' => (int)(5 - $diff < 0 ? 0  : 5 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -267,6 +267,11 @@ class DocumentoController extends Controller
         $productos = Producto::where('estado', 'ACTIVO')->get();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
 
+        $dolar_aux = json_encode(precio_dolar(), true);
+        $dolar_aux = json_decode($dolar_aux, true);
+
+        $dolar = (float)$dolar_aux['original']['venta'];
+
         $fullaccess = false;
 
         if(count(Auth::user()->roles)>0)
@@ -310,6 +315,7 @@ class DocumentoController extends Controller
                     'errores' => $errores,
                     'fecha_hoy' => $fecha_hoy,
                     'fullaccess' => $fullaccess,
+                    'dolar' => $dolar,
                 ]);
             }
             //COMPROBACION DE LOTES SI LAS CANTIDADES ENVIADAS SON IGUALES A LAS SOLICITADAS
@@ -357,6 +363,7 @@ class DocumentoController extends Controller
                 'errores' => $errores,
                 'fecha_hoy' => $fecha_hoy,
                 'fullaccess' => $fullaccess,
+                'dolar' => $dolar,
             ]);
 
         }
@@ -369,6 +376,7 @@ class DocumentoController extends Controller
                 'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
                 'fullaccess' => $fullaccess,
+                'dolar' => $dolar,
             ]);
         }
     }
@@ -1624,11 +1632,12 @@ class DocumentoController extends Controller
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->select('compra_documento_detalles.precio_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
-                    'productos_clientes.monto','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
+            ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
+            ->select('compra_documentos.moneda as moneda_compra','compra_documentos.igv as igv_compra','compra_documento_detalles.precio_soles','compra_documento_detalles.precio as precio_compra','compra_documento_detalles.precio_mas_igv_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
+                    'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')
-            ->where('productos_clientes.cliente','121') //TIPO DE CLIENTE CONSUMIDOR TABLA DETALLE (121)
+            ->where('productos_clientes.cliente',$tipo_cliente) //TIPO DE CLIENTE CONSUMIDOR TABLA DETALLE (121)
             ->where('productos_clientes.moneda','1') // TABLA DETALLE SOLES(1)
             ->orderBy('lote_productos.id','ASC')
             ->where('productos_clientes.estado','ACTIVO')

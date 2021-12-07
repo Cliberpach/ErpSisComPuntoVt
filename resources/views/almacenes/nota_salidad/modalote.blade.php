@@ -156,11 +156,51 @@ function obtenerLotesproductos() {
             {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento", sWidth: '5%' },
             {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
             {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
-            {data: 'monto', className: "text-center", name:"productos_clientes.monto", sWidth: '15%' },
             {
                 data: null,
-                className: "text-center letrapequeña",
-                sWidth: '5%',
+                className: "text-center",
+                name:"compra_documento_detalles.precio_mas_igv_soles",
+                sWidth: '10%',
+                render: function(data) {
+                    if (data.precio_mas_igv_soles == null) {
+                        return '0.00';
+                    }else{
+                        let cambio = $('#dolar').val();
+                        let precio = 0;
+                        let precio_ = data.precio_compra;
+                        let porcentaje = 0;
+                        let porcentaje_ = data.porcentaje;
+                        if(data.moneda_compra == 'DOLARES')
+                        {
+                            if(data.igv_compra == 1)
+                            {
+                                precio = precio_ * cambio;
+                            }
+                            else
+                            {
+                                precio = (precio_ * cambio * 1.18)
+                                porcentaje  = precio * (porcentaje_ / 100)
+                            }
+                        }
+                        else
+                        {
+                            if(data.igv_compra == 1)
+                            {
+                                precio = precio_;
+                            }
+                            else
+                            {
+                                precio = (precio_ * 1.18)
+                                porcentaje  = precio * (porcentaje_ / 100)
+                            }
+                        }
+                        return convertFloat(precio + porcentaje).toFixed(2);
+                    }
+                }
+            },
+            {
+                data: null,
+                className: "text-center",
                 name:"compra_documento_detalles.precio_soles",
                 sWidth: '5%',
                 render: function(data) {

@@ -66,7 +66,7 @@ class CajaController extends Controller
                 'tipo_venta_id' => $documento->tipo_venta,
                 'empresa' => $documento->empresaEntidad->razon_social,
                 'tipo_pago' => $documento->tipo_pago_id,
-                'tipo_pago_desc' => $documento->tipo_pago->descripcion,
+                'tipo_pago_desc' => $documento->tipo_pago_id ? $documento->tipo_pago->descripcion : '-',
                 'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
                 'serie' => $documento->serie,
                 'correlativo' => $documento->correlativo,
@@ -91,7 +91,7 @@ class CajaController extends Controller
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff),
+                'dias' => (int)(5 - $diff < 0 ? 0  : 5 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }

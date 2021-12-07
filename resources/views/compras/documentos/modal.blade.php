@@ -128,7 +128,7 @@
 
                     </div>
 
-                    <div class="form-group row">
+                    <div class="form-group row d-none">
 
                         <div class="col-md-6" id="fecha_vencimiento_campo_editar">
                             <label class="required">Fecha de Vencimiento</label>
@@ -263,7 +263,7 @@ function actualizarTabla(i) {
     var presentacion_producto = obtenerPresentacion($('#presentacion_editar').val())
     var detalle = {
         producto_id: $('#producto_id_editar').val(),
-        descripcion: descripcion_producto.nombre+' - '+$('#lote_editar').val(),
+        descripcion: descripcion_producto.nombre,//+' - '+$('#lote_editar').val()
         costo_flete : $('#costo_flete_editar').val(),
         precio: $('#precio_editar').val(),
         cantidad: $('#cantidad_editar').val(),

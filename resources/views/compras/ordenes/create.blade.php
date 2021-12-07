@@ -272,49 +272,46 @@
 
                                         <div class="row align-items-end">
 
-                                            <div class="col-10 col-md-4">
-                                                <label class="required">Producto</label>
-                                                <select class="select2_form form-control"
-                                                    style="text-transform: uppercase; width:100%" name="producto_id"
-                                                    id="producto_id">
-                                                </select>
-                                                <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                            <div class="col-10 col-md-3">
+                                                <div class="form-group">
+                                                    <label class="required">Producto</label>
+                                                    <select class="select2_form form-control"
+                                                        style="text-transform: uppercase; width:100%" name="producto_id"
+                                                        id="producto_id">
+                                                    </select>
+                                                    <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-2 col-md-2">
-                                                <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-sm-3">
                                                 <div class="form-group">
-                                                    <label class="col-form-label required" for="amount">Precio</label>
+                                                    <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-2">
+                                                <div class="form-group">
+                                                    <label class="col-form-label required" for="amount">Importe</label>
                                                     <input type="text" id="precio" class="form-control">
                                                     <div class="invalid-feedback"><b><span id="error-precio"></span></b>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-sm-3">
-
-                                                <label class="col-form-label required">Cantidad</label>
-                                                <input type="text" id="cantidad" class="form-control">
-                                                <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
+                                            <div class="col-12 col-md-2">
+                                                <div class="form-group">
+                                                    <label class="col-form-label required">Cantidad</label>
+                                                    <input type="text" id="cantidad" class="form-control">
+                                                    <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
+                                                    </div>
                                                 </div>
-
-
                                             </div>
-                                            <div class="col-sm-6">
-
+                                            <div class="col-12 col-md-3">
                                                 <div class="form-group">
                                                     <label class="col-form-label" for="amount">&nbsp;</label>
                                                     <a class="btn btn-block btn-warning enviar_producto"
                                                         style='color:white;'> <i class="fa fa-plus"></i> AGREGAR</a>
                                                 </div>
-
                                             </div>
                                         </div>
-
 
                                         <hr>
 
@@ -778,6 +775,9 @@ $(".enviar_producto").click(function() {
         $("#cantidad").addClass("is-invalid");
         $('#error-cantidad').text('El campo Cantidad es obligatorio.')
     }
+    let precio_aux = convertFloat($('#precio').val()) / convertFloat($('#cantidad').val());
+    let precio = (precio_aux).toFixed(4)
+
     if (enviar != true) {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -801,7 +801,7 @@ $(".enviar_producto").click(function() {
                 var detalle = {
                     producto_id: $('#producto_id').val(),
                     descripcion: descripcion_producto,
-                    precio: $('#precio').val(),
+                    precio: precio,
                     cantidad: $('#cantidad').val(),
                 }
                 limpiarDetalle()
@@ -1003,7 +1003,8 @@ function obtenerProducts()
                 $('#producto_id').append('<option></option>').trigger('change');
                 for(var i = 0;i < data.productos.length; i++)
                 {
-                    var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + ' - ' + data.productos[i].codigo_barra + '</option>';
+                    let codigo = data.productos[i].codigo_barra ? (' - ' + data.productos[i].codigo_barra) : '';
+                    var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + codigo + '</option>';
                     $('#producto_id').append(newOption).trigger('change');
                     //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
                 }

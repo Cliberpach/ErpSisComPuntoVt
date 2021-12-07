@@ -152,7 +152,7 @@ function obtenerLotesproductosRecientes() {
             {data: 'monto', className: "text-center", sWidth: '10%' },
             {
                 data: null,
-                className: "text-center letrapequeña",
+                className: "text-center",
                 sWidth: '5%',
                 render: function(data) {
                     if (data.precio_soles == null) {

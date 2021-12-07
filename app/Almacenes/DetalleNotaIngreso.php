@@ -69,14 +69,14 @@ class DetalleNotaIngreso extends Model
             $kardex->origen = 'INGRESO';
             $kardex->numero_doc = $detalle->nota_ingreso->numero;
             $kardex->fecha = $detalle->nota_ingreso->fecha;
-            $kardex->cantidad = $detalle->cantidad;            
+            $kardex->cantidad = $detalle->cantidad;
             $kardex->producto_id = $detalle->producto_id;
             $kardex->descripcion = $detalle->nota_ingreso->origen;
-            $kardex->precio = $detalle->producto->precio_venta_minimo;
+            $kardex->precio = 0;
             $kardex->importe = $detalle->producto->precio_venta_minimo * $detalle->cantidad;
             $kardex->stock = $detalle->producto->stock;
             $kardex->save();
-            
+
         });
     }
 }

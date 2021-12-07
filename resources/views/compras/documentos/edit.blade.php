@@ -375,10 +375,13 @@
                                                     </div>
                                                 </div>
 
+                                            </div>
+
+                                            <div class="col-lg-6 col-xs-12">
                                                 <div class="form-group row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="col-form-label required" for="amount">Precio:</label>
+                                                            <label class="col-form-label required" for="amount">Importe:</label>
                                                             <input type="text" id="precio" class="form-control">
                                                             <div class="invalid-feedback"><b><span id="error-precio"></span></b>
                                                             </div>
@@ -394,12 +397,7 @@
 
                                                     </div>
                                                 </div>
-
-                                            </div>
-
-                                            <div class="col-lg-6 col-xs-12">
-
-                                                <div class="form-group row" >
+                                                <div class="form-group row d-none">
                                                     <div class="col-md-6" id="fecha_vencimiento_campo">
                                                         <label class="required">Fecha de vencimiento:</label>
                                                         <div class="input-group date">
@@ -884,6 +882,7 @@ $(document).ready(function() {
             {
                 "targets": [4],
                 className: "text-center",
+                visible: false
             },
 
             {
@@ -949,7 +948,7 @@ function obtenerTabla() {
         "{{$detalle->producto_id}}",
         '',
         "{{$detalle->cantidad}}",
-        "{{$detalle->producto->nombre.' - '.$detalle->lote}}",
+        "{{$detalle->producto->nombre}}",
         "{{$detalle->fechaFormateada()}}",
         "{{$detalle->costo_flete}}",
         "{{$detalle->precio}}",
@@ -1087,6 +1086,9 @@ $(".enviar_producto").click(function() {
     let proveedor_id = $('#proveedor_id').val();
     let tipo_compra = $('#tipo_compra').val();
 
+    let precio_aux = convertFloat($('#precio').val()) / convertFloat($('#cantidad').val());
+    let precio = (precio_aux).toFixed(4)
+
     if(moneda == '')
     {
         toastr.error("Seleccionar moneda");
@@ -1154,7 +1156,7 @@ $(".enviar_producto").click(function() {
                             producto_id: $('#producto_id').val(),
                             descripcion: descripcion_producto.nombre+' - '+$('#lote').val(),
                             costo_flete: $('#costo_flete').val(),
-                            precio: $('#precio').val(),
+                            precio: precio,
                             cantidad: $('#cantidad').val(),
                             lote: $('#lote').val(),
                             fecha_vencimiento: $('#fecha_vencimiento').val(),

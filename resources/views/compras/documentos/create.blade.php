@@ -525,7 +525,7 @@
                                                 <div class="form-group row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="col-form-label required" for="amount">Precio:</label>
+                                                            <label class="col-form-label required" for="amount">Importe:</label>
                                                             <input type="text" id="precio" class="form-control">
                                                             <div class="invalid-feedback"><b><span id="error-precio"></span></b>
                                                             </div>
@@ -1584,11 +1584,11 @@
                     '',
                     "{{$detalle->cantidad}}",
                     "{{$detalle->producto->nombre}}",
-                    '',
+                    "{{$detalle->fecha_vencimiento}}",
                     "{{$detalle->costo_flete}}",
                     "{{$detalle->precio}}",
                     ("{{$detalle->precio}}" * "{{$detalle->cantidad}}").toFixed(2),
-                    '',
+                    "{{$detalle->lote_aux}}",
                     '',
                 ]).draw(false);
             @endforeach
