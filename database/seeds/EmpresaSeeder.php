@@ -56,6 +56,7 @@ class EmpresaSeeder extends Seeder
         $empresa->nombre_representante = 'NOMBRE APELLIDOPAT APELLIDOMAT';
         $empresa->num_asiento = 'A00001';
         $empresa->num_partida = '11036086';
+        $empresa->ubigeo = '13';
         $empresa->ruta_logo = 'public/empresas/logos/oBeXUrV1fBtySgntsQ3uGwlw7Src40d6SEghrKxc.jpg';
         $empresa->estado_ruc = 'ACTIVO';
         $empresa->estado_fe= '1';
