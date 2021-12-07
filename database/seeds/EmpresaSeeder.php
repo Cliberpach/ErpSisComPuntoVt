@@ -18,6 +18,7 @@ class EmpresaSeeder extends Seeder
     public function run()
     {
         //Agroensancha S.R.L
+        /*En Local
         $empresa = new Empresa();
         $empresa->ruc = '10802398307';
         $empresa->razon_social = 'SISCOM FAC';
@@ -43,6 +44,35 @@ class EmpresaSeeder extends Seeder
         $facturacion->certificado =  null;
         $facturacion->token_code =  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MzM0NjcxMzgsImV4cCI6NDc4NzA2NzEzOCwidXNlcm5hbWUiOiJMZXN0ZXIiLCJjb21wYW55IjoiMTA4MDIzOTgzMDcifQ.YjQK8uvUFn8glmKHwDdPXfhqCIBUU51Rl5hF1OKZ9BC0QDcbPFelunk_mXws9k6wqrXvISitKwVltlpdPfrbx9NoU0sygEhIyr4EanYYdthvtRj18X_bki_fk90sRi1AKf0rXHObVGeXZtdAYIwvYQRy_PmUORJlmJf_K6EYpO6tFib529Eqzs0DaiOVR4k21nCI3u7RDUFlABJMv75IpS24jL9WmtwptkswuskpotC4tbr6FUll7Yk1lG3kniFqf60G0nA30HUpctmjQY7oPCjEySLsjGYqnE78l7r5bdHi9TTUaRr3U4gsdvO39Uzw_TmOm9PxArYd2z19iBoQ3eoF-pYBk3V8xjUCy3-zXzE_2aq3jzZvMoUy7L89iXw2zODca3JcszM_BM2gxx97ulTm62lGPYiPLW1hLath3HvwyYNGH6Xihd9I-xNNwK3MGiNnbbmNqKh5FPGK-DIBLfnm4y0QJil0lM89jXjaaTeNOHuN8By45mKrzG6jZSxY8pG-YoncHMRMRwzMXu6SxjQgWuDvXk53BMnw3xOtvA1QwslJmnhblpiG9-_AAWDSQuQXmz4mQaK375aSGLc8QHXjarKuq6ToXVoF29hBh9CWuXt7F_5wa54Xbq6J_EPNtu4vdG3vrul_Q2zSuMMQRZygjDIJd8mT37200Ft3CLc';
         $facturacion->save();
+        */
+
+        /*En Servidor*/
+        $empresa = new Empresa();
+        $empresa->ruc = '20608741578';
+        $empresa->razon_social = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L';
+        $empresa->razon_social_abreviada = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L';
+        $empresa->direccion_fiscal = 'AV. CESAR VALLEJO NRO. 1717 URB. EL PALOMAR LA LIBERTAD - TRUJILLO - TRUJILLO';
+        $empresa->direccion_llegada = 'AV. CESAR VALLEJO NRO. 1717 URB. EL PALOMAR LA LIBERTAD - TRUJILLO - TRUJILLO';
+        $empresa->dni_representante = '76682608';
+        $empresa->nombre_representante = 'NOMBRE APELLIDOPAT APELLIDOMAT';
+        $empresa->num_asiento = 'A00001';
+        $empresa->num_partida = '11036086';
+        $empresa->estado_ruc = 'ACTIVO';
+        $empresa->estado_ruc = 'ACTIVO';
+        $empresa->estado_fe= '1';
+        $empresa->save();
+
+        $facturacion = new Facturacion();
+        $facturacion->empresa_id = $empresa->id; //RELACION CON LA EMPRESA
+        $facturacion->fe_id = 1235; //ID EMPRESA API
+        $facturacion->sol_user = 'USUARIO1';
+        $facturacion->sol_pass = 'MiUsuario123';
+        $facturacion->plan = 'free';
+        $facturacion->ambiente = 'beta';
+        $facturacion->certificado =  null;
+        $facturacion->token_code =  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Mzg5MDkzMzMsImV4cCI6NDc5MjUwOTMzMywidXNlcm5hbWUiOiJMZXN0ZXIiLCJjb21wYW55IjoiMjA2MDg3NDE1NzggIn0.hiLkBv2TBm7TU8e-nQiJO_KGsZ1eFHb4-xACVkptQ0Z_2sff9DsMuYXD8wauZEyFa7Ht0A2a-aOY9n6ylNlG2U39Jb3x_IlxTbhc_hB8tNeG9alxs_46GikzN5mx5hXQ45uK_uubc4mkdV0tcpISbGPiqcBdPs-KYjycbhKpppkWOSLoyvJsd5QBFEIXQxyvH-pCtUL_F2rpkOiUmXdFSIQTdFnL2rerJ9bpgX0tJVd1wruPzo2F3cMfwkuL5TkVhABI399v3-3XzztCN4TQHNdhlLjxFS40-dvCdU0LmbwW9BydPQYR6cfd7uplwt0KNDRWYzym4ehY_b7nZzGf8mzgRF6dMhwD6ekm5nniFcSyEIew8UWVrG-9DBUaupNJhyTawodpj1mZF-rtAn1fglNOgYiOkeoUX7OUm8sSEoztPmE7ZSh-0zuxw4iLhp6pT57C4SqkTdA4N2Q9CjQqrHxpE0Zw8AVpP1T5JAVupjMMeXj-UowtKcb0ZFa3BhvAur9Nwg4m58e7wtL3fRBrW5JujN3BHzLb9_h3afme8acDT9-l8TGwxGrbEcwNwrTJIYZf7ILvX6lcj6aAbK1-U195k7ZgQPiUNd39JgenjE-2MBMkYoKbuAxYjUeFm7WVdEUXyvPIvTW0-m-gH2eI2NgHQbQVzCn7nNDG-nvW65E';
+        $facturacion->save();
+
 
         Numeracion::create([
             'empresa_id' => $empresa->id,
