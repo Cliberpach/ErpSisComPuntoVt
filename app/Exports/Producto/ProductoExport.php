@@ -36,11 +36,9 @@ class ProductoExport implements fromArray, WithHeadings, ShouldAutoSize, WithEve
             'Marcas' => 'JET AGRO',
             'Almacenes' => 'CENTRAL',
             'StockMinimo' => '0.00',
-            'PrecioVentaMinimo' => '0.00',
-            'PrecioVentaMaximo' => '0.00',
+            'PorcentajeDistribuidor' => '0.00',
+            'PorcentajeNormal' => '0.00',
             'Igv' => 'SI',
-            'PrecioNormal' => '0.00',
-            'PrecioDistribuidor' => '0.00',
             'CodigoBarra' => '115464856'
         ]);
         return $data;
@@ -55,11 +53,9 @@ class ProductoExport implements fromArray, WithHeadings, ShouldAutoSize, WithEve
             'Marcas',
             'Almacenes',
             'StockMinimo',
-            'PrecioVentaMinimo',
-            'PrecioVentaMaximo',
+            'PorcentajeDistribuidor',
+            'PorcentajeNormal',
             'Igv',
-            'PrecioNormal',
-            'PrecioDistribuidor',
             'CodigoBarra'
         ];
     }
@@ -75,10 +71,10 @@ class ProductoExport implements fromArray, WithHeadings, ShouldAutoSize, WithEve
                             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                             'rotation' => 90,
                             'startColor' => [
-                                'argb' => '1ab394',
+                                'argb' => 'ffffff',
                             ],
                             'endColor' => [
-                                'argb' => '1ab394',
+                                'argb' => 'ffffff',
                             ],
                         ],
 

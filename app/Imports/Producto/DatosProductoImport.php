@@ -23,12 +23,12 @@ class DatosProductoImport implements ToCollection, WithHeadingRow
                 'marcas' => $row['marcas'],
                 'almacenes' => $row['almacenes'],
                 'stockminimo' => $row['stockminimo'],
-                'precioventaminimo' => $row['precioventaminimo'],
-                'precioventamaximo' => $row['precioventamaximo'],
+                'precioventaminimo' => 0,
+                'precioventamaximo' => 0,
                 'codigobarra' => $row['codigobarra'],
                 'igv' => $row['igv'],
-                'precionormal' => $row['precionormal'],
-                'preciodistribuidor' => $row['preciodistribuidor'],
+                'porcentajenormal' => $row['porcentajenormal'],
+                'porcentajedistribuidor' => $row['porcentajedistribuidor'],
             ));
         }
     }

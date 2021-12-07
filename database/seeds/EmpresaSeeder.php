@@ -6,6 +6,7 @@ use App\Compras\Proveedor;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Mantenimiento\Empresa\Facturacion;
 use App\Mantenimiento\Empresa\Numeracion;
+use App\Ventas\Cliente;
 
 class EmpresaSeeder extends Seeder
 {
@@ -87,6 +88,24 @@ class EmpresaSeeder extends Seeder
         $proveedor->estado_transporte = 'ACTIVO';
         $proveedor->estado_documento = 'ACTIVO';
         $proveedor->save();
+
+        $cliente = new Cliente();
+        $cliente->tipo_documento = 'DNI';
+
+        $cliente->documento = '99999999';
+        $cliente->tabladetalles_id = 121;
+        $cliente->nombre = 'CLIENTES VARIOS';
+        $cliente->codigo = null;
+        $cliente->zona = 'NORTE';
+
+        $cliente->departamento_id = '13';
+        $cliente->provincia_id = '1301';
+        $cliente->distrito_id = '130101';
+        $cliente->direccion = 'DIRECCION TRUJILLO';
+        $cliente->correo_electronico = null;
+        $cliente->telefono_movil = '999999999';
+        $cliente->telefono_fijo = null;
+        $cliente->save();
 
     }
 }

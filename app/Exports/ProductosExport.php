@@ -37,8 +37,8 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
                 "codigo_barra"=>$producto->codigo_barra,
                 "stock"=>$producto->stock,
                 "stock_minimo"=>$producto->stock_minimo,
-                "precio_venta_minimo"=>$producto->precio_venta_minimo,
-                "precio_venta_maximo"=>$producto->precio_venta_maximo,
+                "precio_venta_minimo"=>0,
+                "precio_venta_maximo"=>0,
                 "peso_producto"=>$producto->peso_producto,
                 "igv"=>($producto->igv=="1") ? "SI": "NO"
 
@@ -90,10 +90,10 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                         'rotation' => 90,
                         'startColor' => [
-                            'argb' => '00bbd4',
+                            'argb' => 'ffffff',
                         ],
                         'endColor' => [
-                            'argb' => '00bbd4',
+                            'argb' => 'ffffff',
                         ],
                     ],
 
@@ -108,10 +108,10 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                         'rotation' => 90,
                         'startColor' => [
-                            'argb' => '1ab394',
+                            'argb' => 'ffffff',
                         ],
                         'endColor' => [
-                            'argb' => '1ab394',
+                            'argb' => 'ffffff',
                         ],
                     ],
 

@@ -172,34 +172,38 @@ function obtenerLotesproductos(tipo_cliente) {
                     }else{
                         let cambio = $('#dolar').val();
                         let precio = 0;
-                        let precio_ = data.precio_compra;
+                        var precio_ = data.precio_compra;
                         let porcentaje = 0;
                         let porcentaje_ = data.porcentaje;
+                        let precio_nuevo = 0;
                         if(data.moneda_compra == 'DOLARES')
                         {
                             if(data.igv_compra == 1)
                             {
                                 precio = precio_ * cambio;
+                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
                             else
                             {
                                 precio = (precio_ * cambio * 1.18)
-                                porcentaje  = precio * (porcentaje_ / 100)
+                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
                         }
                         else
                         {
+                            console.log(data.igv_compra)
                             if(data.igv_compra == 1)
                             {
                                 precio = precio_;
+                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
                             else
                             {
                                 precio = (precio_ * 1.18)
-                                porcentaje  = precio * (porcentaje_ / 100)
+                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
                         }
-                        return convertFloat(precio + porcentaje).toFixed(2);
+                        return convertFloat(precio_nuevo).toFixed(2);
                     }
                 }
             },
@@ -207,13 +211,13 @@ function obtenerLotesproductos(tipo_cliente) {
             {
                 data: null,
                 className: "text-center",
-                name:"compra_documento_detalles.precio_soles",
+                name:"compra_documento_detalles.precio_mas_igv_soles",
                 sWidth: '5%',
                 render: function(data) {
-                    if (data.precio_soles == null) {
+                    if (data.precio_mas_igv_soles == null) {
                         return '0.00';
                     }else{
-                        return convertFloat(data.precio_soles).toFixed(2);
+                        return convertFloat(data.precio_mas_igv_soles).toFixed(2);
                     }
                 }
             },

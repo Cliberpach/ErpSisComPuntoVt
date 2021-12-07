@@ -39,8 +39,8 @@ class ProductoImport implements ToCollection,WithHeadingRow,WithValidation
                 $producto->medida = $m ? $m->id : $m_aux->id;
                 $producto->peso_producto = $row['peso'];
                 $producto->stock_minimo = $row['stockminimo'];
-                $producto->precio_venta_minimo = $row['precioventaminimo'];
-                $producto->precio_venta_maximo = $row['precioventamaximo'];
+                $producto->precio_venta_minimo = 0;
+                $producto->precio_venta_maximo = 0;
                 $producto->codigo_barra = $row['codigobarra'];
                 $producto->igv = $row['igv']=='SI'? 1 : 0;
                 $producto->save();
@@ -53,13 +53,15 @@ class ProductoImport implements ToCollection,WithHeadingRow,WithValidation
                     TipoCliente::create([
                         'producto_id' => $producto->id,
                         'cliente' => '121',
-                        'monto' => $row['precionormal'],
+                        'monto' => $row['porcentajenormal'],
+                        'porcentaje' => $row['porcentajenormal'],
                         'moneda' => 1,
                     ]);
                     TipoCliente::create([
                         'producto_id' => $producto->id,
                         'cliente' =>'122',
-                        'monto' => $row['preciodistribuidor'],
+                        'monto' => $row['porcentajedistribuidor'],
+                        'porcentaje' => $row['porcentajedistribuidor'],
                         'moneda' => 1,
                     ]);
             }

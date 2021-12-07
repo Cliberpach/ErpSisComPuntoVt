@@ -201,13 +201,13 @@ function obtenerLotesproductos(tipo_cliente) {
             {
                 data: null,
                 className: "text-center",
-                name:"compra_documento_detalles.precio_soles",
+                name:"compra_documento_detalles.precio_mas_igv_soles",
                 sWidth: '5%',
                 render: function(data) {
-                    if (data.precio_soles == null) {
+                    if (data.precio_mas_igv_soles == null) {
                         return '0.00';
                     }else{
-                        return convertFloat(data.precio_soles).toFixed(2);
+                        return convertFloat(data.precio_mas_igv_soles).toFixed(2);
                     }
                 }
             },

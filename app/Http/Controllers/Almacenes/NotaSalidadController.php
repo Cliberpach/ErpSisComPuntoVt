@@ -302,8 +302,8 @@ class NotaSalidadController extends Controller
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
-            ->select('compra_documentos.moneda as moneda_compra','compra_documentos.igv as igv_compra','compra_documento_detalles.precio_soles','compra_documento_detalles.precio as precio_compra','compra_documento_detalles.precio_mas_igv_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
+            ->join('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
+            ->select('compra_documentos.moneda as moneda_compra','compra_documentos.igv_check as igv_compra','compra_documento_detalles.precio_soles','compra_documento_detalles.precio as precio_compra','compra_documento_detalles.precio_mas_igv_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
                     'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')
