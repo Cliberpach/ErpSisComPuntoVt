@@ -293,6 +293,7 @@ class ComprobanteController extends Controller
         }
         catch(Exception $e)
         {
+            return  $e->getMessage();
             Session::flash('error', $e->getMessage()); //$e->getMessage()
             return redirect()->route('ventas.documento.index');
         }
