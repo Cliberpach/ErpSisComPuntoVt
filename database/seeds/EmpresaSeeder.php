@@ -65,7 +65,7 @@ class EmpresaSeeder extends Seeder
 
         $facturacion = new Facturacion();
         $facturacion->empresa_id = $empresa->id; //RELACION CON LA EMPRESA
-        $facturacion->fe_id = 1235; //ID EMPRESA API
+        $facturacion->fe_id = 1237; //ID EMPRESA API
         $facturacion->sol_user = 'USUARIO1';
         $facturacion->sol_pass = 'MiUsuario123';
         $facturacion->plan = 'free';
