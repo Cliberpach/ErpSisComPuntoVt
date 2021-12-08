@@ -48,10 +48,10 @@ class EmpresaSeeder extends Seeder
         /*En Servidor*/
         $empresa = new Empresa();
         $empresa->ruc = '20608741578';
-        $empresa->razon_social = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L';
-        $empresa->razon_social_abreviada = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L';
-        $empresa->direccion_fiscal = 'AV. CESAR VALLEJO NRO. 1717 URB. EL PALOMAR LA LIBERTAD - TRUJILLO - TRUJILLO';
-        $empresa->direccion_llegada = 'AV. CESAR VALLEJO NRO. 1717 URB. EL PALOMAR LA LIBERTAD - TRUJILLO - TRUJILLO';
+        $empresa->razon_social = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L.';
+        $empresa->razon_social_abreviada = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L.';
+        $empresa->direccion_fiscal = 'AV. CESAR VALLEJO NRO. 1717 URB. EL PALOMAR - - - - - -';
+        $empresa->direccion_llegada = 'AV. CESAR VALLEJO NRO. 1717 URB. EL PALOMAR - - - - - -';
         $empresa->dni_representante = '76682608';
         $empresa->nombre_representante = 'NOMBRE APELLIDOPAT APELLIDOMAT';
         $empresa->num_asiento = 'A00001';
