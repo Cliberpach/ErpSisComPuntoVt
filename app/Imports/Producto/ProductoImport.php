@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Illuminate\Validation\Rule;
-use App\Compras\Articulo;
 use App\Mantenimiento\Tabla\Detalle;
 use Illuminate\Support\Facades\Log;
 
@@ -50,20 +49,21 @@ class ProductoImport implements ToCollection,WithHeadingRow,WithValidation
 
 
 
-                    TipoCliente::create([
-                        'producto_id' => $producto->id,
-                        'cliente' => '121',
-                        'monto' => $row['porcentajenormal'],
-                        'porcentaje' => $row['porcentajenormal'],
-                        'moneda' => 1,
-                    ]);
-                    TipoCliente::create([
-                        'producto_id' => $producto->id,
-                        'cliente' =>'122',
-                        'monto' => $row['porcentajedistribuidor'],
-                        'porcentaje' => $row['porcentajedistribuidor'],
-                        'moneda' => 1,
-                    ]);
+                TipoCliente::create([
+                    'producto_id' => $producto->id,
+                    'cliente' => '121',
+                    'monto' => $row['porcentajenormal'],
+                    'porcentaje' => $row['porcentajenormal'],
+                    'moneda' => 1,
+                ]);
+
+                TipoCliente::create([
+                    'producto_id' => $producto->id,
+                    'cliente' =>'122',
+                    'monto' => $row['porcentajedistribuidor'],
+                    'porcentaje' => $row['porcentajedistribuidor'],
+                    'moneda' => 1,
+                ]);
             }
         }
 
