@@ -28,10 +28,10 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox ">
-                <div class="ibox-content">
+                <div class="ibox-content" id="div_productos">
                     <div class="table-responsive">
                         <table class="table dataTables-producto table-striped table-bordered table-hover"
-                            style="text-transform:uppercase">
+                            style="text-transform:uppercase" id="table_productos">
                             <thead>
                                 <tr>
                                     <th class="text-center">CÓDIGO</th>
@@ -61,6 +61,10 @@
 @push('styles')
 <!-- DataTable -->
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<style>
+
+
+</style>
 @endpush
 
 @push('scripts')
@@ -74,32 +78,36 @@
         // DataTables
         $('.dataTables-producto').DataTable({
             "dom": '<"html5buttons"B>lTfgitp',
-            "buttons": [{
-                    extend: 'excelHtml5',
-                    text: '<i class="fa fa-file-excel-o"></i> Excel',
+            "buttons": [
+                {
+                    extend:    'excelHtml5',
+                    text:      '<i class="fa fa-file-excel-o"></i> Excel',
                     titleAttr: 'Excel',
-                    title: 'Tablas Generales'
+                    title: 'PRODUCTOS'
                 },
+
                 {
                     titleAttr: 'Imprimir',
                     extend: 'print',
-                    text: '<i class="fa fa-print"></i> Imprimir',
-                    customize: function(win) {
+                    text:      '<i class="fa fa-print"></i> Imprimir',
+                    customize: function (win){
                         $(win.document.body).addClass('white-bg');
                         $(win.document.body).css('font-size', '10px');
+
                         $(win.document.body).find('table')
-                            .addClass('compact')
-                            .css('font-size', 'inherit');
+                                .addClass('compact')
+                                .css('font-size', 'inherit');
                     }
                 }
             ],
             "bPaginate": true,
+            "serverSide":true,
+            "processing":true,
             "bLengthChange": true,
             "bFilter": true,
+            "order": [],
             "bInfo": true,
-            "bAutoWidth": false,
-            "processing": true,
-            "serverSide": true,
+            'bAutoWidth': false,
             "ajax": "{{ route('almacenes.producto.getTable') }}",
             "columns": [{
                     data: 'codigo',
@@ -138,6 +146,8 @@
                 },
                 {
                     data: null,
+                    defaultContent: "",
+                    searchable: false,
                     className: "text-center",
                     render: function(data) {
                         //Ruta Detalle
@@ -165,8 +175,18 @@
             "language": {
                 "url": "{{ asset('Spanish.json') }}"
             },
-            "order": [],
+            createdRow: function(row, data, dataIndex, cells) {
+                $(row).addClass('fila_lote');
+                $(row).attr('data-href', "");
+            },
         });
+
+        $('buttons-html5').removeClass('.btn-default');
+        $('#table_productos_wrapper').removeClass('');
+        $('.dataTables-productos tbody').on( 'click', 'tr', function () {
+                $('.dataTables-productos').DataTable().$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+        } );
 
         // Eventos
         $('#btn_añadir_producto').on('click', añadirProducto);

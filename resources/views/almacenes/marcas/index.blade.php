@@ -91,7 +91,7 @@
                     extend:    'excelHtml5',
                     text:      '<i class="fa fa-file-excel-o"></i> Excel',
                     titleAttr: 'Excel',
-                    title: 'Tablas Generales'
+                    title: 'MARCAS'
                 },
 
                 {
@@ -105,9 +105,9 @@
                         $(win.document.body).find('table')
                                 .addClass('compact')
                                 .css('font-size', 'inherit');
+                    }
                 }
-                }
-                ],
+            ],
             "bPaginate": true,
             "bLengthChange": true,
             "bFilter": true,
