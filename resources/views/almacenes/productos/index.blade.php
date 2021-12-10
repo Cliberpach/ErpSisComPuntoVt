@@ -113,6 +113,7 @@
                             if (response.success) {
                                 productos = [];
                                 productos = response.productos;
+                                console.log(response.productos)
                                 loadTable();
                                 timerInterval = 0;
                                 Swal.resumeTimer();
