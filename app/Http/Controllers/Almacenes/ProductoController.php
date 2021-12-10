@@ -44,6 +44,7 @@ class ProductoController extends Controller
             ]);
         }
         return response()->json([
+            'success' => true,
             'productos' => $coleccion
         ]);
     }
