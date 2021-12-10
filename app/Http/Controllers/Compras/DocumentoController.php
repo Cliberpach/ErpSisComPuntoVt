@@ -724,7 +724,7 @@ class DocumentoController extends Controller
 
     public function comprobante_store(Request $request)
     {
-        $compras = Documento::where('moneda', $request->moneda)->where('serie_tipo', $request->serie_tipo)->where('numero_tipo', $request->numero_tipo)->where('proveedor_id',$request->proveedor_id)->where('tipo_compra',$request->tipo_compra)->get();
+        $compras = Documento::where('moneda', $request->moneda)->where('serie_tipo', $request->serie_tipo)->where('numero_tipo', $request->numero_tipo)->where('proveedor_id',$request->proveedor_id)->where('tipo_compra',$request->tipo_compra)->where('estado','ACTIVO')->get();
         $success = true;
         if(count($compras) > 0){
             $success = false;
@@ -738,7 +738,7 @@ class DocumentoController extends Controller
 
     public function comprobante_update(Request $request)
     {
-        $compras = Documento::where('moneda', $request->moneda)->where('serie_tipo', $request->serie_tipo)->where('numero_tipo', $request->numero_tipo)->where('proveedor_id',$request->proveedor_id)->where('tipo_compra',$request->tipo_compra)->where('id', '!=',$request->id)->get();
+        $compras = Documento::where('moneda', $request->moneda)->where('serie_tipo', $request->serie_tipo)->where('numero_tipo', $request->numero_tipo)->where('proveedor_id',$request->proveedor_id)->where('tipo_compra',$request->tipo_compra)->where('estado','ACTIVO')->where('id', '!=',$request->id)->get();
         $success = true;
         if(count($compras) > 0){
             $success = false;
