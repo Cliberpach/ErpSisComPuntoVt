@@ -112,16 +112,17 @@ class Detalle extends Model
             $kardex->save();
         });
 
-        static::deleted(function(Detalle $detalle){
+        static::updated(function(Detalle $detalle){
             //ANULAR LOTE producto
-            $lote = LoteProducto::where('compra_documento_detalle_id', $detalle->id)->first();
-            $producto= Producto::findOrFail($lote->producto_id);
-            $producto->stock=$producto->stock-$lote->cantidad;
-            $producto->save();
-            //$lote->estado = '0';
-            //$lote->update();
-            $lote->delete();
-
+            if($detalle->estado == 'ANULADO')
+            {
+                $lote = LoteProducto::where('compra_documento_detalle_id', $detalle->id)->first();
+                $producto= Producto::findOrFail($lote->producto_id);
+                $producto->stock=$producto->stock-$lote->cantidad;
+                $producto->save();
+                $lote->estado = '0';
+                $lote->update();
+            }
         });
 
 

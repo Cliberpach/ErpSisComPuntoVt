@@ -27,23 +27,31 @@ class ProductoController extends Controller
     public function getTable()
     {
         $this->authorize('haveaccess','producto.index');
-        $productos = Producto::where('estado','ACTIVO')->orderBy('id', 'desc')->get();
-        $coleccion = collect([]);
-        foreach($productos as $producto) {
-            $coleccion->push([
-                'id' => $producto->id,
-                'codigo' => $producto->codigo,
-                'codigo_barra' => $producto->codigo_barra,
-                'nombre' => $producto->nombre,
-                'categoria' => $producto->categoria->descripcion,
-                'almacen' => $producto->almacen->descripcion,
-                'marca' => $producto->marca->marca,
-                'stock' => $producto->stock,
-                'precio_venta_minimo' => $producto->precio_venta_minimo,
-                'precio_venta_maximo' => $producto->precio_venta_maximo,
-            ]);
-        }
-        return datatables()->of($coleccion)->toJson();
+        // $productos = Producto::where('estado','ACTIVO')->orderBy('id', 'desc')->get();
+        // $coleccion = collect([]);
+        return datatables()->query(
+            DB::table('productos')
+            ->join('marcas','marcas.id','=','productos.marca_id')
+            ->join('almacenes','almacenes.id','=','productos.almacen_id')
+            ->join('categorias','categorias.id','=','productos.categoria_id')
+            ->select('productos.*','categorias.descripcion as categoria','almacenes.descripcion as almacen','marcas.marca')
+            ->orderBy('productos.id','ASC')
+        )->toJson();
+        // foreach($productos as $producto) {
+        //     $coleccion->push([
+        //         'id' => $producto->id,
+        //         'codigo' => $producto->codigo,
+        //         'codigo_barra' => $producto->codigo_barra,
+        //         'nombre' => $producto->nombre,
+        //         'categoria' => $producto->categoria->descripcion,
+        //         'almacen' => $producto->almacen->descripcion,
+        //         'marca' => $producto->marca->marca,
+        //         'stock' => $producto->stock,
+        //         'precio_venta_minimo' => $producto->precio_venta_minimo,
+        //         'precio_venta_maximo' => $producto->precio_venta_maximo,
+        //     ]);
+        // }
+        // return datatables()->of($coleccion)->toJson();
     }
 
     public function create()

@@ -103,31 +103,38 @@
             "ajax": "{{ route('almacenes.producto.getTable') }}",
             "columns": [{
                     data: 'codigo',
-                    className: "text-left"
+                    className: "text-left",
+                    name:"productos.codigo"
                 },
                 {
                     data: 'codigo_barra',
-                    className: "text-left"
+                    className: "text-left",
+                    name:"productos.codigo_barra"
                 },
                 {
                     data: 'nombre',
-                    className: "text-left"
+                    className: "text-left",
+                    name:"productos.nombre"
                 },
                 {
                     data: 'almacen',
-                    className: "text-left"
+                    className: "text-left",
+                    name:"almacenes.descripcion"
                 },
                 {
                     data: 'marca',
-                    className: "text-left"
+                    className: "text-left",
+                    name:"marcas.marca"
                 },
                 {
                     data: 'categoria',
-                    className: "text-left"
+                    className: "text-left",
+                    name:"categorias.descripcion"
                 },
                 {
                     data: 'stock',
-                    className: "text-center"
+                    className: "text-center",
+                    name:"productos.stock"
                 },
                 {
                     data: null,
