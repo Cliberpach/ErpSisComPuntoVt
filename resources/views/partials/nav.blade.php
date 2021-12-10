@@ -181,7 +181,7 @@
             <a href="#">Producto <span class="fa arrow"></span></a>
             <ul class="nav nav-third-level">
                 <li class="@yield('producto_kardex-kardex-active')"><a href="{{ route('consultas.kardex.producto.index') }}">Kardex </a></li>
-                <li class="@yield('producto_kardex-top-active')"><a href="#">Top</a></li>
+                <li class="@yield('producto_kardex-top-active')"><a href="{{ route('consultas.kardex.producto.index_top') }}">Top</a></li>
             </ul>
         </li>
         <li class="@yield('salida-kardex-active')">

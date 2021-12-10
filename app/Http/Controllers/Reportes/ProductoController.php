@@ -7,6 +7,7 @@ use App\Compras\Documento\Detalle;
 use App\Http\Controllers\Controller;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductoController extends Controller
@@ -18,27 +19,15 @@ class ProductoController extends Controller
 
     public function getTable()
     {
-        $productos = Producto::where('estado','ACTIVO')->orderBy('id', 'desc')->get();
-        $coleccion = collect([]);
-        foreach($productos as $producto) {
-            $coleccion->push([
-                'id' => $producto->id,
-                'codigo' => $producto->codigo,
-                'codigo_barra' => $producto->codigo_barra,
-                'nombre' => $producto->nombre,
-                'categoria' => $producto->categoria->descripcion,
-                'almacen' => $producto->almacen->descripcion,
-                'marca' => $producto->marca->marca,
-                'stock' => $producto->stock,
-                'precio_venta_minimo' => $producto->precio_venta_minimo,
-                'precio_venta_maximo' => $producto->precio_venta_maximo,
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'productos' => $coleccion
-        ]);
+        return datatables()->query(
+            DB::table('productos')
+            ->join('marcas','productos.marca_id','=','marcas.id')
+            ->join('almacenes','almacenes.id','=','productos.almacen_id')
+            ->join('categorias','categorias.id','=','productos.categoria_id')
+            ->select('categorias.descripcion as categoria','almacenes.descripcion as almacen','marcas.marca','productos.*')
+            ->orderBy('productos.id','ASC')
+            ->where('productos.estado', 'ACTIVO')
+        )->toJson();
     }
 
     public function llenarCompras($id)

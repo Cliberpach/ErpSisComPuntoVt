@@ -51,6 +51,11 @@ class ProductoController extends Controller
         ]);
     }
 
+    public function index_top()
+    {
+        return view('consultas.kardex.producto_top');
+    }
+
     public function getTableTop(Request $request){
         $top = $request->top;
 
@@ -86,8 +91,8 @@ class ProductoController extends Controller
 
         foreach($productos as $producto)
         {
-            $suma_vendidos = $coleccion_aux->where('producto_id', $producto->id)->sum('cantidad');
-            $suma_importe = $coleccion_aux->where('producto_id', $producto->id)->sum('importe');
+            $suma_vendidos = $coleccion_aux->where('producto_id', $producto->id)->sum('cantidad') ? $coleccion_aux->where('producto_id', $producto->id)->sum('cantidad') : 0;
+            $suma_importe = $coleccion_aux->where('producto_id', $producto->id)->sum('importe') ? $coleccion_aux->where('producto_id', $producto->id)->sum('importe') : 0;
             $coleccion->push([
                 'codigo' => $producto->codigo,
                 'producto' => $producto->nombre,
@@ -96,9 +101,22 @@ class ProductoController extends Controller
             ]);
         }
 
+        $coll = $coleccion->sortByDesc('cantidad')->take($top);
+
+        $arr = array();
+        foreach($coll as $coll_)
+        {
+            $arr_aux = array('codigo' => $coll_['codigo'],
+            'producto' => $coll_['producto'],
+            'cantidad' => $coll_['cantidad'],
+            'importe' => $coll_['importe']);
+            array_push($arr,$arr_aux);
+        }
+
         return response()->json([
             'success' => true,
-            'ventas' => $coleccion->sortByDesc('cantidad')->take($top),
+            'kardex' => $arr,
+            'top' => count($coll->all())
         ]);
     }
 }

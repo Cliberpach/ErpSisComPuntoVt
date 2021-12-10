@@ -568,8 +568,9 @@ function(){
     Route::prefix('consultas/kardex/producto')->group(function(){
 
         Route::get('index', 'Consultas\Kardex\ProductoController@index')->name('consultas.kardex.producto.index');
+        Route::get('index_top', 'Consultas\Kardex\ProductoController@index_top')->name('consultas.kardex.producto.index_top');
         Route::post('getTable','Consultas\Kardex\ProductoController@getTable')->name('consultas.kardex.producto.getTable');
-        Route::get('getTableTop','Consultas\Kardex\ProductoController@getTableTop')->name('consultas.kardex.producto.getTableTop');
+        Route::post('getTableTop','Consultas\Kardex\ProductoController@getTableTop')->name('consultas.kardex.producto.getTableTop');
 
     });
 
