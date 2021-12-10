@@ -136,7 +136,7 @@
 
     function loadTable()
     {
-        $('.dataTables-producto').DataTable().fnDestroy();
+        $('.dataTables-producto').dataTable().fnDestroy();
         $('.dataTables-producto').DataTable({
             "dom": '<"html5buttons"B>lTfgitp',
             "buttons": [{
