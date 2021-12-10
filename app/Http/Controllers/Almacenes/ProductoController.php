@@ -43,10 +43,7 @@ class ProductoController extends Controller
                 'precio_venta_maximo' => $producto->precio_venta_maximo,
             ]);
         }
-        return response()->json([
-            'success' => true,
-            'productos' => $coleccion
-        ]);
+        return datatables()->of($coleccion)->toJson();
     }
 
     public function create()

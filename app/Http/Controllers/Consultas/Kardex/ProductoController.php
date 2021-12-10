@@ -52,26 +52,15 @@ class ProductoController extends Controller
     }
 
     public function getTableTop(Request $request){
-
-        $top = 4;
-        //$top = $request->top;
+        $top = $request->top;
 
         $documentos = Documento::where('estado','!=','ANULADO');
-        // if($request->fecha_desde && $request->fecha_hasta)
-        // {
-        //     $documentos = $documentos->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta]);
-        // }
+        if($request->fecha_desde && $request->fecha_hasta)
+        {
+            $documentos = $documentos->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta]);
+        }
 
         $documentos = $documentos->orderBy('id', 'desc')->get();
-
-        // if($request->fecha_desde && $request->fecha_hasta)
-        // {
-        //     $documentos = Documento::where('estado','!=','ANULADO')->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
-        // }
-        // else
-        // {
-        //     $documentos = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
-        // }
 
 
 
@@ -109,7 +98,7 @@ class ProductoController extends Controller
 
         return response()->json([
             'success' => true,
-            'ventas' => $coleccion->orderBy('cantidad')->take($top),
+            'ventas' => $coleccion->sortByDesc('cantidad')->take($top),
         ]);
     }
 }
