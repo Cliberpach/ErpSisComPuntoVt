@@ -569,6 +569,7 @@ function(){
 
         Route::get('index', 'Consultas\Kardex\ProductoController@index')->name('consultas.kardex.producto.index');
         Route::post('getTable','Consultas\Kardex\ProductoController@getTable')->name('consultas.kardex.producto.getTable');
+        Route::get('getTableTop','Consultas\Kardex\ProductoController@getTableTop')->name('consultas.kardex.producto.getTableTop');
 
     });
 

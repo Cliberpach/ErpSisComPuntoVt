@@ -71,14 +71,78 @@
 <script>
     $(document).ready(function() {
 
+        var productos = [];
         // DataTables
+        initTable();
+
+        tablaDatos = $('.dataTables-producto').DataTable({
+            "language": {
+                "url": "{{ asset('Spanish.json') }}"
+            },
+            "order": [],
+        });
+        // DataTables
+
+
+        // Eventos
+        $('#btn_añadir_producto').on('click', añadirProducto);
+    });
+
+    function initTable()
+    {
+        let verificar = true;
+
+        if(verificar)
+        {
+            let timerInterval;
+            Swal.fire({
+                title: 'Cargando...',
+                icon: 'info',
+                customClass: {
+                    container: 'my-swal'
+                },
+                timer: 10,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    Swal.stopTimer();
+                    $.ajax({
+                        type : 'get',
+                        url : '{{ route('almacenes.producto.getTable') }}',
+                        success: function(response) {
+                            if (response.success) {
+                                productos = [];
+                                productos = response.productos;
+                                loadTable();
+                                timerInterval = 0;
+                                Swal.resumeTimer();
+                                //console.log(colaboradores);
+                            } else {
+                                Swal.resumeTimer();
+                                productos = [];
+                                loadTable();
+                            }
+                        }
+                    });
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                }
+            });
+        }
+        return false;
+    }
+
+    function loadTable()
+    {
+        $('.dataTables-producto').DataTable().fnDestroy();
         $('.dataTables-producto').DataTable({
             "dom": '<"html5buttons"B>lTfgitp',
             "buttons": [{
                     extend: 'excelHtml5',
                     text: '<i class="fa fa-file-excel-o"></i> Excel',
                     titleAttr: 'Excel',
-                    title: 'Tablas Generales'
+                    title: 'PRODUCTOS'
                 },
                 {
                     titleAttr: 'Imprimir',
@@ -98,9 +162,7 @@
             "bFilter": true,
             "bInfo": true,
             "bAutoWidth": false,
-            "processing": true,
-            "serverSide": true,
-            "ajax": "{{ route('almacenes.producto.getTable') }}",
+            "data": productos,
             "columns": [{
                     data: 'codigo',
                     className: "text-left"
@@ -160,10 +222,8 @@
             },
             "order": [],
         });
-
-        // Eventos
-        $('#btn_añadir_producto').on('click', añadirProducto);
-    });
+        return false;
+    }
 
     $(".dataTables-producto").on('click','.nuevo-ingreso',function(){
         var data = $(".dataTables-producto").dataTable().fnGetData($(this).closest('tr'));

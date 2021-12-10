@@ -2,6 +2,7 @@
 
 @section('kardex-active', 'active')
 @section('producto_kardex-active', 'active')
+@section('producto_kardex-kardex-active', 'active')
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10 col-md-8">
@@ -211,7 +212,7 @@ function loadTable()
         "columns": [
             //kardex INTERNA
             //{ data: 'id',className: "text-center"},
-            
+
             { data: 'producto',className: "text-center"},
             { data: 'origen',className: "text-center"},
             { data: 'numero_doc',className: "text-center"},
@@ -226,7 +227,7 @@ function loadTable()
                     "url": "{{asset('Spanish.json')}}"
         },
         "order": [[ 0, "desc" ]],
-        
+
 
     });
     return false;

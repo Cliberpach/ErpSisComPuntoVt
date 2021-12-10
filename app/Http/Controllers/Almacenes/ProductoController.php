@@ -43,7 +43,9 @@ class ProductoController extends Controller
                 'precio_venta_maximo' => $producto->precio_venta_maximo,
             ]);
         }
-        return DataTables::of($coleccion)->make(true);
+        return response()->json([
+            'productos' => $coleccion
+        ]);
     }
 
     public function create()

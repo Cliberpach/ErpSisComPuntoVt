@@ -177,7 +177,13 @@
     <ul class="nav nav-second-level collapse">
         <li class="@yield('proveedor_kardex-active')"><a href="#">Proveedor</a></li>
         <li class="@yield('cliente_kardex-active')"><a href="#">Cliente</a></li>
-        <li class="@yield('producto_kardex-active')"><a href="{{ route('consultas.kardex.producto.index') }}">Producto</a></li>
+        <li class="@yield('producto_kardex-active')">
+            <a href="#">Producto <span class="fa arrow"></span></a>
+            <ul class="nav nav-third-level">
+                <li class="@yield('producto_kardex-kardex-active')"><a href="{{ route('consultas.kardex.producto.index') }}">Kardex </a></li>
+                <li class="@yield('producto_kardex-top-active')"><a href="#">Top</a></li>
+            </ul>
+        </li>
         <li class="@yield('salida-kardex-active')">
             <a href="#">Salidas <span class="fa arrow"></span></a>
             <ul class="nav nav-third-level">
