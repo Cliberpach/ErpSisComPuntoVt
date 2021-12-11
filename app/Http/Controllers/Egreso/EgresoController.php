@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Egreso;
 
-use App\Pos\Caja;
+use App\Http\Controllers\Controller;
 use App\Pos\DetalleMovimientoEgresosCaja;
 use App\Pos\Egreso;
-use App\Pos\MovimientoCaja;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Yajra\DataTables\DataTables;
+use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade as PDF;
 
 class EgresoController extends Controller

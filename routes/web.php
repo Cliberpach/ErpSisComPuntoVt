@@ -426,13 +426,13 @@ function(){
         Route::get('repoteMovimiento/{id}','Pos\CajaController@reporteMovimiento')->name('Caja.reporte.movimiento');
     });
     Route::prefix('egreso')->group(function () {
-        Route::get('index','EgresoController@index')->name('Egreso.index');
-        Route::get('getEgresos','EgresoController@getEgresos')->name('Egreso.getEgresos');
-        Route::get('getEgreso','EgresoController@getEgreso')->name('Egreso.getEgreso');
-        Route::post('store','Egresocontroller@store')->name('Egreso.store');
-        Route::post('update/{id}','Egresocontroller@update')->name('Egreso.update');
-        Route::get('destroy/{id}','Egresocontroller@destroy')->name('Egreso.destroy');
-        Route::get('recibo/{size}','Egresocontroller@recibo')->name('Egreso.recibo');
+        Route::get('index','Egreso\EgresoController@index')->name('Egreso.index');
+        Route::get('getEgresos','Egreso\EgresoController@getEgresos')->name('Egreso.getEgresos');
+        Route::get('getEgreso','Egreso\EgresoController@getEgreso')->name('Egreso.getEgreso');
+        Route::post('store','Egreso\Egresocontroller@store')->name('Egreso.store');
+        Route::post('update/{id}','Egreso\Egresocontroller@update')->name('Egreso.update');
+        Route::get('destroy/{id}','Egreso\Egresocontroller@destroy')->name('Egreso.destroy');
+        Route::get('recibo/{size}','Egreso\Egresocontroller@recibo')->name('Egreso.recibo');
     });
 
     Route::prefix('cuentaProveedor')->group(function () {
