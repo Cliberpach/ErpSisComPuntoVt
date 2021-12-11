@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Consultas\Caja;
 
 use App\Http\Controllers\Controller;
+use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 use Exception;
 use Illuminate\Http\Request;
@@ -29,18 +30,19 @@ class UtilidadController extends Controller
 
             $coleccion = collect();
 
-            foreach ($ventas as $key => $value) {
-                foreach($value->detalles as $detalle)
+            foreach ($ventas as $venta) {
+                $detalles = Detalle::where('estado','ACTIVO')->where('documento_id',$venta->id)->get();
+                foreach($detalles as $detalle)
                 {
                     $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio + ($detalle->lote->detalle_compra->costo_flete / $detalle->lote->detalle_compra->cantidad)) : 0.00;
                     $coleccion->push([
-                        "fecha_doc" => $value->fecha_documento,
+                        "fecha_doc" => $venta->fecha_documento,
                         "cantidad" => $detalle->cantidad,
                         "producto" => $detalle->lote->producto->nombre,
                         "precio_venta" => $detalle->precio_nuevo,
-                        "precio_compra" => $precom,
-                        "utilidad" => $detalle->precio_nuevo - $precom,
-                        "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
+                        "precio_compra" => number_format($precom, 2),
+                        "utilidad" => number_format($detalle->precio_nuevo - $precom,2),
+                        "importe" => number_format(($detalle->precio_nuevo - $precom) * $detalle->cantidad, 2)
                     ]);
                 }
             }

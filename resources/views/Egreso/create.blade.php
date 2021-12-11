@@ -59,7 +59,7 @@
                             class="required"></label>) son obligatorios.</small>
                 </div>
                 <div class="col-md-6 text-right">
-                    <button type="button" class="btn btn-primary btn-sm btn-submit-egreso"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="submit" class="btn btn-primary btn-sm btn-submit-egreso"><i class="fa fa-save"></i> Guardar</button>
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i
                             class="fa fa-times"></i> Cancelar</button>
                 </div>
@@ -93,14 +93,16 @@
             $("#documento").attr('disabled',false)
            }
         });
-        $(".btn-submit-egreso").on('click', function(e) {
+        $(".frm_egreso_create").on('submit', function(e) {
+            e.preventDefault();
+
             axios.get("{{route('Caja.movimiento.verificarestado')}}").then((value) => {
                 if(value.data=="")
                 {
                     toastr.error("No hay ninguna apertura de caja");
                 }
                 else{
-                    $("#frm_egreso_create").submit();
+                    this.submit();
                 }
             })
         })

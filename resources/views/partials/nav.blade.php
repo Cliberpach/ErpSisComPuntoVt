@@ -25,6 +25,11 @@
     <a href="{{ route('home') }}"><i class="fa fa-th-large"></i> <span class="nav-label">Panel de
             control</span></a>
 </li>
+@can('haveaccess','utilidad_mensual.index')
+<li class="@yield('utilidad-active')">
+    <a href="{{ route('consultas.utilidad.index') }}"><i class="fa fa-money"></i> <span class="nav-label">Utilidad</span></a>
+</li>
+@endcan
 
 @can('restore', [Auth::user(),['caja.index','movimiento_caja.index','egreso.index']])
 <li class="@yield('caja-chica-active')">

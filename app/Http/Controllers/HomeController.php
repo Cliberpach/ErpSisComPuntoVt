@@ -58,25 +58,25 @@ class HomeController extends Controller
             $ventas = array();
             for ($j = 0; $j < count($meses_aux); $j++) {
                 $total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$meses_aux[$j]->mes)->whereYear('fecha_documento',$meses_aux[$j]->anio)->sum('total');
-                array_push($ventas, array("nombre" => $meses_aux[$j]->nombre, "total" => number_format($total,3)));
+                array_push($ventas, array("nombre" => $meses_aux[$j]->nombre, "total" => round($total,2)));
             }
 
             $compras = array();
             for ($j = 0; $j < count($meses_aux); $j++) {
                 $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_emision',$meses_aux[$j]->mes)->whereYear('fecha_emision',$meses_aux[$j]->anio)->sum('total_soles');
-                array_push($compras, array("nombre" => $meses_aux[$j]->nombre, "total" => number_format($total,3)));
+                array_push($compras, array("nombre" => $meses_aux[$j]->nombre, "total" => round($total,2)));
             }
 
             $cobrar = array();
             for ($j = 0; $j < count($meses_aux); $j++) {
                 $total = CuentaCliente::where('estado','!=','ANULADO')->whereMonth('created_at',$meses_aux[$j]->mes)->whereYear('created_at',$meses_aux[$j]->anio)->sum('saldo');
-                array_push($cobrar, array("nombre" => $meses_aux[$j]->nombre, "total" => number_format($total,3)));
+                array_push($cobrar, array("nombre" => $meses_aux[$j]->nombre, "total" => round($total,2)));
             }
 
             $pagar = array();
             for ($j = 0; $j < count($meses_aux); $j++) {
                 $total = CuentaProveedor::where('estado','!=','ANULADO')->whereMonth('created_at',$meses_aux[$j]->mes)->whereYear('created_at',$meses_aux[$j]->anio)->sum('saldo');
-                array_push($pagar, array("nombre" => $meses_aux[$j]->nombre, "total" => number_format($total,3)));
+                array_push($pagar, array("nombre" => $meses_aux[$j]->nombre, "total" => round($total,2)));
             }
 
             return response()->json([

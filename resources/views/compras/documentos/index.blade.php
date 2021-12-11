@@ -42,6 +42,7 @@
                                     <th style="text-center">ID</th>
                                     <th style="display:none;"></th>
                                     <th class="text-center">O.C</th>
+                                    <th class="text-center">#Doc</th>
                                     <th class="text-center">EMISION</th>
                                     <th class="text-center">TIPO</th>
                                     <th class="text-center">PROVEEDOR</th>
@@ -133,6 +134,10 @@ $(document).ready(function() {
 
             },
             {
+                data: 'numero_doc',
+                className: "text-center"
+            },
+            {
                 data: 'fecha_emision',
                 className: "text-center"
             },
@@ -183,7 +188,7 @@ $(document).ready(function() {
                                 "</span>";
                             break;
                         case "PAGADA":
-                            return "<span class='badge badge-danger' d-block>" + data.estado +
+                            return "<span class='badge badge-primary' d-block>" + data.estado +
                                 "</span>";
                             break;
                         case "ADELANTO":

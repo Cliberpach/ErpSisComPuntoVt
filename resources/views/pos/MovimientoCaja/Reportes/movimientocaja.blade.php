@@ -307,7 +307,7 @@
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
                                         {{ $ventas->documento->efectivo }}</td>
                                 @elseif ($ventas->documento->tipo_pago_id==3)
-                                    <td style="text-align: center; border-right: 2px solid #52BE80"></td>
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
                                         {{ $ventas->documento->importe }}</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
@@ -340,7 +340,7 @@
                                         <td style="text-align: center; border-right: 2px solid #52BE80">
                                             {{ $cuentaCliente->efectivo }}</td>
                                     @elseif ($cuentaCliente->tipo_pago_id==3)
-                                        <td style="text-align: center; border-right: 2px solid #52BE80"></td>
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                         <td style="text-align: center; border-right: 2px solid #52BE80">
                                             {{ $cuentaCliente->importe }}</td>
                                         <td style="text-align: center; border-right: 2px solid #52BE80">

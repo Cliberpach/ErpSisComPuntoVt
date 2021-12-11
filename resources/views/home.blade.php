@@ -8,7 +8,7 @@
                     <h5>Ventas</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ ventas_mensual() }}</h1>
+                    <h1 class="no-margins">{{ number_format(ventas_mensual(), 2) }}</h1>
                     <div class="stat-percent font-bold text-success d-none">98% <i class="fa fa-bolt"></i></div>
                     <small>Total de ventas:</small>
                 </div>
@@ -21,7 +21,7 @@
                     <h5>Compras</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ compras_mensual() }}</h1>
+                    <h1 class="no-margins">{{ number_format(compras_mensual(),2) }}</h1>
                     <div class="stat-percent font-bold text-info d-none">20% <i class="fa fa-level-up"></i></div>
                     <small>Total de Compras:</small>
                 </div>
@@ -34,7 +34,7 @@
                     <h5>Cuentas Cobrar</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ cuentas_cobrar() }}</h1>
+                    <h1 class="no-margins">{{ number_format(cuentas_cobrar(),2) }}</h1>
                     <div class="stat-percent font-bold text-navy d-none">44% <i class="fa fa-level-up"></i></div>
                     <small>Cuentas Cobrar total:</small>
                 </div>
@@ -47,7 +47,7 @@
                         <h5>Cuentas Pagar</h5>
                     </div>
                     <div class="ibox-content">
-                        <h1 class="no-margins">{{ cuentas_pagar() }}</h1>
+                        <h1 class="no-margins">{{ number_format(cuentas_pagar(),2) }}</h1>
                         <div class="stat-percent font-bold text-danger d-none">38% <i class="fa fa-level-down"></i></div>
                         <small>Cuentas Pagar total:</small>
                     </div>

@@ -1042,7 +1042,7 @@ if (!function_exists('MovimientoCajaIngresos')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->forma_pago == 160) {
+            if ($item->documento->condicion_id == 1) {
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 } else {
@@ -1121,9 +1121,41 @@ if (!function_exists('ventas_mensual')) {
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        return number_format($total,3);
+        return $total;
     }
 }
+
+if (!function_exists('utilidad_mensual')) {
+    function utilidad_mensual()
+    {
+        $fecha_hoy = Carbon::now();
+        $mes = date_format($fecha_hoy,'m');
+        $anio = date_format($fecha_hoy,'Y');
+        $ventas = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get();
+        $coleccion = collect();
+        foreach ($ventas as $venta) {
+            $detalles = DocumentoDetalle::where('estado','ACTIVO')->where('documento_id',$venta->id)->get();
+            foreach($detalles as $detalle)
+            {
+                $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio + ($detalle->lote->detalle_compra->costo_flete / $detalle->lote->detalle_compra->cantidad)) : 0.00;
+                $coleccion->push([
+                    "fecha_doc" => $venta->fecha_documento,
+                    "cantidad" => $detalle->cantidad,
+                    "producto" => $detalle->lote->producto->nombre,
+                    "precio_venta" => $detalle->precio_nuevo,
+                    "precio_compra" => number_format($precom, 2),
+                    "utilidad" => number_format($detalle->precio_nuevo - $precom,2),
+                    "importe" => number_format(($detalle->precio_nuevo - $precom) * $detalle->cantidad, 2)
+                ]);
+            }
+        }
+
+        $utilidad = $coleccion->sum('importe');
+        return $utilidad;
+    }
+}
+
+
 
 if (!function_exists('compras_mensual')) {
     function compras_mensual()
@@ -1132,7 +1164,7 @@ if (!function_exists('compras_mensual')) {
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_emision',$mes)->whereYear('fecha_emision',$anio)->sum('total_soles');
-        return number_format($total,3);
+        return $total;
     }
 }
 
@@ -1143,7 +1175,7 @@ if (!function_exists('cuentas_pagar')) {
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = CuentaProveedor::where('estado','!=','ANULADO')->whereMonth('created_at',$mes)->whereYear('created_at',$anio)->sum('saldo');
-        return number_format($total,3);
+        return $total;
     }
 }
 
@@ -1154,7 +1186,7 @@ if (!function_exists('cuentas_cobrar')) {
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = CuentaCliente::where('estado','!=','ANULADO')->whereMonth('created_at',$mes)->whereYear('created_at',$anio)->sum('saldo');
-        return number_format($total,3);
+        return $total;
     }
 }
 

@@ -102,6 +102,7 @@ class DocumentoController extends Controller
                 'empresa' => $documento->empresa->razon_social,
                 'fecha_emision' =>  Carbon::parse($documento->fecha_emision)->format( 'd/m/Y'),
                 'igv' =>  $documento->igv,
+                'numero_doc' =>  $documento->serie_tipo.'-'.$documento->numero_tipo,
                 'moneda' =>  $documento->moneda,
                 'tipo_cambio' =>  $documento->tipo_cambio,
                 'orden_compra' =>  $documento->orden_compra,

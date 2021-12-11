@@ -156,8 +156,8 @@ function obtenerLotesproductos(tipo_cliente) {
             {data: 'id', className: "text-center", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
             {data: 'nombre', className: "text-left", name:"productos.nombre", sWidth: '35%' },
             {data: 'unidad_producto', className: "text-center", name:"tabladetalles.simbolo", sWidth: '5%' },
-            {data: 'codigo_lote', className: "text-center", name:"lote_productos.codigo_lote", sWidth: '15%' },
-            {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento", sWidth: '5%' },
+            {data: 'codigo_lote', className: "text-center", name:"lote_productos.codigo_lote",visible: false, sWidth: '15%' },
+            {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento",visible: false, sWidth: '5%' },
             {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
             {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
             @if ($fullaccess)

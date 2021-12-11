@@ -594,6 +594,13 @@ function(){
 
     });
 
+    // Cosultas - Utilidad
+    Route::prefix('consultas/utilidad')->group(function(){
+
+        Route::get('index', 'Consultas\UtilidadController@index')->name('consultas.utilidad.index');
+
+    });
+
 
     // Reportes - Producto - informe
     Route::prefix('reportes/producto')->group(function(){
@@ -609,6 +616,7 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
+    return utilidad_mensual();
     $dato = 'Actualizar';
     broadcast(new VentasCajaEvent($dato));
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';
