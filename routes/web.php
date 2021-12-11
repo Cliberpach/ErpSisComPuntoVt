@@ -429,10 +429,10 @@ function(){
         Route::get('index','Egreso\EgresoController@index')->name('Egreso.index');
         Route::get('getEgresos','Egreso\EgresoController@getEgresos')->name('Egreso.getEgresos');
         Route::get('getEgreso','Egreso\EgresoController@getEgreso')->name('Egreso.getEgreso');
-        Route::post('store','Egreso\Egresocontroller@store')->name('Egreso.store');
-        Route::post('update/{id}','Egreso\Egresocontroller@update')->name('Egreso.update');
-        Route::get('destroy/{id}','Egreso\Egresocontroller@destroy')->name('Egreso.destroy');
-        Route::get('recibo/{size}','Egreso\Egresocontroller@recibo')->name('Egreso.recibo');
+        Route::post('store','Egreso\EgresoController@store')->name('Egreso.store');
+        Route::post('update/{id}','Egreso\EgresoController@update')->name('Egreso.update');
+        Route::get('destroy/{id}','Egreso\EgresoController@destroy')->name('Egreso.destroy');
+        Route::get('recibo/{size}','Egreso\EgresoController@recibo')->name('Egreso.recibo');
     });
 
     Route::prefix('cuentaProveedor')->group(function () {
