@@ -45,7 +45,7 @@ class CajaController extends Controller
         return DataTables::of($datos)->toJson();
     }
     public function store(Request $request)
-    {        
+    {
         $this->authorize('haveaccess','caja.index');
         $caja = new Caja();
         $caja->nombre = $request->nombre;
@@ -67,14 +67,14 @@ class CajaController extends Controller
         return redirect()->route('Caja.index');
     }
     public function indexMovimiento()
-    {        
+    {
         $this->authorize('haveaccess','movimiento_caja.index');
         return view('pos.MovimientoCaja.indexMovimiento');
     }
     public function getMovimientosCajas()
     {
         $datos = array();
-        $movimientos = MovimientoCaja::get();
+        $movimientos = MovimientoCaja::where('estado','ACTIVO')->get();
         foreach ($movimientos as $key => $movimiento) {
             array_push($datos, array(
                 'id' => $movimiento->id,
@@ -154,12 +154,12 @@ class CajaController extends Controller
                     if(Auth::user()->user->persona->colaborador)
                     {
                         if (MovimientoCaja::where('colaborador_id',Auth::user()->user->persona->colaborador->id)->where('estado_movimiento', 'APERTURA')->count() != 0) {
-                            return response()->json([                            
+                            return response()->json([
                                 'success' => true
                             ]);
                         }
                         else{
-                            return response()->json([   
+                            return response()->json([
                                 'success' => false,
                                 'mensaje' => 'No tienes ninguna apertura de caja disponible'
                             ]);
@@ -167,7 +167,7 @@ class CajaController extends Controller
                     }
                     else
                     {
-                        return response()->json([   
+                        return response()->json([
                             'success' => false,
                             'mensaje' => 'No eres un colaborador por favor registrarte como colaborador'
                         ]);
@@ -176,7 +176,7 @@ class CajaController extends Controller
             }
             else
             {
-                return response()->json([                    
+                return response()->json([
                     'success' => false,
                     'mensaje' => 'No hay ninguna apertura de caja disponible'
                 ]);
@@ -184,13 +184,13 @@ class CajaController extends Controller
         }
         catch(Exception $e)
         {
-            return response()->json([                
+            return response()->json([
                 'success' => false,
                 'mensaje' => $e->getMessage()
             ]);
         }
     }
-    
+
     public function reporteMovimiento($id)
     {
         $movimiento=MovimientoCaja::findOrFail($id);

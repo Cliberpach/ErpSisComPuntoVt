@@ -51,7 +51,7 @@ class ColaboradorController extends Controller
     }
 
     public function store(Request $request)
-    {        
+    {
         $this->authorize('haveaccess','colaborador.index');
         $data = $request->all();
         $rules = [
@@ -174,7 +174,7 @@ class ColaboradorController extends Controller
             'fecha_nacimiento.required' => 'El campo fecha de nacimiento es obligatorio.',
             'sexo.required' => 'El campo sexo es obligatorio.',
         ];
-        
+
         Validator::make($data, $rules, $message)->validate();
 
         $persona =  $colaborador->persona;
@@ -262,6 +262,8 @@ class ColaboradorController extends Controller
         DB::transaction(function() use ($id) {
 
             $colaborador= Colaborador::findOrFail($id);
+            $colaborador->estado = 'ANULADO';
+            $colaborador->update();
             $persona=$colaborador->persona;
             $persona->estado = 'ANULADO';
             $persona->update();
