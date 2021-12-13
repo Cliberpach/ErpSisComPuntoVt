@@ -81,7 +81,7 @@ class LoteProducto extends Model
         });
 
         static::updated(function(LoteProducto $loteProducto){
-            if($loteProducto->cantidad === 0)
+            if($loteProducto->cantidad == 0)
             {
                 $loteProducto->estado = '0';
                 $loteProducto->update();

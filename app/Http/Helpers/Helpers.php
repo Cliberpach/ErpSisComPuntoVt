@@ -1,5 +1,7 @@
 <?php
 
+use App\Almacenes\LoteProducto;
+use App\Almacenes\Producto;
 use App\Compras\CuentaProveedor;
 use App\Mantenimiento\Tabla\General;
 use App\Mantenimiento\Ubigeo\Departamento;
@@ -958,16 +960,23 @@ if (!function_exists('enviarNotaapi')) {
 //MODIFICAR LOTES CANTIDADES
 
 if (!function_exists('actualizarStockLotes')) {
-    function actualizarStockLotes($id = null)
+    function actualizarStockLotes()
     {
         DB::update('update lote_productos set cantidad_logica = cantidad');
     }
 }
 
 if (!function_exists('actualizarStockProductos')) {
-    function actualizarStockLotes($id = null)
+    function actualizarStockProductos()
     {
-        DB::update('update lote_productos set cantidad_logica = cantidad');
+        $productos = Producto::all();
+        foreach($productos as $producto)
+        {
+            $cantidadProductos = LoteProducto::where('producto_id',$producto->id)->where('estado','1')->sum('cantidad');
+            //ACTUALIZAR EL STOCK DEL PRODUCTO
+            $producto->stock = $cantidadProductos ? $cantidadProductos : 0.00;
+            $producto->update();
+        }
     }
 }
 
