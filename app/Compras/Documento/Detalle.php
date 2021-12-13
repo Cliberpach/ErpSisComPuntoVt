@@ -116,12 +116,12 @@ class Detalle extends Model
             //ANULAR LOTE producto
             if($detalle->estado == 'ANULADO')
             {
-                $lote = LoteProducto::where('compra_documento_detalle_id', $detalle->id)->first();
-                $producto= Producto::findOrFail($lote->producto_id);
-                $producto->stock =$producto->stock-$lote->cantidad;
-                $producto->save();
-                $lote->estado = '0';
-                $lote->update();
+                $lote = LoteProducto::find($detalle->lote_id);
+                if($lote)
+                {
+                    $lote->estado = '0';
+                    $lote->update();
+                }
             }
         });
 

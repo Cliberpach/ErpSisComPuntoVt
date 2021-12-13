@@ -964,6 +964,13 @@ if (!function_exists('actualizarStockLotes')) {
     }
 }
 
+if (!function_exists('actualizarStockProductos')) {
+    function actualizarStockLotes($id = null)
+    {
+        DB::update('update lote_productos set cantidad_logica = cantidad');
+    }
+}
+
 if (!function_exists('turnos')) {
     function turnos()
     {
