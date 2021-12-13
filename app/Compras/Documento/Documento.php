@@ -67,6 +67,11 @@ class Documento extends Model
         return $this->hasMany('App\Almacenes\LoteProducto','compra_documento_id');
     }
 
+    public function detalles()
+    {
+        return $this->hasMany('App\Compras\Documento\Detalle','documento_id');
+    }
+
     protected static function booted()
     {
         static::created(function(Documento $documento){

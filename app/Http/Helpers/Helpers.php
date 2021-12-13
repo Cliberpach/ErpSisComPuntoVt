@@ -980,6 +980,21 @@ if (!function_exists('actualizarStockProductos')) {
     }
 }
 
+if (!function_exists('actualizarStockProductosxCompras')) {
+    function actualizarStockProductosxCompras()
+    {
+        $compras = Documento::where('estado','ANULADO')->get();
+        foreach($compras as $compra)
+        {
+            foreach($compra->detalles as $item)
+            {
+                $item->estado = 'ANULADO';
+                $item->update();
+            }
+        }
+    }
+}
+
 if (!function_exists('turnos')) {
     function turnos()
     {
