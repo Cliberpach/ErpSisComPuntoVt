@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Ventas;
 
+use App\Almacenes\LoteDetalle;
 use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
 use App\Events\ComprobanteRegistrado;
@@ -33,6 +34,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 use App\Ventas\ErrorVenta;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Exception;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 //CONVERTIR DE NUMEROS A LETRAS
@@ -1627,8 +1629,8 @@ class DocumentoController extends Controller
     {
         return datatables()->query(
             DB::table('lote_productos')
-            ->join('productos_clientes','productos_clientes.producto_id','=','lote_productos.producto_id')
             ->join('productos','productos.id','=','lote_productos.producto_id')
+            ->join('productos_clientes','productos_clientes.producto_id','=','productos.id')
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
@@ -1637,8 +1639,8 @@ class DocumentoController extends Controller
                     'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')
-            ->where('productos_clientes.cliente',$tipo_cliente) //TIPO DE CLIENTE CONSUMIDOR TABLA DETALLE (121)
-            ->where('productos_clientes.moneda','1') // TABLA DETALLE SOLES(1)
+            ->where('productos_clientes.cliente',$tipo_cliente)
+            ->where('productos_clientes.moneda','1')
             ->orderBy('lote_productos.id','ASC')
             ->where('productos_clientes.estado','ACTIVO')
         )->toJson();

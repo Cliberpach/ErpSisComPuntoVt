@@ -32,7 +32,7 @@ class ProductoController extends Controller
 
     public function llenarCompras($id)
     {
-        $compras = Detalle::where('producto_id', $id)->orderBy('id', 'desc')->take(5)->get();
+        $compras = Detalle::where('producto_id', $id)->where('estado','ACTIVO')->orderBy('id', 'desc')->get();
         $coleccion = collect([]);
         foreach($compras as $producto) {
             $coleccion->push([
@@ -51,7 +51,7 @@ class ProductoController extends Controller
 
     public function llenarVentas($id)
     {
-        $ventas = DocumentoDetalle::orderBy('id', 'desc')->take(5)->get();
+        $ventas = DocumentoDetalle::orderBy('id', 'desc')->where('estado','ACTIVO')->get();
         $coleccion = collect([]);
         foreach($ventas as $producto) {
             if($producto->lote->producto_id == $id)

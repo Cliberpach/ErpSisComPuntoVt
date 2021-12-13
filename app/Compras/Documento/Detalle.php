@@ -118,7 +118,7 @@ class Detalle extends Model
             {
                 $lote = LoteProducto::where('compra_documento_detalle_id', $detalle->id)->first();
                 $producto= Producto::findOrFail($lote->producto_id);
-                $producto->stock=$producto->stock-$lote->cantidad;
+                $producto->stock =$producto->stock-$lote->cantidad;
                 $producto->save();
                 $lote->estado = '0';
                 $lote->update();
