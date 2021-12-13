@@ -1027,7 +1027,7 @@ if (!function_exists('colaboradoresDisponibles')) {
         //   return $datos;
         $colaboradores = Colaborador::cursor()->filter(function ($colaborador) {
             $consulta = MovimientoCaja::where('colaborador_id', $colaborador->id)->where('estado_movimiento', 'APERTURA');
-            return $consulta->count() == 0 ? true : false;
+            return ($consulta->count() == 0 && $colaborador->estado == 'ACTIVO') ? true : false;
         });
         return $colaboradores;
     }
@@ -1068,7 +1068,7 @@ if (!function_exists('movimientoUser')) {
         }
     }
 }
-if (!function_exists('MovimientoCajaIngresos')) {
+if (!function_exists('cuadreMovimientoCajaIngresos')) {
     function cuadreMovimientoCajaIngresos(MovimientoCaja $movimiento)
     {
         $totalIngresos = 0;

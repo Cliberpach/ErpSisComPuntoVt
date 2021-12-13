@@ -65,13 +65,15 @@ class NotaIngresoController extends Controller
         $ngenerado = $fecha . (DB::table('nota_ingreso')->count() + 1);
         $usuarios = User::get();
         $productos = Producto::where('estado', 'ACTIVO')->get();
+        $monedas =  tipos_moneda();
         return view('almacenes.nota_ingresos.create', [
             "fecha_hoy" => $fecha_hoy,
             "fecha_actual" => $fecha_actual,
             "fecha_5" => $fecha_5,
             "origenes" => $origenes, 'destinos' => $destinos,
             'ngenerado' => $ngenerado, 'usuarios' => $usuarios,
-            'productos' => $productos, 'lotes' => $lotes
+            'productos' => $productos, 'lotes' => $lotes,
+            'monedas' => $monedas
         ]);
     }
     public function getProductos(Request $request)
@@ -102,17 +104,22 @@ class NotaIngresoController extends Controller
             'destino' => 'nullable',
             'origen' => 'required',
             'notadetalle_tabla' => 'required',
-
-
+            'moneda' => 'required',
         ];
         $message = [
 
             'fecha.required' => 'El campo fecha  es Obligatorio',
             'origen.required' => 'El campo origen  es Obligatorio',
-            'notadetalle_tabla.required' => 'No hay dispositivos',
+            'moneda.required' => 'El campo moneda  es Obligatorio',
+            'notadetalle_tabla.required' => 'No hay detalles',
         ];
 
         Validator::make($data, $rules, $message)->validate();
+
+        $dolar_aux = json_encode(precio_dolar(), true);
+        $dolar_aux = json_decode($dolar_aux, true);
+
+        $dolar = (float)$dolar_aux['original']['venta'];
 
 
         //$registro_sanitario = new RegistroSanitario();
@@ -127,18 +134,50 @@ class NotaIngresoController extends Controller
         $origen = DB::table('tabladetalles')->where('id', $request->origen)->first();
         $notaingreso->origen = $origen->descripcion;
         $notaingreso->usuario = Auth()->user()->usuario;
+        $notaingreso->total = $request->get('monto_total');
+        $notaingreso->moneda = $request->get('moneda');
+        $notaingreso->tipo_cambio = $dolar;
+        $notaingreso->dolar = $dolar;
+        if($request->get('moneda') === 'DOLARES')
+        {
+            $notaingreso->total_soles = (float) $request->get('monto_total') * (float) $dolar;
+
+            $notaingreso->total_dolares = (float) $request->get('monto_total');
+        }
+        else
+        {
+            $notaingreso->total_soles = (float) $request->get('monto_total');
+
+            $notaingreso->total_dolares = (float) $request->get('monto_total') / $dolar;
+        }
         $notaingreso->save();
 
         $articulosJSON = $request->get('notadetalle_tabla');
         $notatabla = json_decode($articulosJSON[0]);
 
         foreach ($notatabla as $fila) {
+            if($request->get('moneda') == 'DOLARES')
+            {
+                $costo_soles = (float) $fila->costo * (float) $dolar;
+
+                $costo_dolares = (float) $fila->costo;
+            }
+            else
+            {
+                $costo_soles = (float) $fila->costo;
+
+                $costo_dolares = (float) $fila->costo / (float) $dolar;
+            }
             DetalleNotaIngreso::create([
                 'nota_ingreso_id' => $notaingreso->id,
                 'lote' => $fila->lote,
                 'cantidad' => $fila->cantidad,
                 'producto_id' => $fila->producto_id,
-                'fecha_vencimiento' => $fila->fechavencimiento
+                'fecha_vencimiento' => $fila->fechavencimiento,
+                'costo' => $fila->costo,
+                'costo_soles' => $costo_soles,
+                'costo_dolares' => $costo_dolares,
+                'valor_ingreso' => $fila->valor_ingreso,
             ]);
         }
 

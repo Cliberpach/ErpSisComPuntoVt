@@ -19,7 +19,7 @@ class CreateDetalleNotaIngresoTable extends Migration
             $table->foreign('nota_ingreso_id')
                   ->references('id')->on('nota_ingreso')
                   ->onDelete('cascade');
-                  
+
             $table->unsignedInteger('producto_id')->unsigned();
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
             $table->string('lote');
@@ -28,6 +28,12 @@ class CreateDetalleNotaIngresoTable extends Migration
            // $table->foreign('lote_id')->references('id')->on('lote_productos')->onDelete('cascade');
             $table->unsignedDecimal('cantidad', 15,2);
             $table->date("fecha_vencimiento");
+            $table->unsignedDecimal('costo', 15,4)->nullable();
+            $table->unsignedDecimal('costo_soles', 15,4)->nullable();
+            $table->unsignedDecimal('costo_dolares', 15,4)->nullable();
+            $table->unsignedDecimal('costo_mas_igv_soles', 15,4)->nullable();
+            $table->unsignedDecimal('costo_mas_igv_dolares', 15,4)->nullable();
+            $table->unsignedDecimal('valor_ingreso', 15,4)->nullable();
             $table->timestamps();
         });
     }

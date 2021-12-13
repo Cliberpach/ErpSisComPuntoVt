@@ -20,6 +20,16 @@ class CreateNotaIngresoTable extends Migration
             $table->string("origen")->nullable();
             $table->string("destino")->nullable();
             $table->string("usuario");
+
+            $table->string('moneda');
+            $table->unsignedDecimal('tipo_cambio', 15, 4)->nullable();
+            $table->unsignedDecimal('dolar', 15, 4)->nullable();
+            $table->unsignedDecimal('total', 15, 4)->nullable();
+            $table->unsignedDecimal('total_soles', 15, 4)->nullable();
+            $table->unsignedDecimal('total_dolares', 15, 4)->nullable();
+            $table->unsignedDecimal('total_mas_igv_soles', 15, 4)->nullable();
+            $table->unsignedDecimal('total_mas_igv_dolares', 15, 4)->nullable();
+
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();
         });

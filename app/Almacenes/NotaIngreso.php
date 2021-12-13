@@ -13,7 +13,15 @@ class NotaIngreso extends Model
         'origen',
         'destino',
         'usuario',
-        'estado'
+        'estado',
+        'moneda',
+        'tipo_cambio',
+        'dolar',
+        'total',
+        'total_soles',
+        'total_dolares',
+        'total_mas_igv_soles',
+        'total_mas_igv_dolares',
     ];
     public $timestamps = true;
 
