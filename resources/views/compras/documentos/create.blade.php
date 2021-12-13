@@ -1480,7 +1480,8 @@
     function cargarPresentacion(producto) {
         if(producto.value != '')
         {
-            $('#precio').val(obtenerproducto(producto.value).precio_venta_minimo)
+            //$('#precio').val(obtenerproducto(producto.value).precio_venta_minimo)
+            $('#precio').val('')
         }
     }
 

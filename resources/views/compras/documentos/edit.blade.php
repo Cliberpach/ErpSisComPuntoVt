@@ -1227,7 +1227,8 @@ function obtenerproducto(id) {
 }
 //AGREGAR EL CAMPO PRESENTACION Y PRECIO DEL PRODUCTO
 function cargarPresentacion(producto) {
-    $('#precio').val(obtenerproducto(producto.value).precio_venta_minimo)
+    //$('#precio').val(obtenerproducto(producto.value).precio_venta_minimo)
+    $('#precio').val('')
 }
 
 $("#moneda").on("change", function() {

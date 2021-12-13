@@ -13,7 +13,11 @@ class UtilidadController extends Controller
         $inversion_mensual = compras_mensual();
         $ventas_mensual = ventas_mensual();
         $utilidad_mensual = utilidad_mensual();
-        $porcentaje = ($utilidad_mensual * 100) / $ventas_mensual;
+        $porcentaje = 0;
+        if($ventas_mensual > 0)
+        {
+            $porcentaje = ($utilidad_mensual * 100) / $ventas_mensual;
+        }
 
         $dolar_aux = json_encode(precio_dolar(), true);
         $dolar_aux = json_decode($dolar_aux, true);

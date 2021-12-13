@@ -577,15 +577,37 @@ class DocumentoController extends Controller
     {
         $this->authorize('haveaccess','documento_compra.index');
         $documento = Documento::findOrFail($id);
-        $documento->estado = 'ANULADO';
-        $documento->update();
+
+        $detalles_ = DocumentoDetalle::where('documento_id', $documento->id)->where('estado','ACTIVO')->get();
+        $cont = 0;
+        $success = true;
+        while($cont < count($detalles_))
+        {
+            $lote = LoteProducto::find($detalles_[$cont]->lote_id);
+            if(count($lote->detalles_venta) > 0)
+            {
+                $success = false;
+                $cont = count($detalles_);
+            }
+            $cont = $cont + 1;
+        }
+
+        if(!$success)
+        {
+            Session::flash('error','Documento de compra no se puede eliminar porque ya se han realizado ventas de uno de los detalles.');
+            return redirect()->route('compras.documento.index')->with('eliminar', 'error');
+        }
 
         $detalles = DocumentoDetalle::where('documento_id', $documento->id)->where('estado','ACTIVO')->get();
+
         foreach($detalles as $item)
         {
             $item->estado = 'ANULADO';
             $item->update();
         }
+
+        $documento->estado = 'ANULADO';
+        $documento->update();
         //Registro de actividad
         $descripcion = "SE ELIMINÓ EL DOCUMENTO DE COMPRA CON LA FECHA DE EMISION: ". Carbon::parse($documento->fecha_emision)->format('d/m/y');
         $gestion = "DOCUMENTO DE COMPRA";
