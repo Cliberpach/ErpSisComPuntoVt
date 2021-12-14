@@ -15,7 +15,11 @@ class DetalleNotaIngreso extends Model
         'lote_id',
         'cantidad',
         'producto_id',
-        'fecha_vencimiento'
+        'fecha_vencimiento',
+        'costo',
+        'costo_soles',
+        'costo_dolares',
+        'valor_ingreso',
     ];
     public $timestamps = true;
 

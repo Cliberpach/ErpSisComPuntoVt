@@ -290,6 +290,8 @@ class NotaIngresoController extends Controller
                 'lote' => $lote->codigo_lote,
                 'producto' => $producto->nombre,
                 'fechavencimiento' => $fila->fecha_vencimiento,
+                'costo' => $fila->costo,
+                'valor_ingreso' => $fila->valor_ingreso,
             ));
         }
         $origenes =  General::find(28)->detalles;
@@ -297,6 +299,7 @@ class NotaIngresoController extends Controller
         $lotes = DB::table('lote_productos')->get();
         $usuarios = User::get();
         $productos = Producto::where('estado', 'ACTIVO')->get();
+        $monedas =  tipos_moneda();
         return view('almacenes.nota_ingresos.edit', [
             "fecha_hoy" => $fecha_hoy,
             "fecha_actual" => $fecha_actual,
@@ -306,6 +309,7 @@ class NotaIngresoController extends Controller
             'usuarios' => $usuarios,
             'productos' => $productos,
             'lotes' => $lotes,
+            'monedas' => $monedas,
             'notaingreso' => $notaingreso,
             'detalle' => json_encode($data)
         ]);

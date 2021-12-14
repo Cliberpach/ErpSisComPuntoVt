@@ -44,43 +44,67 @@
                                         <p>Actualizar Nota de Ingresos :</p>
                                     </div>
                                 </div>
-                            	<div class="form-group row">
+                            	<div class="row">
 
 
-                                    <div class="col-sm-4"  id="fecha">
-                                        <label>Fecha</label>
-                                        <div class="input-group date">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-calendar"></i>
-                                            </span>
-                                            <input type="date" id="fecha" name="fecha"
-                                                class="form-control {{ $errors->has('fecha') ? ' is-invalid' : '' }}"
-                                                value="{{old('fecha',$notaingreso->fecha)}}"
-                                                autocomplete="off" readonly required>
-                                            @if ($errors->has('fecha'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('fecha') }}</strong>
-                                            </span>
-                                            @endif
+                                    <div class="col-12 col-md-3"  id="fecha">
+                                        <div class="form-group">
+                                            <label>Fecha</label>
+                                            <div class="input-group date">
+                                                <span class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </span>
+                                                <input type="date" id="fecha" name="fecha"
+                                                    class="form-control {{ $errors->has('fecha') ? ' is-invalid' : '' }}"
+                                                    value="{{old('fecha',$notaingreso->fecha)}}"
+                                                    autocomplete="off" readonly required>
+                                                @if ($errors->has('fecha'))
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('fecha') }}</strong>
+                                                </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <label class="required">Origen</label>
-                                        <select name="origen" id="origen" class="form-control {{ $errors->has('origen') ? ' is-invalid' : '' }}">
-                                            <option value="">Seleccionar Origen</option>
-                                            @foreach ($origenes as  $tabla)
-                                                <option {{ $notaingreso->origen== $tabla->descripcion ? 'selected' : '' }}  value="{{$tabla->id}}">{{$tabla->descripcion}}</option>
+                                    <div class="col-12 col-md-3">
+                                        <label class="required">Moneda: </label>
+                                        <select
+                                            class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
+                                            style="text-transform: uppercase; width:100%"
+                                            value="{{old('moneda',$notaingreso->moneda)}}" name="moneda" id="moneda" required>
+                                            <option></option>
+                                            @foreach (tipos_moneda() as $moneda)
+                                            <option value="{{$moneda->descripcion}}" {{ old('moneda') == $moneda->descripcion || $notaingreso->moneda == $moneda->descripcion ?  'selected' : ''}}
+                                                >{{$moneda->simbolo.' - '.$moneda->descripcion}}</option>
                                             @endforeach
+                                            @if ($errors->has('moneda'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('moneda') }}</strong>
+                                            </span>
+                                            @endif
                                         </select>
                                     </div>
-                                    <div class="col-sm-4">
-                                        <label>Destino</label>
-                                        <select name="destino" id="destino" class="form-control {{ $errors->has('destino') ? ' is-invalid' : '' }}">
-                                            <option value="">Seleccionar Destino</option>
-                                            @foreach ($destinos as $tabla)
-                                                <option {{ $notaingreso->destino == $tabla->descripcion ? 'selected' : '' }} value="{{$tabla->id}}">{{$tabla->descripcion}}</option>
-                                            @endforeach
-                                        </select>
+                                    <div class="col-12 col-md-3">
+                                        <div class="form-group">
+                                            <label class="required">Origen</label>
+                                            <select name="origen" id="origen" class="form-control {{ $errors->has('origen') ? ' is-invalid' : '' }}">
+                                                <option value="">Seleccionar Origen</option>
+                                                @foreach ($origenes as  $tabla)
+                                                    <option {{ $notaingreso->origen== $tabla->descripcion ? 'selected' : '' }}  value="{{$tabla->id}}">{{$tabla->descripcion}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <div class="form-group">
+                                            <label>Destino</label>
+                                            <select name="destino" id="destino" class="form-control {{ $errors->has('destino') ? ' is-invalid' : '' }}">
+                                                <option value="">Seleccionar Destino</option>
+                                                @foreach ($destinos as $tabla)
+                                                    <option {{ $notaingreso->destino == $tabla->descripcion ? 'selected' : '' }} value="{{$tabla->id}}">{{$tabla->descripcion}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
 
 
@@ -100,14 +124,14 @@
                                         <h4 class=""><b>Detalle de la Nota de Ingreso</b></h4>
                                     </div>
                                     <div class="panel-body">
-                                        <div class="row align-items-end">
+                                        <div class="row align-items-end d-none">
                                         	<div class="col-md-2">
                                                 <div class="form-group">
                                                     <label class="col-form-label">Cantidad </label>
                                                     <input type="number" id="cantidad" class="form-control" min="1" onkeypress="return isNumber(event)">
                                                     <div class="invalid-feedback"><b><span id="error-cantidad"></span></b></div>
                                                 </div>
-                                            </div> 
+                                            </div>
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label class="col-form-label">Producto</label>
@@ -124,7 +148,7 @@
                                                     <label class="col-form-label">lote</label>
                                                     <input type="text" name="lote" id="lote" class="form-control">
                                                 </div>
-                                            </div>                                           
+                                            </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="col-form-label">Fecha Vencimiento</label>
@@ -157,13 +181,21 @@
                     									<th class="text-center">Lote</th>
                     									<th class="text-center">Producto</th>
                                                         <th class="text-center">Fecha Vencimiento</th>
+                                                        <th class="text-center">Costo U</th>
+                                                        <th class="text-center">Total</th>
 
                                                     </tr>
                                                 </thead>
                                                 <tbody>
 
                                                 </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="7" class="text-center">TOTAL:</th>
+                                                        <th class="text-right"><span id="total">{{$notaingreso->total}}</span></th>
 
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </div>
                                     </div>
@@ -183,7 +215,7 @@
                                     class="btn btn-w-m btn-default">
                                     <i class="fa fa-arrow-left"></i> Regresar
                                 </a>
-                                <button type="submit" id="btn_grabar" class="btn btn-w-m btn-primary">
+                                <button type="submit" id="btn_grabar" class="btn btn-w-m btn-primary d-none">
                                     <i class="fa fa-save"></i> Grabar
                                 </button>
                             </div>
@@ -275,7 +307,8 @@ $(document).ready(function() {
             "url": "{{asset('Spanish.json')}}"
         },
 
-        "columnDefs": [{
+        "columnDefs": [
+            {
                 "targets": [0],
                 "visible": false,
                 "searchable": false
@@ -285,10 +318,11 @@ $(document).ready(function() {
                 "targets": [1],
                 className: "text-center",
                 render: function(data, type, row) {
-                    return "<div class='btn-group'>" +
+                    /*"<div class='btn-group'>" +
                         "<a class='btn btn-warning btn-sm modificarDetalle btn-edit'  style='color:white;' title='Modificar'><i class='fa fa-edit'></i></a>" +
                         "<a class='btn btn-danger btn-sm' id='borrar_detalle' style='color:white;' title='Eliminar'><i class='fa fa-trash'></i></a>" +
-                        "</div>";
+                        "</div>"*/
+                    return "-";
                 }
             },
             {
@@ -297,6 +331,7 @@ $(document).ready(function() {
             {
                 "targets": [3],
                 className: "text-center",
+                "visible": false,
             },
             {
                 "targets": [4],
@@ -305,8 +340,17 @@ $(document).ready(function() {
             {
                 "targets": [5],
                 className: "text-center",
-            }
+                "visible": false,
 
+            },
+            {
+                "targets": [6],
+                className: "text-center",
+            },
+            {
+                "targets": [7],
+                className: "text-center",
+            }
         ],
 
     });
@@ -315,11 +359,14 @@ $(document).ready(function() {
     var t = $('.dataTables-ingreso').DataTable();
     for (var i = 0; i < detalle.length; i++) {
         t.row.add([
-                detalle[i].producto_id,'',
+                detalle[i].producto_id,
+                '',
                 detalle[i].cantidad,
                 detalle[i].lote,
                 detalle[i].producto,
-                detalle[i].fechavencimiento
+                detalle[i].fechavencimiento,
+                detalle[i].costo,
+                detalle[i].valor_ingreso,
             ]).draw(false);
         }
 
@@ -427,8 +474,9 @@ $(".enviar_detalle").click(function() {
 function limpiarDetalle()
 {
     $('#cantidad').val('');
+    $('#costo').val('');
     $('#lote').val('LT-{{ $fecha_actual }}');
-    $('#fechavencimiento').val('{{$fecha_5}}');    
+    $('#fechavencimiento').val('{{$fecha_5}}');
     $('#producto').val($('#producto option:first-child').val()).trigger('change');
 }
 

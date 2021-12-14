@@ -124,6 +124,7 @@
 
 
                             <input type="hidden" id="notadetalle_tabla" name="notadetalle_tabla[]">
+                            <input type="hidden" id="monto_total" name="monto_total">
 
                         <hr>
                         <div class="row">
@@ -517,7 +518,6 @@
                     }
                     agregarTabla(detalle);
                     limpiarDetalle();
-                    sumaTotal();
 
                 } else if (
                     /* Read more about handling dismissals below */
@@ -568,6 +568,7 @@
             $detalle.costo,
             ($detalle.costo * $detalle.cantidad).toFixed(2),
         ]).draw(false);
+        sumaTotal();
         cargarDetalle();
     }
 
@@ -597,6 +598,7 @@
             total = Number(el[7]) + total
         });
         $('#total').text(total.toFixed(2))
+        $('#monto_total').val(total.toFixed(2))
     }
 
     function buscarproducto(id) {

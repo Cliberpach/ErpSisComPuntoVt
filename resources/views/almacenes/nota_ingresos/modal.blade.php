@@ -176,7 +176,7 @@ function actualizarTabla(i) {
         producto: $( "#modal_editar_detalle #producto option:selected" ).text(),
         fechavencimiento: $('#modal_editar_detalle #fechavencimiento').val(),
         producto_id:$( "#modal_editar_detalle #producto" ).val(),
-        costo:$( "#modal_editar_detalle #costo" ).val(),
+        costo:convertFloat($( "#modal_editar_detalle #costo" ).val()).toFixed(4),
     }
     agregarTabla(detalle);
     $('#modal_editar_detalle').modal('hide');
