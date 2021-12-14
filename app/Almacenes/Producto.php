@@ -22,7 +22,9 @@ class Producto extends Model
         'igv',
         'estado',
         'codigo_barra',
-        'peso_producto'
+        'peso_producto',
+        'porcentaje_normal',
+        'porcentaje_distribuidor',
     ];
     protected $casts = [
         'igv' => 'boolean'

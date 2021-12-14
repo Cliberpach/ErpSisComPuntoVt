@@ -30,4 +30,24 @@ class TipoCliente extends Model
             return $cliente->descripcion;
     }
 
+    protected static function booted()
+    {
+        static::created(function(TipoCliente $tipo){
+            if($tipo->cliente == '121')
+            {
+                $producto = Producto::find($tipo->producto_id);
+                $producto->porcentaje_normal = $tipo->porcentaje;
+            }
+            else
+            {
+                $producto = Producto::find($tipo->producto_id);
+                $producto->porcentaje_distribuidor = $tipo->porcentaje;
+            }
+        });
+
+        static::updated(function(TipoCliente $tipo){
+
+        });
+    }
+
 }

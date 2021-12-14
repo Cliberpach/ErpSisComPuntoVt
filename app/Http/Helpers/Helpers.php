@@ -2,6 +2,7 @@
 
 use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
+use App\Almacenes\TipoCliente;
 use App\Compras\CuentaProveedor;
 use App\Mantenimiento\Tabla\General;
 use App\Mantenimiento\Ubigeo\Departamento;
@@ -976,6 +977,21 @@ if (!function_exists('actualizarStockProductos')) {
             //ACTUALIZAR EL STOCK DEL PRODUCTO
             $producto->stock = $cantidadProductos ? $cantidadProductos : 0.00;
             $producto->update();
+        }
+    }
+}
+
+if (!function_exists('actualizarPorcentajes')) {
+    function actualizarPorcentajes()
+    {
+        $productos = Producto::all();
+        foreach($productos as $producto)
+        {
+            $tipo_normal = TipoCliente::where('producto_id',$producto->id)->where('estado','ACTIVO')->where('cliente','121')->first();
+            $tipo_distribuidor = TipoCliente::where('producto_id',$producto->id)->where('estado','ACTIVO')->where('cliente','122')->first();
+
+            $producto->porcentaje_normal = $tipo_normal ? $tipo_normal->porcentaje : 0;
+            $producto->porcentaje_distribuidor = $tipo_distribuidor ? $tipo_distribuidor->porcentaje : 0;
         }
     }
 }
