@@ -37,11 +37,13 @@ class TipoCliente extends Model
             {
                 $producto = Producto::find($tipo->producto_id);
                 $producto->porcentaje_normal = $tipo->porcentaje;
+                $producto->update();
             }
             else
             {
                 $producto = Producto::find($tipo->producto_id);
                 $producto->porcentaje_distribuidor = $tipo->porcentaje;
+                $producto->update();
             }
         });
 

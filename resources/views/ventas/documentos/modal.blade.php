@@ -11,33 +11,34 @@
                 <small class="font-bold">Editar detalle</small>
             </div>
             <div class="modal-body">
-                
-                <input type="hidden" id="id_editar" name="id_editar">
-                <input type="hidden" id="presentacion_producto_editar" name="presentacion_producto_editar">
-                <input type="hidden" id="indice" name="indice">
-                <input type="hidden" id="codigo_nombre_producto_editar" name="codigo_nombre_producto_editar">
+                <form id="edit_detalle_venta">
+                    <input type="hidden" id="id_editar" name="id_editar">
+                    <input type="hidden" id="presentacion_producto_editar" name="presentacion_producto_editar">
+                    <input type="hidden" id="indice" name="indice">
+                    <input type="hidden" id="codigo_nombre_producto_editar" name="codigo_nombre_producto_editar">
 
-                <div class="form-group">
-                    <label class="col-form-label required">Producto-lote:</label>
-                    <input type="text" class="form-control" id="producto_lote_editar" name="producto_lote_editar" readonly> 
-                    <input type="hidden" class="form-control" id="producto_editar" name="producto_editar"> 
-                </div>
-                <div class="form-group">
-                    <label class="">Unidad de Medida</label>
-                    <input type="text" id="medida_editar" name="medida_editar" class="form-control" disabled>
-                </div>
-                <div class="form-group row">
+                    <div class="form-group">
+                        <label class="col-form-label required">Producto-lote:</label>
+                        <input type="text" class="form-control" id="producto_lote_editar" name="producto_lote_editar" readonly>
+                        <input type="hidden" class="form-control" id="producto_editar" name="producto_editar">
+                    </div>
+                    <div class="form-group">
+                        <label class="">Unidad de Medida</label>
+                        <input type="text" id="medida_editar" name="medida_editar" class="form-control" disabled>
+                    </div>
+                    <div class="form-group row">
 
-                    <div class="col-lg-6 col-xs-12">
-                        <label class="required">Cantidad</label>
-                        <input type="number" id="cantidad_editar" name="cantidad_editar" class="form-control" min="1" onkeypress="return isNumber(event);">
-                        <input type="hidden" id="cantidad_editar_actual" name="cantidad_editar_actual" class="form-control">
+                        <div class="col-lg-6 col-xs-12">
+                            <label class="required">Cantidad</label>
+                            <input type="number" id="cantidad_editar" name="cantidad_editar" class="form-control" min="1" onkeypress="return isNumber(event);">
+                            <input type="hidden" id="cantidad_editar_actual" name="cantidad_editar_actual" class="form-control">
+                        </div>
+                        <div class="col-lg-6 col-xs-12">
+                            <label class="required">Precio</label>
+                            <input type="text" id="precio_editar" name="precio_editar" class="form-control" maxlength="15" onkeypress="return filterFloat(event, this, true);" required>
+                        </div>
                     </div>
-                    <div class="col-lg-6 col-xs-12">
-                        <label class="required">Precio</label>
-                        <input type="text" id="precio_editar" name="precio_editar" class="form-control" maxlength="15" onkeypress="return filterFloat(event, this, true);" required>
-                    </div>
-                </div>
+                </form>
             </div>
 
             <div class="modal-footer">
@@ -45,7 +46,7 @@
                     <i class="fa fa-exclamation-circle leyenda-required"></i> <small class="leyenda-required">Los campos marcados con asterisco (<label class="required"></label>) son obligatorios.</small>
                 </div>
                 <div class="col-md-6 text-right">
-                    <button type="button" id="btn_editar_detalle" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="submit" id="btn_editar_detalle" form="edit_detalle_venta" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
                     <button type="button"  onclick="limpiar()" class="btn btn-danger btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cancelar</button>
                 </div>
             </div>
@@ -68,8 +69,8 @@ $('#cantidad_editar').on('input', function() {
 });
 
 //Validacion al ingresar tablas
-$("#btn_editar_detalle").click(function() {
-    // limpiarErrores()
+$('#edit_detalle_venta').submit(function(e) {
+    e.preventDefault();
     var enviar = false;
 
     if ($('#precio_editar').val() == '') {
@@ -117,7 +118,7 @@ $("#btn_editar_detalle").click(function() {
             {
                 enviar = true;
                 toastr.warning('Ocurrió un error porfavor recargar la pagina.')
-            } 
+            }
         });
     }else{
         toastr.error('Cerrar ventana y volver a editar producto.', 'Error');
@@ -183,7 +184,7 @@ function actualizarTabla(i) {
     let cantidad = convertFloat($('#cantidad_editar').val());
 
     precio_unitario = precio_inicial;
-    valor_unitario = precio_unitario / (1 + igv_calculado);                
+    valor_unitario = precio_unitario / (1 + igv_calculado);
     dinero = precio_unitario * (pdescuento / 100);
     precio_nuevo = precio_unitario - dinero;
     valor_venta = precio_nuevo * cantidad;
