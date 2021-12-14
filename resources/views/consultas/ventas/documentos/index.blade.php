@@ -72,16 +72,16 @@
                                     <td colspan="6" class="text-right" id="efectivo"></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6"  class="text-right">TRANSFERENCIA</td>                                    
-                                    <td colspan="6" class="text-right" id="transferencia"></td>
+                                    <td colspan="6"  class="text-right letrapequeña">TRANSFERENCIA</td>
+                                    <td colspan="6" class="text-right letrapequeña" id="transferencia"></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6"  class="text-right">YAPE/PLIN</td>      
-                                    <td colspan="6" class="text-right" id="yape_plin"></td>
+                                    <td colspan="6"  class="text-right letrapequeña">YAPE/PLIN</td>
+                                    <td colspan="6" class="text-right letrapequeña" id="yape_plin"></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="6"  class="text-right">TOTAL</td>      
-                                    <td colspan="6" class="text-right" id="total"></td>
+                                    <td colspan="6"  class="text-right letrapequeña">TOTAL</td>
+                                    <td colspan="6" class="text-right letrapequeña" id="total"></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -255,8 +255,8 @@ function loadTable()
         "bInfo": true,
         "bAutoWidth": false,
         "data": ventas,
-        "columns": [ 
-            
+        "columns": [
+
             {data: 'cliente', name:'cliente', className: "letrapequeña"},
             {data: 'tipo_venta', name:'tipo_venta', className: "letrapequeña"},
             {data: 'numero_doc',name:'numero_doc', className: "letrapequeña"},
@@ -265,7 +265,7 @@ function loadTable()
             {data: 'forma_pago',name:'forma_pago', className: "letrapequeña"},
             {data: 'efectivo',name:'efectivo', className: "letrapequeña"},
             {data: 'transferencia',name:'transferencia', className: "letrapequeña"},
-            {data: 'otros',name:'otros', className: "letrapequeña"},            
+            {data: 'otros',name:'otros', className: "letrapequeña"},
             {
                 data: null,
                 className: "letrapequeña",
@@ -292,7 +292,7 @@ function loadTable()
                                 "</span>";
                     }
                 },
-            },            
+            },
             {
                 data: null,
                 className: "letrapequeña",
@@ -322,7 +322,7 @@ function loadTable()
                     "url": "{{asset('Spanish.json')}}"
         },
         "order": [[ 0, "desc" ]],
-        
+
 
     });
     return false;
@@ -358,7 +358,7 @@ function cambiarEstado(id) {
         // showLoaderOnConfirm: true,
     }).then((result) => {
         if (result.value) {
-            
+
             var url = '{{ route("ventas.documento.sunat", ":id")}}';
             url = url.replace(':id',id);
 
@@ -396,7 +396,7 @@ function comprobanteElectronico(id) {
 
 function comprobanteElectronicoTicket(id) {
     var url = '{{ route("ventas.documento.comprobante", ":id")}}';
-    url = url.replace(':id',id+'-80');    
+    url = url.replace(':id',id+'-80');
     window.open(url, "Comprobante SISCOM", "width=900, height=600");
 }
 
@@ -420,7 +420,7 @@ function xmlElectronico(id) {
         // showLoaderOnConfirm: true,
     }).then((result) => {
         if (result.value) {
-            
+
             var url = '{{ route("ventas.documento.xml", ":id")}}';
             url = url.replace(':id',id);
 

@@ -53,6 +53,8 @@ class DocumentoController extends Controller
                 'forma_pago' => $documento->formaPago(),
                 'cliente' => $documento->clienteEntidad->nombre,
                 'tipo_pago' => $documento->tipo_pago,
+                'serie' => $documento->serie,
+                'correlativo' => $documento->correlativo,
                 'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
                 'empresa' => $documento->empresa,
                 'cotizacion_venta' =>  $documento->cotizacion_venta,

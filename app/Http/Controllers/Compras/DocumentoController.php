@@ -418,29 +418,29 @@ class DocumentoController extends Controller
         $documento->fecha_emision = Carbon::createFromFormat('d/m/Y', $request->get('fecha_emision'))->format('Y-m-d');
         $documento->fecha_entrega = Carbon::createFromFormat('d/m/Y', $request->get('fecha_entrega'))->format('Y-m-d');
         $documento->sub_total = (float) $request->get('monto_sub_total');
-            $documento->total_igv = (float) $request->get('monto_total_igv');
-            $documento->total = (float) $request->get('monto_total');
-            //-------------------------------
-            if($request->get('moneda') === 'DOLARES')
-            {
-                $documento->sub_total_soles = (float) $request->get('monto_sub_total') * (float) $request->get('tipo_cambio');
-                $documento->total_igv_soles = (float) $request->get('monto_total_igv') * (float) $request->get('tipo_cambio');
-                $documento->total_soles = (float) $request->get('monto_total') * (float) $request->get('tipo_cambio');
+        $documento->total_igv = (float) $request->get('monto_total_igv');
+        $documento->total = (float) $request->get('monto_total');
+        //-------------------------------
+        if($request->get('moneda') === 'DOLARES')
+        {
+            $documento->sub_total_soles = (float) $request->get('monto_sub_total') * (float) $request->get('tipo_cambio');
+            $documento->total_igv_soles = (float) $request->get('monto_total_igv') * (float) $request->get('tipo_cambio');
+            $documento->total_soles = (float) $request->get('monto_total') * (float) $request->get('tipo_cambio');
 
-                $documento->sub_total_dolares = (float) $request->get('monto_sub_total');
-                $documento->total_igv_dolares = (float) $request->get('monto_total_igv');
-                $documento->total_dolares = (float) $request->get('monto_total');
-            }
-            else
-            {
-                $documento->sub_total_soles = (float) $request->get('monto_sub_total');
-                $documento->total_igv_soles = (float) $request->get('monto_total_igv');
-                $documento->total_soles = (float) $request->get('monto_total');
+            $documento->sub_total_dolares = (float) $request->get('monto_sub_total');
+            $documento->total_igv_dolares = (float) $request->get('monto_total_igv');
+            $documento->total_dolares = (float) $request->get('monto_total');
+        }
+        else
+        {
+            $documento->sub_total_soles = (float) $request->get('monto_sub_total');
+            $documento->total_igv_soles = (float) $request->get('monto_total_igv');
+            $documento->total_soles = (float) $request->get('monto_total');
 
-                $documento->sub_total_dolares = (float) $request->get('monto_sub_total') / $dolar;
-                $documento->total_igv_dolares = (float) $request->get('monto_total_igv') / $dolar;
-                $documento->total_dolares = (float) $request->get('monto_total') / $dolar;
-            }
+            $documento->sub_total_dolares = (float) $request->get('monto_sub_total') / $dolar;
+            $documento->total_igv_dolares = (float) $request->get('monto_total_igv') / $dolar;
+            $documento->total_dolares = (float) $request->get('monto_total') / $dolar;
+        }
             //-------------------------------
         $documento->empresa_id = '1';
         $documento->proveedor_id = $request->get('proveedor_id');
