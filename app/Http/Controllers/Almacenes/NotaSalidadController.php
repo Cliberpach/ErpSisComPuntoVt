@@ -14,6 +14,7 @@ use App\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -59,10 +60,25 @@ class NotaSalidadController extends Controller
         $ngenerado=$fecha.(DB::table('nota_salidad')->count()+1);
         $usuarios=User::get();
         $productos=Producto::where('estado','ACTIVO')->get();
+        $fullaccess = false;
+
+        if(count(Auth::user()->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count(Auth::user()->roles))
+            {
+                if(Auth::user()->roles[$cont]['full-access'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count(Auth::user()->roles);
+                }
+                $cont = $cont + 1;
+            }
+        }
         return view('almacenes.nota_salidad.create',["fecha_hoy"=>$fecha_hoy,
         "origenes"=>$origenes,'destinos'=>$destinos,
         'ngenerado'=>$ngenerado,'usuarios'=>$usuarios,
-        'productos'=>$productos,'lotes'=>$lotes]);
+        'productos'=>$productos,'lotes'=>$lotes,'fullaccess'=>$fullaccess]);
     }
 
     /**
@@ -301,10 +317,12 @@ class NotaSalidadController extends Controller
             ->join('productos','productos.id','=','lote_productos.producto_id')
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
+            ->leftJoin('detalle_nota_ingreso','detalle_nota_ingreso.lote_id','=','lote_productos.id')
+            ->leftJoin('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
             ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
-            ->select('compra_documentos.moneda as moneda_compra','compra_documentos.igv_check as igv_compra','compra_documento_detalles.precio_soles','compra_documento_detalles.precio as precio_compra','compra_documento_detalles.precio_mas_igv_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
-                    'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')) //DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
+            ->select('nota_ingreso.moneda as moneda_ingreso','compra_documentos.moneda as moneda_compra','compra_documentos.igv_check as igv_compra','compra_documento_detalles.precio_soles','compra_documento_detalles.precio as precio_compra','detalle_nota_ingreso.costo as precio_ingreso','compra_documento_detalles.precio_mas_igv_soles','lote_productos.*','productos.nombre','productos.igv','productos.codigo_barra','productos.porcentaje_normal','productos.porcentaje_distribuidor','productos_clientes.cliente','productos_clientes.moneda','tabladetalles.simbolo as unidad_producto',
+                    'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci'))
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')
             ->where('productos_clientes.cliente','121') //TIPO DE CLIENTE CONSUMIDOR TABLA DETALLE (121)

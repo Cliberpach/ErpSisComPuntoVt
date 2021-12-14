@@ -321,5 +321,12 @@ class PermissionsSeeder extends Seeder
             'slug'=>'nota_electronica.index',
             'description'=>'El usuario puede acceder al mantenedor de Notas Electronicas'
         ]);
+
+        //Utilidad Mensual
+        Permission::create([
+            'name'  => 'Vista de utilidad mensual',
+            'slug'=>'utilidad_mensual.index',
+            'description'=>'El usuario puede acceder a la vista de utilidad mensual'
+        ]);
     }
 }

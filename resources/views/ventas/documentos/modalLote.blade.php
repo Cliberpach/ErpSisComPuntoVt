@@ -316,7 +316,7 @@ function evaluarPrecioigv(producto) {
         toastr.error('Precio registrado diferente a Soles (S/.).', 'Error');
         return 0.00
     }*/
-    if (producto.precio_mas_igv_soles == null) {
+    if (producto.precio_compra == null) {
         let cambio = $('#dolar').val();
         let precio = 0;
         var precio_ = data.precio_ingreso;
