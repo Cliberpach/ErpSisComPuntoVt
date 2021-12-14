@@ -992,6 +992,7 @@ if (!function_exists('actualizarPorcentajes')) {
 
             $producto->porcentaje_normal = $tipo_normal ? $tipo_normal->porcentaje : 0;
             $producto->porcentaje_distribuidor = $tipo_distribuidor ? $tipo_distribuidor->porcentaje : 0;
+            $producto->update();
         }
     }
 }
