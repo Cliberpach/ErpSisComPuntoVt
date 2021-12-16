@@ -84,19 +84,33 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6 col-xs-12">
-                                        <div class="form-group">
-                                            <label class="">Código de Barra</label>
-                                            <input type="text" id="codigo_barra" class="form-control {{ $errors->has('codigo_barra') ? ' is-invalid' : '' }}" name="codigo_barra" value="{{ old('codigo_barra')}}"   onkeyup="return mayus(this)">
-                                            @if ($errors->has('codigo_barra'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('codigo_barra') }}</strong>
-                                                </span>
-                                            @endif
+                                    <div class="col-12">
+                                        <div class="row align-items-end">
+                                            <div class="col-12 col-md-10">
+                                                <div class="form-group">
+                                                    <label class="">Código de Barra</label>
+                                                    <input type="text" id="codigo_barra" class="form-control {{ $errors->has('codigo_barra') ? ' is-invalid' : '' }}" name="codigo_barra" value="{{ old('codigo_barra')}}">
+                                                    @if ($errors->has('codigo_barra'))
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $errors->first('codigo_barra') }}</strong>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-2">
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-success btn-block" title="Generar" onclick="generarCode()"><i class="fa fa-refresh"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-2 d-none">
+                                                <div class="form-group">
+                                                    <button type="button" class="btn btn-primary btn-block" title="Imprimir"><i class="fa fa-file-excel-o"></i></button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-lg-6 col-12">
+                                    <div class="col-12">
                                         <div class="form-group">
                                             <label class="required">Marca</label>
                                             <select id="marca" name="marca" class="select2_form form-control {{ $errors->has('marca') ? ' is-invalid' : '' }}" required value="{{old('marca')}}">
@@ -409,6 +423,17 @@
                     toastr.error('El código ingresado ya se encuentra registrado para un producto','Error');
                     $(this).focus();
                 }
+            });
+        }
+
+        function generarCode() {
+            // Consultamos nuestra BBDD
+            $.ajax({
+                dataType : 'json',
+                type : 'get',
+                url : '{{ route('generarCode') }}',
+            }).done(function (result){
+                $('#codigo_barra').val(result.code)
             });
         }
 

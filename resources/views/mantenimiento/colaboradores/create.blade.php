@@ -505,7 +505,7 @@
             });
 
             $("#correo_electronico").on('change', validarEmail);
-            
+
         })
 
         function setLongitudDocumento() {

@@ -191,9 +191,11 @@ function(){
         Route::get('/destroy/{id}', 'Almacenes\ProductoController@destroy')->name('almacenes.producto.destroy');
         Route::post('/destroyDetalle', 'Almacenes\ProductoController@destroyDetalle')->name('almacenes.producto.destroyDetalle');
         Route::post('/getCodigo', 'Almacenes\ProductoController@getCodigo')->name('almacenes.producto.getCodigo');
+        Route::get('/codigoBarras/{id}', 'Almacenes\ProductoController@codigoBarras')->name('almacenes.producto.codigoBarras');
 
         Route::get('getProductos','Almacenes\ProductoController@getProductos')->name('getProductos');
         Route::get('getProducto/{id}','Almacenes\ProductoController@getProducto')->name('getProducto');
+        Route::get('generarCode','Almacenes\ProductoController@generarCode')->name('generarCode');
 
         Route::get('/obtenerProducto/{id}', 'Almacenes\ProductoController@obtenerProducto')->name('almacenes.producto.obtenerProducto');
 
@@ -616,7 +618,7 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    return actualizarPorcentajes();
+    return generarCodigo(13);
     $dato = 'Actualizar';
     broadcast(new VentasCajaEvent($dato));
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';

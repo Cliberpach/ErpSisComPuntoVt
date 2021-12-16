@@ -1,7 +1,7 @@
 @extends('layout') @section('content')
 
 @section('mantenimiento-active', 'active')
-@section('empleados-active', 'active')
+@section('colaboradores-active', 'active')
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10 col-md-10">

@@ -8,6 +8,7 @@ use App\Almacenes\Marca;
 use App\Almacenes\Producto;
 use App\Almacenes\ProductoDetalle;
 use App\Almacenes\TipoCliente;
+use App\Exports\Producto\CodigoBarra;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductoController extends Controller
 {
@@ -35,7 +37,7 @@ class ProductoController extends Controller
             ->join('almacenes','almacenes.id','=','productos.almacen_id')
             ->join('categorias','categorias.id','=','productos.categoria_id')
             ->select('categorias.descripcion as categoria','almacenes.descripcion as almacen','marcas.marca','productos.*')
-            ->orderBy('productos.id','ASC')
+            ->orderBy('productos.id','DESC')
             ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
@@ -59,7 +61,7 @@ class ProductoController extends Controller
             // })],
             'codigo_barra' => ['nullable',Rule::unique('productos','codigo_barra')->where(function ($query) {
                 $query->whereIn('estado',["ACTIVO"]);
-            })],
+            }),'min:8','max:8'],
             'nombre' => 'required',
             'marca' => 'required',
             'categoria' => 'required',
@@ -73,6 +75,8 @@ class ProductoController extends Controller
 
         $message = [
             'codigo_barra.unique' => 'El campo Código de Barra debe de ser único.',
+            'codigo_barra.min' => 'El campo Código de Barra debe de tener almenos 8 caracteres.',
+            'codigo_barra.max' => 'El campo Código de Barra debe de tener solo 8 caracteres.',
             'linea_comercial.required' => 'El campo Linea Comercial es obligatorio',
             // 'codigo.unique' => 'El campo Código debe ser único',
             // 'codigo.max:50' => 'El campo Código debe tener como máximo 50 caracteres',
@@ -111,6 +115,22 @@ class ProductoController extends Controller
 
             $producto->codigo = 1000 + $producto->id;
             $producto->update();
+
+            if($request->get('codigo_barra'))
+            {
+                $generatorPNG = new \Picqer\Barcode\BarcodeGeneratorPNG();
+                $code = base64_encode($generatorPNG->getBarcode($request->get('codigo_barra'), $generatorPNG::TYPE_CODE_128));
+                $data_code = base64_decode($code);
+                $name =  $producto->codigo_barra.'.png';
+
+                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'))) {
+                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'));
+                }
+
+                $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'.DIRECTORY_SEPARATOR.$name);
+
+                file_put_contents($pathToFile, $data_code);
+            }
 
             //Llenado de los Clientes
             $clientesJSON = $request->get('clientes_tabla');
@@ -168,7 +188,7 @@ class ProductoController extends Controller
             // })->ignore($id)],
             'codigo_barra' => ['nullable',Rule::unique('productos','codigo_barra')->where(function ($query) {
                 $query->whereIn('estado',["ACTIVO"]);
-            })->ignore($id)],
+            })->ignore($id),'min:8','max:8'],
             'nombre' => 'required',
             'almacen' => 'required',
             'marca' => 'required',
@@ -179,9 +199,9 @@ class ProductoController extends Controller
         ];
 
         $message = [
-            // 'codigo.required' => 'El campo Código es obligatorio',
-            // 'codigo.unique' => 'El campo Código debe ser único',
-            // 'codigo.max:50' => 'El campo Código debe tener como máximo 50 caracteres',
+            'codigo_barra.unique' => 'El campo Código de barra debe ser único',
+            'codigo_barra.min' => 'El campo Código de Barra debe de tener almenos 8 caracteres.',
+            'codigo_barra.max' => 'El campo Código de Barra debe de tener solo 8 caracteres.',
             'nombre.required' => 'El campo Descripción del Producto es obligatorio',
             'almacen.required' => 'El campo Almacén es obligatorio',
             'marca.required' => 'El campo Marca es obligatorio',
@@ -211,6 +231,22 @@ class ProductoController extends Controller
         $producto->peso_producto = $request->get('peso_producto');
         $producto->codigo_barra = $request->get('codigo_barra');
         $producto->update();
+
+        if($request->get('codigo_barra'))
+        {
+            $generatorPNG = new \Picqer\Barcode\BarcodeGeneratorPNG();
+            $code = base64_encode($generatorPNG->getBarcode($request->get('codigo_barra'), $generatorPNG::TYPE_CODE_128));
+            $data_code = base64_decode($code);
+            $name =  $producto->codigo_barra.'.png';
+
+            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'))) {
+                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'));
+            }
+
+            $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'productos'.DIRECTORY_SEPARATOR.$name);
+
+            file_put_contents($pathToFile, $data_code);
+        }
 
         $clientesJSON = $request->get('clientes_tabla');
         $clientetabla = json_decode($clientesJSON[0]);
@@ -356,5 +392,19 @@ class ProductoController extends Controller
             ->select('productos.*','categorias.descripcion as categoria')
             ->where('productos.estado','ACTIVO')
         )->toJson();
+    }
+
+    public function generarCode()
+    {
+        return response()->json([
+            'code' => generarCodigo(8)
+        ]);
+    }
+
+    public function codigoBarras($id){
+        ob_end_clean();
+        ob_start();
+        $producto = Producto::find($id);
+        return  Excel::download(new CodigoBarra($producto), $producto->codigo_barra.'.xlsx');
     }
 }
