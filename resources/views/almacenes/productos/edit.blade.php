@@ -104,14 +104,16 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12">
-                                        @php
-                                            $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
-                                        @endphp
-                                        <div class="form-group">
-                                            {!! $generator->getBarcode($producto->codigo_barra, $generator::TYPE_CODE_128) !!}
-                                        </div>
+                                   @if($producto->codigo_barra)
+                                   <div class="col-12">
+                                    @php
+                                        $generator = new Picqer\Barcode\BarcodeGeneratorHTML();
+                                    @endphp
+                                    <div class="form-group">
+                                        {!! $generator->getBarcode($producto->codigo_barra, $generator::TYPE_CODE_128) !!}
                                     </div>
+                                </div>
+                                   @endif
                                 </div>
 
                                 <div class="col-12">
