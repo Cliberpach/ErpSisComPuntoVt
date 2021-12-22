@@ -126,7 +126,7 @@ class DocumentoController extends Controller
 
     public function getDocumentClient(Request $request)
     {
-        $documentos = Documento::where('estado','!=','ANULADO')->where('cliente_id', $request->cliente_id)->where('estado_pago', 'PENDIENTE')->where('condicion_id', $request->condicion_id)->orderBy('id', 'desc')->get();
+        $documentos = Documento::where('estado','!=','ANULADO')->where('cliente_id', $request->cliente_id)->where('estado_pago', 'PENDIENTE')->where('condicion_id', $request->condicion_id)->where('sunat','!=','2')->orderBy('id', 'desc')->get();
         $coleccion = collect([]);
 
         $hoy = Carbon::now();

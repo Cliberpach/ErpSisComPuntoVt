@@ -330,7 +330,7 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
                     }
 
-                    if(data.code == '1033' && data.regularize == '1')
+                    if(data.code == '1033' && data.regularize == '1' && data.sunat != '2')
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-primary-cdr m-1' onclick='cdr(" + data.id + ")' title='CDR'>CDR</button>";
