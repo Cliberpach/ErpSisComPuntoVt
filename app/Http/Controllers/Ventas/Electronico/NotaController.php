@@ -199,13 +199,6 @@ class NotaController extends Controller
             $nota->direccion_cliente =  $documento->direccion_cliente;
             $nota->cliente =  $documento->cliente;
 
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> $documento->cliente,
-                'excepcion' => $documento
-            ]);
-
             $nota->sunat = '0';
             $nota->tipo_nota = $request->get('tipo_nota'); //0 -> CREDITO
 
@@ -217,6 +210,13 @@ class NotaController extends Controller
             $nota->value = self::convertirTotal($request->get('total'));
             $nota->code = '1000';
             $nota->save();
+
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> $nota->code,
+                'excepcion' => $documento
+            ]);
 
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
