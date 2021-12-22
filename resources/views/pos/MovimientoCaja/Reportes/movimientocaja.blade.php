@@ -285,7 +285,7 @@
             </thead>
             <tbody>
                 @foreach ($movimiento->detalleMovimientoVentas as $ventas)
-                    @if ($ventas->documento->estado_pago == 'PAGADA')
+                    @if ($ventas->documento->estado_pago == 'PAGADA' && $ventas->documento->sunat != '2')
                         @if ($ventas->documento->condicion_id == 1)
                             <tr>
                                 <td style="text-align: center; border-right: 2px solid #52BE80">
