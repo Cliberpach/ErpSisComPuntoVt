@@ -211,13 +211,6 @@ class NotaController extends Controller
             $nota->code = '1000';
             $nota->save();
 
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> $nota->code,
-                'excepcion' => $documento
-            ]);
-
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);

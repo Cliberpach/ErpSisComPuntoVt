@@ -2,6 +2,7 @@
 
 namespace App\Ventas;
 
+use App\Mantenimiento\Condicion;
 use Illuminate\Database\Eloquent\Model;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Ventas\DetalleCuentaCliente;
@@ -64,8 +65,8 @@ class Nota extends Model
     {
         static::created(function(Nota $nota){
             //CREAR LOTE PRODUCTO
-            $modo = TablaDetalle::find($nota->documento->forma_pago);
-            if($modo->simbolo === 'CREDITO' || $modo->simbolo === 'credito' || $modo->simbolo === 'CRÉDITO' || $modo->simbolo === 'crédito')
+            $condicion = Condicion::find($nota->documento->condicion_id);
+            if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
             {
                 if($nota->documento->cuenta)
                 {
@@ -80,7 +81,7 @@ class Nota extends Model
                     {
                         $cuenta_cliente->monto = 0.00;
                     }
-                    
+
                     $monto_saldo = DetalleCuentaCliente::where('cuenta_cliente_id',$cuenta_cliente->id)->sum('monto');
                     if($monto - $monto_saldo > 0)
                     {
@@ -90,7 +91,7 @@ class Nota extends Model
                     {
                         $cuenta_cliente->saldo = 0.00;
                     }
-                    
+
                     $cuenta_cliente->update();
                 }
             }
