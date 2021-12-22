@@ -225,8 +225,8 @@ class NotaController extends Controller
                         DB::rollBack();
                         return response()->json([
                             'success' => false,
-                            'mensaje'=> $lote->producto->getMedida(),
-                            'excepcion' => $lote->producto->getMedida()
+                            'mensaje'=> $lote->producto,
+                            'excepcion' => $lote->producto
                         ]);
                         NotaDetalle::create([
                             'nota_id' => $nota->id,
