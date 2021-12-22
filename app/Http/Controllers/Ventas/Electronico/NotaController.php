@@ -175,6 +175,13 @@ class NotaController extends Controller
 
             $documento = Documento::find($request->get('documento_id'));
 
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> $documento,
+                'excepcion' => $documento
+            ]);
+
             $igv = $documento->igv ? $documento->igv : 18;
 
             $nota = new Nota();
@@ -214,13 +221,6 @@ class NotaController extends Controller
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
-
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> $productotabla,
-                'excepcion' => $productotabla
-            ]);
 
             foreach ($productotabla as $producto) {
                 if($request->cod_motivo != '01')
