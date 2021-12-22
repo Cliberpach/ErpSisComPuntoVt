@@ -175,13 +175,6 @@ class NotaController extends Controller
 
             $documento = Documento::find($request->get('documento_id'));
 
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> $documento->tipoDocumento(),
-                'excepcion' => $documento
-            ]);
-
             $igv = $documento->igv ? $documento->igv : 18;
 
             $nota = new Nota();
@@ -201,6 +194,12 @@ class NotaController extends Controller
             $nota->empresa_id =  $documento->empresa_id; //OBTENER NUMERACION DE LA EMPRESA
             //CLIENTE
             $nota->cod_tipo_documento_cliente =  $documento->tipoDocumentoCliente();
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> $documento->tipoDocumentoCliente(),
+                'excepcion' => $documento
+            ]);
             $nota->tipo_documento_cliente =  $documento->tipo_documento_cliente;
             $nota->documento_cliente =  $documento->documento_cliente;
             $nota->direccion_cliente =  $documento->direccion_cliente;
