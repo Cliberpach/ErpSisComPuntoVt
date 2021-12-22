@@ -215,6 +215,13 @@ class NotaController extends Controller
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
 
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> $productotabla,
+                'excepcion' => $productotabla
+            ]);
+
             foreach ($productotabla as $producto) {
                 if($request->cod_motivo != '01')
                 {
@@ -222,12 +229,6 @@ class NotaController extends Controller
                     {
                         $detalle = Detalle::find($producto->id);
                         $lote = LoteProducto::findOrFail($detalle->lote_id);
-                        DB::rollBack();
-                        return response()->json([
-                            'success' => false,
-                            'mensaje'=> $lote->producto,
-                            'excepcion' => $lote->producto
-                        ]);
                         NotaDetalle::create([
                             'nota_id' => $nota->id,
                             'detalle_id' => $detalle->id,
@@ -256,12 +257,6 @@ class NotaController extends Controller
                 {
                     $detalle = Detalle::find($producto->id);
                     $lote = LoteProducto::findOrFail($detalle->lote_id);
-                    DB::rollBack();
-                        return response()->json([
-                            'success' => false,
-                            'mensaje'=> $lote->producto,
-                            'excepcion' => $lote->producto
-                        ]);
                     NotaDetalle::create([
                         'nota_id' => $nota->id,
                         'detalle_id' => $detalle->id,
