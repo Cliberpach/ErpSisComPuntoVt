@@ -194,12 +194,6 @@ class NotaController extends Controller
             $nota->empresa_id =  $documento->empresa_id; //OBTENER NUMERACION DE LA EMPRESA
             //CLIENTE
             $nota->cod_tipo_documento_cliente =  $documento->tipoDocumentoCliente();
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> $documento->tipoDocumentoCliente(),
-                'excepcion' => $documento
-            ]);
             $nota->tipo_documento_cliente =  $documento->tipo_documento_cliente;
             $nota->documento_cliente =  $documento->documento_cliente;
             $nota->direccion_cliente =  $documento->direccion_cliente;
@@ -220,6 +214,13 @@ class NotaController extends Controller
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
+
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> $documento->tipoDocumentoCliente(),
+                'excepcion' => $documento
+            ]);
 
             foreach ($productotabla as $producto) {
                 if($request->cod_motivo != '01')
