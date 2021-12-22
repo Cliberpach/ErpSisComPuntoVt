@@ -150,7 +150,8 @@
     function reporte(id)
     {
         var url="{{route('Caja.reporte.movimiento',':id')}}"
-        window.location.href=url.replace(":id", id)
+        url = url.replace(':id',id);
+        window.open(url, "REPORTE CAJA", "width=900, height=600")
     }
     function cerrarCaja(id) {
         axios.get("{{ route('Caja.datos.cierre') }}", {
