@@ -178,7 +178,7 @@ class NotaController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'mensaje'=> $documento,
+                'mensaje'=> $documento->tipoDocumento(),
                 'excepcion' => $documento
             ]);
 
