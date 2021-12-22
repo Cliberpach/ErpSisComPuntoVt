@@ -5,9 +5,6 @@ namespace App\Almacenes;
 use App\Almacenes\Producto;
 use Illuminate\Database\Eloquent\Model;
 
-use App\Produccion\OrdenDetalle;
-use App\Compras\Articulo;
-
 class LoteProducto extends Model
 {
     protected $table = 'lote_productos';

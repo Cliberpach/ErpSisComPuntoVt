@@ -35,7 +35,7 @@ class NotaController extends Controller
         $documento = Documento::find($id);
         $nota_venta = true;
         return view('ventas.notas.index',compact('documento','nota_venta'));
-        
+
     }
 
     public function getNotes($id)
@@ -92,7 +92,7 @@ class NotaController extends Controller
                     'tipo_nota' => '0'
                 ]);
             }
-            
+
         }
     }
 
@@ -143,8 +143,8 @@ class NotaController extends Controller
     public function store(Request $request)
     {
         try
-        {         
-            DB::beginTransaction();   
+        {
+            DB::beginTransaction();
             $data = $request->all();
             $rules = [
                 'documento_id' => 'required',
@@ -218,7 +218,7 @@ class NotaController extends Controller
             foreach ($productotabla as $producto) {
                 if($request->cod_motivo != '01')
                 {
-                    if($producto->editable === 1)
+                    if($producto->editable == 1)
                     {
                         $detalle = Detalle::find($producto->id);
                         $lote = LoteProducto::findOrFail($detalle->lote_id);
@@ -250,6 +250,12 @@ class NotaController extends Controller
                 {
                     $detalle = Detalle::find($producto->id);
                     $lote = LoteProducto::findOrFail($detalle->lote_id);
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'mensaje'=> $lote->producto->getMedida(),
+                        'excepcion' => $lote->producto->getMedida()
+                    ]);
                     NotaDetalle::create([
                         'nota_id' => $nota->id,
                         'detalle_id' => $detalle->id,
@@ -410,7 +416,7 @@ class NotaController extends Controller
 
         $nota_json= json_encode($arreglo_nota);
         $data = pdfNotaapi($nota_json);
-        
+
         $name = $nota->serie.'-'.$nota->correlativo.'.pdf';
         $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'.DIRECTORY_SEPARATOR.$name);
         if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'))) {
@@ -462,7 +468,7 @@ class NotaController extends Controller
             'empresa' => $empresa,
             "legends" =>  $legends,
             ])->setPaper('a4')->setWarnings(false);
-        
+
         $pdf->save(public_path().'/storage/comprobantessiscom/notas/'.$name);
         return $pdf->stream($name);
     }
@@ -472,7 +478,7 @@ class NotaController extends Controller
         $nota = Nota::with(['documento'])->findOrFail($id);
         $empresa = Empresa::first();
         $detalles = NotaDetalle::where('nota_id',$id)->get();
-        
+
         $legends = self::obtenerLeyenda($nota);
         $legends = json_encode($legends,true);
         $legends = json_decode($legends,true);
@@ -491,7 +497,7 @@ class NotaController extends Controller
             "legends" =>  $legends,
             "nota_venta" => 1,
             ])->setPaper('a4')->setWarnings(false);
-        
+
         $pdf->save(public_path().'/storage/comprobantessiscom/notas/'.$name);
         return $pdf->stream($name);
     }
@@ -630,7 +636,7 @@ class NotaController extends Controller
                         $data = enviarNotaapi(json_encode($arreglo_nota));
 
                         //RESPUESTA DE LA SUNAT EN JSON
-                        $json_sunat = json_decode($data);                        
+                        $json_sunat = json_decode($data);
 
                         if ($json_sunat->sunatResponse->success == true) {
 
@@ -769,8 +775,8 @@ class NotaController extends Controller
     public function sunat_post($id)
     {
         try
-        {            
-            $nota = Nota::findOrFail($id);            
+        {
+            $nota = Nota::findOrFail($id);
             $detalles = NotaDetalle::where('nota_id',$id)->get();
             if ($nota->sunat != '1') {
                 //ARREGLO COMPROBANTE
