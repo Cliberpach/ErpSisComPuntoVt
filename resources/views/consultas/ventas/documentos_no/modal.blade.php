@@ -30,7 +30,7 @@
 
                     <div class="col-lg-6 col-xs-12">
                         <label class="required">Cantidad</label>
-                        <input type="number" id="cantidad_editar" name="cantidad_editar" class="form-control" min="1" onkeypress="return isNumber(event);">
+                        <input type="text" id="cantidad_editar" name="cantidad_editar" class="form-control" min="1" onkeypress="return filterFloat(event, this, false);">
                         <input type="hidden" id="cantidad_editar_actual" name="cantidad_editar_actual" class="form-control">
                     </div>
                     <div class="col-lg-6 col-xs-12">
@@ -58,9 +58,8 @@
 <script>
 
 $('#cantidad_editar').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-    let max= parseInt(this.max);
-    let valor = parseInt(this.value);
+    let max= convertFloat(this.max);
+    let valor = convertFloat(this.value);
     if(valor>max){
         toastr.error('La cantidad ingresada supera al stock del producto Max('+max+').', 'Error');
         this.value = max;

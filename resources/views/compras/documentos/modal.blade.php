@@ -115,7 +115,7 @@
 
                         <div class="col-md-6">
                             <label class="required">Cantidad</label>
-                            <input type="text" id="cantidad_editar" class="form-control" @if (!empty($orden)) {{'disabled'}} @endif>
+                            <input type="text" id="cantidad_editar" onkeypress="return filterFloat(event, this, false);" class="form-control" @if (!empty($orden)) {{'disabled'}} @endif>
                             <div class="invalid-feedback"><b><span id="error-cantidad_editar"></span></b></div>
                         </div>
 
@@ -177,6 +177,15 @@
 
 @push('scripts')
 <script>
+$('#cantidad_editar').on('input', function() {
+    //this.value = this.value.replace(/[^0-9]/g, '');
+    let max = convertFloat(this.max);
+    let valor = convertFloat(this.value);
+    if(valor>max){
+        toastr.error('La cantidad ingresada supera al stock del producto Max('+max+').', 'Error');
+        this.value = max;
+    }
+});
 //Validacion al ingresar tablas
 $(".editarRegistro").click(function() {
     // limpiarErrores()

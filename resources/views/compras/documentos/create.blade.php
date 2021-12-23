@@ -541,7 +541,7 @@
                                                 <div class="col-md-6">
 
                                                     <label class="col-form-label required">Cantidad:</label>
-                                                    <input type="text" id="cantidad" class="form-control" onkeydown="nextFocus(event,'costo_flete')">
+                                                    <input type="text" id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'costo_flete')">
                                                     <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
                                                     </div>
 

@@ -26,7 +26,7 @@ class CreateCompraDocumentoDetallesTable extends Migration
             $table->string('presentacion_producto')->nullable();
             $table->string('medida_producto');
 
-            $table->BigInteger('cantidad');
+            $table->unsignedDecimal('cantidad', 15, 4);
             $table->date('fecha_vencimiento')->nullable();
 
             $table->string('lote')->nullable();

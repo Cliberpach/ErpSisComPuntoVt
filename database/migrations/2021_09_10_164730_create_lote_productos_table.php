@@ -18,16 +18,16 @@ class CreateLoteProductosTable extends Migration
             $table->string('codigo_lote')->nullable();
             $table->unsignedInteger('compra_documento_id')->nullable();
             $table->foreign('compra_documento_id')->references('id')->on('compra_documentos')->onDelete('SET NULL');
-            
+
             $table->unsignedInteger('nota_ingreso_id')->nullable();
             $table->foreign('nota_ingreso_id')->references('id')->on('nota_ingreso')->onDelete('SET NULL');
 
             $table->unsignedInteger('producto_id');
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
 
-            $table->unsignedDecimal('cantidad', 15,2);
-            $table->unsignedDecimal('cantidad_logica', 15,2);
-            $table->unsignedDecimal('cantidad_inicial', 15,2)->nullable();
+            $table->unsignedDecimal('cantidad', 15,4);
+            $table->unsignedDecimal('cantidad_logica', 15,4);
+            $table->unsignedDecimal('cantidad_inicial', 15,4)->nullable();
 
             $table->date('fecha_vencimiento');
             $table->date('fecha_entrega');

@@ -368,7 +368,7 @@
                                                 <div class="col-lg-2 col-xs-12">
 
                                                     <label class="col-form-label required">Cantidad:</label>
-                                                    <input type="text" name="cantidad"  id="cantidad" class="form-control" onkeypress="return isNumber(event)" onkeydown="nextFocus(event,'precio')" disabled>
+                                                    <input type="text" name="cantidad"  id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'precio')" disabled>
                                                     <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
                                                     </div>
                                                 </div>
@@ -532,7 +532,7 @@
     })
 
     $('#cantidad').on('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
+        //this.value = this.value.replace(/[^0-9]/g, '');
         let max = convertFloat(this.max);
         let valor = convertFloat(this.value);
         if (valor > max) {
