@@ -1531,6 +1531,10 @@ class DocumentoController extends Controller
 
                     };
 
+                    $documento->getRegularizeResponse = $id_sunat;
+                    $documento->regularize = '1';
+                    $documento->update();
+
                     $errorVenta = new ErrorVenta();
                     $errorVenta->documento_id = $documento->id;
                     $errorVenta->tipo = 'sunat-envio';

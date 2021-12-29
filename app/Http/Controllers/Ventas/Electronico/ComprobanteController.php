@@ -267,6 +267,9 @@ class ComprobanteController extends Controller
 
                             };
 
+                            $documento->getRegularizeResponse = $id_sunat;
+                            $documento->regularize = '1';
+                            $documento->update();
 
                             Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
                             return view('ventas.documentos.index',[
