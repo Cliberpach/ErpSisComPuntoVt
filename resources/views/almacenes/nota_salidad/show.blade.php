@@ -35,7 +35,7 @@
                 <div class="ibox-content">
                     <input type="hidden" id='asegurarCierre' >
                     <form id="enviar_ingresos">
-                       
+
                             <div class="col-sm-12">
                                 <h4 class=""><b>Notas de Salidad</b></h4>
                                 <div class="row">
@@ -44,7 +44,7 @@
                                     </div>
                                 </div>
                             	<div class="form-group row">
-                                   
+
                                     <div class="col-sm-4"  id="fecha">
                                         <label>Fecha</label>
                                         <div class="input-group date">
@@ -80,7 +80,7 @@
                             </div>
 
                             <input type="hidden" id="notadetalle" name="notadetalle" value="{{$detalle}}">
-                       
+
                         <hr>
                         <div class="row">
                             <div class="col-lg-12">
@@ -88,7 +88,7 @@
                                     <div class="panel-heading">
                                         <h4 class=""><b>Detalle de la Nota de Salida</b></h4>
                                     </div>
-                                    <div class="panel-body">                                        
+                                    <div class="panel-body">
                                         <hr>
 
                                         <div class="table-responsive">
@@ -105,13 +105,13 @@
                     									<th class="text-center">Precio</th>
                                                         <th></th>
                                                         <th></th>
-                    									
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
 
                                                 </tbody>
-                                                
+
                                             </table>
                                         </div>
                                     </div>
@@ -142,7 +142,7 @@
 
 </div>
 @include('almacenes.nota_salidad.modal')
-@include('almacenes.nota_salidad.modalote')
+@include('almacenes.nota_salidad.modalLote')
 @stop
 
 @push('styles')

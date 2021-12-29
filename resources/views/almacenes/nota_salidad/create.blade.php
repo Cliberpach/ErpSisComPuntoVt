@@ -37,7 +37,7 @@
                     <form action="{{route('almacenes.nota_salidad.store')}}" method="POST" id="enviar_nota_salida">
                         {{csrf_field()}}
 
-                       
+
                             <div class="col-sm-12">
                                 <h4 class=""><b>Notas de Salidad</b></h4>
                                 <div class="row">
@@ -46,7 +46,7 @@
                                     </div>
                                 </div>
                             	<div class="form-group row">
-                                   
+
                                     <input type="hidden" id="numero" name="numero" class="form-control" value="{{$ngenerado}}" >
                                     <div class="col-sm-4"  id="fecha">
                                         <label>Fecha</label>
@@ -87,9 +87,9 @@
                                 </div>
                             </div>
 
-                   
+
                             <input type="hidden" id="notadetalle_tabla" name="notadetalle_tabla[]">
-                       
+
                         <hr>
                         <div class="row">
                             <div class="col-lg-12">
@@ -99,12 +99,12 @@
                                     </div>
                                     <div class="panel-body">
                                         <div class="row">
-                                        	
+
                                             <div class="col-lg-6 col-xs-12">
                                                 <label class="col-form-label required">Producto-lote:</label>
                                                 <div class="input-group">
-                                                    <input type="text" class="form-control" id="producto_lote_form" readonly> 
-                                                    <span class="input-group-append"> 
+                                                    <input type="text" class="form-control" id="producto_lote_form" readonly>
+                                                    <span class="input-group-append">
                                                         <button type="button" class="btn btn-primary" id="buscarLotes" data-toggle="modal" data-target="#modal_lote"><i class='fa fa-search'></i> Buscar
                                                         </button>
                                                     </span>
@@ -129,9 +129,9 @@
                                             <input type="hidden" name="producto" id="producto_form">
                                             <input type="hidden" name="lote" id="lote_form">
                                             <input type="hidden" name="cantidad_actual_form" id="cantidad_actual_form">
-                                            
+
                                         </div>
-                                       
+
                                         <hr>
 
                                         <div class="table-responsive">
@@ -146,13 +146,13 @@
                     									<th class="text-center">Producto-Lote</th>
                                                         <th></th>
                                                         <th></th>
-                    									
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
 
                                                 </tbody>
-                                                
+
                                             </table>
                                         </div>
                                     </div>
@@ -186,7 +186,7 @@
 
 </div>
 @include('almacenes.nota_salidad.modal')
-@include('almacenes.nota_salidad.modalote')
+@include('almacenes.nota_salidad.modalLote')
 @stop
 
 @push('styles')
@@ -376,35 +376,35 @@ $(document).on('click', '#borrar_detalle', function(event) {
 
 //Validacion al ingresar tablas
 $(".enviar_detalle").click(function() {
-    
+
     let enviar = false;
     let cantidad= $('#cantidad_form').val();
     let lote= $('#lote_form').val();
     let producto= $('#producto_form').val();
 
-    
+
     let cantidad_actual = convertFloat($('#cantidad_actual_form').val());
-   
+
 
     if(convertFloat(cantidad) > cantidad_actual)
     {
         toastr.warning('La cantidad debe ser menor o igual al stock actual: ' + cantidad_actual);
-        
+
         enviar=true;
     }
-    
+
     if(convertFloat(cantidad) <= 0)
     {
         toastr.warning('La cantidad debe ser mayor a 0.');
-       
+
         enviar=true;
     }
-                    
+
     if(cantidad.length === 0 || lote.length === 0 || producto.length === 0)
     {
         toastr.error('Ingrese datos', 'Error');
         enviar=true;
-    }    
+    }
     else {
         var existe = buscarProducto($('#lote_form').val())
         if (existe == true) {
@@ -412,7 +412,7 @@ $(".enviar_detalle").click(function() {
             enviar = true;
         }
     }
-    
+
     if (enviar != true) {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
@@ -437,7 +437,7 @@ $(".enviar_detalle").click(function() {
                 	cantidad: cantidad,
                     lote_id: lote,
                     producto_id: producto,
-                    producto_lote: $('#producto_lote_form').val()                   
+                    producto_lote: $('#producto_lote_form').val()
                 }
                 agregarTabla(detalle);
                 cambiarCantidad(detalle,'1');
@@ -491,7 +491,7 @@ $(document).on('click', '.btn-edit', function(event) {
         }
         else{
             toastr.warning('Ocurrió un error porfavor recargar la pagina.')
-        } 
+        }
     });
 });
 
@@ -547,7 +547,7 @@ function cambiarCantidad(detalle, condicion) {
 //DEVOLVER CANTIDADES A LOS LOTES
 function devolverCantidades() {
     //CARGAR PRODUCTOS PARA DEVOLVER LOTE
-    cargarDetalle() 
+    cargarDetalle()
     $.ajax({
         dataType : 'json',
         type : 'post',
@@ -593,10 +593,10 @@ function buscarProducto(id) {
 }
 </script>
 <script>
-    window.onbeforeunload = function () { 
-        //DEVOLVER CANTIDADES 
+    window.onbeforeunload = function () {
+        //DEVOLVER CANTIDADES
         if($('#asegurarCierre').val() == 1 ) {devolverCantidades()}
-    
+
     };
 
 </script>

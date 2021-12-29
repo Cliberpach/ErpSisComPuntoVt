@@ -165,6 +165,22 @@ class NotaSalidadController extends Controller
                     'lote_id' => $fila->lote_id
             ));
         }
+
+        $fullaccess = false;
+
+        if(count(Auth::user()->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count(Auth::user()->roles))
+            {
+                if(Auth::user()->roles[$cont]['full-access'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count(Auth::user()->roles);
+                }
+                $cont = $cont + 1;
+            }
+        }
         $origenes=  General::find(28)->detalles;
         $destinos=  General::find(29)->detalles;
         $lotes=DB::table('lote_productos')->get();
@@ -173,7 +189,7 @@ class NotaSalidadController extends Controller
         return view('almacenes.nota_salidad.show',[
         "origenes"=>$origenes,'destinos'=>$destinos,
        'usuarios'=>$usuarios,
-        'productos'=>$productos,'lotes'=>$lotes,'notasalidad'=>$notasalidad,'detalle'=>json_encode($data)]);
+        'productos'=>$productos,'lotes'=>$lotes,'notasalidad'=>$notasalidad,'detalle'=>json_encode($data),'fullaccess'=>$fullaccess]);
     }
 
     /**
