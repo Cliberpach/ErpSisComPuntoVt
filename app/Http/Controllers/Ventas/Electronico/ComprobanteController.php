@@ -308,8 +308,8 @@ class ComprobanteController extends Controller
         try
         {
             $documento = Documento::findOrFail($id);
-            $json_data = json_decode($documento->getRegularizeResponse, false);
-            if($documento->regularize == '1' && $json_data->code == '1033')
+            //$json_data = json_decode($documento->getRegularizeResponse, false);
+            if($documento->regularize == '1' && $documento->getRegularizeResponse == '1033')
             {
                 $documento->regularize = '0';
                 $documento->sunat = '1';
