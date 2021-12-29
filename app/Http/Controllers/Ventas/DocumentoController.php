@@ -84,7 +84,7 @@ class DocumentoController extends Controller
             $code = '-';
             if(!empty($documento->getRegularizeResponse))
             {
-                $json_data = json_decode($documento->getRegularizeResponse, false);
+                $json_data = json_decode($documento->getRegularizeResponse, true);
                 $code = $json_data->code;
             }
 
