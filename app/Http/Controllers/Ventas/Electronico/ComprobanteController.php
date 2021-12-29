@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Luecano\NumeroALetras\NumeroALetras;
+use stdClass;
 use Yajra\DataTables\Facades\DataTables;
 
 class ComprobanteController extends Controller
@@ -254,21 +255,29 @@ class ComprobanteController extends Controller
 
                             //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                             $documento->sunat = '0';
-                            $documento->update();
+                            $documento->regularize = '1';
 
                             if ($json_sunat->sunatResponse->error) {
                                 $id_sunat = $json_sunat->sunatResponse->error->code;
                                 $descripcion_sunat = $json_sunat->sunatResponse->error->message;
+
+                                $obj_erro = new stdClass();
+                                $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                                $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                                $respuesta_error = json_encode($obj_erro, true);
+                                $respuesta_error = json_decode($respuesta_error, true);
+                                $documento->getRegularizeResponse = $respuesta_error;
 
 
                             }else {
                                 $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                                 $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
+                                $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                                $respuesta_error = json_decode($respuesta_error, true);
+                                $documento->getCdrResponse = $respuesta_error;
                             };
 
-                            $documento->getRegularizeResponse = $id_sunat;
-                            $documento->regularize = '1';
                             $documento->update();
 
                             Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
@@ -296,6 +305,16 @@ class ComprobanteController extends Controller
         }
         catch(Exception $e)
         {
+            $documento = Documento::findOrFail($id);
+            $documento->regularize = '1';
+            $documento->sunat = '0';
+            $obj_erro = new stdClass();
+            $obj_erro->code = 6;
+            $obj_erro->description = $e->getMessage();
+            $respuesta_error = json_encode($obj_erro, true);
+            $respuesta_error = json_decode($respuesta_error, true);
+            $documento->getRegularizeResponse = $respuesta_error;
+            $documento->update();
             Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
             return redirect()->route('ventas.documento.index');
         }
@@ -308,8 +327,8 @@ class ComprobanteController extends Controller
         try
         {
             $documento = Documento::findOrFail($id);
-            //$json_data = json_decode($documento->getRegularizeResponse, false);
-            if($documento->regularize == '1' && $documento->getRegularizeResponse == '1033')
+            $json_data = json_decode($documento->getRegularizeResponse, false);
+            if($documento->regularize == '1' && $json_data->code == '1033')
             {
                 $documento->regularize = '0';
                 $documento->sunat = '1';

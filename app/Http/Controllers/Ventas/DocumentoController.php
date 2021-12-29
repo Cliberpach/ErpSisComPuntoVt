@@ -39,6 +39,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 //CONVERTIR DE NUMEROS A LETRAS
 use Luecano\NumeroALetras\NumeroALetras;
+use stdClass;
 
 class DocumentoController extends Controller
 {
@@ -83,9 +84,8 @@ class DocumentoController extends Controller
             $code = '-';
             if(!empty($documento->getRegularizeResponse))
             {
-                // $json_data = json_decode($documento->getRegularizeResponse, false);
-                // $code = $json_data->code;
-                $code = $documento->getRegularizeResponse;
+                $json_data = json_decode($documento->getRegularizeResponse, false);
+                $code = $json_data->code;
             }
 
             $coleccion->push([
@@ -1519,21 +1519,28 @@ class DocumentoController extends Controller
                     // $documento->correlativo = null;
                     // $documento->serie = null;
                     $documento->sunat = '0';
-                    $documento->update();
+                    $documento->regularize = '1';
 
                     if ($json_sunat->sunatResponse->error) {
                         $id_sunat = $json_sunat->sunatResponse->error->code;
                         $descripcion_sunat = $json_sunat->sunatResponse->error->message;
+
+                        $obj_erro = new stdClass();
+                        $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                        $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                        $respuesta_error = json_encode($obj_erro, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $documento->getRegularizeResponse = $respuesta_error;
 
 
                     }else {
                         $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                         $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $documento->getCdrResponse = $respuesta_error;
                     };
-
-                    $documento->getRegularizeResponse = $id_sunat;
-                    $documento->regularize = '1';
                     $documento->update();
 
                     $errorVenta = new ErrorVenta();
@@ -1557,6 +1564,16 @@ class DocumentoController extends Controller
         catch(Exception $e)
         {
             $documento = Documento::find($id);
+
+            $documento->regularize = '1';
+            $documento->sunat = '0';
+            $obj_erro = new stdClass();
+            $obj_erro->code = 6;
+            $obj_erro->description = $e->getMessage();
+            $respuesta_error = json_encode($obj_erro, true);
+            $respuesta_error = json_decode($respuesta_error, true);
+            $documento->getRegularizeResponse = $respuesta_error;
+            $documento->update();
 
             $errorVenta = new ErrorVenta();
             $errorVenta->documento_id = $documento->id;
