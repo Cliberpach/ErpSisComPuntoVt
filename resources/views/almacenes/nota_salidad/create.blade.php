@@ -67,7 +67,7 @@
                                     </div>
                                 <div class="col-sm-4">
                                         <label>Origen</label>
-                                        <input type="text" name="origen" id="origen" readonly value="ALMACEN DE PRODUCTO TERMINADO" class="form-control">
+                                        <input type="text" name="origen" id="origen" readonly value="ALMACEN" class="form-control">
                                     </div>
                                     <div class="col-sm-4">
                                         <label class="required">Destino</label>

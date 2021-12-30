@@ -25,6 +25,8 @@ class DataExcel implements ToCollection,WithHeadingRow
             ));
         }
     }
+    //PROBLEMAS CON GIT rm -f .git/index.lock
+
     public function get_data()
     {
         return $this->data;
