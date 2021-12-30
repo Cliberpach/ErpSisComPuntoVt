@@ -20,6 +20,7 @@ class DataExcel implements ToCollection,WithHeadingRow
                 'codigo'=> $row['codigo'],
                 'codigo_lote' => $row['codigo_lote'],
                 'cantidad' => $row['cantidad'],
+                'costo_total' => $row['costo_total'],
                 'fecha_vencimiento' => $row['fecha_vencimiento']
             ));
         }

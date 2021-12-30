@@ -25,7 +25,6 @@ class CreateDetalleNotaIngresoTable extends Migration
             $table->string('lote');
             $table->unsignedInteger('lote_id')->unsigned()->nullable();
             $table->foreign('lote_id')->references('id')->on('lote_productos')->onDelete('cascade');
-           // $table->foreign('lote_id')->references('id')->on('lote_productos')->onDelete('cascade');
             $table->unsignedDecimal('cantidad', 15,2);
             $table->date("fecha_vencimiento");
             $table->unsignedDecimal('costo', 15,4)->nullable();

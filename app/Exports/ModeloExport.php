@@ -16,9 +16,10 @@ class ModeloExport implements FromArray,WithHeadings,ShouldAutoSize,WithEvents
     public function array(): array
     {
         $data=array();
-        array_push($data,  ['codigo'=>'ACEI001-10',
-        'codigo_lote'=>'LT-10/09/2021',
-        'cantidad'=>'12',
+        array_push($data,  ['codigo'=>'1001',
+        'codigo_lote'=>'LT-29/12/2021',
+        'cantidad'=>'10',
+        'costo_total'=>'100',
         'fecha_vencimiento'=>'2021-04-30'
         ]);
         return $data;
@@ -29,6 +30,7 @@ class ModeloExport implements FromArray,WithHeadings,ShouldAutoSize,WithEvents
             ['codigo',
             'codigo_lote',
             'cantidad',
+            'costo_total',
             'fecha_vencimiento'
             ]
         ]
@@ -40,7 +42,7 @@ class ModeloExport implements FromArray,WithHeadings,ShouldAutoSize,WithEvents
 
             BeforeWriting::class => [self::class, 'beforeWriting'],
             AfterSheet::class    => function(AfterSheet $event) {
-                $event->sheet->getStyle('B1:E1')->applyFromArray([
+                $event->sheet->getStyle('A1:E1')->applyFromArray([
 
 
                     'fill' => [
@@ -58,7 +60,7 @@ class ModeloExport implements FromArray,WithHeadings,ShouldAutoSize,WithEvents
                 ]
 
                 );
-                $event->sheet->getStyle('A1:A1')->applyFromArray([
+                $event->sheet->getStyle('A1:E1')->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                         'rotation' => 90,

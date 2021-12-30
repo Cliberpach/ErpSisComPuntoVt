@@ -138,7 +138,7 @@ class NotaIngresoController extends Controller
         $notaingreso->moneda = $request->get('moneda');
         $notaingreso->tipo_cambio = $dolar;
         $notaingreso->dolar = $dolar;
-        if($request->get('moneda') === 'DOLARES')
+        if($request->get('moneda') == 'DOLARES')
         {
             $notaingreso->total_soles = (float) $request->get('monto_total') * (float) $dolar;
 

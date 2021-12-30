@@ -73,11 +73,11 @@
                                         <select
                                             class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
                                             style="text-transform: uppercase; width:100%" value="{{old('moneda')}}"
-                                            name="moneda" id="moneda" required>
+                                            name="moneda" id="moneda" required disabled>
                                             {{-- onchange="cambioMoneda(this)" --}}
                                                 <option></option>
                                             @foreach ($monedas as $moneda)
-                                            <option value="{{$moneda->descripcion}}" @if(old('moneda')==$moneda->descripcion ) {{'selected'}} @endif
+                                            <option value="{{$moneda->descripcion}}" @if(old('moneda') == $moneda->descripcion || $moneda->descripcion == 'SOLES') {{'selected'}} @endif
                                                 >{{$moneda->simbolo.' - '.$moneda->descripcion}}</option>
                                             @endforeach
                                             @if ($errors->has('moneda'))
@@ -86,7 +86,9 @@
                                             </span>
                                             @endif
 
-                                            </select>
+                                        </select>
+
+                                        <input type="hidden" id="moneda" name="moneda" value="SOLES">
 
                                     </div>
                                     <div class="col-12 col-md-3">
