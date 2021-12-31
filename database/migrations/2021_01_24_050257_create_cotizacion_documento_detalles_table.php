@@ -22,8 +22,8 @@ class CreateCotizacionDocumentoDetallesTable extends Migration
             $table->string('codigo_producto')->nullable();
             $table->string('unidad');
             $table->string('nombre_producto');
-            $table->string('codigo_lote');           
-            $table->unsignedInteger('cantidad');
+            $table->string('codigo_lote');
+            $table->unsignedDecimal('cantidad', 15, 4);
             $table->unsignedDecimal('precio_inicial', 15, 2);
             $table->unsignedDecimal('precio_unitario', 15, 2);
             $table->unsignedDecimal('descuento', 15, 2)->default(0.00);

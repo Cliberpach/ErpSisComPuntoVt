@@ -24,8 +24,7 @@
                             <label class="required">Cantidad a devolver</label>
                         </div>
                         <div class="col-12 col-md-6">
-                            <input type="text" class="form-control" id="cantidad_devolver" onkeypress="return isNumber(event)" required readonly
-                            >
+                            <input type="text" class="form-control" id="cantidad_devolver" onkeypress="return filterFloat(event, this, false);" required readonly>
                         </div>
                     </div>
                     <div class="form-group row">

@@ -381,9 +381,8 @@
         viewData();
 
         $('#cantidad_devolver').on('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
-            let max = parseInt(this.max);
-            let valor = parseInt(this.value);
+            let max = convertFloat(this.max);
+            let valor = convertFloat(this.value);
             if (valor > max) {
                 toastr.error('La cantidad ingresada supera al stock del producto Max(' + max + ').', 'Error');
                 this.value = max;
