@@ -462,8 +462,8 @@
     $(".enviar_detalle").click(function() {
 
         var enviar = true;
-        var cantidad= $('#cantidad').val();
-        var costo_aux= $('#costo').val();
+        var cantidad = $('#cantidad').val();
+        var costo_aux = $('#costo').val();
         var lote= $('#lote').val();
         var producto= $('#producto').val();
         var fechavencimiento= $('#fechavencimiento').val();
