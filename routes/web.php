@@ -576,6 +576,14 @@ function(){
 
     });
 
+    // Cosultas - Kardex - Cliente
+    Route::prefix('consultas/kardex/cliente')->group(function(){
+
+        Route::get('index', 'Consultas\Kardex\ClienteController@index')->name('consultas.kardex.cliente.index');
+        Route::post('getTable','Consultas\Kardex\ClienteController@getTable')->name('consultas.kardex.cliente.getTable');
+
+    });
+
 
     // Cosultas - Kardex - Salida -Ventas
     Route::prefix('consultas/kardex/salidas')->group(function(){
