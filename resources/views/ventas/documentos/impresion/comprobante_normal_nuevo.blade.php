@@ -289,7 +289,7 @@
                 <tbody>
                     @foreach($detalles as $item)
                     <tr>
-                        <td style="text-align: left; border-right: 2px solid #52BE80;">{{ number_format($item->cantidad) }}</td>
+                        <td style="text-align: left; border-right: 2px solid #52BE80;">{{ number_format($item->cantidad, 2) }}</td>
                         <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->unidad }}</td>
                         <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->nombre_producto }}</td>
                         <td style="text-align: left; border-right: 2px solid #52BE80; ">{{ $item->precio_nuevo }}</td>
