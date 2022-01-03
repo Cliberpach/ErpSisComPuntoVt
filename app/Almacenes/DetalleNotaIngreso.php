@@ -76,8 +76,8 @@ class DetalleNotaIngreso extends Model
             $kardex->cantidad = $detalle->cantidad;
             $kardex->producto_id = $detalle->producto_id;
             $kardex->descripcion = $detalle->nota_ingreso->origen;
-            $kardex->precio = 0;
-            $kardex->importe = $detalle->producto->precio_venta_minimo * $detalle->cantidad;
+            $kardex->precio = $detalle->costo_soles;
+            $kardex->importe = $detalle->costo_soles * $detalle->cantidad;
             $kardex->stock = $detalle->producto->stock;
             $kardex->save();
 
