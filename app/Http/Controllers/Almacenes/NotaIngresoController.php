@@ -224,18 +224,37 @@ class NotaIngresoController extends Controller
             return redirect()->route('almacenes.producto.index')->with('guardar', 'error');
         }
 
+        $dolar_aux = json_encode(precio_dolar(), true);
+        $dolar_aux = json_decode($dolar_aux, true);
+
+        $dolar = (float)$dolar_aux['original']['venta'];
+
         $notaingreso = new NotaIngreso();
         $notaingreso->numero = $fecha . (DB::table('nota_ingreso')->count() + 1);
         $notaingreso->fecha = $fecha_;
         $notaingreso->origen = 'INGRESO RAPIDO';
+        $notaingreso->tipo_cambio = $dolar;
+        $notaingreso->dolar = $dolar;
+        $notaingreso->total = $request->get('costo');
+        $notaingreso->moneda = 'SOLES';
+        $notaingreso->total_soles = (float) $request->get('costo');
+        $notaingreso->total_dolares = (float) $request->get('costo') / $dolar;
         $notaingreso->usuario = Auth()->user()->usuario;
         $notaingreso->save();
+
+        $costo_soles = (float) $request->get('costo') / (float) $request->cantidad;
+
+        $costo_dolares = (float) $costo_soles / (float) $dolar;
 
         DetalleNotaIngreso::create([
             'nota_ingreso_id' => $notaingreso->id,
             'lote' => 'LT-'.$fecha_actual,
             'cantidad' => $request->cantidad,
             'producto_id' => $request->producto_id,
+            'costo' => $costo_soles,
+            'costo_soles' => $costo_soles,
+            'costo_dolares' => $costo_dolares,
+            'valor_ingreso' => $request->costo ,
             'fecha_vencimiento' => $fecha_5
         ]);
 

@@ -56,11 +56,15 @@
                     </div>
                     <ul class="nav navbar-top-links">
                         <li>
-                            <a href="{{ route('reporte.producto.informe' )}}" title="PRODUCTO INFORME">
-                                <i class="fa fa-question"></i> PI
+                            <a href="{{ route('ventas.documento.create') }}" title="DOC. DE VENTA">
+                                <i class="fa fa-plus"></i> DV
                             </a>
                         </li>
-
+                        <li>
+                            <a href="{{ route('reporte.producto.informe' )}}" title="PRODUCTO INFORME">
+                                <i class="fa fa-plus"></i> PI
+                            </a>
+                        </li>
                     </ul>
                     <ul class="nav navbar-top-links navbar-right">
                         <li>

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Almacenes\Producto;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -20,6 +21,15 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
     {
         $productos= DB::table('productos as p')->where('p.estado','ACTIVO')->get();
         $data=array();
+        $fecha_hoy = Carbon::now()->toDateString();
+        $fecha = Carbon::createFromFormat('Y-m-d', $fecha_hoy);
+        $fecha = str_replace("-", "", $fecha);
+        $fecha = str_replace(" ", "", $fecha);
+        $fecha = str_replace(":", "", $fecha);
+
+        $fecha_actual = Carbon::now();
+        $fecha_actual = date("d/m/Y", strtotime($fecha_actual));
+        $fecha_5 = date("Y-m-d", strtotime($fecha_hoy . "+ 5 years"));
         foreach($productos as $producto)
         {
             $categoria=DB::table('categorias')->where('id',$producto->categoria_id)->first();
@@ -35,12 +45,11 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
                 "marca"=>$marca->marca,
                 "almacen"=>$almacen->descripcion,
                 "codigo_barra"=>$producto->codigo_barra,
-                "stock"=>$producto->stock,
-                "stock_minimo"=>$producto->stock_minimo,
-                "precio_venta_minimo"=>0,
-                "precio_venta_maximo"=>0,
-                "peso_producto"=>$producto->peso_producto,
-                "igv"=>($producto->igv=="1") ? "SI": "NO"
+                "igv"=>($producto->igv=="1") ? "SI": "NO",
+                "fecha_vencimiento"=>$fecha_5,
+                "codigo_lote"=>"L-".$fecha_5,
+                "cantidad"=>"",
+                "costo_total"=>"",
 
             ));
         }
@@ -55,24 +64,20 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
     public function headings(): array
     {
         return [
-            ['codigo',
-            'nombre',
-            'descripcion',
-            'categoria',
-            'medida',
-            'marca',
-            'almacen',
-            'codigo_barra',
-            'stock',
-            'stock_minimo',
-            'precio_venta_minimo',
-            'precio_venta_maximo',
-            'peso_producto',
-            'igv',
-            'codigo_lote',
-            'cantidad',
-            'fecha_vencimiento',
-            'fecha_entrega'
+            [
+                'codigo',
+                'nombre',
+                'descripcion',
+                'categoria',
+                'medida',
+                'marca',
+                'almacen',
+                'codigo_barra',
+                'igv',
+                'fecha_vencimiento',
+                'codigo_lote',
+                'cantidad',
+                'costo_total',
             ]
         ]
        ;
@@ -83,7 +88,7 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
 
             BeforeWriting::class => [self::class, 'beforeWriting'],
             AfterSheet::class    => function(AfterSheet $event) {
-                $event->sheet->getStyle('O1:R1')->applyFromArray([
+                $event->sheet->getStyle('K1:M1')->applyFromArray([
 
 
                     'fill' => [
@@ -101,7 +106,7 @@ class ProductosExport implements ShouldAutoSize,WithHeadings,FromArray,WithEvent
                 ]
 
                 );
-                $event->sheet->getStyle('A1:N1')->applyFromArray([
+                $event->sheet->getStyle('A1:M1')->applyFromArray([
 
 
                     'fill' => [

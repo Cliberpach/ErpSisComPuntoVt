@@ -1663,7 +1663,7 @@ class DocumentoController extends Controller
                     'productos_clientes.porcentaje','categorias.descripcion as categoria', DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci'))
             ->where('lote_productos.cantidad_logica','>',0)
             ->where('lote_productos.estado','1')
-            ->where('productos_clientes.cliente',$tipo_cliente)
+            //->where('productos_clientes.cliente',$tipo_cliente)
             ->where('productos_clientes.moneda','1')
             ->orderBy('lote_productos.id','ASC')
             ->where('productos_clientes.estado','ACTIVO')

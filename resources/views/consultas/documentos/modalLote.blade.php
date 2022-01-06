@@ -235,19 +235,56 @@ function ingresarProducto(producto) {
 }
 
 function evaluarPrecioigv(producto) {
-    if ( producto.moneda == 1 ) {
-        //PRODUCTO SIN IGV
-        if ( producto.igv == '0' ) {
-            var precio = Number(producto.precio_venta * 0.18) + Number(producto.precio_venta)
-            return Number(precio).toFixed(2)
-        }else{
-            //PRODUCTO CON IGV
-            var precio = producto.precio_venta
-            return Number(precio).toFixed(2)
+    if (producto.precio_compra == null) {
+        let cambio = $('#dolar').val();
+        let precio = 0;
+        var precio_ = producto.precio_ingreso;
+        let porcentaje_ = producto.porcentaje;
+        let precio_nuevo = 0;
+        if(producto.moneda_compra == 'DOLARES')
+        {
+            precio = precio_ * cambio;
+            precio_nuevo = precio * (1 + (porcentaje_ / 100))
         }
+        else
+        {
+            precio = precio_;
+            precio_nuevo = precio * (1 + (porcentaje_ / 100))
+        }
+        return convertFloat(precio_nuevo).toFixed(2);
     }else{
-        toastr.error('Precio registrado diferente a Soles (S/.).', 'Error');
-        return 0.00
+        let cambio = $('#dolar').val();
+        let precio = 0;
+        let precio_ = producto.precio_compra;
+        let porcentaje_ = producto.porcentaje;
+        let precio_nuevo = 0;
+        if(producto.moneda_compra == 'DOLARES')
+        {
+            if(producto.igv_compra == 1)
+            {
+                precio = precio_ * cambio;
+                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+            }
+            else
+            {
+                precio = (precio_ * cambio * 1.18)
+                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+            }
+        }
+        else
+        {
+            if(producto.igv_compra == 1)
+            {
+                precio = precio_;
+                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+            }
+            else
+            {
+                precio = (precio_ * 1.18)
+                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+            }
+        }
+        return convertFloat(precio_nuevo).toFixed(2);
     }
 }
 

@@ -22,6 +22,14 @@
         </div>
         <div class="col-lg-12">
             <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Productos</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
                 <div class="ibox-content">
                     <div class="table-responsive">
                         <table class="table dataTables-producto table-striped table-bordered table-hover"
@@ -45,11 +53,19 @@
                 </div>
             </div>
         </div>
-        <div class="col-12">
-            <h2>COMPRAS</h2>
-        </div>
         <div class="col-lg-12">
             <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Compras</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link d-none">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
                 <div class="ibox-content">
                     <div class="table-responsive">
                         <table class="table dataTables-compras table-striped table-bordered table-hover"
@@ -75,11 +91,19 @@
             </div>
         </div>
 
-        <div class="col-12">
-            <h2>VENTAS</h2>
-        </div>
         <div class="col-lg-12">
             <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Ventas</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link d-none">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
                 <div class="ibox-content">
                     <div class="table-responsive">
                         <table class="table dataTables-ventas table-striped table-bordered table-hover"
@@ -94,6 +118,75 @@
                                     <th class="text-center">PRECIO</th>
                                     <th class="text-center">LOTE</th>
                                     <th class="text-center">FECHA VENC.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Ingresos</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link d-none">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table dataTables-ingresos table-striped table-bordered table-hover"
+                            style="text-transform:uppercase">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ORIGEN</th>
+                                    <th class="text-center">DESTINO</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">COSTO U.</th>
+                                    <th class="text-center">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12">
+            <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Salidas</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link d-none">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table dataTables-salidas table-striped table-bordered table-hover"
+                            style="text-transform:uppercase">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">ORIGEN</th>
+                                    <th class="text-center">DESTINO</th>
+                                    <th class="text-center">CANTIDAD</th>
+                                    <th class="text-center">LOTE</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -242,6 +335,58 @@
             },
             "order": [[ 0, "desc" ]],
         });
+        $('.dataTables-salidas').dataTable({
+            "dom": '<"html5buttons"B>lTfgitp',
+            "buttons": [{
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i> Excel',
+                    titleAttr: 'Excel',
+                    title: 'CONSULTA SALIDAS'
+                },
+                {
+                    titleAttr: 'Imprimir',
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Imprimir',
+                    customize: function(win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+                        $(win.document.body).find('table')
+                            .addClass('compact')
+                            .css('font-size', 'inherit');
+                    }
+                }
+            ],
+            "language": {
+                        "url": "{{asset('Spanish.json')}}"
+            },
+            "order": [[ 0, "desc" ]],
+        });
+        $('.dataTables-ingresos').dataTable({
+            "dom": '<"html5buttons"B>lTfgitp',
+            "buttons": [{
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i> Excel',
+                    titleAttr: 'Excel',
+                    title: 'CONSULTA INGRESOS'
+                },
+                {
+                    titleAttr: 'Imprimir',
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Imprimir',
+                    customize: function(win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+                        $(win.document.body).find('table')
+                            .addClass('compact')
+                            .css('font-size', 'inherit');
+                    }
+                }
+            ],
+            "language": {
+                        "url": "{{asset('Spanish.json')}}"
+            },
+            "order": [[ 0, "desc" ]],
+        });
 
         loadTable();
 
@@ -258,6 +403,8 @@
             var data = lote.row(this).data();
             llenarCompras(data.id);
             llenarVentas(data.id);
+            llenarSalidas(data.id);
+            llenarIngresos(data.id);
         });
 
     });
@@ -356,6 +503,103 @@
                 {data: 'precio',name:'precio', className: "letrapequeña"},
                 {data: 'lote',name:'lote', className: "letrapequeña"},
                 {data: 'fecha_vencimiento',name:'fecha_vencimiento', className: "letrapequeña"}
+            ],
+            "language": {
+                        "url": "{{asset('Spanish.json')}}"
+            },
+            "order": [[ 0, "desc" ]],
+
+
+        });
+    }
+
+    function llenarSalidas(id)
+    {
+        $('.dataTables-salidas').dataTable().fnDestroy();
+        let url = '{{ route("reporte.producto.llenarSalidas", ":id")}}';
+        url = url.replace(":id", id);
+        $('.dataTables-salidas').DataTable({
+            "dom": '<"html5buttons"B>lTfgitp',
+            "buttons": [{
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i> Excel',
+                    titleAttr: 'Excel',
+                    title: 'CONSULTA SALIDAS'
+                },
+                {
+                    titleAttr: 'Imprimir',
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Imprimir',
+                    customize: function(win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+                        $(win.document.body).find('table')
+                            .addClass('compact')
+                            .css('font-size', 'inherit');
+                    }
+                }
+            ],
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": true,
+            "bAutoWidth": false,
+            "ajax": url,
+            "columns": [
+
+                {data: 'origen', name:'origen', className: "letrapequeña"},
+                {data: 'destino', name:'destino', className: "letrapequeña"},
+                {data: 'cantidad',name:'cantidad', className: "letrapequeña"},
+                {data: 'lote',name:'lote', className: "letrapequeña"},
+            ],
+            "language": {
+                        "url": "{{asset('Spanish.json')}}"
+            },
+            "order": [[ 0, "desc" ]],
+
+
+        });
+    }
+
+    function llenarIngresos(id)
+    {
+        $('.dataTables-ingresos').dataTable().fnDestroy();
+        let url = '{{ route("reporte.producto.llenarIngresos", ":id")}}';
+        url = url.replace(":id", id);
+        $('.dataTables-ingresos').DataTable({
+            "dom": '<"html5buttons"B>lTfgitp',
+            "buttons": [{
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i> Excel',
+                    titleAttr: 'Excel',
+                    title: 'CONSULTA INGRESOS'
+                },
+                {
+                    titleAttr: 'Imprimir',
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i> Imprimir',
+                    customize: function(win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+                        $(win.document.body).find('table')
+                            .addClass('compact')
+                            .css('font-size', 'inherit');
+                    }
+                }
+            ],
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": true,
+            "bAutoWidth": false,
+            "ajax": url,
+            "columns": [
+
+                {data: 'origen', name:'origen', className: "letrapequeña"},
+                {data: 'destino', name:'destino', className: "letrapequeña"},
+                {data: 'cantidad',name:'cantidad', className: "letrapequeña"},
+                {data: 'costo',name:'costo', className: "letrapequeña"},
+                {data: 'total',name:'total', className: "letrapequeña"},
             ],
             "language": {
                         "url": "{{asset('Spanish.json')}}"

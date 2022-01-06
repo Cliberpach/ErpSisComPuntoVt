@@ -363,10 +363,10 @@ function evaluarPrecioigv(producto) {
     if (producto.precio_compra == null) {
         let cambio = $('#dolar').val();
         let precio = 0;
-        var precio_ = data.precio_ingreso;
-        let porcentaje_ = data.porcentaje;
+        var precio_ = producto.precio_ingreso;
+        let porcentaje_ = producto.porcentaje;
         let precio_nuevo = 0;
-        if(data.moneda_compra == 'DOLARES')
+        if(producto.moneda_compra == 'DOLARES')
         {
             precio = precio_ * cambio;
             precio_nuevo = precio * (1 + (porcentaje_ / 100))

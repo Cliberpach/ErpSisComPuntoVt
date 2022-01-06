@@ -43,16 +43,6 @@
                             <input type="hidden" name="cotizacion_id" value="{{ $cotizacion->id }}">
                         @endif
                         <div class="row">
-                            <div class="col-12">
-                                <h4 class=""><b>Documento de venta</b></h4>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <p>Registrar datos del documento de venta:</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
                             <div class="col-12 col-md-6 b-r">
                                 <div class="row">
                                     <div class="col-12 col-md-6" id="fecha_documento">
@@ -127,7 +117,7 @@
 
                                                 @foreach (tipos_venta() as $tipo)
                                                     @if ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS')
-                                                        <option value="{{ $tipo->id }}" @if (old('tipo_venta') == $tipo->nombre) {{ 'selected' }} @endif>
+                                                        <option value="{{ $tipo->id }}" @if (old('tipo_venta') == $tipo->id || $tipo->id == 129) {{ 'selected' }} @endif>
                                                             {{ $tipo->nombre }}</option>
                                                     @endif
                                                 @endforeach
@@ -218,7 +208,7 @@
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
+                                                        {{ old('condicion_id') == $condicion->id || $condicion->descripcion == 'CONTADO' ? 'selected' : '' }}>
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
                                                 @endforeach
@@ -276,9 +266,9 @@
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <div class="checkbox">
+                                            <div class="checkbox input-required pt-2">
                                                 <input type="checkbox" name="envio_sunat" id="envio_sunat" value="1">
-                                                <label for="envio_sunat" title="Enviar ahora">
+                                                <label for="envio_sunat" title="Enviar ahora" class="text-danger font-weight-bold">
                                                     Enviar a sunat
                                                 </label>
                                             </div>
@@ -409,8 +399,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th></th>
-                                                        <th class="text-center">ACCIONES</th>
-                                                        <th class="text-center">CANTIDAD</th>
+                                                        <th class="text-center"><i class="fa fa-dashboard"></i></th>
+                                                        <th class="text-center">CANT</th>
                                                         <th class="text-center">UM</th>
                                                         <th class="text-center">PRODUCTO</th>
                                                         <th class="text-center">V. UNITARIO</th>
@@ -758,27 +748,47 @@
                     sWidth: '0%'
                 },
                 {
-                    sWidth: '15%',
+                    sWidth: '10%',
                     sClass: 'text-center'
                 },
                 {
-                    sWidth: '15%',
+                    sWidth: '10%',
                     sClass: 'text-center'
                 },
                 {
-                    sWidth: '15%',
+                    sWidth: '10%',
                     sClass: 'text-center'
                 },
                 {
-                    sWidth: '25%',
+                    sWidth: '40%',
                     sClass: 'text-left'
                 },
                 {
-                    sWidth: '15%',
+                    sWidth: '10%',
                     sClass: 'text-center'
                 },
                 {
-                    sWidth: '15%',
+                    sWidth: '10%',
+                    sClass: 'text-center'
+                },
+                {
+                    sWidth: '10%',
+                    sClass: 'text-center'
+                },
+                {
+                    sWidth: '0%',
+                    sClass: 'text-center'
+                },
+                {
+                    sWidth: '0%',
+                    sClass: 'text-center'
+                },
+                {
+                    sWidth: '0%',
+                    sClass: 'text-center'
+                },
+                {
+                    sWidth: '0%',
                     sClass: 'text-center'
                 },
             ],
@@ -1489,7 +1499,15 @@
                     $('#cliente_id').append('<option></option>').trigger('change');
                     for(var i = 0;i < data.clientes.length; i++)
                     {
-                        var newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>';
+                        var newOption = '';
+                        if(data.clientes[i].id == 1)
+                        {
+                            newOption = '<option value="'+data.clientes[i].id+'" selected>'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                        }
+                        else
+                        {
+                            newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                        }
                         $('#cliente_id').append(newOption).trigger('change');
                         //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
                     }

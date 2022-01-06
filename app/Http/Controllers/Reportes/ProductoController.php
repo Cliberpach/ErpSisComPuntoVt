@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Reportes;
 
+use App\Almacenes\DetalleNotaIngreso;
+use App\Almacenes\DetalleNotaSalidad;
 use App\Almacenes\Producto;
 use App\Compras\Documento\Detalle;
 use App\Http\Controllers\Controller;
@@ -67,6 +69,37 @@ class ProductoController extends Controller
                     'fecha_vencimiento' => $producto->documento->fecha_vencimiento,
                 ]);
             }
+        }
+        return DataTables::of($coleccion)->make(true);
+    }
+
+    public function llenarSalidas($id)
+    {
+        $salidas = DetalleNotaSalidad::orderBy('id', 'desc')->where('producto_id', $id)->get();
+        $coleccion = collect([]);
+        foreach($salidas as $salida) {
+            $coleccion->push([
+                'origen' => $salida->nota_salidad->origen,
+                'destino' => $salida->nota_salidad->destino,
+                'cantidad' => $salida->cantidad,
+                'lote' => $salida->lote->codigo_lote,
+            ]);
+        }
+        return DataTables::of($coleccion)->make(true);
+    }
+
+    public function llenarIngresos($id)
+    {
+        $ingresos = DetalleNotaIngreso::orderBy('id', 'desc')->where('producto_id', $id)->get();
+        $coleccion = collect([]);
+        foreach($ingresos as $ingreso) {
+            $coleccion->push([
+                'origen' => $ingreso->nota_ingreso->origen,
+                'destino' => $ingreso->nota_ingreso->destino,
+                'cantidad' => $ingreso->cantidad,
+                'costo' => $ingreso->costo_soles,
+                'total' => $ingreso->valor_ingreso,
+            ]);
         }
         return DataTables::of($coleccion)->make(true);
     }

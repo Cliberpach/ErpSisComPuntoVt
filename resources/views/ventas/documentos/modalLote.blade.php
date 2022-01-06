@@ -328,6 +328,7 @@ $(document).ready(function() {
     $ ('.dataTables-lotes'). on ('dblclick', 'tbody td', function () {
         var lote =  $('.dataTables-lotes').DataTable();
         var data = lote.row(this).data();
+        console.log(data)
         ingresarProducto(data)
     });
 
@@ -361,27 +362,13 @@ function ingresarProducto(producto) {
 }
 
 function evaluarPrecioigv(producto) {
-    /*if ( producto.moneda == 1 ) {
-        //PRODUCTO SIN IGV
-        if ( producto.igv == '0' ) {
-            var precio = Number(producto.monto * 0.18) + Number(producto.monto)
-            return Number(precio).toFixed(2)
-        }else{
-            //PRODUCTO CON IGV
-            var precio = producto.monto
-            return Number(precio).toFixed(2)
-        }
-    }else{
-        toastr.error('Precio registrado diferente a Soles (S/.).', 'Error');
-        return 0.00
-    }*/
     if (producto.precio_compra == null) {
         let cambio = $('#dolar').val();
         let precio = 0;
-        var precio_ = data.precio_ingreso;
-        let porcentaje_ = data.porcentaje;
+        var precio_ = producto.precio_ingreso;
+        let porcentaje_ = producto.porcentaje;
         let precio_nuevo = 0;
-        if(data.moneda_compra == 'DOLARES')
+        if(producto.moneda_compra == 'DOLARES')
         {
             precio = precio_ * cambio;
             precio_nuevo = precio * (1 + (porcentaje_ / 100))

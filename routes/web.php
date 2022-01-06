@@ -618,6 +618,8 @@ function(){
         Route::get('informe', 'Reportes\ProductoController@informe')->name('reporte.producto.informe');
         Route::get('llenarCompras/{id}', 'Reportes\ProductoController@llenarCompras')->name('reporte.producto.llenarCompras');
         Route::get('llenarVentas/{id}', 'Reportes\ProductoController@llenarVentas')->name('reporte.producto.llenarVentas');
+        Route::get('llenarSalidas/{id}', 'Reportes\ProductoController@llenarSalidas')->name('reporte.producto.llenarSalidas');
+        Route::get('llenarIngresos/{id}', 'Reportes\ProductoController@llenarIngresos')->name('reporte.producto.llenarIngresos');
         Route::get('getTable', 'Reportes\ProductoController@getTable')->name('reporte.producto.getTable');
 
     });

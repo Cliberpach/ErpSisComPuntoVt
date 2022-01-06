@@ -17,8 +17,8 @@ class CreateProductosClientesTable extends Migration
 
             $table->Increments('id');
             $table->string('cliente');
-            $table->unsignedDecimal('monto', 15, 2)->nullable();
-            $table->unsignedDecimal('porcentaje', 15, 2)->nullable();
+            $table->unsignedDecimal('monto', 15, 2)->default(0);
+            $table->unsignedDecimal('porcentaje', 15, 2)->default(0);
             $table->unsignedInteger('producto_id');
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
 
