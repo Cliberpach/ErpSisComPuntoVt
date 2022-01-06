@@ -1704,7 +1704,7 @@ class DocumentoController extends Controller
         $cantidades = $data['cantidades'];
         $productosJSON = $cantidades;
         $productotabla = json_decode($productosJSON);
-        $mensaje = '';
+        $mensaje = true;
         foreach ($productotabla as $detalle) {
             //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
             $lote = LoteProducto::findOrFail($detalle->producto_id);

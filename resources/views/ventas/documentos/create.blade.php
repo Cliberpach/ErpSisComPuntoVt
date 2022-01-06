@@ -1039,17 +1039,16 @@
     function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
-        $.ajax({
+        return $.ajax({
             dataType: 'json',
             type: 'post',
             url: '{{ route('ventas.documento.devolver.cantidades') }}',
             data: {
                 '_token': $('input[name=_token]').val(),
                 'cantidades': $('#productos_tabla').val(),
-            }
-        }).done(function(result) {
-            alert('DEVOLUCION REALIZADA')
-        });
+            },
+            async: true
+        }).responseText();
     }
 
     function sumaTotal() {
@@ -1726,12 +1725,25 @@
 </script>
 
 <script>
-    window.onbeforeunload = function() {
-        //DEVOLVER CANTIDADES
-        if ($('#asegurarCierre').val() == 1) {
-            devolverCantidades()
-        }
 
-    };
+    window.onbeforeunload = () => {
+        while (true) {
+            if ($('#asegurarCierre').val() == 1) {
+                devolverCantidades()
+            }
+            else
+            {
+                return true;
+            }
+        }
+        return null;
+    }
+    // window.onbeforeunload = function() {
+    //     //DEVOLVER CANTIDADES
+    //     if ($('#asegurarCierre').val() == 1) {
+    //         devolverCantidades()
+    //     }
+
+    // };
 </script>
 @endpush
