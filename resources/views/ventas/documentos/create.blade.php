@@ -415,17 +415,20 @@
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <th class="text-center" colspan="9">Sub Total:</th>
+                                                        <th class="text-right" colspan="10"></th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="text-right" colspan="9">Sub Total:</th>
                                                         <th class="text-center"><span
                                                                 id="subtotal">@if (!empty($cotizacion)) {{ $cotizacion->sub_total }} @else 0.0 @endif</span></th>
                                                     </tr>
                                                     <tr>
-                                                        <th class="text-center" colspan="9">IGV <span id="igv_int"></span>:</th>
+                                                        <th class="text-right" colspan="9">IGV <span id="igv_int"></span>:</th>
                                                         <th class="text-center"><span
                                                                 id="igv_monto">@if (!empty($cotizacion)) {{ $cotizacion->total_igv }} @else 0.0 @endif</span></th>
                                                     </tr>
                                                     <tr>
-                                                        <th class="text-center" colspan="9">TOTAL:</th>
+                                                        <th class="text-right" colspan="9">TOTAL:</th>
                                                         <th class="text-center"><span id="total">@if (!empty($cotizacion)) {{ $cotizacion->total }} @else 0.0 @endif</span>
                                                         </th>
                                                     </tr>
@@ -776,20 +779,16 @@
                     sClass: 'text-center'
                 },
                 {
-                    sWidth: '0%',
-                    sClass: 'text-center'
+                    sWidth: '10%',
                 },
                 {
                     sWidth: '0%',
-                    sClass: 'text-center'
                 },
                 {
                     sWidth: '0%',
-                    sClass: 'text-center'
                 },
                 {
                     sWidth: '0%',
-                    sClass: 'text-center'
                 },
             ],
             "language": {
@@ -1726,7 +1725,7 @@
 
 <script>
 
-    window.onbeforeunload = () => {
+    /*window.onbeforeunload = () => {
         while (true) {
             if ($('#asegurarCierre').val() == 1) {
                 devolverCantidades()
@@ -1737,13 +1736,12 @@
             }
         }
         return null;
-    }
-    // window.onbeforeunload = function() {
-    //     //DEVOLVER CANTIDADES
-    //     if ($('#asegurarCierre').val() == 1) {
-    //         devolverCantidades()
-    //     }
-
-    // };
+    }*/
+    window.onbeforeunload = function() {
+        //DEVOLVER CANTIDADES
+        if ($('#asegurarCierre').val() == 1) {
+            devolverCantidades()
+        }
+    };
 </script>
 @endpush

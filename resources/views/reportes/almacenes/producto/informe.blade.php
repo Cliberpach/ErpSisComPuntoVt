@@ -225,52 +225,6 @@
         background-color: #18a689 !important;
         /* background-color: #CFCFCF !important; */
     }
-
-    #div_productos  div.dataTables_wrapper div.dataTables_filter{
-        text-align:left !important;
-    }
-
-
-    @media only screen and (max-width: 992px) {
-
-        #table_tabla_registro_filter{
-            text-align:left;
-        }
-
-        #table_productos_filter{
-            text-align: left;
-        }
-        #table_productos  div.dataTables_wrapper div.dataTables_paginate ul.pagination {
-            float:left;
-            margin: 10px 0;
-            white-space: nowrap;
-        }
-
-    }
-
-    @media only screen and (min-width: 428px) and (max-width: 1190px) {
-        /* Para tables: */
-        #div_productos div.dataTables_filter input {
-            width: 175% !important;
-            display: inline-block !important;
-        }
-    }
-
-    @media only screen and (max-width: 428px) {
-        /* Para celular: */
-        #div_productos  div.dataTables_filter input {
-            width: 100% !important;
-            display: inline-block !important;
-        }
-    }
-
-    @media only screen and (min-width: 1190px) {
-
-        #div_productos div.dataTables_filter input {
-            width: 363% !important;
-            display: inline-block !important;
-        }
-    }
 </style>
 @endpush
 
