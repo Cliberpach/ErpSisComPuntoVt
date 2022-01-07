@@ -8,6 +8,7 @@ use App\Compras\Proveedor;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
 use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,9 @@ class CuentaProveedorController extends Controller
 {
     public function index() {
         $this->authorize('haveaccess','cuenta_proveedor.index');
-        return view('compras.cuentaProveedor.index');
+
+        $fecha_hoy = Carbon::now()->toDateString();
+        return view('compras.cuentaProveedor.index',compact('fecha_hoy'));
     }
     public function getTable() {
         $this->authorize('haveaccess','cuenta_proveedor.index');
@@ -30,14 +33,14 @@ class CuentaProveedorController extends Controller
                 "numero_doc"=>$value->documento->numero_doc,
                 "fecha_doc"=>strval($value->documento->created_at) ,
                 "monto"=>$value->documento->total,
-                "acta"=>$value->acta,
+                "acta"=>number_format(round($value->monto - $value->saldo, 2), 2),
                 "saldo"=>$value->saldo,
                 "estado"=>$value->estado
             ));
         }
         return DataTables::of($datos)->toJson();
     }
-    public function getDatos(Request $request) 
+    public function getDatos(Request $request)
     {
         $this->authorize('haveaccess','cuenta_proveedor.index');
         $cuenta=CuentaProveedor::findOrFail($request->id);

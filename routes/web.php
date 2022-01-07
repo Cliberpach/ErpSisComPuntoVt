@@ -452,6 +452,7 @@ function(){
         Route::get('getTable','Ventas\CuentaClienteController@getTable')->name('cuentaCliente.getTable');
         Route::get('getDatos','Ventas\CuentaClienteController@getDatos')->name('cuentaCliente.getDatos');
         Route::post('detallePago/{id}','Ventas\CuentaClienteController@detallePago')->name('cuentaCliente.detallePago');
+        Route::get('detalle','Ventas\CuentaClienteController@detalle')->name('cuentaCliente.detalle');
         Route::get('consulta','Ventas\CuentaClienteController@consulta')->name('cuentaCliente.consulta');
         Route::get('reporte/{id}','Ventas\CuentaClienteController@reporte')->name('cuentaCliente.reporte');
         Route::get('imagen/{id}','Ventas\CuentaClienteController@imagen')->name('cuentaCliente.imagen');
@@ -622,6 +623,11 @@ function(){
         Route::get('llenarIngresos/{id}', 'Reportes\ProductoController@llenarIngresos')->name('reporte.producto.llenarIngresos');
         Route::get('getTable', 'Reportes\ProductoController@getTable')->name('reporte.producto.getTable');
 
+    });
+
+    Route::prefix('configuracion')->group(function(){
+        Route::get('index', 'Configuracion\ConfiguracionController@index')->name('configuracion.index');
+        Route::put('update/{id}', 'Configuracion\ConfiguracionController@update')->name('configuracion.update');
     });
 });
 

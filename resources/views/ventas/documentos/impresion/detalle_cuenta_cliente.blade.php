@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>DETALLE CUENTA</title>
+        <title>CUENTAS {{ $cliente->nombre_comercial }}</title>
         <link rel="icon" href="{{ base_path() . '/img/siscom.ico' }}" />
         <style>
             body {
@@ -207,7 +207,7 @@
                         <div class="nombre-documento">
                             <p class="m-0 p-0 text-uppercase">CUENTA</p>
                         </div>
-                        <p class="m-0 p-0 text-uppercase">C - {{ $cuenta->id}}</p>
+                        <p class="m-0 p-0 text-uppercase">CL - {{ $cliente->id}}</p>
                     </div>
                 </div>
             </div>
@@ -241,29 +241,19 @@
             <table class="tbl-informacion">
                 <tbody style="padding-top: 5px; padding-bottom: 5px;">
                     <tr>
-                        <td style="padding-left: 5px;">FECHA DOCUMENTO</td>
-                        <td>:</td>
-                        <td>{{ getFechaFormato($cuenta->documento->fecha_documento ,'d/m/Y') }}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding-left: 5px;">DOCUMENTO</td>
-                        <td>:</td>
-                        <td>{{ $cuenta->documento->serie . ' - ' . $cuenta->documento->correlativo }}</td>
-                    </tr>
-                    <tr>
                         <td style="padding-left: 5px;">CLIENTE</td>
                         <td>:</td>
-                        <td>{{ $proveedor->descripcion }}</td>
+                        <td>{{ $cliente->nombre }}</td>
                     </tr>
                     <tr>
-                        <td style="padding-left: 5px;" class="text-uppercase">{{ $proveedor->tipodocumento() }}</td>
+                        <td style="padding-left: 5px;" class="text-uppercase">{{ $cliente->tipo_documento }}</td>
                         <td>:</td>
-                        <td>{{ $proveedor->documento() }}</td>
+                        <td>{{ $cliente->documento }}</td>
                     </tr>
                     <tr>
                         <td style="padding-left: 5px;">DIRECCIÓN</td>
                         <td>:</td>
-                        <td>{{ $proveedor->direccion }}</td>
+                        <td>{{ $cliente->direccion }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -278,10 +268,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($detalles as $item)
+                    @foreach($cuentas as $item)
                     <tr>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ getFechaFormato($item->fecha ,'d/m/Y') }}</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $item->efectivo+$item->importe }}</td>
+                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ getFechaFormato($item->fecha_doc ,'d/m/Y') }}</td>
+                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $item->monto }}</td>
                         <td style="text-align: right">{{ $item->saldo }}</td>
                     </tr>
                     @endforeach
@@ -319,11 +309,11 @@
                         <table class="tbl-total text-uppercase">
                             <tr>
                                 <td style="text-align:left; padding: 5px;"><p class="m-0 p-0">Saldo: S/.</p></td>
-                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($cuenta->saldo, 2) }}</p></td>
+                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($cuentas->sum('saldo'), 2) }}</p></td>
                             </tr>
                             <tr>
-                                <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Total cuenta: S/.</p></td>
-                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($cuenta->documento->total, 2) }}</p></td>
+                                <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Total: S/.</p></td>
+                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($cuentas->sum('monto'), 2) }}</p></td>
                             </tr>
                         </table>
                     </td>

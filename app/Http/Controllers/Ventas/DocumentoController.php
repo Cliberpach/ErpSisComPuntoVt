@@ -293,6 +293,11 @@ class DocumentoController extends Controller
 
         $cotizacion = '';
         $detalles = '';
+        $vista = 'create';
+        if(CEC() == 'NO')
+        {
+            $vista = 'create_new';
+        }
         if($request->get('cotizacion')){
             //COLECCION DE ERRORES
             $errores = collect();
@@ -309,7 +314,7 @@ class DocumentoController extends Controller
                 $coll->cantidad = '.';
                 $errores->push($coll);
 
-                return view('ventas.documentos.create',[
+                return view('ventas.documentos.'.$vista,[
                     'cotizacion' => $cotizacion,
                     'empresas' => $empresas,
                     'clientes' => $clientes,
@@ -356,7 +361,7 @@ class DocumentoController extends Controller
                 }
             }
 
-            return view('ventas.documentos.create',[
+            return view('ventas.documentos.'.$vista,[
                 'cotizacion' => $cotizacion,
                 'empresas' => $empresas,
                 'clientes' => $clientes,
@@ -372,7 +377,7 @@ class DocumentoController extends Controller
         }
 
         if (empty($cotizacion)) {
-            return view('ventas.documentos.create',[
+            return view('ventas.documentos.'.$vista,[
                 'empresas' => $empresas,
                 'clientes' => $clientes,
                 'productos' => $productos,
@@ -582,6 +587,11 @@ class DocumentoController extends Controller
             $documento->tipo_pago_id = $request->get('tipo_pago_id');
             $documento->importe = $request->get('importe');
             $documento->efectivo = $request->get('efectivo');
+
+            if(!empty($request->get('tipo_pago_id')) && $condicion->descripcion == 'CONTADO')
+            {
+                $documento->estado_pago = 'PAGADA';
+            }
 
             if ($request->get('igv_check') == "on") {
                 $documento->igv_check = "1";

@@ -122,6 +122,12 @@
 
     </div>
 
+    <div class="position-fixed" style="bottom:50px; top:auto; right:30px; left:auto; -webkit-box-shadow: 8px 8px 3px 0px rgba(0,0,0,0.75); -moz-box-shadow: 8px 8px 3px 0px rgba(0,0,0,0.75); box-shadow: 6px 6px 4px 0px rgba(0,0,0,0.75); border-radius: 50%;">
+        <a class="d-sm-block" href="{{ route('configuracion.index') }}" target="_blank">
+            <img src="/img/config_.png" style="width: 50px">
+        </a>
+    </div>
+
     @yield('vue-js')
 
     <!-- Mainly scripts -->

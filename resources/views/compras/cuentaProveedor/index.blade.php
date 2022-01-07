@@ -22,7 +22,7 @@
         <div class="col-md-12">
             <div class="ibox">
                 <div class="ibox-content">
-                    <div class="row">
+                    <div class="row align-items-end">
                         <div class="col-md-4">
                             <label for="" class="required">Proveedor</label>
                             <select name="proveedor_b" id="proveedor_b" class="select2_form form-control">
@@ -32,7 +32,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label for="" class="required">Estado</label>
                             <select name="estado_b" id="estado_b" class="select2_form form-control">
                                 <option value=""></option>
@@ -40,7 +40,7 @@
                                 <option value="PAGADO">CANCELADOS</option>
                             </select>
                         </div>
-                        <div class="col-md-2 mt-4">
+                        <div class="col-md-2">
                             <button class="btn btn-primary btn-sm" id="btn_buscar" type="button"><i
                                     class="fa fa-search"></i> Buscar</button>
                         </div>

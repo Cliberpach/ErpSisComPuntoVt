@@ -32,7 +32,7 @@ class CuentaClienteController extends Controller
                 "numero_doc"=>$value->documento->numero_doc,
                 "fecha_doc"=>$value->fecha_doc,
                 "monto"=>$value->monto,
-                "acta"=>$value->acta,
+                "acta"=> number_format(round($value->monto - $value->saldo, 2), 2),
                 "saldo"=>$value->saldo,
                 "estado"=>$value->estado
             ));
@@ -140,7 +140,7 @@ class CuentaClienteController extends Controller
                                 $detallepago->monto = $cantidadRecibida;
                                 $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
                                 $cantidadRecibidaImporte = 0;
-                                
+
                                 $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
                             }
                             else
@@ -151,13 +151,13 @@ class CuentaClienteController extends Controller
                                 $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
                                 $cantidadRecibidaEfectivo = 0;
                                 $cantidadRecibidaImporte = 0;
-                                
+
                                 $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
                             }
                         }
                         else{
                             if($cantidadRecibidaEfectivo == 0)
-                            {   
+                            {
                                 $importe = 0;
                                 if($cantidadRecibidaImporte > $cuenta->saldo)
                                 {
@@ -190,7 +190,7 @@ class CuentaClienteController extends Controller
                                     $detallepago->importe = $cantidadRecibidaImporte;
                                     $detallepago->monto = $cuenta->saldo;
                                     $cantidadRecibidaEfectivo = $cantidadRecibidaEfectivo - $efectivo;
-                                    
+
                                     $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
                                 }
                                 else
@@ -198,7 +198,7 @@ class CuentaClienteController extends Controller
                                     $detallepago->efectivo = $cantidadRecibidaEfectivo;
                                     $detallepago->importe = $cuenta->saldo - $cantidadRecibidaEfectivo;
                                     $detallepago->monto = $detallepago->efectivo + $detallepago->importe;
-                                    $cantidadRecibidaImporte =  $cantidadRecibidaImporte - ($cuenta->saldo - $cantidadRecibidaEfectivo);                                    
+                                    $cantidadRecibidaImporte =  $cantidadRecibidaImporte - ($cuenta->saldo - $cantidadRecibidaEfectivo);
                                     $cantidadRecibidaEfectivo = 0;
                                     $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
                                 }
@@ -241,6 +241,30 @@ class CuentaClienteController extends Controller
             'empresa' => $empresa
             ])->setPaper('a4');
         return $pdf->stream('CUENTA-'.$cuenta->id.'.pdf');
+    }
+
+    public function detalle(Request $request)
+    {
+        $estado = $request->estado;
+        $id = $request->id;
+        //$cuentas = CuentaCliente::where('cliente_id',$request->id)->where('estado', $request->estado);
+        $cuentas = DB::table('cuenta_cliente')
+        ->join('cotizacion_documento', 'cotizacion_documento.id', '=', 'cuenta_cliente.cotizacion_documento_id')
+        ->join('clientes', 'clientes.id', '=', 'cotizacion_documento.cliente_id')
+        ->select(
+            'cuenta_cliente.*',
+        )
+        ->where('cotizacion_documento.cliente_id',$id)
+        ->where('cuenta_cliente.estado',$estado)
+        ->get();
+        $cliente = Cliente::find($request->id);
+        $empresa = Empresa::first();
+        $pdf = PDF::loadview('ventas.documentos.impresion.detalle_cuenta_cliente',[
+            'cuentas' => $cuentas,
+            'cliente' => $cliente,
+            'empresa' => $empresa
+            ])->setPaper('a4');
+        return $pdf->stream('CUENTAS-'.$cliente->nombre_comercial.'.pdf');
     }
 
     public function imagen($id)

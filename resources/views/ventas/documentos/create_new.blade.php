@@ -473,6 +473,7 @@
     </div>
 </div>
 @include('ventas.documentos.modal')
+@include('ventas.documentos.modalPagoForm')
 @include('ventas.documentos.modalLote')
 @include('ventas.documentos.modalCliente')
 @stop
@@ -1281,10 +1282,12 @@
             }
             else
             {
-                $('#importe_form').val(0.00);
-                $('#efectivo_form').val(0.00);
-                $('#tipo_pago_id').val('');
-                enviarVenta();
+                // $('#importe_form').val(0.00);
+                // $('#efectivo_form').val(0.00);
+                // $('#tipo_pago_id').val('');
+                // enviarVenta();
+                $('#modal_pago').modal('show');
+                $('#modo_pago').val('1-EFECTIVO').trigger('change.select2');
             }
             /*if(convertFloat(forma_pago) === 161)
             {
@@ -1743,7 +1746,7 @@
 
 <script>
 
-    /*window.onbeforeunload = () => {
+    window.onbeforeunload = () => {
         while (true) {
             if ($('#asegurarCierre').val() == 1) {
                 devolverCantidades()
@@ -1754,12 +1757,12 @@
             }
         }
         return null;
-    }*/
-    window.onbeforeunload = function() {
+    }
+    /*window.onbeforeunload = function() {
         //DEVOLVER CANTIDADES
         if ($('#asegurarCierre').val() == 1) {
             devolverCantidades()
         }
-    };
+    };*/
 </script>
 @endpush

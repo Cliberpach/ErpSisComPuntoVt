@@ -98,7 +98,7 @@
                                     <div class="col-md-8">
                                         <div class="form-group">
                                             <label for="" class="col-form-label required">Fecha</label>
-                                            <input type="date" name="fecha" id="fecha" class="form-control">
+                                            <input type="date" name="fecha" id="fecha" value="{{ $fecha_hoy }}" class="form-control">
                                         </div>
                                     </div>
 

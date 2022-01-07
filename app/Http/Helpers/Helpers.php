@@ -16,6 +16,7 @@ use App\Compras\Detalle;
 use App\Compras\Orden;
 use App\Compras\Documento\Documento;
 use App\Compras\Proveedor;
+use App\Configuracion\Configuracion;
 use App\Mantenimiento\Colaborador\Colaborador;
 use App\Mantenimiento\Empresa\Empresa;
 //Bitacora de actividades
@@ -1248,6 +1249,16 @@ if (!function_exists('generarCodigo')) {
         return $key;
     }
 }
+
+if (!function_exists('CEC')) {
+    function CEC()
+    {
+        $config = Configuracion::where('slug', 'CEC')->first();
+        return $config->propiedad;
+    }
+}
+
+
 
 
 

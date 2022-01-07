@@ -23,7 +23,7 @@
             <div class="ibox">
                 <div class="ibox-content">
                     <div class="row align-items-end">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="" class="required">Cliente</label>
                                 <select name="cliente_b" id="cliente_b" class="select2_form form-control">
@@ -46,8 +46,14 @@
                         </div>
                         <div class="col-md-2">
                             <div class="form-group">
-                                <button class="btn btn-primary" id="btn_buscar" type="button"><i
+                                <button class="btn btn-primary btn-block" id="btn_buscar" type="button"><i
                                     class="fa fa-search"></i> Buscar</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <button class="btn btn-danger btn-block" id="btn_pdf" type="button"><i
+                                    class="fa fa-file-pdf-o"></i> PDF</button>
                             </div>
                         </div>
                     </div>
@@ -243,6 +249,32 @@
         })
 
     });
+
+    $("#btn_pdf").on('click', function() {
+        var cliente = $("#cliente_b").val();
+        var estado = $("#estado_b").val();
+
+        let enviar = true;
+
+        if(cliente == null || cliente == '')
+        {
+            toastr.error("Seleccionar cliente","Error")
+            enviar = false;
+        }
+
+        if(estado == null || estado == '')
+        {
+            toastr.error("Seleccionar estado","Error")
+            enviar = false;
+        }
+
+        if(enviar)
+        {
+            var url_open_pdf = '/cuentaCliente/detalle?id='+cliente+'&estado='+estado;
+            window.open(url_open_pdf,'Informe SISCOM','location=1, status=1, scrollbars=1,width=900, height=600');
+        }
+    });
+
     $(document).on('click', '.btn-detalle', function(e) {
         var id = $(this).data('id');
         axios.get("{{ route('cuentaCliente.getDatos') }}", {
