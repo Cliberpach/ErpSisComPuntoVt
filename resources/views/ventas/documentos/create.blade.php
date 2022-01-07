@@ -195,7 +195,7 @@
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }}>
+                                                        {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
                                                 @endforeach
@@ -1056,6 +1056,22 @@
     function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
+        $.ajax({
+            dataType: 'json',
+            type: 'post',
+            url: '{{ route('ventas.documento.devolver.cantidades') }}',
+            data: {
+                '_token': $('input[name=_token]').val(),
+                'cantidades': $('#productos_tabla').val(),
+            }
+        }).done(function(result) {
+            alert('DEVOLUCION REALIZADA')
+        });
+    }
+
+    /*function devolverCantidades() {
+        //CARGAR PRODUCTOS PARA DEVOLVER LOTE
+        cargarProductos()
         return $.ajax({
             dataType: 'json',
             type: 'post',
@@ -1066,7 +1082,7 @@
             },
             async: true
         }).responseText();
-    }
+    }*/
 
     function sumaTotal() {
         var t = $('.dataTables-detalle-documento').DataTable();
@@ -1286,18 +1302,6 @@
                 $('#tipo_pago_id').val('');
                 enviarVenta();
             }
-            /*if(convertFloat(forma_pago) === 161)
-            {
-                $('#importe_form').val(0.00);
-                $('#efectivo_form').val(0.00);
-                $('#tipo_pago_id').val('');
-                enviarVenta();
-            }
-            else
-            {
-                $('#modal_pago').modal('show');
-                $('#modo_pago').val('1-EFECTIVO').trigger('change.select2');
-            }*/
         }
     });
 
@@ -1745,18 +1749,19 @@
 
     /*window.onbeforeunload = () => {
         while (true) {
+            console.log($('#asegurarCierre').val())
             if ($('#asegurarCierre').val() == 1) {
                 devolverCantidades()
             }
             else
             {
+                //location = "{{ route('ventas.documento.index') }}";
                 return true;
             }
         }
         return null;
     }*/
     window.onbeforeunload = function() {
-        //DEVOLVER CANTIDADES
         if ($('#asegurarCierre').val() == 1) {
             devolverCantidades()
         }
