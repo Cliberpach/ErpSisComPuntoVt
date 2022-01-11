@@ -412,10 +412,18 @@ class NotaController extends Controller
         $data = pdfNotaapi($nota_json);
 
         $name = $nota->serie.'-'.$nota->correlativo.'.pdf';
-        $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'.DIRECTORY_SEPARATOR.$name);
+
+        if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'))) {
+            mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'));
+        }
+
         if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'))) {
             mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'));
         }
+
+        $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'.DIRECTORY_SEPARATOR.$name);
+
+        file_put_contents($pathToFile, $data);
 
         if($nota->ruta_qr === null)
         {
