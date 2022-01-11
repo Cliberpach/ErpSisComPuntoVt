@@ -291,7 +291,7 @@
         <div class="info-total-qr">
             <table class="tbl-qr">
                 <tr>
-                    <td style="width: 60%">
+                    <td style="width: 50%">
                         <table class="tbl-qr">
                             <tr>
                                 <td>
@@ -302,7 +302,7 @@
                             </tr>
                         </table>
                     </td>
-                    <td style="width: 40%;">
+                    <td style="width: 50%;">
                         <table class="tbl-total text-uppercase">
                             <tr>
                                 <td style="text-align:left; padding: 5px;"><p class="m-0 p-0">Saldo: S/.</p></td>
