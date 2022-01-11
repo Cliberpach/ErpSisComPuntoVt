@@ -436,11 +436,11 @@ class NotaController extends Controller
 
             $name_qr = $nota->serie."-".$nota->correlativo.'.svg';
 
-            $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
-
             if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'))) {
                 mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'));
             }
+
+            $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
 
             file_put_contents($pathToFile_qr, $data_qr);
 
@@ -478,6 +478,10 @@ class NotaController extends Controller
         $legends = json_decode($legends,true);
 
         $name = 'NOTA-'.$nota->id;
+
+        if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'))) {
+            mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'));
+        }
 
         if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'))) {
             mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'comprobantessiscom'.DIRECTORY_SEPARATOR.'notas'));
@@ -639,11 +643,15 @@ class NotaController extends Controller
                             $data_comprobante = pdfNotaapi(json_encode($arreglo_nota));
                             $name = $existe->get('numeracion')->serie."-".$nota->correlativo.'.pdf';
 
-                            $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'.DIRECTORY_SEPARATOR.$name);
+                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
+                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                            }
 
                             if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'))) {
                                 mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'));
                             }
+
+                            $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'.DIRECTORY_SEPARATOR.$name);
 
                             /*************************************** */
                             $arreglo_qr = array(
@@ -662,11 +670,10 @@ class NotaController extends Controller
 
                             $name_qr = $nota->serie."-".$nota->correlativo.'.svg';
 
-                            $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
-
                             if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'))) {
                                 mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'));
                             }
+                            $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
 
                             file_put_contents($pathToFile_qr, $data_qr);
                             /*************************************** */
@@ -821,11 +828,15 @@ class NotaController extends Controller
                     $data_comprobante = pdfNotaapi(json_encode($arreglo_nota));
                     $name = $nota->serie."-".$nota->correlativo.'.pdf';
 
-                    $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'.DIRECTORY_SEPARATOR.$name);
+                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
+                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                    }
 
                     if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'))) {
                         mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'));
                     }
+
+                    $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'.DIRECTORY_SEPARATOR.$name);
 
                     /*************************************** */
                     $arreglo_qr = array(
@@ -844,11 +855,15 @@ class NotaController extends Controller
 
                     $name_qr = $nota->serie."-".$nota->correlativo.'.svg';
 
-                    $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
+                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
+                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                    }
 
                     if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'))) {
                         mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'));
                     }
+
+                    $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
 
                     file_put_contents($pathToFile_qr, $data_qr);
                     /*************************************** */
