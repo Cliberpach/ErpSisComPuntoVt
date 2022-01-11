@@ -305,7 +305,7 @@ $(document).ready(function() {
                         cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }
 
-                    if((data.sunat == '1' || data.notas > 0))
+                    if((data.sunat == '1' || data.notas > 0) && data.tipo_venta_id != 129)
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>" ;

@@ -38,9 +38,9 @@ class DocumentoController extends Controller
         $this->authorize('haveaccess','documento_compra.index');
         $documentos = Documento::where('estado','!=','ANULADO')->get();
         $coleccion = collect([]);
-        foreach($documentos as $documento){
-            $detalles = DocumentoDetalle::where('documento_id',$documento->id)->get();
-            $documento = Documento::findOrFail($documento->id);
+        foreach($documentos as $doc){
+            $detalles = DocumentoDetalle::where('documento_id',$doc->id)->get();
+            $documento = Documento::findOrFail($doc->id);
             $subtotal = 0;
             $igv = '';
             $tipo_moneda = '';
