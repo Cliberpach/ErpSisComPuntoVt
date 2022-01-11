@@ -33,7 +33,7 @@ class CuentaProveedorController extends Controller
                 "numero_doc"=>$value->documento->numero_doc,
                 "fecha_doc"=>strval($value->documento->created_at) ,
                 "monto"=>$value->documento->total,
-                "acta"=>number_format(round($value->monto - $value->saldo, 2), 2),
+                "acta"=>number_format(round($value->documento->total - $value->saldo, 2), 2),
                 "saldo"=>$value->saldo,
                 "estado"=>$value->estado
             ));
