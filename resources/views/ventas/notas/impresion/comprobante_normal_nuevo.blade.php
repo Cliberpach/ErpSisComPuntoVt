@@ -193,7 +193,7 @@
                     @else
                     <img src="{{ public_path() . '/img/default.png' }}" class="img-fluid">
                     @endif
-                    
+
                 </div>
             </div>
             <div class="empresa">
@@ -323,12 +323,14 @@
                                     <p class="m-0 p-0" style="font-size: 9px;">{{ $nota->hash }}</p>
                                     @endif
                                 </td>
+                                @if ($empresa->conficion == 1)
                                 <td>
                                     <p class="m-0 p-0" style="color: #229954;"><em>¡¡Gracias por su confianza y preferencia!!</em></p><br>
                                     <div style="width: 90%; text-align: right;">
                                         <img src="{{ public_path() . '/img/gota.png' }}" style="width: 50px;height: 45px;">
                                     </div>
                                 </td>
+                                @endif
                             </tr>
                         </table>
                     </td>

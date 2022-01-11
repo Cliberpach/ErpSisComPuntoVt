@@ -34,7 +34,8 @@ class Empresa extends Model
         'web',
         'facebook',
         'instagram',
-        
+
+        'condicion',
         'estado_fe',
     ];
 
