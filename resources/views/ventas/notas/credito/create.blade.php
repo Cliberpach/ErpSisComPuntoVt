@@ -696,10 +696,6 @@
                 object[key] = value;
             });
 
-            console.log(object);
-
-            //var json = JSON.stringify(object);
-
             var datos = object;
             var init = {
                 // el método de envío de la información será POST
@@ -755,9 +751,9 @@
                         let id = result.value.nota_id;
                         @if(isset($nota_venta))
                         toastr.success('Nota de devolución creada!','Exito')
-                        let url_open_pdf = '{{ route("ventas.notas_dev.show", ":id")}}';
-                        url_open_pdf = url_open_pdf.replace(':id',id);
-                        window.open(url_open_pdf, "Comprobante SISCOM", "width=900, height=600");
+                        // let url_open_pdf = '{{ route("ventas.notas_dev.show", ":id")}}';
+                        // url_open_pdf = url_open_pdf.replace(':id',id);
+                        // window.open(url_open_pdf, "Comprobante SISCOM", "width=900, height=600");
                         @else
                         toastr.success('Nota de crédito creada!','Exito')
                         let url_open_pdf = '{{ route("ventas.notas.show", ":id")}}';
