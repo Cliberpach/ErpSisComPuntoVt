@@ -1053,7 +1053,7 @@
         });
     }
     //DEVOLVER CANTIDADES A LOS LOTES
-    function devolverCantidades() {
+    /*function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
         $.ajax({
@@ -1067,11 +1067,12 @@
         }).done(function(result) {
             alert('DEVOLUCION REALIZADA')
         });
-    }
+    }*/
 
-    /*function devolverCantidades() {
+    function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
+
         return $.ajax({
             dataType: 'json',
             type: 'post',
@@ -1082,7 +1083,7 @@
             },
             async: true
         }).responseText();
-    }*/
+    }
 
     function sumaTotal() {
         var t = $('.dataTables-detalle-documento').DataTable();
@@ -1529,19 +1530,9 @@
                             newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
                         }
                         $('#cliente_id').append(newOption).trigger('change');
-                        //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
                     }
-                    // $('#cliente_id').val($('#cliente_id option:first-child').val()).trigger('change');
-                    // //$('#cliente_id').prop("disabled", false);
-                    // var clientes = '<option value="" selected disabled >SELECCIONAR</option>'
-                    // for (var i = 0; i < data.clientes.length; i++)
-                    //     clientes += '<option value="' + data.clientes[i].id + '">' + data.clientes[i]
-                    //     .tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i]
-                    //     .nombre + '</option>';
 
                 } else {
-                    //$('#cliente_id').val($('#cliente_id option:first-child').val()).trigger('change');
-                    //$('#cliente_id').prop("disabled", true);
                     toastr.error('Clientes no encontrados.', 'Error');
                 }
 
@@ -1563,6 +1554,7 @@
                 },
                 success: function(cliente) {
                     $('#buscarLotes').prop("disabled", false)
+                    $("#cliente_id option[value='"+cliente.id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
                     obtenerLotesproductos(cliente.tabladetalles_id)
                 },
             })
@@ -1747,24 +1739,34 @@
 
 <script>
 
-    /*window.onbeforeunload = () => {
-        while (true) {
-            console.log($('#asegurarCierre').val())
-            if ($('#asegurarCierre').val() == 1) {
+    window.onbeforeunload = () => {
+        if ($('#asegurarCierre').val() == 1) {
+            while (true) {
                 devolverCantidades()
             }
-            else
-            {
-                //location = "{{ route('ventas.documento.index') }}";
-                return true;
-            }
         }
-        return null;
-    }*/
-    window.onbeforeunload = function() {
+    }
+    /*window.onbeforeunload = function() {
         if ($('#asegurarCierre').val() == 1) {
             devolverCantidades()
         }
-    };
+    };*/
+
+
+    /*
+    function request() {
+        return $.ajax({
+            type: "GET",
+            url: "http://localhost:3030/" + Date.now(),
+            async: true
+        }).responseText;
+    }
+    window.onbeforeunload = () => {
+        while (true) {
+            request();
+        }
+        return null;
+    }
+    */
 </script>
 @endpush

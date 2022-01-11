@@ -134,298 +134,307 @@
 <script src="{{asset('Inspinia/js/plugins/dataTables/datatables.min.js')}}"></script>
 <script>
 
+    function obtenerLotesproductos(tipo_cliente) {
+        //RUTA LOTES PRODUCTOS
+        var url = '{{ route("ventas.getLot", ":id")}}';
+        url = url.replace(':id', tipo_cliente);
+        //ELIMINAR EL DATATABLE PARA VOLVER A INSTANCIARLO
+        $(".dataTables-lotes").dataTable().fnDestroy();
+        //INSTANCIAR DATATABLE
+        var lotes = $('.dataTables-lotes').DataTable({
+            "dom":
+                    "<'row'<'col-sm-12 col-md-12 col-lg-12'f>>" +
+                    "<'row'<'col-sm-12'tr>>"+
+                    "<'row justify-content-between'<'col information-content p-0'i><''p>>",
 
-function obtenerLotesproductos(tipo_cliente) {
-    //RUTA LOTES PRODUCTOS
-    var url = '{{ route("ventas.getLot", ":id")}}';
-    url = url.replace(':id', tipo_cliente);
-    //ELIMINAR EL DATATABLE PARA VOLVER A INSTANCIARLO
-    $(".dataTables-lotes").dataTable().fnDestroy();
-    //INSTANCIAR DATATABLE
-    var lotes = $('.dataTables-lotes').DataTable({
-        "dom":
-                "<'row'<'col-sm-12 col-md-12 col-lg-12'f>>" +
-                "<'row'<'col-sm-12'tr>>"+
-                "<'row justify-content-between'<'col information-content p-0'i><''p>>",
-
-        "bPaginate": true,
-        "serverSide":true,
-        "processing":true,
-        "ajax": url,
-        "columns": [
-            {data: 'id', className: "text-center", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
-            {data: 'nombre', className: "text-left", name:"productos.nombre", sWidth: '35%' },
-            {data: 'unidad_producto', className: "text-center", name:"tabladetalles.simbolo", sWidth: '5%' },
-            {data: 'codigo_lote', className: "text-center", name:"lote_productos.codigo_lote",visible: false, sWidth: '15%' },
-            {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento",visible: false, sWidth: '5%' },
-            {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
-            {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
-            {
-                data: null,
-                className: "text-center",
-                name:"compra_documento_detalles.precio_mas_igv_soles",
-                sWidth: '10%',
-                render: function(data) {
-                    if (data.precio_compra == null) {
-                        let cambio = $('#dolar').val();
-                        let precio = 0;
-                        var precio_ = data.precio_ingreso;
-                        let porcentaje = 0;
-                        let porcentaje_ = data.porcentaje_normal;
-                        let precio_nuevo = 0;
-                        if(data.moneda_compra == 'DOLARES')
-                        {
-                            precio = precio_ * cambio;
-                            precio_nuevo = precio * (1 + (porcentaje_ / 100))
-                        }
-                        else
-                        {
-                            precio = precio_;
-                            precio_nuevo = precio * (1 + (porcentaje_ / 100))
-                        }
-                        return convertFloat(precio_nuevo).toFixed(2);
-                    }else{
-                        let cambio = $('#dolar').val();
-                        let precio = 0;
-                        var precio_ = data.precio_compra;
-                        let porcentaje = 0;
-                        let porcentaje_ = data.porcentaje_normal;
-                        let precio_nuevo = 0;
-                        if(data.moneda_compra == 'DOLARES')
-                        {
-                            if(data.igv_compra == 1)
+            "bPaginate": true,
+            "serverSide":true,
+            "processing":true,
+            "ajax": url,
+            "columns": [
+                {data: 'id', className: "text-center", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
+                {data: 'nombre', className: "text-left", name:"productos.nombre", sWidth: '35%' },
+                {data: 'unidad_producto', className: "text-center", name:"tabladetalles.simbolo", sWidth: '5%' },
+                {data: 'codigo_lote', className: "text-center", name:"lote_productos.codigo_lote",visible: false, sWidth: '15%' },
+                {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento",visible: false, sWidth: '5%' },
+                {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
+                {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
+                {
+                    data: null,
+                    className: "text-center",
+                    name:"compra_documento_detalles.precio_mas_igv_soles",
+                    sWidth: '10%',
+                    render: function(data) {
+                        if (data.precio_compra == null) {
+                            let cambio = $('#dolar').val();
+                            let precio = 0;
+                            var precio_ = data.precio_ingreso;
+                            let porcentaje = 0;
+                            let porcentaje_ = data.porcentaje_normal;
+                            let precio_nuevo = 0;
+                            if(data.moneda_compra == 'DOLARES')
                             {
                                 precio = precio_ * cambio;
                                 precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
                             else
                             {
-                                precio = (precio_ * cambio * 1.18)
-                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
-                            }
-                        }
-                        else
-                        {
-                            if(data.igv_compra == 1)
-                            {
                                 precio = precio_;
                                 precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
+                            return convertFloat(precio_nuevo).toFixed(2);
+                        }else{
+                            let cambio = $('#dolar').val();
+                            let precio = 0;
+                            var precio_ = data.precio_compra;
+                            let porcentaje = 0;
+                            let porcentaje_ = data.porcentaje_normal;
+                            let precio_nuevo = 0;
+                            if(data.moneda_compra == 'DOLARES')
+                            {
+                                if(data.igv_compra == 1)
+                                {
+                                    precio = precio_ * cambio;
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
+                                else
+                                {
+                                    precio = (precio_ * cambio * 1.18)
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
+                            }
                             else
                             {
-                                precio = (precio_ * 1.18)
-                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                if(data.igv_compra == 1)
+                                {
+                                    precio = precio_;
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
+                                else
+                                {
+                                    precio = (precio_ * 1.18)
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
                             }
+                            return convertFloat(precio_nuevo).toFixed(2);
                         }
-                        return convertFloat(precio_nuevo).toFixed(2);
                     }
-                }
-            },
-            {
-                data: null,
-                className: "text-center",
-                name:"compra_documento_detalles.precio_mas_igv_soles",
-                sWidth: '10%',
-                render: function(data) {
-                    if (data.precio_compra == null) {
-                        let cambio = $('#dolar').val();
-                        let precio = 0;
-                        var precio_ = data.precio_ingreso;
-                        let porcentaje_ = data.porcentaje_distribuidor;
-                        let precio_nuevo = 0;
-                        if(data.moneda_compra == 'DOLARES')
-                        {
-                            precio = precio_ * cambio;
-                            precio_nuevo = precio * (1 + (porcentaje_ / 100))
-                        }
-                        else
-                        {
-                            precio = precio_;
-                            precio_nuevo = precio * (1 + (porcentaje_ / 100))
-                        }
-                        return convertFloat(precio_nuevo).toFixed(2);
-                    }else{
-                        let cambio = $('#dolar').val();
-                        let precio = 0;
-                        var precio_ = data.precio_compra;
-                        let porcentaje = 0;
-                        let porcentaje_ = data.porcentaje_distribuidor;
-                        let precio_nuevo = 0;
-                        if(data.moneda_compra == 'DOLARES')
-                        {
-                            if(data.igv_compra == 1)
+                },
+                {
+                    data: null,
+                    className: "text-center",
+                    name:"compra_documento_detalles.precio_mas_igv_soles",
+                    sWidth: '10%',
+                    render: function(data) {
+                        if (data.precio_compra == null) {
+                            let cambio = $('#dolar').val();
+                            let precio = 0;
+                            var precio_ = data.precio_ingreso;
+                            let porcentaje_ = data.porcentaje_distribuidor;
+                            let precio_nuevo = 0;
+                            if(data.moneda_compra == 'DOLARES')
                             {
                                 precio = precio_ * cambio;
                                 precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
                             else
                             {
-                                precio = (precio_ * cambio * 1.18)
-                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
-                            }
-                        }
-                        else
-                        {
-                            if(data.igv_compra == 1)
-                            {
                                 precio = precio_;
                                 precio_nuevo = precio * (1 + (porcentaje_ / 100))
                             }
+                            return convertFloat(precio_nuevo).toFixed(2);
+                        }else{
+                            let cambio = $('#dolar').val();
+                            let precio = 0;
+                            var precio_ = data.precio_compra;
+                            let porcentaje = 0;
+                            let porcentaje_ = data.porcentaje_distribuidor;
+                            let precio_nuevo = 0;
+                            if(data.moneda_compra == 'DOLARES')
+                            {
+                                if(data.igv_compra == 1)
+                                {
+                                    precio = precio_ * cambio;
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
+                                else
+                                {
+                                    precio = (precio_ * cambio * 1.18)
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
+                            }
                             else
                             {
-                                precio = (precio_ * 1.18)
-                                precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                if(data.igv_compra == 1)
+                                {
+                                    precio = precio_;
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
+                                else
+                                {
+                                    precio = (precio_ * 1.18)
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                }
                             }
+                            return convertFloat(precio_nuevo).toFixed(2);
                         }
-                        return convertFloat(precio_nuevo).toFixed(2);
                     }
-                }
-            },
-            @if ($fullaccess)
-            {
-                data: null,
-                className: "text-center",
-                name:"compra_documento_detalles.precio_mas_igv_soles",
-                sWidth: '5%',
-                render: function(data) {
-                    if (data.precio_mas_igv_soles == null) {
-                        return data.precio_ingreso;
-                    }else{
-                        return convertFloat(data.precio_mas_igv_soles).toFixed(2);
+                },
+                @if ($fullaccess)
+                {
+                    data: null,
+                    className: "text-center",
+                    name:"compra_documento_detalles.precio_mas_igv_soles",
+                    sWidth: '5%',
+                    render: function(data) {
+                        if (data.precio_mas_igv_soles == null) {
+                            return data.precio_ingreso;
+                        }else{
+                            return convertFloat(data.precio_mas_igv_soles).toFixed(2);
+                        }
                     }
-                }
+                },
+                @endif
+            ],
+            "bLengthChange": true,
+            "bFilter": true,
+            "order": [],
+            "bInfo": true,
+            'bAutoWidth': false,
+            "language": {
+                        "url": "{{asset('Spanish.json')}}"
             },
-            @endif
-        ],
-        "bLengthChange": true,
-        "bFilter": true,
-        "order": [],
-        "bInfo": true,
-        'bAutoWidth': false,
-        "language": {
-                    "url": "{{asset('Spanish.json')}}"
-        },
-        createdRow: function(row, data, dataIndex, cells) {
-            $(row).addClass('fila_lote');
-            $(row).attr('data-href', "");
-        },
+            createdRow: function(row, data, dataIndex, cells) {
+                $(row).addClass('fila_lote');
+                $(row).attr('data-href', "");
+            },
 
 
-    });
-}
+        });
+    }
 
-$(document).ready(function() {
+    $(document).ready(function() {
 
-    $('buttons-html5').removeClass('.btn-default');
-    $('#table_lotes_wrapper').removeClass('');
+        $('buttons-html5').removeClass('.btn-default');
+        $('#table_lotes_wrapper').removeClass('');
 
-    $('.dataTables-lotes tbody').on( 'click', 'tr', function () {
-            $('.dataTables-lotes').DataTable().$('tr.selected').removeClass('selected');
-            $(this).addClass('selected');
-    } );
+        $('.dataTables-lotes tbody').on( 'click', 'tr', function () {
+                $('.dataTables-lotes').DataTable().$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+        } );
 
-    //DOBLE CLICK EN LOTES
-    $ ('.dataTables-lotes'). on ('dblclick', 'tbody td', function () {
-        var lote =  $('.dataTables-lotes').DataTable();
-        var data = lote.row(this).data();
-        console.log(data)
-        ingresarProducto(data)
-    });
+        //DOBLE CLICK EN LOTES
+        $ ('.dataTables-lotes'). on ('dblclick', 'tbody td', function () {
+            var lote =  $('.dataTables-lotes').DataTable();
+            var data = lote.row(this).data();
+            console.log(data)
+            ingresarProducto(data)
+        });
 
-})
+    })
 
-function ingresarProducto(producto) {
-    //LIMPIAR ERRORES AL INGRESAR PRODUCTO LOTE
-    limpiarErrores()
-    //HABILITAR CAMPOS DEL PRODUCTO
-    $('#precio').prop('disabled' , false)
-    $('#cantidad').prop('disabled' , false)
-    $('#btn_agregar_detalle').prop('disabled' , false)
-    //INGRESAR DATOS DEL PRODUCTO A LOS CAMPOS
-    $('#precio').val(evaluarPrecioigv(producto))
-    $('#cantidad').val(producto.cantidad_logica)
-    $('#producto_unidad').val(producto.unidad_producto)
-    $('#producto_id').val(producto.id)
-    $('#producto_lote').val(producto.nombre+' - '+ producto.codigo_lote)
-    //AGREGAR LIMITE A LA CANTIDAD SEGUN EL LOTE SELECCIONADO
-    $("#cantidad").attr({
-        "max" : producto.cantidad_logica,
-        "min" : 1,
-    });
-    $("#precio").attr({
-        "min" : 1,
-    });
-    document.getElementById('cantidad').focus()
-    setTimeout(function() { $('input[name="cantidad"]').focus() }, 10);
-    //LIMPIAR MODAL
-    limpiarModallote()
-}
+    function ingresarProducto(producto) {
+        //LIMPIAR ERRORES AL INGRESAR PRODUCTO LOTE
+        limpiarErrores()
+        //HABILITAR CAMPOS DEL PRODUCTO
+        $('#precio').prop('disabled' , false)
+        $('#cantidad').prop('disabled' , false)
+        $('#btn_agregar_detalle').prop('disabled' , false)
+        //INGRESAR DATOS DEL PRODUCTO A LOS CAMPOS
+        $('#precio').val(evaluarPrecioigv(producto))
+        $('#cantidad').val(producto.cantidad_logica)
+        $('#producto_unidad').val(producto.unidad_producto)
+        $('#producto_id').val(producto.id)
+        $('#producto_lote').val(producto.nombre+' - '+ producto.codigo_lote)
+        //AGREGAR LIMITE A LA CANTIDAD SEGUN EL LOTE SELECCIONADO
+        $("#cantidad").attr({
+            "max" : producto.cantidad_logica,
+            "min" : 1,
+        });
+        $("#precio").attr({
+            "min" : 1,
+        });
+        document.getElementById('cantidad').focus()
+        setTimeout(function() { $('input[name="cantidad"]').focus() }, 10);
+        //LIMPIAR MODAL
+        limpiarModallote()
+    }
 
-function evaluarPrecioigv(producto) {
-    if (producto.precio_compra == null) {
-        let cambio = $('#dolar').val();
-        let precio = 0;
-        var precio_ = producto.precio_ingreso;
-        let porcentaje_ = producto.porcentaje;
-        let precio_nuevo = 0;
-        if(producto.moneda_compra == 'DOLARES')
-        {
-            precio = precio_ * cambio;
-            precio_nuevo = precio * (1 + (porcentaje_ / 100))
-        }
-        else
-        {
-            precio = precio_;
-            precio_nuevo = precio * (1 + (porcentaje_ / 100))
-        }
-        return convertFloat(precio_nuevo).toFixed(2);
-    }else{
-        let cambio = $('#dolar').val();
-        let precio = 0;
-        let precio_ = producto.precio_compra;
-        let porcentaje_ = producto.porcentaje;
-        let precio_nuevo = 0;
-        if(producto.moneda_compra == 'DOLARES')
-        {
-            if(producto.igv_compra == 1)
+    function evaluarPrecioigv(producto) {
+        if (producto.precio_compra == null) {
+            let cambio = $('#dolar').val();
+            let precio = 0;
+            var precio_ = producto.precio_ingreso;
+            let porcentaje_ = producto.porcentaje;
+            let precio_nuevo = 0;
+            if(producto.moneda_compra == 'DOLARES')
             {
                 precio = precio_ * cambio;
-                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                precio_nuevo = precio * (1 + (porcentaje_ / 100))
             }
             else
-            {
-                precio = (precio_ * cambio * 1.18)
-                precio_nuevo  = precio * (1 + porcentaje_ / 100)
-            }
-        }
-        else
-        {
-            if(producto.igv_compra == 1)
             {
                 precio = precio_;
-                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                precio_nuevo = precio * (1 + (porcentaje_ / 100))
+            }
+            return convertFloat(precio_nuevo).toFixed(2);
+        }else{
+            let cambio = $('#dolar').val();
+            let precio = 0;
+            let precio_ = producto.precio_compra;
+            let porcentaje_ = producto.porcentaje;
+            let precio_nuevo = 0;
+            if(producto.moneda_compra == 'DOLARES')
+            {
+                if(producto.igv_compra == 1)
+                {
+                    precio = precio_ * cambio;
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                }
+                else
+                {
+                    precio = (precio_ * cambio * 1.18)
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                }
             }
             else
             {
-                precio = (precio_ * 1.18)
-                precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                if(producto.igv_compra == 1)
+                {
+                    precio = precio_;
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                }
+                else
+                {
+                    precio = (precio_ * 1.18)
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                }
             }
+            return convertFloat(precio_nuevo).toFixed(2);
         }
-        return convertFloat(precio_nuevo).toFixed(2);
     }
-}
 
-function limpiarModallote() {
-    //ACTUALIZAR DATATABLE
-    $('.dataTables-lotes').DataTable().ajax.reload();
-    //CERRAR MODAL
-    $('#modal_lote').modal('hide');
-}
-//AL ABRIR EL MODAL SE DEBE DE ACTUALIZAR EL DATATABLE
-$('#modal_lote').on('show.bs.modal', function(e) {
-    //ACTUALIZAR DATATABLE
-    $('.dataTables-lotes').DataTable().ajax.reload();
-});
+    function limpiarModallote() {
+        //ACTUALIZAR DATATABLE
+        let cliente_id = $("#cliente_id option:selected").attr('tabladetalle_id')
+        obtenerLotesproductos(cliente_id)
+        setTimeout(function() {
+            $('div.dataTables_filter input').focus();
+        }, 10);
+        //7$('.dataTables-lotes').DataTable().ajax.reload();
+        //CERRAR MODAL
+        $('#modal_lote').modal('hide');
+    }
+    //AL ABRIR EL MODAL SE DEBE DE ACTUALIZAR EL DATATABLE
+    $('#modal_lote').on('show.bs.modal', function(e) {
+        //ACTUALIZAR DATATABLE
+        let cliente_id = $("#cliente_id option:selected").attr('tabladetalle_id')
+        obtenerLotesproductos(cliente_id)
+        setTimeout(function() {
+            $('div.dataTables_filter input').focus();
+        }, 10);
+        //$('.dataTables-lotes').DataTable().ajax.reload();
+    });
 
 
 </script>

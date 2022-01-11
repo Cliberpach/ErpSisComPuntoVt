@@ -309,11 +309,17 @@
 
 
 
-    $('#enviar_ingreso_mercaderia').submit(function(e) {
+    $('#enviar_ingresos').submit(function(e) {
         e.preventDefault();
-        var correcto = validarFecha()
-
-        if (correcto == false) {
+        let correcto = true;
+        cargarDetalle();
+        let detalles = JSON.parse($('#notadetalle_tabla').val());
+        if (detalles.length < 1) {
+            correcto = false;
+            toastr.error('El documento debe tener almenos un producto de ingreso.');
+        }
+        console.log(detalles.length);
+        if (correcto) {
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: 'btn btn-success',
@@ -332,7 +338,6 @@
                 cancelButtonText: "No, Cancelar",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    cargarDetalle();
                     this.submit();
                 } else if (
                     /* Read more about handling dismissals below */

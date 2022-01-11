@@ -83,7 +83,7 @@
             .numero-documento {
                 margin: 1px;
                 padding-top: 20px;
-                padding-bottom: 20px;                
+                padding-bottom: 20px;
                 border: 2px solid #52BE80;
                 font-size: 14px;
             }
@@ -114,7 +114,7 @@
 
             .informacion{
                 width: 100%;
-                position: relative;           
+                position: relative;
                 border: 2px solid #52BE80;
             }
 
@@ -125,8 +125,8 @@
 
             .cuerpo{
                 width: 100%;
-                position: relative; 
-                border: 1px solid red;     
+                position: relative;
+                border: 1px solid red;
             }
 
             .tbl-detalles {
@@ -195,7 +195,7 @@
                 <div class="empresa-info">
                     <p class="m-0 p-0 text-uppercase nombre-empresa">{{ DB::table('empresas')->count() == 0 ? 'SISCOM ' : DB::table('empresas')->first()->razon_social }}</p>
                     <p class="m-0 p-0 text-uppercase direccion-empresa">{{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->direccion_fiscal }}</p>
-                    
+
                     <p class="m-0 p-0 text-info-empresa">Central telefónica: {{ DB::table('empresas')->count() == 0 ? '-' : DB::table('empresas')->first()->telefono }}</p>
                     <p class="m-0 p-0 text-info-empresa">Email: {{ DB::table('empresas')->count() == 0 ? '-' : DB::table('empresas')->first()->correo }}</p>
                 </div>
@@ -295,10 +295,9 @@
                         <table class="tbl-qr">
                             <tr>
                                 <td>
-                                    <p class="m-0 p-0" style="color: #229954;"><em>¡¡Gracias por su confianza y preferencia!!</em></p>
-                                    <div style="width: 90%; text-align: right;">
-                                        <img src="{{ public_path() . '/img/gota.png' }}" style="width: 50px;height: 45px;">
-                                    </div>
+                                    @foreach($empresa->bancos as $banco)
+                                        <p class="m-0 p-0 text-cuerpo"><b class="text-uppercase">{{ $banco->descripcion}}</b> {{ $banco->tipo_moneda}} <b>N°: </b> {{ $banco->num_cuenta}} <b>CCI:</b> {{ $banco->cci}}</p>
+                                    @endforeach
                                 </td>
                             </tr>
                         </table>

@@ -55,7 +55,7 @@ class Producto extends Model
     }
     public function tabladetalle()
     {
-        return $this->belongsTo('App\Mantenimiento\Tabla\detalle','medida');
+        return $this->belongsTo('App\Mantenimiento\Tabla\Detalle','medida');
     }
     public function getMedida(): string
     {

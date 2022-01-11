@@ -1722,7 +1722,7 @@ class DocumentoController extends Controller
             //$lote->cantidad =  $lote->cantidad_logica;
             $lote->estado = '1';
             $lote->update();
-            $mensaje = 'Cantidad devuelta';
+            $mensaje = true;
         };
 
         return $mensaje;

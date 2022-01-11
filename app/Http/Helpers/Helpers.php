@@ -1194,7 +1194,7 @@ if (!function_exists('utilidad_mensual')) {
                     "precio_venta" => $detalle->precio_nuevo,
                     "precio_compra" => number_format($precom, 2),
                     "utilidad" => number_format($detalle->precio_nuevo - $precom,2),
-                    "importe" => number_format(($detalle->precio_nuevo - $precom) * $detalle->cantidad, 2)
+                    "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
                 ]);
             }
         }

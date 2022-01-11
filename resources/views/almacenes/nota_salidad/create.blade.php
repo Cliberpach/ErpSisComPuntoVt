@@ -235,7 +235,7 @@ $('#enviar_nota_salida').submit(function(e) {
     let detalles = JSON.parse($('#notadetalle_tabla').val());
     if (detalles.length < 1) {
         correcto = false;
-        toastr.error('El documento de venta debe tener almenos un producto de salida.');
+        toastr.error('El documento debe tener almenos un producto de salida.');
     }
     console.log(detalles.length);
     if (correcto) {

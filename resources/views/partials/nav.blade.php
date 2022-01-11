@@ -220,6 +220,7 @@
         @can('haveaccess', 'tabla.index')
         <li class="@yield('tablas-active')"><a href="{{ route('mantenimiento.tabla.general.index') }}">Tablas Generales</a></li>
         @endcan
+        <li class="@yield('configuracion-active')"><a href="{{ route('configuracion.index') }}">Configuración</a></li>
     </ul>
 </li>
 @endcan
