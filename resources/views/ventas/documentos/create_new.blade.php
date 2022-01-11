@@ -1054,24 +1054,7 @@
         });
     }
     //DEVOLVER CANTIDADES A LOS LOTES
-    //DEVOLVER CANTIDADES A LOS LOTES
     function devolverCantidades() {
-        //CARGAR PRODUCTOS PARA DEVOLVER LOTE
-        cargarProductos()
-        $.ajax({
-            dataType: 'json',
-            type: 'post',
-            url: '{{ route('ventas.documento.devolver.cantidades') }}',
-            data: {
-                '_token': $('input[name=_token]').val(),
-                'cantidades': $('#productos_tabla').val(),
-            }
-        }).done(function(result) {
-            alert('DEVOLUCION REALIZADA')
-        });
-    }
-
-    /*function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
         return $.ajax({
@@ -1084,7 +1067,7 @@
             },
             async: true
         }).responseText();
-    }*/
+    }
 
     function sumaTotal() {
         var t = $('.dataTables-detalle-documento').DataTable();
@@ -1763,25 +1746,13 @@
 
 <script>
 
-    /*window.onbeforeunload = () => {
-        while (true) {
-            console.log($('#asegurarCierre').val())
-            if ($('#asegurarCierre').val() == 1) {
+    window.onbeforeunload = () => {
+        if ($('#asegurarCierre').val() == 1) {
+            while (true) {
                 devolverCantidades()
             }
-            else
-            {
-                //location = "{{ route('ventas.documento.index') }}";
-                return true;
-            }
         }
-        return null;
-    }*/
-    window.onbeforeunload = function() {
-        if ($('#asegurarCierre').val() == 1) {
-            devolverCantidades()
-        }
-    };
+    }
 
 </script>
 @endpush
