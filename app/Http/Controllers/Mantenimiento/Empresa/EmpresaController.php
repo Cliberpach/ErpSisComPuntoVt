@@ -99,7 +99,7 @@ class EmpresaController extends Controller
             'soap_usuario' => 'required_if:estado_fe,==,on',
             'soap_password' => 'required_if:estado_fe,==,on',
         ];
-        
+
         $message = [
             'ruc.required' => 'El campo Ruc es obligatorio.',
             'ruc.unique'=> 'El campo Ruc debe de ser campo único.',
@@ -134,14 +134,14 @@ class EmpresaController extends Controller
         $empresa->celular = $request->get('celular');
         $empresa->ubigeo = $request->get('ubigeo_empresa');
 
-        if($request->hasFile('logo')){                
+        if($request->hasFile('logo')){
             $file = $request->file('logo');
             $name = $file->getClientOriginalName();
             $empresa->nombre_logo = $name;
             $empresa->ruta_logo = $request->file('logo')->store('public/empresas/logos');
             $empresa->base64_logo = '-';//base64_encode( file_get_contents($request->file('logo')));
         }
-        
+
         $empresa->dni_representante = $request->get('dni_representante');
         $empresa->nombre_representante = $request->get('nombre_representante');
         $empresa->estado_dni_representante = $request->get('estado_dni_representante');
@@ -166,7 +166,7 @@ class EmpresaController extends Controller
             $contenidoImagen = file_get_contents($request->file('logo'));
 
             $empresa_facturacion = array(
-                "plan" => "free", 
+                "plan" => "free",
                 "environment" => "beta",
                 "sol_user" => $request->get('soap_usuario'),
                 "sol_pass" => $request->get('soap_password'),
@@ -227,7 +227,7 @@ class EmpresaController extends Controller
 
     public function destroy($id)
     {
-        
+
         $empresa = Empresa::findOrFail($id);
         $empresa->estado = 'ANULADO';
         $empresa->update();
@@ -238,14 +238,14 @@ class EmpresaController extends Controller
         eliminarRegistro($empresa, $descripcion , $gestion);
 
         $facturacion = Facturacion::where('empresa_id',$empresa->id)->where('estado','ACTIVO')->first();
-       
+
         if ($facturacion) {
-            
+
             $estado = borrarEmpresaapi($facturacion->fe_id);
 
             $facturacion->estado = 'ANULADO';
             $facturacion->update();
-    
+
             if ($estado != '200') {
                 // Session::flash('success','Empresa eliminado (Error en eliminacion del certificado)');
                 // return redirect()->route('mantenimiento.empresas.index')->with('eliminar', 'success');
@@ -259,7 +259,7 @@ class EmpresaController extends Controller
             }else{
                 // Session::flash('success','Empresa eliminado.');
                 // return redirect()->route('mantenimiento.empresas.index')->with('eliminar', 'success');
-                
+
                 return [
                     'success' => true,
                     'eliminar' => 'success',
@@ -300,7 +300,7 @@ class EmpresaController extends Controller
     public function edit($id)
     {
         $empresa = Empresa::findOrFail($id);
-        
+
         $numeraciones = Numeracion::where('empresa_id',$id)->where('estado','ACTIVO')->get();
         $facturacion = Facturacion::where('empresa_id',$empresa->id)->where('estado','ACTIVO')->first();
         $banco = EmpresaBanco::where('empresa_id',$id)->where('estado','ACTIVO')->get();
@@ -308,7 +308,7 @@ class EmpresaController extends Controller
         $monedas = tipos_moneda();
         return view('mantenimiento.empresas.edit', [
             'empresa' => $empresa ,
-            'bancos' => $bancos, 
+            'bancos' => $bancos,
             'monedas' => $monedas,
             'banco' => $banco,
             'facturacion' => $facturacion,
@@ -346,7 +346,7 @@ class EmpresaController extends Controller
             'soap_password' => 'required_if:estado_fe,==,1',
 
         ];
-        
+
         $message = [
             'ruc.required' => 'El campo Ruc es obligatorio.',
             'ruc.unique'=> 'El campo Ruc debe de ser campo único.',
@@ -385,10 +385,10 @@ class EmpresaController extends Controller
         $empresa->correo = $request->get('correo');
         $empresa->condicion = $request->get('condicion');
 
-       
+
         if($request->hasFile('logo')){
             //Eliminar Archivo anterior
-            Storage::delete($empresa->ruta_logo);               
+            Storage::delete($empresa->ruta_logo);
             //Agregar nuevo archivo
             $file = $request->file('logo');
             $name = $file->getClientOriginalName();
@@ -430,7 +430,7 @@ class EmpresaController extends Controller
             if($request->hasFile('logo')){
                 $contenidoImagen = file_get_contents($request->file('logo'));
                 $empresa_facturacion = array(
-                    "plan" => "free", 
+                    "plan" => "free",
                     "environment" => "beta",
                     "sol_user" => $request->get('soap_usuario'),
                     "sol_pass" => $request->get('soap_password'),
@@ -443,7 +443,7 @@ class EmpresaController extends Controller
             }else{
                 if ($request->get('ruta_logo') != null ) {
                     $empresa_facturacion = array(
-                        "plan" => "free", 
+                        "plan" => "free",
                         "environment" => "beta",
                         "sol_user" => $request->get('soap_usuario'),
                         "sol_pass" => $request->get('soap_password'),
@@ -455,7 +455,7 @@ class EmpresaController extends Controller
                     );
                 }else{
                     $empresa_facturacion = array(
-                        "plan" => "free", 
+                        "plan" => "free",
                         "environment" => "beta",
                         "sol_user" => $request->get('soap_usuario'),
                         "sol_pass" => $request->get('soap_password'),
@@ -466,14 +466,14 @@ class EmpresaController extends Controller
                     );
                 }
             }
-        
+
 
             $json_empresa = json_encode($empresa_facturacion);
             //ENCONTRAR ID DE LA API
             $facturacion = Facturacion::where('empresa_id',$empresa->id)->where('estado','ACTIVO')->first();
-           
+
             if ($facturacion) {
-                
+
                 //MODIFICAR EMPRESA "FACTURACION ELECTRONICA"
 
                 //$facturado = json_decode((modificarEmpresaapi($json_empresa,$facturacion->fe_id)));
@@ -489,9 +489,9 @@ class EmpresaController extends Controller
                 $facturacion->ambiente = 'beta';
                 $facturacion->certificado =  $request->get('certificado_base');
                 $facturacion->update();
-            
+
             }else{
-              
+
                 //AGREGAR EMPRESA "FACTURACION ELECTRONICA"
                 //$agregar_api = json_decode((agregarEmpresaapi($json_empresa)));
                 //Facturacion Electronica (GUARDAR DATOS INGRESADO POR API)
@@ -510,7 +510,7 @@ class EmpresaController extends Controller
 
 
         }
-        
+
         // else{
 
         //     dd('sasa');
@@ -544,6 +544,10 @@ class EmpresaController extends Controller
                 $banco->delete();
             }
             foreach ($entidadtabla as $entidad) {
+                if(empty($entidad->itf))
+                {
+                    $entidad->itf = null;
+                }
                 EmpresaBanco::create([
                     'empresa_id' => $empresa->id,
                     'descripcion' => $entidad->entidad,
@@ -599,7 +603,7 @@ class EmpresaController extends Controller
             'message' =>  'Error',
         ];
     }
-    
+
     public function serie($id)
     {
         $tipos = tipos_venta();
@@ -615,7 +619,7 @@ class EmpresaController extends Controller
                     $empresas_numeracion = Numeracion::where('tipo_comprobante', $id)->where('estado','ACTIVO')->get();
                     $serie = $tipo->parametro.'00'.(count($empresas_numeracion)+1);
                     return $serie;
-                } 
+                }
             }
 
         }

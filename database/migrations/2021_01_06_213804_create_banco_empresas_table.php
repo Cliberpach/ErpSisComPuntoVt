@@ -19,11 +19,11 @@ class CreateBancoEmpresasTable extends Migration
             $table->foreign('empresa_id')
                   ->references('id')->on('empresas')
                   ->onDelete('cascade');
-            $table->string('descripcion');
-            $table->string('tipo_moneda');
-            $table->string('num_cuenta');
-            $table->string('cci');
-            $table->unsignedDecimal('itf', 15,2);
+            $table->longText('descripcion');
+            $table->longText('tipo_moneda');
+            $table->longText('num_cuenta');
+            $table->longText('cci');
+            $table->unsignedDecimal('itf', 15,2)->nullable();
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();
         });

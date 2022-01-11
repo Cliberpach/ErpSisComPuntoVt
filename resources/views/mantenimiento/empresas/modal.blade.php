@@ -53,20 +53,20 @@
                     </div>
 
                     <div class="form-group">
-                        
+
                         <label class="required" for="amount"># CCI</label>
                         <input type="text" id="entidad_cci" class="form-control">
                         <div class="invalid-feedback"><b><span id="error-entidad-cci"></span></b></div>
-                        
+
 
                     </div>
 
                     <div class="form-group">
-                        
-                        <label class="required" for="amount"># ITF</label>
+
+                        <label># ITF</label>
                         <input type="text" id="entidad_itf" class="form-control">
                         <div class="invalid-feedback"><b><span id="error-entidad-itf"></span></b></div>
-                        
+
 
                     </div>
 
@@ -146,20 +146,20 @@
                     </div>
 
                     <div class="form-group">
-                        
+
                         <label class="required" for="amount"># CCI</label>
                         <input type="text" id="modificar_entidad_cci" class="form-control">
                         <div class="invalid-feedback"><b><span id="error-modificar-entidad-cci"></span></b></div>
-                        
+
 
                     </div>
 
                     <div class="form-group">
-                        
-                        <label class="required" for="amount"># ITF</label>
+
+                        <label># ITF</label>
                         <input type="text" id="modificar_entidad_itf" class="form-control">
                         <div class="invalid-feedback"><b><span id="error-modificar-entidad-itf"></span></b></div>
-                        
+
 
                     </div>
 
@@ -229,7 +229,7 @@
 
 
             </div>
-            
+
 
 
             <div class="modal-footer">
@@ -245,7 +245,7 @@
                 </div>
             </div>
 
-            
+
         </div>
     </div>
 </div>
@@ -265,10 +265,10 @@
             <form role="form" id="formulario_comprobante_numero" method="post" name="formulario_comprobante_numero">
                 {{ csrf_field() }} {{method_field('POST')}}
                 <div class="modal-body">
-                
-                       
+
+
                         <div class="form-group">
-                            <label class="required">Tipo de Comprobante:</label> 
+                            <label class="required">Tipo de Comprobante:</label>
                             <select class="select2_form form-control" style="text-transform: uppercase; width:100%" name="tipo_comprobante" id="tipo_comprobante" required>
                                 <option></option>
                                 @foreach (tipos_venta() as $venta)
@@ -287,10 +287,10 @@
                                 <label class="required">Número a Iniciar :</label>
                                 <input type="number" name="numero_iniciar" id="numero_iniciar" class="form-control" required>
                             </div>
-                            
+
                         </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <div class="col-md-6 text-left" style="color:#fcbc6c">
                         <i class="fa fa-exclamation-circle"></i> <small>Los campos marcados con asterisco (<label class="required"></label>) son obligatorios.</small>
@@ -305,7 +305,7 @@
                 </div>
 
             </form>
-            
+
         </div>
     </div>
 </div>
@@ -376,13 +376,13 @@ $(".modificarEntidad").click(function() {
         $('#error-modificar-entidad-cci').text('El campo N° CCI es obligatorio.')
     }
 
-    if ($('#modificar_entidad_itf').val() == '') {
+    /*if ($('#modificar_entidad_itf').val() == '') {
         toastr.error('Ingrese el N° de ITF.', 'Error');
         enviar = true;
 
         $("#modificar_entidad_itf").addClass("is-invalid");
         $('#error-modificar-entidad-itf').text('El campo N° ITF es obligatorio.')
-    }
+    }*/
 
     if (enviar != true) {
         Swal.fire({
@@ -449,10 +449,10 @@ $('#entidad_itf , #modificar_entidad_itf').keyup(function(){
     var val = $(this).val();
     if(isNaN(val)){
         val = val.replace(/[^0-9\.]/g,'');
-        if(val.split('.').length>2) 
+        if(val.split('.').length>2)
             val =val.replace(/\.+$/,"");
     }
-    $(this).val(val); 
+    $(this).val(val);
 });
 
 function limpiarErrores() {
@@ -529,13 +529,13 @@ $(".agregarEntidad").click(function() {
     }
 
 
-    if ($('#entidad_itf').val() == '') {
+    /*if ($('#entidad_itf').val() == '') {
         toastr.error('Ingrese el N° de ITF.', 'Error');
         enviar = true;
 
         $("#entidad_itf").addClass("is-invalid");
         $('#error-entidad-itf').text('El campo N° ITF es obligatorio.')
-    }
+    }*/
 
     if (enviar != true) {
         const swalWithBootstrapButtons = Swal.mixin({
@@ -595,11 +595,11 @@ function buscarRegistro(entidad) {
     var existe = false;
     var t = $('.dataTables-bancos').DataTable();
     t.rows().data().each(function(el, index) {
-        if (el[1] == entidad.descripcion && el[2] == entidad.moneda) {
+        if (el[1] == entidad.descripcion && el[2] == entidad.moneda && el[3] == entidad.cuenta && el[4] == entidad.cci && el[5] == entidad.itf) {
             existe = true
             toastr.error('Entidad Bancaria ya se encuentra registrada.', 'Error');
         }
-        if (el[3] == entidad.cuenta) {
+        /*if (el[3] == entidad.cuenta) {
             existe = true
             toastr.error('N° de Cuenta ya se encuentra registrada.', 'Error');
         }
@@ -610,7 +610,7 @@ function buscarRegistro(entidad) {
         if (el[5] == entidad.itf) {
             existe = true
             toastr.error('N° de ITF ya se encuentra registrada.', 'Error');
-        }
+        }*/
 
     });
     return existe
@@ -623,11 +623,11 @@ function buscarRegistromodificar(entidad) {
     t.rows().data().each(function(el, index) {
         console.log("indice:"+index)
         if (index!=indice) {
-            if (el[1] == entidad.descripcion && el[2] == entidad.moneda) {
-            existe = true
-            toastr.error('Entidad Bancaria ya se encuentra registrada.', 'Error');
+            if (el[1] == entidad.descripcion && el[2] == entidad.moneda && el[3] == entidad.cuenta && el[4] == entidad.cci && el[5] == entidad.itf) {
+                existe = true
+                toastr.error('Entidad Bancaria ya se encuentra registrada.', 'Error');
             }
-            if (el[3] == entidad.cuenta) {
+            /*if (el[3] == entidad.cuenta) {
                 existe = true
                 toastr.error('N° de Cuenta ya se encuentra registrada.', 'Error');
             }
@@ -638,12 +638,21 @@ function buscarRegistromodificar(entidad) {
             if (el[5] == entidad.itf) {
                 existe = true
                 toastr.error('N° de ITF ya se encuentra registrada.', 'Error');
-            }
+            }*/
         }
 
 
     });
     return existe
+}
+
+function limpiarForm() {
+    $('#entidad_descripcion').val($('#entidad_descripcion option:first-child').val()).trigger('change');
+    $('#entidad_moneda').val($('#entidad_moneda option:first-child').val()).trigger('change');
+    $('#entidad_cuenta').val('')
+    $('#entidad_cci').val('')
+    $('#entidad_itf').val('')
+    limpiarErrores()
 }
 
 function limpiar() {
@@ -743,7 +752,7 @@ $(function(){
 
         var fd = new FormData(document.getElementById("fileinfo"));
         var request = $.ajax({
-            url: "{{route('mantenimiento.empresas.certificado')}}",  
+            url: "{{route('mantenimiento.empresas.certificado')}}",
             type: 'POST',
             data: fd,
             cache: false,
@@ -822,7 +831,7 @@ $(document).ready(function(){
                     success:  function (response) {
                         console.log(response)
                         $('#serie_comprobante').val($.trim(response));
-                    },              
+                    },
                 });
             }
         });

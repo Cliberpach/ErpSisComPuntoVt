@@ -49,11 +49,11 @@
                                         <li title="Datos de Entidades Financieras">
                                             <a class="nav-link" data-toggle="tab"href="#tab-2" id="bancos_link"> <i class="fa fa-user"></i> Bancos</a>
                                         </li>
-                                        
+
                                         <li title="Datos sobre la Facturación Electrónica" id="facturacion_tab" style="display:none;">
                                             <a class="nav-link" data-toggle="tab"href="#tab-3" id="facturacion_link"> <i class="fa fa-file-pdf-o"></i> Facturación Electrónica</a>
                                         </li>
-                                        
+
                                     </ul>
                                     <div class="tab-content">
                                             <div id="tab-1" class="tab-pane active">
@@ -77,7 +77,7 @@
                                                                 <div class="col-md-6">
                                                                     <label class="required">Ruc: </label>
                                                                         <div class="input-group">
-                                                                            <input type="text" class="form-control {{ $errors->has('ruc') ? ' is-invalid' : '' }}"  name="ruc" id="ruc" maxlength="11" value="{{old('ruc')}}" required> 
+                                                                            <input type="text" class="form-control {{ $errors->has('ruc') ? ' is-invalid' : '' }}"  name="ruc" id="ruc" maxlength="11" value="{{old('ruc')}}" required>
                                                                             <span class="input-group-append"><a style="color:white" onclick="consultarRuc()" class="btn btn-primary"><i class="fa fa-search"></i> Sunat</a></span>
                                                                             @if ($errors->has('ruc'))
                                                                             <span class="invalid-feedback" role="alert">
@@ -278,7 +278,7 @@
                                                             </div>
 
                                                             <div class="form-group">
-                                                                    
+
                                                                     <label class="">Facebook:</label>
                                                                         <div class="input-group">
                                                                             <span class="input-group-addon">
@@ -294,11 +294,11 @@
                                                                                 @endif
                                                                         </div>
 
-                                                                
+
                                                             </div>
 
                                                             <div class="form-group">
-                                                            
+
                                                                     <label class="">Instagram:</label>
                                                                     <div class="input-group">
                                                                         <span class="input-group-addon">
@@ -313,7 +313,7 @@
                                                                             </span>
                                                                             @endif
                                                                     </div>
-                                                                
+
                                                             </div>
 
                                                             <div class="form-group">
@@ -332,7 +332,7 @@
                                                                             </span>
                                                                             @endif
                                                                     </div>
-                                                                
+
                                                             </div>
 
 
@@ -355,7 +355,7 @@
                                                                         <div class="col-md-6">
                                                                             <label class="required">Dni:</label>
                                                                             <div class="input-group">
-                                                                                <input type="text" class="form-control {{ $errors->has('dni_representante') ? ' is-invalid' : '' }}"  name="dni_representante" id="dni_representante" maxlength="8" value="{{old('dni_representante')}}" required> 
+                                                                                <input type="text" class="form-control {{ $errors->has('dni_representante') ? ' is-invalid' : '' }}"  name="dni_representante" id="dni_representante" maxlength="8" value="{{old('dni_representante')}}" required>
                                                                                 <span class="input-group-append"><a style="color:white" onclick="consultarDni()" class="btn btn-primary"><i class="fa fa-search"></i> Reniec</a></span>
 
                                                                                 @if ($errors->has('dni_representante'))
@@ -414,7 +414,7 @@
 
                                                                 </div>
                                                             </div>
-                                                        
+
                                                         </div>
 
                                                         <div class="col-md-6">
@@ -468,19 +468,19 @@
 
                                                                 </div>
                                                             </div>
-                                                        
+
                                                         </div>
-                                                    
+
                                                     </div>
 
 
 
                                                 </div>
-                                            
+
                                             </div>
                                             <div id="tab-2" class="tab-pane">
                                                 <div class="panel-body">
-                                                
+
                                                     <div class="form-group row">
                                                         <div class="col-md-9">
                                                             <h4><b>Entidades Financieras</b></h4>
@@ -528,7 +528,7 @@
                                             <div id="tab-3" class="tab-pane">
 
                                                 <div class="panel-body">
-                                                
+
                                                     <div class="form-group row">
                                                         <div class="col-md-12">
                                                             <h4><b>Facturación Electrónica</b></h4>
@@ -541,7 +541,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6 col-xs-12 b-r">
                                                             <p>Certificado Sunat</p>
-                                                            
+
                                                             <div class="form-group row">
                                                                 <div class="col-lg-6 col-xs-12">
                                                                     <label for="">Certificado</label>
@@ -551,7 +551,7 @@
                                                                     <label for="">Estado</label>
                                                                     <input type="text" id="estado_certificado" class="form-control text-center" name="estado_certificado" value="{{old('estado_certificado','SIN VERIFICAR')}}" readonly>
                                                                 </div>
-                                                                
+
                                                             </div>
 
 
@@ -575,7 +575,7 @@
                                                                 </div>
 
                                                             </div>
-                                                        
+
                                                         </div>
 
                                                     </div>
@@ -621,13 +621,13 @@
                                                     </div>
 
 
-                                                
+
                                                 </div>
 
 
                                             </div>
                                     </div>
-                                
+
                                 </div>
                             </div>
                         </div>
@@ -682,7 +682,7 @@
     border-radius: 10%;
 }
 
-div.dataTables_wrapper div.dataTables_paginate ul.pagination {  
+div.dataTables_wrapper div.dataTables_paginate ul.pagination {
     margin-left:2px;
 }
 </style>
@@ -755,12 +755,12 @@ $(document).ready(function() {
             },
             {
                 "targets": [1],
-                "width": "20%" 
+                "width": "20%"
             },
             {
                 "targets": [2],
                 className: "text-center",
-                "width": "10%" 
+                "width": "10%"
             },
             {
                 "targets": [3],
@@ -817,20 +817,20 @@ $(document).ready(function() {
                 "targets": [2],
                 data: 'serie',
                 className: "text-center",
-              
+
             },
             {
                 "targets": [3],
                 data: 'numero_iniciar',
                 className: "text-center",
-               
+
             },
             {
                 "targets": [4],
                 data: null,
                 className: "text-center",
                 render: function(data, type, row) {
-                    
+
                     if (data.emsion == 1) {
                         return  'SI';
                     }else{
@@ -838,13 +838,13 @@ $(document).ready(function() {
                     }
 
                 }
-               
+
             },
             {
                 "targets": [5],
                 data: 'tipo_id',
                 visible: false,
-               
+
             },
 
         ],
@@ -855,7 +855,9 @@ $(document).ready(function() {
 
 //Añadir Entidad Financiera
 function agregarEntidad() {
+    limpiarForm()
     $('#modal_agregar_entidad').modal('show');
+
 }
 $.fn.select2.defaults.set('language', 'es');
 
@@ -927,7 +929,7 @@ $('#certificado').on('change', function() {
     } else {
         toastr.error('Extensión inválida, formatos admitidos (.pfx)', 'Error');
     }
-    
+
 });
 
 function validarCertificado() {
@@ -956,7 +958,7 @@ function validarCertificado() {
             $('#soap_password').addClass("is-invalid")
             toastr.error("Ingrese Soap Contraseña Sunat.", 'Error');
             $('#error-soap_password').text("El campo Soap Contraseña es obligatorio.")
-            
+
             $('#facturacion_link').click();
         }
     }else{
@@ -966,7 +968,7 @@ function validarCertificado() {
 
     var table = $('.dataTables-numeracion').DataTable();
     var registros = table.rows().data().length;
-    
+
     if ( $('#estado_fe').prop("checked") ) {
         if (registros == 0) {
             correcto = false
@@ -1010,10 +1012,10 @@ $('#enviar_empresa').submit(function(e) {
         if (result.isConfirmed) {
 
             var existe = entidadFinanciera()
-        
-                
+
+
                 if (existe == false) {
-                    
+
                     Swal.fire({
                         title: 'Entidad Financiera',
                         text: "¿Seguro que desea agregar Empresa sin ninguna entidad financiera?",
@@ -1024,7 +1026,7 @@ $('#enviar_empresa').submit(function(e) {
                         cancelButtonText: "No, Cancelar",
                         allowOutsideClick: () => !Swal.isLoading(),
                     }).then((result) => {
-                        
+
                         if (result.isConfirmed) {
 
                             if (validarCertificado() == true) {
@@ -1037,7 +1039,7 @@ $('#enviar_empresa').submit(function(e) {
                                     cargarEntidades()
                                     cargarNumeracion()
                                     this.submit();
-                                    
+
                                     Swal.fire({
                                         title: '¡Cargando!',
                                         type: 'info',
@@ -1222,7 +1224,7 @@ function consultarDni() {
             allowOutsideClick: () => !Swal.isLoading()
         }).then((result) => {
             camposDni(result)
-        
+
             consultaExitosa()
         })
     } else {
@@ -1319,7 +1321,7 @@ $('.tabs-container .nav-tabs #bancos_link , .tabs-container .nav-tabs #facturaci
         $('#error-direccion_fiscal').text("El campo Dirección Fiscal es obligatorio.")
     }
 
-    
+
     if ($('#direccion_llegada').val() == '') {
         enviar = false
         $('#direccion_llegada').addClass("is-invalid")

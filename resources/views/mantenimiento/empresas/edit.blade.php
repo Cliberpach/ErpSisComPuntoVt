@@ -1248,6 +1248,7 @@
     //Añadir Entidad Financiera
     function agregarEntidad() {
         $('#modal_agregar_entidad').modal('show');
+        limpiarForm();
     }
 
     //Consultar si ingesar entidad financiera
