@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Ventas\DetalleCuentaCliente;
 use App\Ventas\CuentaCliente;
+use App\Ventas\Documento\Documento;
+
 class Nota extends Model
 {
     protected $table = 'nota_electronica';
@@ -66,7 +68,7 @@ class Nota extends Model
         static::created(function(Nota $nota){
             //CREAR LOTE PRODUCTO
             $condicion = Condicion::find($nota->documento->condicion_id);
-            if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
+            if($condicion->descripcion == 'CREDITO' || $condicion->descripcion == 'credito' || $condicion->descripcion == 'CRÉDITO' || $condicion->descripcion == 'crédito')
             {
                 if($nota->documento->cuenta)
                 {
@@ -80,6 +82,7 @@ class Nota extends Model
                     else
                     {
                         $cuenta_cliente->monto = 0.00;
+                        $cuenta_cliente->estado='PAGADO';
                     }
 
                     $monto_saldo = DetalleCuentaCliente::where('cuenta_cliente_id',$cuenta_cliente->id)->sum('monto');
@@ -90,9 +93,14 @@ class Nota extends Model
                     else
                     {
                         $cuenta_cliente->saldo = 0.00;
+                        $cuenta_cliente->estado='PAGADO';
                     }
 
                     $cuenta_cliente->update();
+
+                    // $documento = Documento::find($nota->documento->id);
+                    // $documento->total = $documento->total;
+                    // $documento->update();
                 }
             }
         });

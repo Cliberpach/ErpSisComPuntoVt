@@ -102,8 +102,9 @@ class EmpresaSeeder extends Seeder
 
 
         $proveedor = new Proveedor();
-        $proveedor->descripcion = 'LIMPIATODO S.A.C';
+        $proveedor->descripcion = 'PROVEEDORES VARIOS';
         $proveedor->tipo_documento = 'RUC';
+        $proveedor->ruc = '11111111111';
         $proveedor->tipo_persona = 'PERSONA JURIDICA';
         $proveedor->direccion = 'Jr. Puerto Inca Nro. 250 Dpto. 402';
         $proveedor->correo = 'CCUBAS@UNITRU.EDU.PE';

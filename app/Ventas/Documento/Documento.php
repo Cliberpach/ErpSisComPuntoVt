@@ -176,7 +176,7 @@ class Documento extends Model
         static::created(function(Documento $documento){
             //CREAR CUENTA CLIENTE
             $condicion = Condicion::find($documento->condicion_id);
-            if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
+            if($condicion->descripcion == 'CREDITO' || $condicion->descripcion == 'credito' || $condicion->descripcion == 'CRÉDITO' || $condicion->descripcion == 'crédito')
             {
                 $cuenta_cliente = new CuentaCliente();
                 $cuenta_cliente->cotizacion_documento_id = $documento->id;
