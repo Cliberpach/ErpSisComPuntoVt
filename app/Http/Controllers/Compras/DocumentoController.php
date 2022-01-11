@@ -82,6 +82,9 @@ class DocumentoController extends Controller
                 $acuenta = $decimal_total;
             }
 
+            $documento->total = $decimal_total;
+            $documento->update();
+
 
             $saldo = $decimal_total - $acuenta;
             //CALCULAR SALDO
@@ -227,7 +230,7 @@ class DocumentoController extends Controller
             $documento->total_igv = (float) $request->get('monto_total_igv');
             $documento->total = (float) $request->get('monto_total');
             //-------------------------------
-            if($request->get('moneda') === 'DOLARES')
+            if($request->get('moneda') == 'DOLARES')
             {
                 $documento->sub_total_soles = (float) $request->get('monto_sub_total') * (float) $request->get('tipo_cambio');
                 $documento->total_igv_soles = (float) $request->get('monto_total_igv') * (float) $request->get('tipo_cambio');
