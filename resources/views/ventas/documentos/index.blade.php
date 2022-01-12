@@ -325,7 +325,8 @@ $(document).ready(function() {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_devolucion +"'  title='Devoluciones'><i class='fa fa-file-o'></i> Devoluciones</a>" ;
                     }
-                    else
+
+                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_edit +"'  title='Editar'><i class='fa fa-pencil'></i> Editar</a>" ;
