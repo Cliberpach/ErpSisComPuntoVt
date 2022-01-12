@@ -88,6 +88,12 @@ class DocumentoController extends Controller
                 $code = $json_data->code;
             }
 
+            $total = $documento->total;
+            if($documento->tipo_venta == 129)
+            {
+                $total = $documento->total - $documento->notas->sum('mtoImpVenta');
+            }
+
             $coleccion->push([
                 'id' => $documento->id,
                 'tipo_venta' => $documento->nombreTipo(),
@@ -116,7 +122,7 @@ class DocumentoController extends Controller
                 'otros' => 'S/. '.number_format($otros, 2, '.', ''),
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
-                'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
+                'total' => 'S/. '.number_format($total, 2, '.', ''),
                 'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
                 'notas' => $cantidad_notas
             ]);

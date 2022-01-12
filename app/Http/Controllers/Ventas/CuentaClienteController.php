@@ -26,13 +26,25 @@ class CuentaClienteController extends Controller
         $datos = array();
         $cuentaCliente = CuentaCliente::all();
         foreach ($cuentaCliente as $key => $value) {
+            $acta =  $value->monto - $value->saldo;
+            if($acta < $value->monto)
+            {
+                $cuenta = CuentaCliente::find($value->id);
+                $cuenta->estado='PENDIENTE';
+                $cuenta->update();
+            }
+            else{
+                $cuenta = CuentaCliente::find($value->id);
+                $cuenta->estado='PAGADO';
+                $cuenta->update();
+            }
             array_push($datos,array(
                 "id"=>$value->id,
                 "cliente"=>$value->documento->clienteEntidad->nombre,
                 "numero_doc"=>$value->documento->numero_doc,
                 "fecha_doc"=>$value->fecha_doc,
                 "monto"=>$value->monto,
-                "acta"=> number_format(round($value->monto - $value->saldo, 2), 2),
+                "acta"=> number_format(round($acta, 2), 2),
                 "saldo"=>$value->saldo,
                 "estado"=>$value->estado
             ));

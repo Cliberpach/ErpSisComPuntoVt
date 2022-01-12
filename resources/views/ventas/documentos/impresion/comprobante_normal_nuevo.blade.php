@@ -288,13 +288,25 @@
                 </thead>
                 <tbody>
                     @foreach($detalles as $item)
-                    <tr>
-                        <td style="text-align: left; border-right: 2px solid #52BE80;">{{ number_format($item->cantidad, 2) }}</td>
-                        <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->unidad }}</td>
-                        <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->nombre_producto }}</td>
-                        <td style="text-align: left; border-right: 2px solid #52BE80; ">{{ $item->precio_nuevo }}</td>
-                        <td style="text-align: right;">{{ $item->valor_venta }}</td>
-                    </tr>
+                        @if($documento->tipo_venta == 129)
+                            @if ($item->cantidad - $item->detalles->sum('cantidad') > 0)
+                            <tr>
+                                <td style="text-align: left; border-right: 2px solid #52BE80;">{{ number_format($item->cantidad - $item->detalles->sum('cantidad'), 2) }}</td>
+                                <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->unidad }}</td>
+                                <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->nombre_producto }}</td>
+                                <td style="text-align: left; border-right: 2px solid #52BE80; ">{{ $item->precio_nuevo }}</td>
+                                <td style="text-align: right;">{{ number_format(($item->cantidad - $item->detalles->sum('cantidad')) * $item->precio_nuevo, 2) }}</td>
+                            </tr>
+                            @endif
+                        @else
+                        <tr>
+                            <td style="text-align: left; border-right: 2px solid #52BE80;">{{ number_format($item->cantidad, 2) }}</td>
+                            <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->unidad }}</td>
+                            <td style="text-align: left; border-right: 2px solid #52BE80;">{{ $item->nombre_producto }}</td>
+                            <td style="text-align: left; border-right: 2px solid #52BE80; ">{{ $item->precio_nuevo }}</td>
+                            <td style="text-align: right;">{{ $item->valor_venta }}</td>
+                        </tr>
+                        @endif
                     @endforeach
                     <tr>
                         <td colspan="5" style="border-top: 2px solid #52BE80"><p class="p-0 m-0 text-uppercase text-cuerpo">SON: <b>{{ $legends[0]['value'] }}</b></p></td>
@@ -336,11 +348,16 @@
                                 <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">IGV {{$documento->igv}}%: S/.</p></td>
                                 <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->total_igv, 2) }}</p></td>
                             </tr>
-                            @endif
                             <tr>
                                 <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Total a pagar: S/.</p></td>
                                 <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->total, 2) }}</p></td>
                             </tr>
+                            @else
+                            <tr>
+                                <td style="text-align:left; padding: 5px;"><p class="p-0 m-0">Total a pagar: S/.</p></td>
+                                <td style="text-align:right; padding: 5px;"><p class="p-0 m-0">{{ number_format($documento->total - $documento->notas->sum('mtoImpVenta'), 2) }}</p></td>
+                            </tr>
+                            @endif
                         </table>
                     </td>
                 </tr>
