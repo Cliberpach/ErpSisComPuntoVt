@@ -18,7 +18,7 @@ class EmpresaSeeder extends Seeder
     public function run()
     {
         //Agroensancha S.R.L
-        /*En Local
+        /*En Local*/
         $empresa = new Empresa();
         $empresa->ruc = '10802398307';
         $empresa->razon_social = 'SISCOM FAC';
@@ -43,9 +43,9 @@ class EmpresaSeeder extends Seeder
         $facturacion->certificado =  null;
         $facturacion->token_code =  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MzM0NjcxMzgsImV4cCI6NDc4NzA2NzEzOCwidXNlcm5hbWUiOiJMZXN0ZXIiLCJjb21wYW55IjoiMTA4MDIzOTgzMDcifQ.YjQK8uvUFn8glmKHwDdPXfhqCIBUU51Rl5hF1OKZ9BC0QDcbPFelunk_mXws9k6wqrXvISitKwVltlpdPfrbx9NoU0sygEhIyr4EanYYdthvtRj18X_bki_fk90sRi1AKf0rXHObVGeXZtdAYIwvYQRy_PmUORJlmJf_K6EYpO6tFib529Eqzs0DaiOVR4k21nCI3u7RDUFlABJMv75IpS24jL9WmtwptkswuskpotC4tbr6FUll7Yk1lG3kniFqf60G0nA30HUpctmjQY7oPCjEySLsjGYqnE78l7r5bdHi9TTUaRr3U4gsdvO39Uzw_TmOm9PxArYd2z19iBoQ3eoF-pYBk3V8xjUCy3-zXzE_2aq3jzZvMoUy7L89iXw2zODca3JcszM_BM2gxx97ulTm62lGPYiPLW1hLath3HvwyYNGH6Xihd9I-xNNwK3MGiNnbbmNqKh5FPGK-DIBLfnm4y0QJil0lM89jXjaaTeNOHuN8By45mKrzG6jZSxY8pG-YoncHMRMRwzMXu6SxjQgWuDvXk53BMnw3xOtvA1QwslJmnhblpiG9-_AAWDSQuQXmz4mQaK375aSGLc8QHXjarKuq6ToXVoF29hBh9CWuXt7F_5wa54Xbq6J_EPNtu4vdG3vrul_Q2zSuMMQRZygjDIJd8mT37200Ft3CLc';
         $facturacion->save();
-        */
 
-        /*En Servidor*/
+
+        /*En Servidor
         $empresa = new Empresa();
         $empresa->ruc = '20608741578';
         $empresa->razon_social = 'CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L.';
@@ -72,7 +72,7 @@ class EmpresaSeeder extends Seeder
         $facturacion->ambiente = 'beta';
         $facturacion->certificado =  null;
         $facturacion->token_code =  'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Mzg5MjM3MjgsImV4cCI6NDc5MjUyMzcyOCwidXNlcm5hbWUiOiJMZXN0ZXIiLCJjb21wYW55IjoiMjA2MDg3NDE1NzgifQ.MfETLeOy-ArWZFyoESgTcqygN2VDj55xkuXPwlbKGAJe9NTG8-UQPNQy7BgFrWEWhnKfgw6qoXFO6xEESHfAKEAnBWZQ3a2EK2TpV4ebhlyoHMgOiM3qTj48yG5HDBgSraUIpjqFBn26Vw1hv33PFo1yzvAJtBQ5C1v_CJr6xfs3cHSHeBwVp6yNIUeN5sxHuGSVUpoZ_KUnTg9QmXCf6fdzU_w9IRH7HO44Rbs5MLPUOpB-OzPMXM12nexkPbdJ0rGxoSoPyzABkWy_yTVEBboQINfYoX94L0Ffp5MYNGY-dsWfaGPLyg_LJbeufYvi36woMOnNfuqQguixr9bgxL79Xba-x7b0kHl-qSMZYbx8CliP_M8AbbNlo-lO_tzJzDTtAbOvHUpuIxITOnyVFXSZtzSOdsgFIgr9QVDMp4WJEemH20QmjTpWttqCtUbKypYqcZHogwwGJvsqEH3op8NmOUQFqJkObgVeX93HhO2lO-PTZRAdE2VUYyVaDLV14cDKHRnKzQhfJuAp6wdyS9h9QdPYqov990FRJNdOffLF5cgqPgOZ6IBUl3l5x7-lgmbmYDWEXEYKer0F0Z00C39a7JqjtP_7hiOTBjn1G5COn0MqAeH0BA-pkh_GIpuI4I7w7XEury6JlctgFlWjWNrfA_bXVinva17FhyIrR_8';
-        $facturacion->save();
+        $facturacion->save();*/
 
 
         Numeracion::create([

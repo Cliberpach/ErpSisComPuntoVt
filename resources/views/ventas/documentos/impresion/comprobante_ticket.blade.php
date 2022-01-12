@@ -126,8 +126,7 @@
                     <p class="m-0 p-0 text-uppercase">{{$documento->serie.'-'.$documento->correlativo}}</p>
                 </div>
             </div>
-        </div>
-            <br>
+        </div><br>
         <div class="informacion">
             <table class="tbl-informacion">
                 <tr>

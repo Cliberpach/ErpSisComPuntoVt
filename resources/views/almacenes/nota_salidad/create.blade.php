@@ -548,18 +548,16 @@ function cambiarCantidad(detalle, condicion) {
 function devolverCantidades() {
     //CARGAR PRODUCTOS PARA DEVOLVER LOTE
     cargarDetalle()
-    $.ajax({
+    return $.ajax({
         dataType : 'json',
         type : 'post',
         url : '{{ route('almacenes.nota_salidad.devolver.cantidades') }}',
         data : {
             '_token' : $('input[name=_token]').val(),
             'cantidades' :  $('#notadetalle_tabla').val(),
-        }
-    }).done(function (result){
-        alert('DEVOLUCION REALIZADA')
-        console.log(result)
-    });
+        },
+        async: true
+    }).responseText()
 }
 
 $('#cantidad_form').on('input', function() {
@@ -593,11 +591,13 @@ function buscarProducto(id) {
 }
 </script>
 <script>
-    window.onbeforeunload = function () {
-        //DEVOLVER CANTIDADES
-        if($('#asegurarCierre').val() == 1 ) {devolverCantidades()}
-
-    };
+    window.onbeforeunload = () => {
+        if ($('#asegurarCierre').val() == 1) {
+            while (true) {
+                devolverCantidades()
+            }
+        }
+    }
 
 </script>
 

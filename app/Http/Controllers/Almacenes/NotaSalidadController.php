@@ -383,7 +383,7 @@ class NotaSalidadController extends Controller
         $cantidades = $data['cantidades'];
         $productosJSON = $cantidades;
         $productotabla = json_decode($productosJSON);
-        $mensaje = '';
+        $mensaje = true;
         foreach ($productotabla as $detalle) {
             //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
             $lote = LoteProducto::findOrFail($detalle->lote_id);
@@ -391,7 +391,7 @@ class NotaSalidadController extends Controller
             //$lote->cantidad =  $lote->cantidad_logica;
             $lote->estado = '1';
             $lote->update();
-            $mensaje = 'Cantidad devuelta';
+            $mensaje = true;
         };
 
         return $mensaje;

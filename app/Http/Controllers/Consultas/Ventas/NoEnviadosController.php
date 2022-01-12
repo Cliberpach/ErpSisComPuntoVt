@@ -669,7 +669,7 @@ class NoEnviadosController extends Controller
         $productos = $detalles_aux;
         $detalles = json_decode($productos);
 
-        $mensaje = '';
+        $mensaje = true;
         foreach ($productotabla as $detalle) {
             $cont = 0;
             $existe = false;
@@ -708,7 +708,7 @@ class NoEnviadosController extends Controller
                 $lote->estado = '1';
                 $lote->update();
             }
-            $mensaje = 'Cantidad devuelta';
+            $mensaje = true;
         };
 
         return $mensaje;

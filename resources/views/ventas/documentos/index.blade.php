@@ -298,6 +298,9 @@ $(document).ready(function() {
                     var url_devolucion = '{{ route("ventas.notas_dev", ":id")}}';
                     url_devolucion = url_devolucion.replace(':id', data.id);
 
+                    var url_edit = '{{ route("ventas.documento.edit", ":id")}}';
+                    url_edit = url_edit.replace(':id', data.id);
+
                     let cadena = "";
 
                     if(data.sunat == '0' && data.tipo_venta_id != 129 && data.dias > 0) //&& data.dias > 0
@@ -317,16 +320,21 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>";
                     }
 
-                    if(data.tipo_venta_id == 129)
+                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado == 'PAGADA')
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_devolucion +"'  title='Devoluciones'><i class='fa fa-file-o'></i> Devoluciones</a>" ;
                     }
+                    else
+                    {
+                        cadena = cadena
+                        + "<a class='btn btn-sm btn-warning m-1' href='"+ url_edit +"'  title='Editar'><i class='fa fa-pencil'></i> Editar</a>" ;
+                    }
 
-                    if(data.sunat == '2')
+                    if(data.sunat == '2' || (data.tipo_venta_id == 129 && data.estado == 'PENDIENTE'))
                     {
                         cadena = cadena +
-                        "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
+                        "<button type='button' class='btn btn-sm btn-danger m-1' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
                     }
 
                     if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')

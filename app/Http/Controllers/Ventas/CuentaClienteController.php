@@ -24,7 +24,7 @@ class CuentaClienteController extends Controller
 
     public function getTable() {
         $datos = array();
-        $cuentaCliente = CuentaCliente::all();
+        $cuentaCliente = CuentaCliente::where('estado', '!=', 'ANULADO')->get();
         foreach ($cuentaCliente as $key => $value) {
             $acta =  $value->monto - $value->saldo;
             if($acta < $value->monto)

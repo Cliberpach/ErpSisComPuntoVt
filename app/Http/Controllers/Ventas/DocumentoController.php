@@ -724,6 +724,41 @@ class DocumentoController extends Controller
         }
     }
 
+    public function edit($id)
+    {
+        $this->authorize('haveaccess','documento_venta.index');
+        $empresas = Empresa::where('estado', 'ACTIVO')->get();
+        $clientes = Cliente::where('estado', 'ACTIVO')->get();
+        $productos = Producto::where('estado', 'ACTIVO')->get();
+        $documento = Documento::findOrFail($id);
+        $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->with(['lote','lote.producto'])->get();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
+        $fullaccess = false;
+
+        if(count(Auth::user()->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count(Auth::user()->roles))
+            {
+                if(Auth::user()->roles[$cont]['full-access'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count(Auth::user()->roles);
+                }
+                $cont = $cont + 1;
+            }
+        }
+        return view('ventas.documentos.edit',[
+            'documento' => $documento,
+            'detalles' => $detalles,
+            'empresas' => $empresas,
+            'clientes' => $clientes,
+            'productos' => $productos,
+            'condiciones' => $condiciones,
+            'fullaccess' => $fullaccess,
+        ]);
+    }
+
     public function venta_comprobante($id)
     {
         try

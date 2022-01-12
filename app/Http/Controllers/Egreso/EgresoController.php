@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Egreso;
 
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Empresa\Empresa;
 use App\Pos\DetalleMovimientoEgresosCaja;
 use App\Pos\Egreso;
 use Carbon\Carbon;
@@ -74,13 +75,13 @@ class EgresoController extends Controller
     public function recibo(Request $request, $size)
     {
         $egreso = Egreso::findOrFail($request->egreso_id);
-
+        $empresa = Empresa::first();
         if ($size == 80) {
-            $pdf = PDF::loadView('Egreso.Imprimir.ticket', compact('egreso'));
+            $pdf = PDF::loadView('Egreso.Imprimir.ticket', compact('egreso','empresa'));
             $pdf->setpaper([0, 0, 226.772, 651.95]);
         }
         else{
-            $pdf = PDF::loadView('Egreso.Imprimir.normal', compact('egreso'));
+            $pdf = PDF::loadView('Egreso.Imprimir.normal', compact('egreso','empresa'));
         }
         return $pdf->stream('recibo.pdf');
     }

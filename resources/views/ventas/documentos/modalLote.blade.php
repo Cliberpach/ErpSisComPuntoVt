@@ -354,7 +354,6 @@
         $("#precio").attr({
             "min" : 1,
         });
-        document.getElementById('cantidad').focus()
         setTimeout(function() { $('input[name="cantidad"]').focus() }, 10);
         //LIMPIAR MODAL
         limpiarModallote()
@@ -419,7 +418,7 @@
         let cliente_id = $("#cliente_id option:selected").attr('tabladetalle_id')
         obtenerLotesproductos(cliente_id)
         setTimeout(function() {
-            $('div.dataTables_filter input').focus();
+            $('#modal_lote div.dataTables_filter input').focus();
         }, 10);
         //7$('.dataTables-lotes').DataTable().ajax.reload();
         //CERRAR MODAL
@@ -431,7 +430,7 @@
         let cliente_id = $("#cliente_id option:selected").attr('tabladetalle_id')
         obtenerLotesproductos(cliente_id)
         setTimeout(function() {
-            $('div.dataTables_filter input').focus();
+            $('#modal_lote div.dataTables_filter input').focus();
         }, 10);
         //$('.dataTables-lotes').DataTable().ajax.reload();
     });

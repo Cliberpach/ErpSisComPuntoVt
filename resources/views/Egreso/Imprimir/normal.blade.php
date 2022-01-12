@@ -7,119 +7,165 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Nota Egreso</title>
     <style>
-        .tipo-letra {
-            font-size: 9pt;
+        body {
             font-family: Arial, Helvetica, sans-serif;
             color: black;
         }
 
-        .cuadroDerecha {
+        .cabecera{
+            width: 100%;
             position: relative;
-            left: 70%;
-            border: 1px #ccc solid;
-            border-radius: 10px;
-            padding: 5px;
-            width: 200px;
-            height: 60px;
+            height: 100px;
+            max-height: 150px;
         }
 
-        .cuadroDerecha .title {
+        .logo {
+            width: 25%;
+            position: absolute;
+            left: 0%;
+        }
 
-            margin-top: 5px !important;
+        .logo .logo-img
+        {
+            position: relative;
+            width: 95%;
+            margin-right: 5%;
+            height: 90px;
+        }
+
+        .img-fluid {
+            width: 100%;
+            height: 100%;
+        }
+
+        .empresa {
+            width: 45%;
+            position: absolute;
+            left: 25%;
+        }
+
+        .empresa .empresa-info {
+            position: relative;
+            width: 100%;
+        }
+
+        .nombre-empresa {
+            font-size: 16px;
+        }
+
+        .ruc-empresa {
             font-size: 15px;
+        }
+
+        .direccion-empresa {
+            font-size: 12px;
+        }
+
+        .text-info-empresa {
+            font-size: 12px;
+        }
+
+        .comprobante {
+            width: 30%;
+            position: absolute;
+            left: 70%;
+        }
+
+        .comprobante .comprobante-info {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-content: center;
+            align-items: center;
             text-align: center;
         }
 
-        .restaurant {
-            position: absolute;
-            font-size: 18px;
-            text-transform: uppercase;
-            left: 15%;
-
+        .numero-documento {
+            margin: 1px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            border: 1px solid #8f8f8f;
+            font-size: 14px;
         }
 
-        .nombre {
+        .informacion{
+            width: 100%;
             position: relative;
-            font-size: 14px;
-            top: 10px;
-            left: 5%;
         }
 
-        .dni {
-            position: absolute;
-            font-size: 14px;
-            top: 8.7%;
-            left: 48%;
+        .tbl-informacion {
+            width: 100%;
+            font-size: 12px;
         }
 
-        .fecha {
-            position: absolute;
-            width: 200px;
-            top: 8.7%;
-            left: 66%;
-            font-size: 14px;
-        }
-
-        .direccion {
+        .cuerpo{
+            width: 100%;
             position: relative;
-            font-size: 14px;
-            top: 10px;
-            left: 5%;
         }
 
-        .ruc {
-            font-size: 14px;
-            text-align: center;
+        .tbl-detalles {
+            width: 100%;
+            font-size: 12px;
         }
 
-        .cabeceraTabla {
+        .tbl-detalles thead{
             border-top: 1px solid;
             background-color: rgb(241, 239, 239);
         }
 
-        .cuerpoTabla {
+        .tbl-detalles tbody{
             border-top: 1px solid;
             border-bottom: 1px solid;
         }
 
+        .text-cuerpo{
+            font-size: 12px
+        }
+
+        .tbl-qr {
+            width: 100%;
+        }
+        /*---------------------------------------------*/
+
+        .m-0{
+            margin:0;
+        }
+
+        .text-uppercase {
+            text-transform: uppercase;
+        }
+
+        .p-0{
+            padding:0;
+        }
     </style>
 </head>
 
 <body>
-    <div style="width: 100%; margin-left: -9mm; margin-right: -9mm; margin-top: -5mm" class="tipo-letra">
-        <br>
-        <div class="restaurant">
-
-        </div>
-        <div class="cuadroDerecha">
-            <div class="ruc">
-                R.U.C:{{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->ruc }}</div>
-
-            <div class="title">Recibo Egreso
-                <br>
+    <div class="cabecera">
+        <div class="logo">
+            <div class="logo-img">
+                @if($empresa->ruta_logo)
+                <img src="{{ base_path() . '/storage/app/'.$empresa->ruta_logo }}" class="img-fluid">
+                @else
+                <img src="{{ public_path() . '/img/default.png' }}" class="img-fluid">
+                @endif
             </div>
+        </div>
+        <div class="empresa">
+            <div class="empresa-info">
+                <p class="m-0 p-0 text-uppercase nombre-empresa">{{ DB::table('empresas')->count() == 0 ? 'SISCOM ' : DB::table('empresas')->first()->razon_social }}</p>
+                <p class="m-0 p-0 text-uppercase ruc-empresa">RUC {{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->ruc }}</p>
+                <p class="m-0 p-0 text-uppercase direccion-empresa">{{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->direccion_fiscal }}</p>
 
+                <p class="m-0 p-0 text-info-empresa">Central telefónica: {{ DB::table('empresas')->count() == 0 ? '-' : DB::table('empresas')->first()->celular }}</p>
+                <p class="m-0 p-0 text-info-empresa">Email: {{ DB::table('empresas')->count() == 0 ? '-' : DB::table('empresas')->first()->correo }}</p>
+            </div>
         </div>
-        <br>
-        <div style="font-size:14px;position:absolute;left: 15%;top:17px;">
-            Razon Social: {{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->razon_social }}
-            <br>
-            Direccion: {{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->direccion_fiscal }}
-            <br>
-            Correo:{{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->correo}}
-            <br>
-            Telefono:{{ DB::table('empresas')->count() == 0 ? '- ' : DB::table('empresas')->first()->telefono}}
-        </div>
-        <div class="fecha">
-            Fecha: {{date('Y-m-d h:i')}}</div>
-        </div>
-
-    </div>
+    </div><br>
     <br>
-    <br>
-    <br>
-    <table style="width: 100%">
-        <thead class="cabeceraTabla">
+    <table class="tbl-detalles" cellpadding="5" cellspacing="0">
+        <thead>
             <tr>
                 <th style="text-align: center">CAJERO</th>
                 <th style="text-align: center">CUENTA</th>
@@ -127,13 +173,12 @@
                 <th style="text-align: center">IMPORTE</th>
             </tr>
         </thead>
-        <tbody class="cuerpoTabla">
+        <tbody>
             <tr>
                 <td style="text-align: center">-</td>
                 <td style="text-align: center">{{$egreso->cuenta->descripcion}}</td>
                 <td style="text-align: center">{{$egreso->descripcion}}</td>
                 <td style="text-align: center">{{$egreso->importe}}</td>
-
             </tr>
         </tbody>
     </table>

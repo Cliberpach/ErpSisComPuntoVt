@@ -636,6 +636,9 @@ Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@vouc
 
 Route::get('ruta', function () {
 
+    $cuenta = CuentaCliente::first();
+    return $cuenta->detalles;
+
     // $pdf = PDF::loadview('ventas.documentos.impresion.example')->setPaper('a4')->setWarnings(false);
 
     // return $pdf->stream('example.pdf');

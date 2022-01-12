@@ -44,7 +44,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-12 col-md-5">
-                                        <label class="required">Tipo Nota de @if(isset($nota_venta)) DevoluciÓn @else Crédito @endif</label>
+                                        <label class="required">Tipo Nota de @if(isset($nota_venta)) Devolución @else Crédito @endif</label>
                                     </div>
                                     <div class="col-12 col-md-7">
                                         @if(isset($nota_venta))

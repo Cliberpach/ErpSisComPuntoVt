@@ -14,6 +14,7 @@ use App\Ventas\Guia;
 use App\Ventas\Nota;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentoController extends Controller
 {
@@ -140,6 +141,21 @@ class DocumentoController extends Controller
         $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->with(['lote','lote.producto'])->get();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
         $fecha_hoy = Carbon::now()->toDateString();
+        $fullaccess = false;
+
+        if(count(Auth::user()->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count(Auth::user()->roles))
+            {
+                if(Auth::user()->roles[$cont]['full-access'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count(Auth::user()->roles);
+                }
+                $cont = $cont + 1;
+            }
+        }
         return view('consultas.documentos.convertir',[
             'documento' => $documento,
             'detalles' => $detalles,
@@ -147,6 +163,7 @@ class DocumentoController extends Controller
             'clientes' => $clientes,
             'productos' => $productos,
             'fecha_hoy' => $fecha_hoy,
+            'fullaccess' => $fullaccess,
             'condiciones' => $condiciones
         ]);
     }

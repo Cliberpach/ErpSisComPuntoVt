@@ -33,7 +33,6 @@ class Documento extends Model
         'total_igv',
         'total',
         'user_id',
-        'estado',
         'igv',
         'igv_check',
         'tipo_venta',
@@ -46,6 +45,9 @@ class Documento extends Model
         'serie',
         'ruta_comprobante_archivo',
         'nombre_comprobante_archivo',
+
+        'estado',
+        'estado_pago',
 
         'convertir'
     ];
@@ -210,8 +212,14 @@ class Documento extends Model
                    $cuenta_cliente->saldo = 0;
                    $cuenta_cliente->estado = 'PAGADO';
                }
-
                $cuenta_cliente->update();
+
+               if($documento->estado == 'ANULADO')
+               {
+                   $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+                   $cuenta_cliente->estado = 'ANULADO';
+                   $cuenta_cliente->update();
+               }
            }
            else
            {

@@ -215,29 +215,6 @@
         </div>
 
     </div><br>
-    {{-- <div class="logos-empresas">
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/cifarelli_1.jpg' }}" class="img-logo">
-            </div>
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/motor.png' }}" class="img-logo">
-            </div>
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/motosierra.jpg' }}" class="img-logo">
-            </div>
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/mochila.jpg' }}" class="img-logo">
-            </div>
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/mochila_jacto.jpg' }}" class="img-logo">
-            </div>
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/filtro.jpg' }}" class="img-logo">
-            </div>
-            <div class="logo-empresa">
-                <img src="{{ public_path() . '/img/llaves.jpg' }}" class="img-logo">
-            </div>
-        </div><br> --}}
     <div class="informacion">
         <table class="tbl-informacion">
             <tbody style="padding-top: 5px; padding-bottom: 5px;">
@@ -285,8 +262,8 @@
             </thead>
             <tbody>
                 @foreach ($movimiento->detalleMovimientoVentas as $ventas)
-                    @if ($ventas->documento->estado_pago == 'PAGADA' && $ventas->documento->sunat != '2')
-                        @if ($ventas->documento->condicion_id == 1)
+                    @if ($ventas->documento->sunat != '2')
+                        @if ($ventas->documento->condicion_id == 1 && $ventas->documento->estado_pago == 'PAGADA' )
                             <tr>
                                 <td style="text-align: center; border-right: 2px solid #52BE80">
                                     {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
@@ -319,21 +296,22 @@
                                 @endif
                             </tr>
                         @else
-                            @foreach ($ventas->documento->cuenta->detalles as $cuentaCliente)
+                            @if (!empty($ventas->documento->cuenta))
+                                @foreach ($ventas->documento->cuenta->detalles as $cuentaCliente)
                                 <tr>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
                                         {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
                                         {{ $ventas->documento->clienteEntidad->nombre }}</td>
                                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $ventas->documento->total }}
+                                        {{ $cuentaCliente->monto }}
                                     </td>
                                     @if ($cuentaCliente->tipo_pago_id == 1)
                                         <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                         <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                         <td style="text-align: center; border-right: 2px solid #52BE80">
                                             {{ $cuentaCliente->efectivo }}</td>
-                                    @elseif ($cuentaCliente->tipo_pago_id==2)
+                                    @elseif ($cuentaCliente->tipo_pago_id == 2)
                                         <td style="text-align: center; border-right: 2px solid #52BE80">
                                             {{ $cuentaCliente->importe }}</td>
                                         <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
@@ -351,7 +329,8 @@
                                         <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                     @endif
                                 </tr>
-                            @endforeach
+                                @endforeach
+                            @endif
                         @endif
                     @endif
                 @endforeach
