@@ -326,13 +326,13 @@ $(document).ready(function() {
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_devolucion +"'  title='Devoluciones'><i class='fa fa-file-o'></i> Devoluciones</a>" ;
                     }
 
-                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')
+                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado == 'PENDIENTE' && data.sunat)
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_edit +"'  title='Editar'><i class='fa fa-pencil'></i> Editar</a>" ;
                     }
 
-                    if(data.sunat == '2' || (data.tipo_venta_id == 129 && data.estado == 'PENDIENTE'))
+                    if((data.sunat == '2' && data.tipo_venta_id == 129) || (data.tipo_venta_id == 129 && data.estado == 'PENDIENTE'))
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-danger m-1' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
