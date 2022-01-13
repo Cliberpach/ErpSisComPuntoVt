@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Mantenimiento;
 
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Condicion;
+use App\Mantenimiento\Tabla\Detalle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -31,19 +32,23 @@ class CondicionController extends Controller
         $data = $request->all();
 
         $rules = [
-            'descripcion_guardar' => 'required',
+            'id_guardar' => 'required',
             'dias_guardar' => 'required',
         ];
 
         $message = [
-            'descripcion_guardar.required' => 'El campo Descripción es obligatorio.',
+            'id_guardar.required' => 'El campo Descripción es obligatorio.',
             'dias_guardar.required' => 'El campo Ubicación es obligatorio.',
         ];
 
         Validator::make($data, $rules, $message)->validate();
 
+        $tabladetalle = Detalle::find($request->get('tabladetalle_id_guardar'));
+
         $condicion = new Condicion();
-        $condicion->descripcion = $request->get('descripcion_guardar');
+        $condicion->descripcion = $tabladetalle->descripcion;
+        $condicion->slug = $tabladetalle->simbolo;
+        $condicion->tabladetalle_id = $request->get('tabladetalle_id_guardar');
         $condicion->dias = $request->get('dias_guardar');
         $condicion->save();
 
@@ -63,19 +68,23 @@ class CondicionController extends Controller
 
         $rules = [
             'tabla_id' => 'required',
-            'descripcion' => 'required',
+            'tabladetalle_id' => 'required',
             'dias' => 'required',
         ];
 
         $message = [
-            'descripcion.required' => 'El campo Descripción es obligatorio.',
+            'id.required' => 'El campo Descripción es obligatorio.',
             'dias.required' => 'El campo dias es obligatorio.',
         ];
 
         Validator::make($data, $rules, $message)->validate();
 
+        $tabladetalle = Detalle::find($request->get('tabladetalle_id'));
+
         $condicion = Condicion::findOrFail($request->get('tabla_id'));
-        $condicion->descripcion = $request->get('descripcion');
+        $condicion->descripcion = $tabladetalle->descripcion;
+        $condicion->slug = $tabladetalle->simbolo;
+        $condicion->tabladetalle_id = $request->get('tabladetalle_id');
         $condicion->dias = $request->get('dias');
         $condicion->update();
 
@@ -110,9 +119,9 @@ class CondicionController extends Controller
     {
         $condicion = null;
 
-        if ($request->descripcion != null && $request->id != null && $request->dias != null) { // edit
+        if ($request->tabladetalle_id != null && $request->id != null && $request->dias != null) { // edit
             $condicion = Condicion::where([
-                                    ['descripcion', $request->descripcion],
+                                    ['tabladetalle_id', $request->tabladetalle_id],
                                     ['dias', $request->dias],
                                     ['id', '<>', $request->id]
                                 ])->where('estado','!=','ANULADO}')->first();

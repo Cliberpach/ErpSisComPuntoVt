@@ -28,6 +28,7 @@ class DatabaseSeeder extends Seeder
         $this->call(EmpresaSeeder::class);
 
         $this->call(PermissionsSeeder::class);
+        $this->call(ConfiguracionSeeder::class);
 
         //--------Seeders Confirmados -----------
         $caja = new Caja();

@@ -1505,6 +1505,7 @@
 
     function obtenerClientes() {
         clientes_global = [];
+        //$("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         $("#cliente_id").empty().trigger('change');
         $.ajax({
             dataType: 'json',
@@ -1536,14 +1537,14 @@
                     toastr.error('Clientes no encontrados.', 'Error');
                 }
 
-                //$("#cliente_id").html(clientes);
+                //$("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
                 $('#tipo_cliente_documento').val(data.tipo);
             },
         })
     }
 
     function obtenerTipocliente(cliente_id) {
-        if (cliente_id) {
+        if (cliente_id != '') {
             $.ajax({
                 dataType: 'json',
                 url: '{{ route('ventas.cliente.getcustomer') }}',
@@ -1554,8 +1555,7 @@
                 },
                 success: function(cliente) {
                     $('#buscarLotes').prop("disabled", false)
-                    $("#cliente_id option[value='"+cliente.id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
-                    obtenerLotesproductos(cliente.tabladetalles_id)
+                    $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
                 },
             })
         }

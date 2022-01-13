@@ -85,6 +85,36 @@ class ComprobanteController extends Controller
         return $arrayProductos;
     }
 
+    public function obtenerCuotas($id)
+    {
+        $documento = Documento::find($id);
+        $arrayCuotas = Array();
+        if($documento->cuenta)
+        {
+            foreach($documento->cuenta->detalles as $item)
+            {
+                $arrayCuotas[] = array(
+                    "moneda" => "PEN",
+                    "monto" => (float)$item->monto,
+                    "fechaPago" => self::obtenerFechaCuenta($item->fecha)
+
+                );
+            }
+        }
+
+        return $arrayCuotas;
+    }
+
+    public function obtenerFechaCuenta($fecha)
+    {
+        $date = strtotime($fecha);
+        $fecha_emision = date('Y-m-d', $date);
+        $hora_emision = date('H:i:s', $date);
+        $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
+
+        return $fecha;
+    }
+
     public function obtenerFechaEmision($documento)
     {
         $date = strtotime($documento->fecha_documento);
@@ -128,8 +158,10 @@ class ComprobanteController extends Controller
                             "observacion" => $documento->observacion,
                             "formaPago" => array(
                                 "moneda" =>  $documento->simboloMoneda(),
-                                "tipo" =>  $documento->formaPago(),
+                                "tipo" =>  $documento->forma_pago(),
+                                "monto" => (float)$documento->total,
                             ),
+                            "cuotas" => self::obtenerCuotas($documento->id),
                             "tipoMoneda" => $documento->simboloMoneda(),
                             "client" => array(
                                 "tipoDoc" => $documento->tipoDocumentoCliente(),

@@ -1220,7 +1220,7 @@ class TablaDetalleSeeder extends Seeder
         //Formas de Pago
         $detalle = new Detalle();
         $detalle->descripcion = "CONTADO";
-        $detalle->simbolo = 'contado';
+        $detalle->simbolo = 'Contado';
         $detalle->estado = 'ACTIVO';
         $detalle->tabla_id = 30;
         $detalle->editable = 1;
@@ -1228,7 +1228,7 @@ class TablaDetalleSeeder extends Seeder
 
         $detalle = new Detalle();
         $detalle->descripcion = "CRÉDITO";
-        $detalle->simbolo = 'credito';
+        $detalle->simbolo = 'Credito';
         $detalle->estado = 'ACTIVO';
         $detalle->tabla_id = 30;
         $detalle->editable = 1;
@@ -1375,11 +1375,15 @@ class TablaDetalleSeeder extends Seeder
         //----------CONDICION------------
         $condicion = new Condicion();
         $condicion->descripcion = 'CONTADO';
+        $condicion->descripcion = 'Contado';
+        $condicion->tabladetalle_id = 160;
         $condicion->dias = 0;
         $condicion->save();
 
         $condicion = new Condicion();
         $condicion->descripcion = 'CRÉDITO';
+        $condicion->descripcion = 'Credito';
+        $condicion->tabladetalle_id = 161;
         $condicion->dias = 10;
         $condicion->save();
 

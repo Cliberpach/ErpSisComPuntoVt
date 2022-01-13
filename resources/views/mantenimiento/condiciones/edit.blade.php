@@ -18,17 +18,17 @@
 
                    <div class="form-group">
                         <label class="required">Descripción:</label>
-                        <select name="descripcion" id="descripcion_editar"
-                            class="select2_form form-control {{ $errors->has('descripcion') ? ' is-invalid' : '' }}"
-                            style="text-transform: uppercase; width:100%" value="{{ old('descripcion') }}" required>
+                        <select name="tabladetalle_id" id="tabladetalle_id"
+                            class="select2_form form-control {{ $errors->has('tabladetalle_id') ? ' is-invalid' : '' }}"
+                            style="text-transform: uppercase; width:100%" value="{{ old('tabladetalle_id') }}" required>
                             <option value=""></option>
                             @foreach (forma_pago() as $pago)
-                                <option value="{{ $pago->descripcion }}">{{ $pago->descripcion }}</option>
+                                <option value="{{ $pago->id }}" descripcion="{{ $pago->descripcion }}">{{ $pago->descripcion }}</option>
                             @endforeach
                         </select>
-                        @if ($errors->has('descripcion'))
+                        @if ($errors->has('tabladetalle_id'))
                         <span class="invalid-feedback" role="alert">
-                            <strong id="error-descripcion-guardar">{{ $errors->first('descripcion') }}</strong>
+                            <strong id="error-tabladetalle_id">{{ $errors->first('tabladetalle_id') }}</strong>
                         </span>
                         @endif
                     </div>
@@ -80,12 +80,13 @@
         width: '100%',
     });
 
-    $('#descripcion_editar').on('change', function(e){
+    $('#tabladetalle_id').on('change', function(e){
         e.preventDefault();
 
         $('#dias_editar').attr('readonly', false);
         $('#dias_editar').val('');
-        let descripcion = $('#descripcion_editar').val();
+        let descripcion = $('#tabladetalle_id option:selected').attr('descripcion');
+        console.log(descripcion)
         if(descripcion == 'CONTADO')
         {
             $('#dias_editar').val(0);
@@ -102,7 +103,7 @@
             data : {
                 '_token' : $('input[name=_token]').val(),
                 'dias' : $('#dias_editar').val(),
-                'descripcion' : $('#descripcion_editar').val(),
+                'tabladetalle_id' : $('#tabladetalle_id').val(),
                 'id':  $('#tabla_id_editar').val(),
             }
         }).done(function (result){

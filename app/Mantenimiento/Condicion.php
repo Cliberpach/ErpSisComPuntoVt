@@ -9,6 +9,8 @@ class Condicion extends Model
     protected $table = 'condicions';
     protected $fillable = [
         'descripcion',
+        'slug',
+        'tabladetalle_id',
         'dias',
         'opcional'
     ];

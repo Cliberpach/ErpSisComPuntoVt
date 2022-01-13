@@ -47,7 +47,6 @@ class DetalleNotaSalidad extends Model
 
             $lote_producto = LoteProducto::findOrFail($detalle->lote_id);
             $lote_producto->cantidad = $lote_producto->cantidad - $detalle->cantidad;
-            $lote_producto->cantidad_logica = $lote_producto->cantidad - $detalle->cantidad;
 
             if($lote_producto->cantidad == 0)
             {

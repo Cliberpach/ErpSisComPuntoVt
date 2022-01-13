@@ -68,7 +68,7 @@ class Nota extends Model
         static::created(function(Nota $nota){
             //CREAR LOTE PRODUCTO
             $condicion = Condicion::find($nota->documento->condicion_id);
-            if($condicion->descripcion == 'CREDITO' || $condicion->descripcion == 'credito' || $condicion->descripcion == 'CRÉDITO' || $condicion->descripcion == 'crédito')
+            if($condicion->descripcion == 'CREDITO' || $condicion->descripcion == 'credito' || $condicion->descripcion == 'CRÉDITO' || $condicion->descripcion == 'crédito' || $condicion->descripcion == 'Crédito' || $condicion->descripcion == 'Credito')
             {
                 if($nota->documento->cuenta)
                 {

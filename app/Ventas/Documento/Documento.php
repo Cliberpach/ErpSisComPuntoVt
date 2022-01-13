@@ -149,6 +149,15 @@ class Documento extends Model
             return strval($condicion->descripcion.' '.($condicion->dias > 0 ? $condicion->dias.' dias' : ''));
     }
 
+    public function forma_pago(): string
+    {
+        $condicion = Condicion::where('id', $this->condicion_id)->first();
+        if (is_null($condicion))
+            return "-";
+        else
+            return strval($condicion->slug);
+    }
+
     public function simboloMoneda(): string
     {
         $moneda = tipos_moneda()->where('id', $this->moneda)->first();

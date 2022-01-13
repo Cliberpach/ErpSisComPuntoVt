@@ -16,6 +16,8 @@ class CreateCondicionsTable extends Migration
         Schema::create('condicions', function (Blueprint $table) {
             $table->id();
             $table->string('descripcion');
+            $table->string('slug')->nullable();
+            $table->integer('tabladetalle_id')->nullable();
             $table->integer('dias');
             $table->string('opcional')->nullable();
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');

@@ -18,17 +18,17 @@
 
                     <div class="form-group">
                         <label class="required">Descripción:</label>
-                        <select name="descripcion_guardar" id="descripcion_guardar"
-                            class="select2_form form-control {{ $errors->has('descripcion_guardar') ? ' is-invalid' : '' }}"
-                            style="text-transform: uppercase; width:100%" value="{{ old('descripcion_guardar') }}" required>
+                        <select name="tabladetalle_id_guardar" id="tabladetalle_id_guardar"
+                            class="select2_form form-control {{ $errors->has('tabladetalle_id_guardar') ? ' is-invalid' : '' }}"
+                            style="text-transform: uppercase; width:100%" value="{{ old('tabladetalle_id_guardar') }}" required>
                             <option value=""></option>
                             @foreach (forma_pago() as $pago)
-                                <option value="{{ $pago->descripcion }}">{{ $pago->descripcion }}</option>
+                                <option value="{{ $pago->id }}" descripcion="{{ $pago->descripcion }}">{{ $pago->descripcion }}</option>
                             @endforeach
                         </select>
-                        @if ($errors->has('descripcion_guardar'))
+                        @if ($errors->has('tabladetalle_id_guardar'))
                         <span class="invalid-feedback" role="alert">
-                            <strong id="error-descripcion-guardar">{{ $errors->first('descripcion_guardar') }}</strong>
+                            <strong id="error-tabladetalle_id-guardar">{{ $errors->first('tabladetalle_id_guardar') }}</strong>
                         </span>
                         @endif
                     </div>
@@ -63,12 +63,12 @@
 @push('scripts')
 <script>
 
-    $('#descripcion_guardar').on('change', function(e){
+    $('#tabladetalle_id_guardar').on('change', function(e){
         e.preventDefault();
 
         $('#dias_guardar').attr('readonly', false);
         $('#dias_guardar').val('');
-        let descripcion = $('#descripcion_guardar').val();
+        let descripcion = $('#descripcion_guardar option:selected').attr('descripcion');
         if(descripcion == 'CONTADO')
         {
             $('#dias_guardar').val(0);
@@ -78,7 +78,7 @@
 
     $('#crear_condicion').on('submit',function(e){
         e.preventDefault();
-        console.log($('#descripcion_guardar').val());
+        console.log($('#tabladetalle_id_guardar').val());
         console.log($('#dias_guardar').val());
         $.ajax({
             dataType : 'json',
@@ -86,7 +86,7 @@
             url : '{{ route('mantenimiento.condiciones.exist') }}',
             data : {
                 '_token' : $('input[name=_token]').val(),
-                'descripcion' : $('#descripcion_guardar').val(),
+                'tabladetalle_id' : $('#tabladetalle_id_guardar').val(),
                 'dias' : $('#dias_guardar').val(),
                 'id':  null
             }

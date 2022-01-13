@@ -157,7 +157,7 @@
         data.each(function (value, index) {
             if (value.id == $id) {
                 $('#tabla_id_editar').val(value.id);
-                $('#descripcion_editar').val(value.descripcion).trigger('change.select2');
+                $('#tabladetalle_id').val(value.tabladetalle_id).trigger('change.select2');
                 $('#dias_editar').val(value.dias);
             }
         });
@@ -173,8 +173,8 @@
     @endif
 
     function limpiarError() {
-        $('#descripcion_editar').removeClass( "is-invalid" )
-        $('#error-descripcion').text('')
+        $('#tabladetalle_id').removeClass( "is-invalid" )
+        $('#error-tabladetalle_id').text('')
 
         $('#dias_editar').removeClass( "is-invalid" )
         $('#error-dias').text('')
@@ -185,13 +185,13 @@
     });
 
     //Old Modal Crear
-    @if ($errors->has('dias_guardar')  ||  $errors->has('descripcion_guardar') )
+    @if ($errors->has('dias_guardar')  ||  $errors->has('tabladetalle_id_guardar') )
         $('#modal_crear_condicion').modal({ show: true });
     @endif
 
     function guardarError() {
-        $('#descripcion_guardar').removeClass( "is-invalid" )
-        $('#error-descripcion-guardar').text('')
+        $('#tabladetalle_id_guardar').removeClass( "is-invalid" )
+        $('#error-tabladetalle_id-guardar').text('')
         $('#dias_guardar').removeClass( "is-invalid" )
         $('#error-dias-guardar').text('')
     }
