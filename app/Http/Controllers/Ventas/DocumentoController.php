@@ -657,17 +657,17 @@ class DocumentoController extends Controller
                 }
             }
 
-            $detalle = new DetalleMovimientoVentaCaja();
-            $detalle->cdocumento_id = $documento->id;
-            $detalle->mcaja_id = movimientoUser()->id;
-            $detalle->save();
-
             DB::rollBack();
             return response()->json([
                 'success' => false,
                 'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
                 'excepcion' => 'Llegue'
             ]);
+
+            $detalle = new DetalleMovimientoVentaCaja();
+            $detalle->cdocumento_id = $documento->id;
+            $detalle->mcaja_id = movimientoUser()->id;
+            $detalle->save();
 
             $envio_prev = self::sunat($documento->id);
             if(!$envio_prev['success'])
