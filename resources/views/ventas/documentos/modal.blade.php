@@ -30,7 +30,7 @@
 
                         <div class="col-lg-6 col-xs-12">
                             <label class="required">Cantidad</label>
-                            <input type="number" id="cantidad_editar" name="cantidad_editar" class="form-control" min="0" onkeypress="return filterFloat(event, this, false);" required>
+                            <input type="text" id="cantidad_editar" name="cantidad_editar" class="form-control" min="0" onkeypress="return filterFloat(event, this, false);" required>
                             <input type="hidden" id="cantidad_editar_actual" name="cantidad_editar_actual" class="form-control">
                         </div>
                         <div class="col-lg-6 col-xs-12">

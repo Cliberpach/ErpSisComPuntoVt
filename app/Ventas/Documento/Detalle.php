@@ -5,6 +5,7 @@ namespace App\Ventas\Documento;
 use App\Almacenes\Kardex;
 use App\Almacenes\LoteProducto;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Detalle extends Model
 {
