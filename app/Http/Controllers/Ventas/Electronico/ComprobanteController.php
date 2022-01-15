@@ -169,7 +169,8 @@ class ComprobanteController extends Controller
                                 "rznSocial" => $documento->cliente,
                                 "address" => array(
                                     "direccion" => $documento->direccion_cliente,
-                                )),
+                                )
+                            ),
                             "company" => array(
                                 "ruc" =>  $documento->ruc_empresa,
                                 "razonSocial" => $documento->empresa,

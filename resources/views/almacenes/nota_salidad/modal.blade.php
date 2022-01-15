@@ -11,18 +11,11 @@
                 <small class="font-bold">Editar detalle</small>
             </div>
             <div class="modal-body">
-                <input type="hidden" id="indice" name="indice">  
+                <input type="hidden" id="indice" name="indice">
                 <div class="form-group row">
                     <div class="col-lg-12 col-xs-12">
                         <label class="col-form-label required">Producto-lote:</label>
-                        <input type="text" class="form-control" id="producto_lote" name="producto_lote" readonly> 
-                        <div class="input-group d-none">
-                            <input type="text" class="form-control" id="producto_lote" name="producto_lote" readonly> 
-                            <span class="input-group-append"> 
-                                <button type="button" class="btn btn-primary" id="buscarLotes" data-toggle="modal" data-target="#modal_lote"><i class='fa fa-search'></i> Buscar
-                                </button>
-                            </span>
-                        </div>
+                        <input type="text" class="form-control" id="producto_lote" name="producto_lote" readonly>
                         <div class="invalid-feedback"><b><span id="error-producto"></span></b>
                         </div>
                     </div>
@@ -30,7 +23,7 @@
                 <div class="form-group row">
                     <div class="col-lg-6 col-xs-12">
                         <label class="required">Cantidad</label>
-                        <input type="text" id="cantidad" name="cantidad" class="form-control"  required>
+                        <input type="text" id="cantidad" name="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);"  required>
                     </div>
                 </div>
 
@@ -66,7 +59,7 @@ $("#btn_editar").click(function() {
     let cantidad_res =  $('#modal_editar_detalle #cantidad').val();
     let cantidad_sum =  $('#modal_editar_detalle #cantidad_actual').val();
     let lote_id = $('#modal_editar_detalle #lote').val();
-    
+
     $.ajax({
         type : 'POST',
         url : '{{ route('almacenes.nota_salidad.update.lote') }}',
@@ -81,7 +74,7 @@ $("#btn_editar").click(function() {
         {
             enviar = true;
             toastr.warning('Ocurrió un error porfavor recargar la pagina.')
-        } 
+        }
     });
 
     if (enviar != true) {
@@ -125,21 +118,19 @@ function actualizarTabla(i) {
     var table = $('.dataTables-ingreso').DataTable();
     table.row(i).remove().draw();
     var detalle = {
-        
         cantidad:  $('#modal_editar_detalle #cantidad').val(),
         lote_id: $('#modal_editar_detalle #lote').val(),
         producto_id:$( "#modal_editar_detalle #producto" ).val(),
         producto_lote:$('#modal_editar_detalle #producto_lote').val()
-                }
-    agregarTabla(detalle);    
+    }
+    agregarTabla(detalle);
     $('#asegurarCierre').val(1)
     $('#modal_editar_detalle').modal('hide');
 }
 
 $('#modal_editar_detalle #cantidad').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-    let max= parseInt(this.max);
-    let valor = parseInt(this.value);
+    let max= convertFloat(this.max);
+    let valor = convertFloat(this.value);
     if(valor>max){
         toastr.error('La cantidad ingresada supera al stock del producto Max('+max+').', 'Error');
         this.value = max;

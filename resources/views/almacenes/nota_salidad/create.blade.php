@@ -114,7 +114,7 @@
                                             </div>
                                             <div class="col-sm-2">
                                                 <label class="col-form-label">Cantidad </label>
-                                                <input type="number" id="cantidad_form" class="form-control">
+                                                <input type="text" id="cantidad_form" class="form-control" onkeypress="return filterFloat(event, this, false);">
                                                 <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
                                                 </div>
                                             </div>
@@ -561,9 +561,8 @@ function devolverCantidades() {
 }
 
 $('#cantidad_form').on('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, '');
-    let max= parseInt(this.max);
-    let valor = parseInt(this.value);
+    let max= convertFloat(this.max);
+    let valor = convertFloat(this.value);
     if(valor>max){
         toastr.error('La cantidad ingresada supera al stock del producto Max('+max+').', 'Error');
         this.value = max;
@@ -575,7 +574,6 @@ function limpiarDetalle(){
     $('#lote_form').val('');
     $('#producto_form').val('');
     $('#producto_lote_form').val('');
-    $('#cantidad_actual_form').val('');
     $("#cantidad_form").removeAttr('max');
 }
 

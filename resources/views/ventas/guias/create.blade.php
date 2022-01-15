@@ -36,7 +36,7 @@
 
                     <form action="{{route('ventas.guiasremision.store')}}" method="POST" id="enviar_documento">
                         {{csrf_field()}}
-                        
+
                         <input type="hidden" name="documento_id" value="{{old('documento_id', $documento->id)}}">
 
                         <div class="row">
@@ -61,7 +61,7 @@
                                                 class="form-control {{ $errors->has('fecha_documento') ? ' is-invalid' : '' }}"
                                                 value="{{old('fecha_documento',getFechaFormato($documento->fecha_documento, 'd/m/Y'))}}"
                                                 autocomplete="off" required readonly disabled>
-                                      
+
 
                                             @if ($errors->has('fecha_documento'))
                                             <span class="invalid-feedback" role="alert">
@@ -77,14 +77,14 @@
                                             <span class="input-group-addon">
                                                 <i class="fa fa-calendar"></i>
                                             </span>
-                                            
+
 
                                             <input type="text" id="fecha_atencion_campo" name="fecha_atencion_campo"
                                                 class="form-control{{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
                                                 value="{{old('fecha_atencion',getFechaFormato( $documento->fecha_atencion ,'d/m/Y'))}}"
                                                 autocomplete="off" required readonly disabled>
 
-                                     
+
 
                                             @if ($errors->has('fecha_atencion'))
                                             <span class="invalid-feedback" role="alert">
@@ -105,7 +105,7 @@
                                             style="text-transform: uppercase; width:100%" value="{{old('tipo_venta')}}"
                                             name="tipo_venta" id="tipo_venta" required disabled>
                                             <option></option>
-                                            
+
                                                 @foreach (tipos_venta() as $tipo)
                                                 <option value="{{$tipo->descripcion}}" @if(old('tipo_venta',$documento->descripcionTipo())==$tipo->descripcion ) {{'selected'}} @endif >{{$tipo->nombre}}</option>
                                                 @endforeach
@@ -115,7 +115,7 @@
                                                     <strong>{{ $errors->first('tipo_venta') }}</strong>
                                                 </span>
                                                 @endif
-                                            
+
 
 
                                         </select>
@@ -136,7 +136,7 @@
                                     <select class="select2_form form-control {{ $errors->has('proveedor_id') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{old('cliente_id')}}" name="cliente_id" id="cliente_id" required disabled>
                                     <option></option>
                                         @foreach ($clientes as $cliente)
-                                            
+
                                             <option value="{{$cliente->id}}" @if(old('cliente_id',$documento->cliente_id)==$cliente->id )
                                                 {{'selected'}} @endif >{{$cliente->tipo_documento.': '.$cliente->documento.' - '.$cliente->nombre}}
                                             </option>
@@ -181,7 +181,7 @@
                                 <div class="form-group row">
                                     <div class="col-lg-8 col-xs-12">
                                         <label class="required">Empresa: </label>
-                                        
+
                                         <select class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}"
                                                 style="text-transform: uppercase; width:100%" value="{{old('empresa_id',$documento->empresa_id)}}"
                                                 name="empresa_id" id="empresa_id" required disabled>
@@ -205,13 +205,13 @@
 
                                 </div>
 
-                                
+
                                 <div class="form-group">
                                     <label class="required">Dirección de la Empresa (Partida): </label>
                                     <textarea type="text" placeholder=""
                                         class="form-control input-required {{ $errors->has('direccion_tienda') ? ' is-invalid' : '' }}"
                                         name="direccion_empresa" id="direccion_empresa" value="{{old('direccion_empresa',$direccion_empresa->direccion_fiscal)}}" required >{{old('direccion_empresa',$direccion_empresa->direccion_fiscal)}}</textarea>
-                                   
+
 
                                     @if ($errors->has('direccion_empresa'))
                                     <span class="invalid-feedback" role="alert">
@@ -261,7 +261,7 @@
                                     <textarea type="text" placeholder=""
                                         class="form-control input-required {{ $errors->has('direccion_tienda') ? ' is-invalid' : '' }}"
                                         name="direccion_tienda" id="direccion_tienda" value="{{old('direccion_tienda')}}"  required >{{old('direccion_tienda')}}</textarea>
-                                   
+
 
                                     @if ($errors->has('direccion_tienda'))
                                     <span class="invalid-feedback" role="alert">
@@ -301,12 +301,12 @@
 
                                 <div class="form-group">
                                     <label>Observación:</label>
-      
+
                                     <textarea type="text" placeholder=""
                                         class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
                                         name="observacion" id="observacion"  onkeyup="return mayus(this)"
                                         value="{{old('observacion')}}"></textarea>
-                                   
+
 
                                     @if ($errors->has('observacion'))
                                     <span class="invalid-feedback" role="alert">
@@ -357,21 +357,21 @@
 
                                                     @foreach($detalles as $detalle)
                                                         <tr>
-                                                            
+
                                                             <td>{{ $detalle->lote->producto->id }}</td>
                                                             <td>-</td>
                                                             <td>{{ $detalle->cantidad }}</td>
                                                             <td>{{ $detalle->lote->producto->getMedida()}}</td>
                                                             <td>{{ number_format($detalle->lote->producto->peso_producto *  $detalle->cantidad,2 , '.', '') }}</td>
                                                             <td>{{ $detalle->lote->producto->nombre.' - '. $detalle->lote->codigo }}</td>
-                                                            <td>{{ $detalle->precio_nuevo }}</td> 
+                                                            <td>{{ $detalle->precio_nuevo }}</td>
                                                             <td>{{ number_format($detalle->precio_nuevo *  $detalle->cantidad,2 , '.', '') }}</td>
                                                             <td>{{ $detalle->lote->producto->medida }}</td>
                                                         </tr>
                                                     @endforeach
 
                                                 </tbody>
-                                                <tfoot>
+                                                <tfoot style="display: none">
                                                     <tr>
                                                         <th colspan="7" class="text-center">Sub Total:</th>
                                                         <th><span id="subtotal">{{ number_format($documento->sub_total,2 , '.', '') }}</span></th>
@@ -413,7 +413,7 @@
                                     class="btn btn-w-m btn-default">
                                     <i class="fa fa-arrow-left"></i> Regresar
                                 </a>
-                                
+
                                 <button type="submit" id="btn_grabar" class="btn btn-w-m btn-primary">
                                     <i class="fa fa-save"></i> Grabar
                                 </button>
@@ -532,12 +532,14 @@
                     },
                     {
                         "targets": [6],
-                        "className": 'text-center'
+                        "className": 'text-center',
+                        "visible": false,
                     },
                     {
                         "targets": [7],
-                        "className": 'text-center'
-                    },                    
+                        "className": 'text-center',
+                        "visible": false,
+                    },
                     {
                         "targets": [8],
                         "visible": false,
@@ -552,7 +554,7 @@
             });
 
             //DIRECCION DE LA TIENDA OLD
-            
+
             //Controlar Error
             $.fn.DataTable.ext.errMode = 'throw';
         });
@@ -646,11 +648,11 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
 
-                         
+
 
                             this.submit();
-                    
-                        
+
+
                     } else if (
                         /* Read more about handling dismissals below */
                         result.dismiss === Swal.DismissReason.cancel
@@ -662,7 +664,7 @@
                         )
                     }
                 })
-            
+
 
         })
 

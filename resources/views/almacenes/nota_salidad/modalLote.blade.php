@@ -335,7 +335,7 @@ $(document).ready(function() {
 function ingresarProducto(producto) {
     //LIMPIAR ERRORES AL INGRESAR PRODUCTO LOTE
     var modalabierto = $('#modal_editar_detalle').data("abierto");
-    $('#cantidad').val('');
+    $('#cantidad_form').val('');
     if(!$('#modal_editar_detalle').is(':visible'))
     {
         $("#producto_form").val(producto.producto_id);

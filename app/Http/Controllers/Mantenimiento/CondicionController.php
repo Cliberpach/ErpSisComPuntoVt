@@ -32,12 +32,12 @@ class CondicionController extends Controller
         $data = $request->all();
 
         $rules = [
-            'id_guardar' => 'required',
+            'tabladetalle_id_guardar' => 'required',
             'dias_guardar' => 'required',
         ];
 
         $message = [
-            'id_guardar.required' => 'El campo Descripción es obligatorio.',
+            'tabladetalle_id_guardar.required' => 'El campo Descripción es obligatorio.',
             'dias_guardar.required' => 'El campo Ubicación es obligatorio.',
         ];
 
@@ -126,7 +126,7 @@ class CondicionController extends Controller
                                     ['id', '<>', $request->id]
                                 ])->where('estado','!=','ANULADO}')->first();
         } else { // create
-            $condicion = Condicion::where('descripcion', $request->descripcion)->where('dias',(int)$request->dias)->where('estado','!=','ANULADO')->first();
+            $condicion = Condicion::where('tabladetalle_id', $request->tabladetalle_id)->where('dias',(int)$request->dias)->where('estado','!=','ANULADO')->first();
         }
 
         $result = ['existe' => $condicion ? true : false, 'data' => $request->all()];

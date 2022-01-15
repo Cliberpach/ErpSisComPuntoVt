@@ -168,7 +168,7 @@
     }
 
     //Old Modal Editar
-    @if ($errors->has('dias')  ||  $errors->has('descripcion') )
+    @if ($errors->has('dias')  ||  $errors->has('tabladetalle_id') )
         $('#modal_editar_condicion').modal({ show: true });
     @endif
 
