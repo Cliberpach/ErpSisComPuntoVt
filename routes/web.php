@@ -635,10 +635,6 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-
-    $cuenta = CuentaCliente::first();
-    return $cuenta->detalles;
-
     // $pdf = PDF::loadview('ventas.documentos.impresion.example')->setPaper('a4')->setWarnings(false);
 
     // return $pdf->stream('example.pdf');
