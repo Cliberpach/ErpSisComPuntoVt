@@ -640,6 +640,13 @@ class DocumentoController extends Controller
                 $lote->update();
             }
 
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
+                'excepcion' => 'Llegue'
+            ]);
+
             if($request->convertir)
             {
                 $doc_a_convertir = Documento::find($request->convertir);
@@ -656,13 +663,6 @@ class DocumentoController extends Controller
                     $lote->update();
                 }
             }
-
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
-                'excepcion' => 'Llegue'
-            ]);
 
             $detalle = new DetalleMovimientoVentaCaja();
             $detalle->cdocumento_id = $documento->id;
