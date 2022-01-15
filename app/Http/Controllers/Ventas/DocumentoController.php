@@ -672,6 +672,13 @@ class DocumentoController extends Controller
                 ]);
             }
 
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
+                'excepcion' => 'Llegue'
+            ]);
+
 
             $documento = Documento::find($documento->id);
             $documento->nombre_comprobante_archivo = $documento->serie.'-'.$documento->correlativo.'.pdf';
@@ -682,7 +689,7 @@ class DocumentoController extends Controller
             $gestion = "DOCUMENTO DE VENTA";
             crearRegistro($documento , $descripcion , $gestion);
 
-            if((int)$documento->tipo_venta === 127 || (int)$documento->tipo_venta === 128)
+            if((int)$documento->tipo_venta == 127 || (int)$documento->tipo_venta == 128)
             {
                 $dato =  'Actualizar';
                 broadcast(new VentasCajaEvent($dato));
@@ -690,7 +697,7 @@ class DocumentoController extends Controller
                 if($request->envio_sunat)
                 {
                     $envio_ = self::sunat_valida($documento->id);
-                    $documento->envio_sunat = '1';
+                    //$documento->envio_sunat = '1';
                 }
                 //$vp = self::venta_comprobante($documento->id);
                 //$ve = self::venta_email($documento->id);

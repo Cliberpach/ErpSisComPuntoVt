@@ -12,7 +12,7 @@ class ConsultarTipoNumeracion
 {
     public function handle($event)
     {
-        
+
         $numeracion = Numeracion::where('empresa_id',$event->documento->empresa_id)->where('estado','ACTIVO')->where('tipo_comprobante',$event->documento->tipo_venta)->first();
         if ($numeracion) {
 
@@ -43,8 +43,8 @@ class ConsultarTipoNumeracion
             ->get();
 
 
-            if (count($serie_comprobantes) === 1) {
-                //OBTENER EL DOCUMENTO INICIADO 
+            if (count($serie_comprobantes) == 1) {
+                //OBTENER EL DOCUMENTO INICIADO
                 $documento->correlativo = $numeracion->numero_iniciar;
                 $documento->serie = $numeracion->serie;
                 $documento->update();
@@ -54,8 +54,8 @@ class ConsultarTipoNumeracion
                 return $documento->correlativo;
 
             }else{
-                //DOCUMENTO DE VENTA ES NUEVO EN SUNAT 
-                if($documento->sunat != '1' || $documento->tipo_venta === 129){
+                //DOCUMENTO DE VENTA ES NUEVO EN SUNAT
+                if($documento->sunat != '1' || $documento->tipo_venta == 129){
                     $ultimo_comprobante = $serie_comprobantes->first();
                     $documento->correlativo = $ultimo_comprobante->correlativo + 1;
                     $documento->serie = $numeracion->serie;
@@ -65,17 +65,17 @@ class ConsultarTipoNumeracion
                     self::actualizarNumeracion($numeracion);
                     return $documento->correlativo;
                 }
-            }       
-       } 
+            }
+       }
        else
        {
            return $documento->correlativo;
-       }     
+       }
     }
 
 
     public function actualizarNumeracion($numeracion)
-    {   
+    {
         $numeracion->emision_iniciada = '1';
         $numeracion->update();
     }
