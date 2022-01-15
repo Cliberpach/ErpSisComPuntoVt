@@ -81,6 +81,7 @@ class LoteProducto extends Model
             if($loteProducto->cantidad == 0)
             {
                 $loteProducto->estado = '0';
+                $loteProducto->cantidad_logica = 0;
                 $loteProducto->update();
             }
             //RECORRER DETALLE NOTAS

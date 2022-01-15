@@ -56,7 +56,7 @@ class Detalle extends Model
             $kardex->descripcion = 'CLIENTES VARIOS';
             $kardex->precio = $detalle->precio_nuevo;
             $kardex->importe = $detalle->precio_nuevo * $detalle->cantidad;
-            $kardex->stock = $detalle->lote->producto->stock - $detalle->cantidad;
+            $kardex->stock = $detalle->lote->producto->stock;
             $kardex->save();
 
         });
