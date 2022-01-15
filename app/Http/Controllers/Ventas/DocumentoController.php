@@ -612,6 +612,12 @@ class DocumentoController extends Controller
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
+                'excepcion' => 'Llegue'
+            ]);
             foreach ($productotabla as $producto) {
                 $lote = LoteProducto::findOrFail($producto->producto_id);
                 Detalle::create([
@@ -639,13 +645,6 @@ class DocumentoController extends Controller
                 $lote->cantidad =  $lote->cantidad - $producto->cantidad;
                 $lote->update();
             }
-
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
-                'excepcion' => 'Llegue'
-            ]);
 
             if($request->convertir)
             {
