@@ -662,6 +662,13 @@ class DocumentoController extends Controller
             $detalle->mcaja_id = movimientoUser()->id;
             $detalle->save();
 
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
+                'excepcion' => 'Llegue'
+            ]);
+
             $envio_prev = self::sunat($documento->id);
             if(!$envio_prev['success'])
             {
@@ -671,13 +678,6 @@ class DocumentoController extends Controller
                     'mensaje'=> $envio_prev['mensaje']
                 ]);
             }
-
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'mensaje'=> 'Llegue', //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
-                'excepcion' => 'Llegue'
-            ]);
 
 
             $documento = Documento::find($documento->id);
