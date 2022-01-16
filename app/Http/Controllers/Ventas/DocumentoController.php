@@ -632,13 +632,11 @@ class DocumentoController extends Controller
                     'valor_venta' => $producto->valor_venta,
                 ]);
 
-                if($lote->cantidad - $producto->cantidad == 0)
+                $lote->cantidad =  $lote->cantidad - $producto->cantidad;
+                if($lote->cantidad == 0)
                 {
-                    $lote->cantidad_logica =  0;
                     $lote->estado =  '0';
                 }
-
-                $lote->cantidad =  $lote->cantidad - $producto->cantidad;
                 $lote->update();
             }
 
