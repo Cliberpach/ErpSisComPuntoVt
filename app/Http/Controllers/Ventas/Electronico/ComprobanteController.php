@@ -89,7 +89,13 @@ class ComprobanteController extends Controller
     {
         $documento = Documento::find($id);
         $arrayCuotas = Array();
-        if($documento->cuenta)
+        $arrayCuotas[] = array(
+            "moneda" => "PEN",
+            "monto" => (float)1,
+            "fechaPago" => self::obtenerFechaEmision($documento)
+
+        );
+        /*if($documento->cuenta)
         {
             foreach($documento->cuenta->detalles as $item)
             {
@@ -100,7 +106,7 @@ class ComprobanteController extends Controller
 
                 );
             }
-        }
+        }*/
 
         return $arrayCuotas;
     }
