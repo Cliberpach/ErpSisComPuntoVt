@@ -15,7 +15,7 @@ class PermissionsSeeder extends Seeder
      */
     public function run()
     {
-        $useradmin = User::find(1);
+        /*$useradmin = User::find(1);
 
         $roleadmin = Role::create([
             'name'=>'ADMIN',
@@ -108,12 +108,12 @@ class PermissionsSeeder extends Seeder
             'description'=>'El usuario puede acceder al mantenedor de Categorias'
         ]);
 
-        //Kardex producto permission
+        //Unidad de Producto permission
 
         Permission::create([
-            'name'  => 'Consulta kardex producto',
-            'slug'=>'kardex_producto.index',
-            'description'=>'El usuario puede acceder a la consulta de Kardex producto'
+            'name'  => 'Mantenedor Unidad de Producto',
+            'slug'=>'unidadProducto.index',
+            'description'=>'El usuario puede acceder al mantenedor de unidad de Producto'
         ]);
 
         //Lote Produco permission
@@ -287,15 +287,7 @@ class PermissionsSeeder extends Seeder
         Permission::create([
             'name'  => 'Mantenedor Documentos Venta',
             'slug'=>'documento_venta.index',
-            'description'=>'El usuario puede acceder al mantenedor de Documentos de Venta'
-        ]);
-
-        //Venta Caja permission
-
-        Permission::create([
-            'name'  => 'Mantenedor Venjas Caja',
-            'slug'=>'ventascaja.index',
-            'description'=>'El usuario puede acceder al mantenedor de Ventas Caja'
+            'description'=>'El usuario puede acceder al mantenedor de Dpcumentos de Venta'
         ]);
 
         //Cuenta Cliente permission
@@ -324,9 +316,185 @@ class PermissionsSeeder extends Seeder
 
         //Utilidad Mensual
         Permission::create([
-            'name'  => 'Vista de utilidad mensual',
+            'name'  => 'Vista de Utilidad Mensual',
             'slug'=>'utilidad_mensual.index',
-            'description'=>'El usuario puede acceder a la vista de utilidad mensual'
+            'description'=>'El usuario puede acceder a la vista de Utilidad Mensual'
+        ]);*/
+
+        /*Nuevos permisos*/
+
+        /*====================CONSULTAS=====================*/
+
+        //Consulta documentos
+        Permission::create([
+            'name'  => 'Vista de Consulta Documentos',
+            'slug'=>'consulta_documento.index',
+            'description'=>'El usuario puede acceder a la vista de consulta documentos'
+        ]);
+
+        //Consulta - venta - documento
+        Permission::create([
+            'name'  => 'Vista de Consulta - Ventas - Documento',
+            'slug'=>'consulta_venta_documento.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta - Ventas - Documento'
+        ]);
+
+        //Consulta - venta - cotizacion
+        Permission::create([
+            'name'  => 'Vista de Consulta - Ventas - Cotizacion',
+            'slug'=>'consulta_venta_cotizacion.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta - Ventas - Cotizacion'
+        ]);
+
+        //Consulta - venta - Documentos No Enviados
+        Permission::create([
+            'name'  => 'Vista de Consulta - Ventas - Documentos No Enviados',
+            'slug'=>'consulta_venta_documento_no.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta - Ventas - Documentos No Enviados'
+        ]);
+
+        //Consulta Compras - Orden
+        Permission::create([
+            'name'  => 'Vista de Consulta Compras - Orden',
+            'slug'=>'consulta_compras_orden.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta - Compras - Orden'
+        ]);
+
+        //Consulta Compras - Documento
+        Permission::create([
+            'name'  => 'Vista de Consulta Compras - Documento',
+            'slug'=>'consulta_compras_documento.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta - Compras - Documento'
+        ]);
+
+        //Consulta Compras - Cuenta Proveedor
+        Permission::create([
+            'name'  => 'Vista de Consulta Cuenta Proveedor',
+            'slug'=>'consulta_cuenta_proveedor.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta Cuenta Proveedor'
+        ]);
+
+        //Consulta Compras - Cuenta Cliente
+        Permission::create([
+            'name'  => 'Vista de Consulta Cuenta Cliente',
+            'slug'=>'consulta_cuenta_cliente.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta Cuenta Cliente'
+        ]);
+
+        //Consulta Compras - Nota de Salida
+        Permission::create([
+            'name'  => 'Vista de Consulta Nota de Salida',
+            'slug'=>'consulta_nota_salida.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta Nota de Salida'
+        ]);
+
+        //Consulta Compras - Nota de Ingreso
+        Permission::create([
+            'name'  => 'Vista de Consulta Nota de Ingreso',
+            'slug'=>'consulta_nota_ingreso.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta Nota de Ingreso'
+        ]);
+
+        //Consulta Compras - Utilidad bruta
+        Permission::create([
+            'name'  => 'Vista de Consulta Utilidad bruta',
+            'slug'=>'consulta_utilidad_bruta.index',
+            'description'=>'El usuario puede acceder a la vista de Consulta Utilidad Bruta'
+        ]);
+
+
+        /*====================REPORTES=====================*/
+
+        //Reporte - Caja Diaria
+        Permission::create([
+            'name'  => 'Vista de Reporte Caja Diaria',
+            'slug'=>'reporte_cajadiaria.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Caja Diaria'
+        ]);
+
+        //Reporte - Venta
+        Permission::create([
+            'name'  => 'Vista de Reporte Venta',
+            'slug'=>'reporte_venta.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Venta'
+        ]);
+
+        //Reporte - Compra
+        Permission::create([
+            'name'  => 'Vista de Reporte Compra',
+            'slug'=>'reporte_compra.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Compra'
+        ]);
+
+        //Reporte - Nota de Salida
+        Permission::create([
+            'name'  => 'Vista de Reporte Nota de Salida',
+            'slug'=>'reporte_nota_salida.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Nota de Salida'
+        ]);
+
+        //Reporte - Nota de Ingreso
+        Permission::create([
+            'name'  => 'Vista de Reporte Nota de Ingreso',
+            'slug'=>'reporte_nota_ingreso.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Nota de Ingreso'
+        ]);
+
+        //Reporte - Cuentas por Cobrar
+        Permission::create([
+            'name'  => 'Vista de Reporte Cuentas por Cobrar',
+            'slug'=>'reporte_cuenta_cobrar.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Cuentas por Cobrar'
+        ]);
+
+        //Reporte - Cuentas por Pagar
+        Permission::create([
+            'name'  => 'Vista de Reporte Cuentas por Pagar',
+            'slug'=>'reporte_cuenta_pagar.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Cuentas por Pagar'
+        ]);
+
+        //Reporte - Stock - Valorizado
+        Permission::create([
+            'name'  => 'Vista de Reporte Stock Valorizado',
+            'slug'=>'reporte_stock_valorizado.index',
+            'description'=>'El usuario puede acceder a la vista de Reporte Stock Valorizado'
+        ]);
+
+        //Kardex - Proveedor
+        Permission::create([
+            'name'  => 'Vista de Kardex Proveedor',
+            'slug'=>'kardex_proveedor.index',
+            'description'=>'El usuario puede acceder a la vista de Kardex Proveedor'
+        ]);
+
+        //Kardex - Cliente
+        Permission::create([
+            'name'  => 'Vista de Kardex Cliente',
+            'slug'=>'kardex_cliente.index',
+            'description'=>'El usuario puede acceder a la vista de Kardex Cliente'
+        ]);
+
+        //Kardex producto permission
+
+        /*Permission::create([
+            'name'  => 'Consulta kardex producto',
+            'slug'=>'kardex_producto.index',
+            'description'=>'El usuario puede acceder a la consulta de Kardex producto'
+        ]);*/
+
+        //Kardex - Ventas
+        Permission::create([
+            'name'  => 'Vista de Kardex Venta',
+            'slug'=>'kardex_venta.index',
+            'description'=>'El usuario puede acceder a la vista de Kardex Venta'
+        ]);
+
+        //Kardex - Salidas
+        Permission::create([
+            'name'  => 'Vista de Kardex Nota de Salida',
+            'slug'=>'kardex_salida.index',
+            'description'=>'El usuario puede acceder a la vista de Kardex Nota de Salida'
         ]);
     }
 }

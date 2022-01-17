@@ -133,71 +133,128 @@
 </li>
 @endcan
 
+@can('restore', [Auth::user(),['consulta_documento.index','consulta_venta_documento.index','consulta_venta_cotizacion.index','consulta_venta_documento_no.index','consulta_compras_orden.index','consulta_compras_documento.index','consulta_cuenta_proveedor.index','consulta_cuenta_cliente.index','consulta_nota_salida.index','consulta_nota_ingreso.index','consulta_utilidad_bruta.index']])
 <li class="@yield('consulta-active')">
     <a href="#"><i class="fa fa-question-circle"></i> <span class="nav-label">Consulta </span><span
             class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
+        @can('haveaccess','consulta_documento.index')
         <li class="@yield('consulta-comprobantes-active')"><a href="{{ route('consultas.documento.index') }}">Documentos</a></li>
+        @endcan
+
+        @can('restore', [Auth::user(),['consulta_venta_documento.index','consulta_venta_cotizacion.index','consulta_venta_documento_no.index']])
         <li class="@yield('consulta-ventas-active')">
             <a href="#">Ventas <span class="fa arrow"></span></a>
             <ul class="nav nav-third-level">
+                @can('haveaccess','consulta_venta_documento.index')
                 <li class="@yield('consulta-ventas-cotizacion-active')"><a href="{{ route('consultas.ventas.cotizacion.index') }}">Cotización</a></li>
+                @endcan
+                @can('haveaccess','consulta_venta_cotizacion.index')
                 <li class="@yield('consulta-ventas-documento-active')"><a href="{{ route('consultas.ventas.documento.index') }}">Doc. Venta</a></li>
+                @endcan
+                @can('haveaccess','consulta_venta_documento_no.index')
                 <li class="@yield('consulta-ventas-documento-no-active')"><a href="{{ route('consultas.ventas.documento.no.index') }}">No enviados</a></li>
+                @endcan
             </ul>
         </li>
+        @endcan
+
+        @can('restore', [Auth::user(),['consulta_compras_orden.index','consulta_compras_documento.index']])
         <li class="@yield('consulta-compras-active')">
             <a href="#">Compras <span class="fa arrow"></span></a>
             <ul class="nav nav-third-level">
+                @can('haveaccess','consulta_compras_orden.index')
                 <li class="@yield('consulta-compras-orden-active')"><a href="{{ route('consultas.compras.orden.index') }}">Orden de Compra</a></li>
+                @endcan
+                @can('haveaccess','consulta_compras_documento.index')
                 <li class="@yield('consulta-compras-documento-active')"><a href="{{ route('consultas.compras.documento.index') }}">Doc. Compras</a></li>
+                @endcan
             </ul>
         </li>
+        @endcan
+        @can('haveaccess','consulta_cuenta_proveedor.index')
         <li class="@yield('cuenta_proveedor-active')"><a href="{{ route('consultas.cuentas.proveedor.index') }}">Cuenta Proveedor</a></li>
+        @endcan
+        @can('haveaccess','consulta_cuenta_cliente.index')
         <li class="@yield('cuenta_cliente-active')"><a href="{{ route('consultas.cuentas.cliente.index') }}">Cuenta Cliente</a></li>
+        @endcan
+        @can('haveaccess','consulta_nota_salida.index')
         <li class="@yield('nota_salida_consulta-active')"><a href="{{ route('consultas.notas.salidad.index') }}">Nota Salida</a></li>
+        @endcan
+        @can('haveaccess','consulta_nota_ingreso.index')
         <li class="@yield('nota_ingreso_consulta-active')"><a href="{{ route('consultas.notas.ingreso.index') }}">Nota Ingreso</a></li>
+        @endcan
+        @can('haveaccess','consulta_utilidad_bruta.index')
         <li class="@yield('utilidad_bruta-active')"><a href="{{ route('consultas.caja.utilidad.index') }}">Utilidad Bruta</a></li>
+        @endcan
     </ul>
 </li>
+@endcan
 
+@can('restore', [Auth::user(),['reporte_cajadiaria.index','reporte_venta.index','reporte_compra.index','reporte_nota_salida.index','reporte_nota_ingreso.index','reporte_cuenta_cobrar.index','reporte_cuenta_pagar.index','reporte_stock_valorizado.index']])
 <li class="@yield('reporte-active')">
     <a href="#"><i class="fa fa-money"></i> <span class="nav-label">Reporte </span><span
             class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
+        @can('haveaccess','reporte_cajadiaria.index')
         <li class="@yield('caja_diaria-active')"><a href="#">Caja Diaria</a></li>
+        @endcan
+        @can('haveaccess','reporte_venta.index')
         <li class="@yield('ventas_reporte-active')"><a href="#">Ventas</a></li>
+        @endcan
+        @can('haveaccess','reporte_compra.index')
         <li class="@yield('compras_reporte-active')"><a href="#">Compras</a></li>
+        @endcan
+        @can('haveaccess','reporte_nota_salida.index')
         <li class="@yield('nota_salida_reporte-active')"><a href="#">Nota Salida</a></li>
+        @endcan
+        @can('haveaccess','reporte_nota_ingreso.index')
         <li class="@yield('nota_ingreso_reporte-active')"><a href="#">Nota Ingreso</a></li>
+        @endcan
+        @can('haveaccess','reporte_cuenta_cobrar.index')
         <li class="@yield('cuentas_x_cobrar_reporte-active')"><a href="#">Cuentas por Cobrar</a></li>
+        @endcan
+        @can('haveaccess','reporte_cuenta_pagar.index')
         <li class="@yield('cuentas_x_pagar_reporte-active')"><a href="#">Cuentas por Pagar</a></li>
+        @endcan
+        @can('haveaccess','reporte_stock_valorizado.index')
         <li class="@yield('stock_valorizado_reporte-active')"><a href="#">Stock Valorizado</a></li>
+        @endcan
     </ul>
 </li>
+@endcan
 
+@can('restore', [Auth::user(),['kardex_proveedor.index','kardex_cliente.index','kardex_producto.index','kardex_salida.index','kardex_venta.index']])
 <li class="@yield('kardex-active')">
     <a href="#"><i class="fa fa-exclamation"></i> <span class="nav-label">Kardex</span><span
             class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
+        @can('haveaccess','kardex_proveedor.index')
         <li class="@yield('proveedor_kardex-active')"><a href="#">Proveedor</a></li>
+        @endcan
+        @can('haveaccess','kardex_cliente.index')
         <li class="@yield('cliente_kardex-active')"><a href="{{ route('consultas.kardex.cliente.index') }}">Cliente</a></li>
-        <li class="@yield('producto_kardex-active')">
-            <a href="#">Producto <span class="fa arrow"></span></a>
-            <ul class="nav nav-third-level">
-                <li class="@yield('producto_kardex-kardex-active')"><a href="{{ route('consultas.kardex.producto.index') }}">Kardex </a></li>
-                <li class="@yield('producto_kardex-top-active')"><a href="{{ route('consultas.kardex.producto.index_top') }}">Top</a></li>
-            </ul>
-        </li>
+        @endcan
+        @can('haveaccess','kardex_producto.index')
+        <li class="@yield('producto_kardex-active')"><a href="{{ route('consultas.kardex.producto.index') }}">Producto</a></li>
+        @endcan
+
+        @can('restore', [Auth::user(),['kardex_salida.index','kardex_venta.index']])
         <li class="@yield('salida-kardex-active')">
             <a href="#">Salidas <span class="fa arrow"></span></a>
             <ul class="nav nav-third-level">
+                @can('haveaccess','kardex_venta.index')
                 <li class="@yield('salida-ventas-active')"><a href="{{ route('consultas.kardex.ventas.index') }}">Ventas</a></li>
+                @endcan
+                @can('haveaccess','kardex_salida.index')
                 <li class="@yield('salida-notas-active')"><a href="{{ route('consultas.kardex.notas.index') }}">Salidas</a></li>
+                @endcan
             </ul>
         </li>
+        @endcan
     </ul>
 </li>
+@endcan
 
 
 @can('restore', [Auth::user(),['colaborador.index','vendedor.index','empresa.index','tabla.index']])
