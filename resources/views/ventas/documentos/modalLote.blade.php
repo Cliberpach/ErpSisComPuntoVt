@@ -342,7 +342,7 @@
         $('#btn_agregar_detalle').prop('disabled' , false)
         //INGRESAR DATOS DEL PRODUCTO A LOS CAMPOS
         $('#precio').val(evaluarPrecioigv(producto))
-        $('#cantidad').val(producto.cantidad_logica)
+        //$('#cantidad').val(producto.cantidad_logica)
         $('#producto_unidad').val(producto.unidad_producto)
         $('#producto_id').val(producto.id)
         $('#producto_lote').val(producto.nombre+' - '+ producto.codigo_lote)

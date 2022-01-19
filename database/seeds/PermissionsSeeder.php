@@ -15,7 +15,7 @@ class PermissionsSeeder extends Seeder
      */
     public function run()
     {
-        /*$useradmin = User::find(1);
+        $useradmin = User::find(1);
 
         $roleadmin = Role::create([
             'name'=>'ADMIN',
@@ -319,7 +319,7 @@ class PermissionsSeeder extends Seeder
             'name'  => 'Vista de Utilidad Mensual',
             'slug'=>'utilidad_mensual.index',
             'description'=>'El usuario puede acceder a la vista de Utilidad Mensual'
-        ]);*/
+        ]);
 
         /*Nuevos permisos*/
 
@@ -477,11 +477,11 @@ class PermissionsSeeder extends Seeder
 
         //Kardex producto permission
 
-        /*Permission::create([
+        Permission::create([
             'name'  => 'Consulta kardex producto',
             'slug'=>'kardex_producto.index',
             'description'=>'El usuario puede acceder a la consulta de Kardex producto'
-        ]);*/
+        ]);
 
         //Kardex - Ventas
         Permission::create([

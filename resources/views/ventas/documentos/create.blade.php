@@ -208,7 +208,7 @@
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ old('condicion_id') == $condicion->id || $condicion->descripcion == 'CONTADO' ? 'selected' : '' }}
+                                                        {{ old('condicion_id') == $condicion->id.'-'.$condicion->descripcion || $condicion->descripcion == 'CONTADO' ? 'selected' : '' }}
                                                         data-dias="{{$condicion->dias}}">
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
@@ -655,7 +655,7 @@
         if(condicion_id)
         {
             let cadena = condicion_id.split('-');
-            let dias = parseInt($('#condicion_id option:selected').data('dias')) + 1
+            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
             let fecha = new Date('{{ $fecha_hoy }}')
 
             fecha.setDate(fecha.getDate() + dias)

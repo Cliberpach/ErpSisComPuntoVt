@@ -958,8 +958,8 @@ class TablaDetalleSeeder extends Seeder
         $detalle->save();
 
         $detalle = new Detalle();
-        $detalle->descripcion = "BOLETA DE VENTA ELECTRÓNICA";
-        $detalle->nombre = "BOLETA DE VENTA ELECTRÓNICA";
+        $detalle->descripcion = "BOLETA ELECTRÓNICA";
+        $detalle->nombre = "BOLETA ELECTRÓNICA";
         $detalle->simbolo = '03';
         $detalle->parametro = 'B';
         $detalle->operacion = '0101';
@@ -1375,14 +1375,14 @@ class TablaDetalleSeeder extends Seeder
         //----------CONDICION------------
         $condicion = new Condicion();
         $condicion->descripcion = 'CONTADO';
-        $condicion->descripcion = 'Contado';
+        $condicion->slug = 'Contado';
         $condicion->tabladetalle_id = 160;
         $condicion->dias = 0;
         $condicion->save();
 
         $condicion = new Condicion();
         $condicion->descripcion = 'CRÉDITO';
-        $condicion->descripcion = 'Credito';
+        $condicion->slug = 'Credito';
         $condicion->tabladetalle_id = 161;
         $condicion->dias = 10;
         $condicion->save();
