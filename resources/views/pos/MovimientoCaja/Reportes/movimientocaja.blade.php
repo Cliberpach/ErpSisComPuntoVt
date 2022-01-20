@@ -295,44 +295,39 @@
                                     <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
                                 @endif
                             </tr>
-                        @else
-                            @if (!empty($ventas->documento->cuenta))
-                                @foreach ($ventas->documento->cuenta->detalles as $cuentaCliente)
-                                <tr>
-                                    <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
-                                    <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $ventas->documento->clienteEntidad->nombre }}</td>
-                                    <td style="text-align: center; border-right: 2px solid #52BE80">
-                                        {{ $cuentaCliente->monto }}
-                                    </td>
-                                    @if ($cuentaCliente->tipo_pago_id == 1)
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">
-                                            {{ $cuentaCliente->efectivo }}</td>
-                                    @elseif ($cuentaCliente->tipo_pago_id == 2)
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">
-                                            {{ $cuentaCliente->importe }}</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">
-                                            {{ $cuentaCliente->efectivo }}</td>
-                                    @elseif ($cuentaCliente->tipo_pago_id==3)
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">
-                                            {{ $cuentaCliente->importe }}</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">
-                                            {{ $cuentaCliente->efectivo }}</td>
-                                    @else
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
-                                    @endif
-                                </tr>
-                                @endforeach
-                            @endif
                         @endif
                     @endif
+                @endforeach
+                @foreach ($movimiento->detalleCuentaCliente as $cuentaCliente)
+                    <tr>
+                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                            {{ $cuentaCliente->cuenta_cliente->documento->nombreDocumento() }}</td>
+                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                            {{ $cuentaCliente->cuenta_cliente->documento->serie . '-' . $cuentaCliente->cuenta_cliente->documento->correlativo }}</td>
+                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                            {{ $cuentaCliente->cuenta_cliente->documento->clienteEntidad->nombre }}</td>
+                        <td style="text-align: center; border-right: 2px solid #52BE80">
+                            {{ $cuentaCliente->cuenta_cliente->monto }}
+                        </td>
+                        @if ($cuentaCliente->tipo_pago_id == 1)
+                            <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80">
+                                {{ $cuentaCliente->efectivo }}</td>
+                        @elseif ($cuentaCliente->tipo_pago_id==2)
+                            <td style="text-align: center; border-right: 2px solid #52BE80">
+                                {{ $cuentaCliente->importe }}</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80">
+                                {{ $cuentaCliente->efectivo }}</td>
+                        @elseif ($cuentaCliente->tipo_pago_id==3)
+                            <td style="text-align: center; border-right: 2px solid #52BE80">0</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80">
+                                {{ $cuentaCliente->importe }}</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80">
+                                {{ $cuentaCliente->efectivo }}</td>
+                        @endif
+                    </tr>
                 @endforeach
             </tbody>
         </table>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ventas\Electronico;
 
 use App\Events\DocumentoNumeracion;
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Condicion;
 use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 use Carbon\Carbon;
@@ -89,12 +90,16 @@ class ComprobanteController extends Controller
     {
         $documento = Documento::find($id);
         $arrayCuotas = Array();
-        $arrayCuotas[] = array(
-            "moneda" => "PEN",
-            "monto" => (float)1,
-            "fechaPago" => self::obtenerFechaEmision($documento)
+        $condicion = Condicion::find($documento->condicion_id);
+        if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
+        {
+            $arrayCuotas[] = array(
+                "moneda" => "PEN",
+                "monto" => (float)1,
+                "fechaPago" => self::obtenerFechaEmision($documento)
 
-        );
+            );
+        }
         /*if($documento->cuenta)
         {
             foreach($documento->cuenta->detalles as $item)
