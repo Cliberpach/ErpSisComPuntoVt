@@ -165,7 +165,7 @@
                             "<li><a class='dropdown-item' href='#' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</a></b></li>" +
                             "<li class='dropdown-divider'></li>" +
 
-                            "<li><a class='dropdown-item nuevo-ingreso' href='#' title='Ingreso'><i class='fa fa-save'></i> Ingreso</a></b></li>" +
+                            "<li><a class='dropdown-item nuevo-ingreso d-none' href='#' title='Ingreso'><i class='fa fa-save'></i> Ingreso</a></b></li>" +
 
                         "</ul></div>";
                     }
