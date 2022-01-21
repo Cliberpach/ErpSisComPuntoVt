@@ -44,9 +44,14 @@
                         <input type="date" id="fecha_hasta" class="form-control">
                     </div>
                 </div>
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-1">
                     <div class="form-group">
-                        <button class="btn btn-primary btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
+                        <button class="btn btn-success btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-1">
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-block" onclick="excelTable()"><i class="fa fa-file-excel-o"></i></button>
                     </div>
                 </div>
             </div>
@@ -297,6 +302,46 @@
             },
             "order": [[ 0, "desc" ]],
         });
+        return false;
+    }
+
+    function excelTable()
+    {
+        let verificar = true;
+        var fecha_desde = $('#fecha_desde').val();
+        var fecha_hasta = $('#fecha_hasta').val();
+        var tipo = $('#tipo_id').val();
+
+        if (tipo == '') {
+            verificar = false;
+            toastr.error('Ingresar documento');
+        }
+
+        if (fecha_desde == '' && fecha_desde == null && fecha_hasta == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha hasta');
+        }
+
+        if (fecha_hasta == '' && fecha_hasta == null && fecha_desde == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha desde');
+        }
+
+        if (fecha_desde > fecha_hasta && fecha_hasta == '' && fecha_desde == '') {
+            verificar = false;
+            toastr.error('Fecha desde debe ser menor que fecha hasta');
+        }
+
+        if(convertFloat(tipo) > 129)
+        {
+            verificar = false;
+            toastr.error('Solo se hace reporte en excel de los documentos de ventas.');
+        }
+
+        if(verificar)
+        {
+            window.location = '/consultas/documentos/getDownload?fecha_desde='+fecha_desde+'&fecha_hasta='+fecha_hasta+'&tipo='+tipo;
+        }
         return false;
     }
 </script>

@@ -194,14 +194,21 @@ class NotaIngresoController extends Controller
     public function storeFast(Request $request)
     {
         $fecha_hoy = Carbon::now()->toDateString();
-        $fecha_ = Carbon::createFromFormat('Y-m-d', $fecha_hoy);
         $fecha = Carbon::createFromFormat('Y-m-d', $fecha_hoy);
         $fecha = str_replace("-", "", $fecha);
         $fecha = str_replace(" ", "", $fecha);
         $fecha = str_replace(":", "", $fecha);
 
         $fecha_actual = Carbon::now();
-        $fecha_actual = date("d/m/Y",strtotime($fecha_actual));
+        $fecha_actual = date("d/m/Y", strtotime($fecha_actual));
+        $fecha_5 = date("Y-m-d", strtotime($fecha_hoy . "+ 5 years"));
+
+        $numero = $fecha . (DB::table('nota_ingreso')->count() + 1);
+
+        $dolar_aux = json_encode(precio_dolar(), true);
+        $dolar_aux = json_decode($dolar_aux, true);
+
+        $dolar = (float)$dolar_aux['original']['venta'];
         $fecha_5 = date("Y-m-d",strtotime($fecha_hoy."+ 5 years"));
 
         $data = $request->all();
@@ -224,44 +231,37 @@ class NotaIngresoController extends Controller
             return redirect()->route('almacenes.producto.index')->with('guardar', 'error');
         }
 
-        $dolar_aux = json_encode(precio_dolar(), true);
-        $dolar_aux = json_decode($dolar_aux, true);
-
-        $dolar = (float)$dolar_aux['original']['venta'];
-
-        $notaingreso = new NotaIngreso();
-        $notaingreso->numero = $fecha . (DB::table('nota_ingreso')->count() + 1);
-        $notaingreso->fecha = $fecha_;
-        $notaingreso->origen = 'INGRESO RAPIDO';
-        $notaingreso->tipo_cambio = $dolar;
-        $notaingreso->dolar = $dolar;
-        $notaingreso->total = $request->get('costo');
-        $notaingreso->moneda = 'SOLES';
-        $notaingreso->total_soles = (float) $request->get('costo');
-        $notaingreso->total_dolares = (float) $request->get('costo') / $dolar;
-        $notaingreso->usuario = Auth()->user()->usuario;
-        $notaingreso->save();
+        $nota = NotaIngreso::create([
+            'numero' => $numero,
+            'fecha' => $fecha_hoy,
+            'destino' => 'ALMACEN',
+            'moneda' => 'SOLES',
+            'tipo_cambio' => $dolar,
+            'dolar' => $dolar,
+            'origen' => 'INGRESO RAPIDO',
+            'usuario' => Auth()->user()->usuario
+        ]);
 
         $costo_soles = (float) $request->get('costo') / (float) $request->cantidad;
 
         $costo_dolares = (float) $costo_soles / (float) $dolar;
 
         DetalleNotaIngreso::create([
-            'nota_ingreso_id' => $notaingreso->id,
+            'nota_ingreso_id' => $nota->id,
             'lote' => 'LT-'.$fecha_actual,
             'cantidad' => $request->cantidad,
             'producto_id' => $request->producto_id,
+            'fecha_vencimiento' => $fecha_5,
             'costo' => $costo_soles,
             'costo_soles' => $costo_soles,
             'costo_dolares' => $costo_dolares,
             'valor_ingreso' => $request->costo ,
-            'fecha_vencimiento' => $fecha_5
         ]);
 
         //Registro de actividad
         $descripcion = "SE AGREGÓ LA NOTA DE INGRESO ";
         $gestion = "ALMACEN / NOTA INGRESO";
-        crearRegistro($notaingreso, $descripcion, $gestion);
+        crearRegistro($nota, $descripcion, $gestion);
 
 
         Session::flash('success','Ingreso creado correctamente.');

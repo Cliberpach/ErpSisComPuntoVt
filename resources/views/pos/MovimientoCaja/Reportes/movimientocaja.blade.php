@@ -246,7 +246,7 @@
             </tbody>
         </table>
     </div><br>
-    <span style="text-transform: uppercase;font-size:15px">Ingresos</span>
+    <span style="text-transform: uppercase;font-size:15px">VENTAS</span>
     <br>
     <div class="cuerpo">
         <table class="tbl-detalles text-uppercase" cellpadding="8" cellspacing="0">
@@ -298,6 +298,24 @@
                         @endif
                     @endif
                 @endforeach
+            </tbody>
+        </table>
+    </div><br>
+    <span style="text-transform: uppercase;font-size:15px">COBRANZA CLIENTES</span>
+    <br>
+    <div class="cuerpo">
+        <table class="tbl-detalles text-uppercase" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th style="text-align: center;border-right: 2px solid #52BE80">NUMERO</th>
+                    <th style="text-align: center; border-right: 2px solid #52BE80">CLIENTE</th>
+                    <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
+                    <th style="text-align: center; border-right: 2px solid #52BE80">TRANSFERENCIA</th>
+                    <th style="text-align: center; border-right: 2px solid #52BE80">YAPE/PLIN</th>
+                    <th style="text-align: right">EFECTIVO</th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach ($movimiento->detalleCuentaCliente as $cuentaCliente)
                     <tr>
                         <td style="text-align: center; border-right: 2px solid #52BE80">
@@ -331,8 +349,8 @@
                 @endforeach
             </tbody>
         </table>
-    </div><br>
-    <span style="text-transform: uppercase;font-size:15px">Egresos</span>
+    </div>
+    <span style="text-transform: uppercase;font-size:15px">EGRESOS POR CAJA</span>
     <br>
     <div class="cuerpo">
         <table class="tbl-detalles text-uppercase" cellpadding="8" cellspacing="0">
@@ -359,6 +377,8 @@
             </tbody>
         </table>
     </div>
+    <br>
+    <span style="text-transform: uppercase;font-size:15px">PAGOS PROVEEDORES</span>
     <br>
     <div class="cuerpo">
         <table class="tbl-detalles text-uppercase" cellpadding="8" cellspacing="0">

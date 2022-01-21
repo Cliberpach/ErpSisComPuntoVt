@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Consultas;
 
 use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
+use App\Exports\DocumentosExport;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Empresa;
@@ -15,6 +16,7 @@ use App\Ventas\Nota;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DocumentoController extends Controller
 {
@@ -166,5 +168,15 @@ class DocumentoController extends Controller
             'fullaccess' => $fullaccess,
             'condiciones' => $condiciones
         ]);
+    }
+
+    public function getDownload(Request $request)
+    {
+        ob_end_clean();
+        ob_start();
+        $tipo = $request->tipo;
+        $fecha_desde = $request->fecha_desde;
+        $fecha_hasta = $request->fecha_hasta;
+        return  Excel::download(new DocumentosExport($tipo,$fecha_desde,$fecha_hasta), 'INFORME_'.$fecha_desde.'-'.$fecha_hasta.'.xlsx');
     }
 }

@@ -480,6 +480,7 @@ function(){
 
         Route::get('index', 'Consultas\DocumentoController@index')->name('consultas.documento.index');
         Route::post('getTable','Consultas\DocumentoController@getTable')->name('consultas.documento.getTable');
+        Route::get('getDownload','Consultas\DocumentoController@getDownload')->name('consultas.documento.getDownload');
         Route::get('convertir/{id}','Consultas\DocumentoController@convertir')->name('consultas.documento.convertir');
 
     });
