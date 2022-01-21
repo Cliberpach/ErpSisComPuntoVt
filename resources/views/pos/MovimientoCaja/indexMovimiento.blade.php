@@ -127,14 +127,16 @@
                 className: "text-center",
                 "render": function(data, type, row, meta) {
                     var html =
-                        "<div class='btn-group'><a class='btn btn-primary btn-sm' href='#' title='Caja Cerrada'><i class='fa fa-check'> Caja Cerrada</i></a></div>";
+                            "<div class='btn-group'><a class='btn btn-primary btn-sm' href='#' title='Caja Cerrada'><i class='fa fa-check'> Caja Cerrada</i></a><a class='btn btn-danger btn-sm' href='#'  onclick='reporte(" +
+                                data.id +
+                            ")' title='Pdf'><i class='fa fa-file-pdf-o'></i></a></div>";
                     if (data.fecha_Cierre == "-") {
                         html =
                             "<div class='btn-group'><a class='btn btn-warning btn-sm' href='#'  onclick='cerrarCaja(" +
                             data.id +
                             ")' title='Modificar'><i class='fa fa-lock'> cerrar</i></a><a class='btn btn-danger btn-sm' href='#'  onclick='reporte(" +
                             data.id +
-                            ")' title='Modificar'><i class='fa fa-file-pdf-o'></i></a></div>"
+                            ")' title='Pdf'><i class='fa fa-file-pdf-o'></i></a></div>"
                     }
                     return html;
                 }

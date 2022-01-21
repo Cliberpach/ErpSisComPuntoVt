@@ -526,7 +526,6 @@
     })
 
     $('#cantidad').on('input', function() {
-        //this.value = this.value.replace(/[^0-9]/g, '');
         let max = convertFloat(this.max);
         let valor = convertFloat(this.value);
         if (valor > max) {
@@ -643,7 +642,6 @@
                 },
                 success: function(data) {
                     clientes_global = data.clientes;
-                    console.log(clientes_global)
                 },
             })
         @endif
@@ -1053,22 +1051,6 @@
         });
     }
     //DEVOLVER CANTIDADES A LOS LOTES
-    /*function devolverCantidades() {
-        //CARGAR PRODUCTOS PARA DEVOLVER LOTE
-        cargarProductos()
-        $.ajax({
-            dataType: 'json',
-            type: 'post',
-            url: '{{ route('ventas.documento.devolver.cantidades') }}',
-            data: {
-                '_token': $('input[name=_token]').val(),
-                'cantidades': $('#productos_tabla').val(),
-            }
-        }).done(function(result) {
-            alert('DEVOLUCION REALIZADA')
-        });
-    }*/
-
     function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
@@ -1215,8 +1197,6 @@
             });
             conIgv(convertFloat(total),convertFloat(18))
         @endif
-
-
     }
 
     function conIgv(total, igv) {

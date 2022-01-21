@@ -126,8 +126,8 @@ class CajaController extends Controller
     {
         $movimiento = MovimientoCaja::findOrFail($request->id);
         $colaborador = $movimiento->colaborador;
-        $ingresos = cuadreMovimientoCajaIngresos($movimiento);
-        $egresos = cuadreMovimientoCajaEgresos($movimiento);
+        $ingresos = cuadreMovimientoCajaIngresosCuadreEfectivo($movimiento);
+        $egresos = cuadreMovimientoCajaEgresosCuadreEfectivo($movimiento);
 
         Log::info($egresos);
         Log::info($ingresos);

@@ -527,7 +527,6 @@
     })
 
     $('#cantidad').on('input', function() {
-        //this.value = this.value.replace(/[^0-9]/g, '');
         let max = convertFloat(this.max);
         let valor = convertFloat(this.value);
         if (valor > max) {
@@ -644,7 +643,6 @@
                 },
                 success: function(data) {
                     clientes_global = data.clientes;
-                    console.log(clientes_global)
                 },
             })
         @endif
@@ -1199,8 +1197,6 @@
             });
             conIgv(convertFloat(total),convertFloat(18))
         @endif
-
-
     }
 
     function conIgv(total, igv) {
@@ -1562,7 +1558,7 @@
                 },
                 success: function(cliente) {
                     $('#buscarLotes').prop("disabled", false)
-                    obtenerLotesproductos(cliente.tabladetalles_id)
+                    $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
                 },
             })
         }
