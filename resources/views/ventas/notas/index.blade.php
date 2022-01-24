@@ -21,12 +21,12 @@
         </a>
     </div>
     <div class="col-12 col-md-2">
-       @if($documento->sunat === '1' && docValido($documento->id))
+       @if($documento->sunat == '1' && docValido($documento->id))
         <a href="{{ route('ventas.notas.create', array('documento_id' => $documento->id, 'nota' => '0')) }}" class="btn btn-block btn-w-m btn-primary m-t-md">
             <i class="fa fa-plus-square"></i> Nota de crédito
         </a>
        @endif
-       @if($documento->tipo_venta === '129' && docValido($documento->id))
+       @if($documento->tipo_venta == '129' && docValido($documento->id))
         <a href="{{ route('ventas.notas.create', array('documento_id' => $documento->id, 'nota' => '0','nota_venta' => 1)) }}" class="btn btn-block btn-w-m btn-primary m-t-md">
             <i class="fa fa-plus-square"></i> Nota
         </a>

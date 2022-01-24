@@ -207,22 +207,21 @@ if (!function_exists('docValido')) {
         $detalles = DocumentoDetalle::where('documento_id', $id)->get();
         $cont = 0 ;
 
-        if($documento->sunat === '2')
+        if($documento->sunat == '2')
         {
             return false;
         }
 
         foreach($detalles as $detalle)
         {
-            if($detalle->cantidad === $detalle->detalles->sum('cantidad'))
+            if($detalle->cantidad == $detalle->detalles->sum('cantidad'))
             {
                 $cont = $cont + 1;
             }
         }
 
-        if(count($detalles) === $cont)
+        if(count($detalles) == $cont)
         {
-
             $documento->sunat = '2';
             $documento->update();
             return false;
