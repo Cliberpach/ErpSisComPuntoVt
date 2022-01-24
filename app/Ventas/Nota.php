@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Ventas\DetalleCuentaCliente;
 use App\Ventas\CuentaCliente;
+use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 
 class Nota extends Model
@@ -102,6 +103,24 @@ class Nota extends Model
                     // $documento->total = $documento->total;
                     // $documento->update();
                 }
+            }
+
+            $documento = Documento::find($nota->documento->id);
+            $detalles = Detalle::where('documento_id', $nota->documento->id)->get();
+            $cont = 0;
+
+            foreach($detalles as $detalle)
+            {
+                if($detalle->cantidad == $detalle->detalles->sum('cantidad'))
+                {
+                    $cont = $cont + 1;
+                }
+            }
+
+            if(count($detalles) == $cont)
+            {
+                $documento->sunat = '2';
+                $documento->update();
             }
         });
 

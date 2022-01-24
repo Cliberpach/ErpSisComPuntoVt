@@ -335,7 +335,7 @@ $(document).ready(function() {
                     if((data.sunat == '2' && data.tipo_venta_id == 129) || (data.tipo_venta_id == 129 && data.estado == 'PENDIENTE'))
                     {
                         cadena = cadena +
-                        "<button type='button' class='btn btn-sm btn-danger m-1' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
+                        "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
                     }
 
                     if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')
