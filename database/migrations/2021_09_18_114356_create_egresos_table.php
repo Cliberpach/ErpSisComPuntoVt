@@ -16,7 +16,7 @@ class CreateEgresosTable extends Migration
         Schema::create('egreso', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('tipodocumento_id');
-            $table->unsignedInteger('cuenta_id');
+            $table->unsignedInteger('cuenta_id')->nullable(); //176
             $table->string('documento')->nullable();
             $table->text('descripcion');
             $table->decimal('importe');

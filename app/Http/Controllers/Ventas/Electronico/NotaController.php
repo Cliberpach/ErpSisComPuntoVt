@@ -303,11 +303,11 @@ class NotaController extends Controller
                 $envio_post = self::sunat_post($nota->id);
             }
 
-            $text = 'Nota de crédito creada.';
+            $text = 'Nota de crédito creada, se creo un egreso con el monto de la nota de credito.';
 
             if(isset($request->nota_venta))
             {
-                $text = 'Nota de devolución creada.';
+                $text = 'Nota de devolución creada, se creo un egreso con el monto de la nota de devolución.';
             }
 
             Session::flash('success', $text);

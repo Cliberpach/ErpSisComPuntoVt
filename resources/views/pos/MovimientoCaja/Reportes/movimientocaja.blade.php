@@ -262,7 +262,8 @@
             </thead>
             <tbody>
                 @foreach ($movimiento->detalleMovimientoVentas as $ventas)
-                    @if ($ventas->documento->sunat != '2' && $ventas->documento->condicion_id == 1 && $ventas->documento->estado_pago == 'PAGADA')
+                {{-- $ventas->documento->sunat != '2' &&  --}}
+                    @if ($ventas->documento->condicion_id == 1 && $ventas->documento->estado_pago == 'PAGADA')
                         <tr>
                             <td style="text-align: center; border-right: 2px solid #52BE80">
                                 {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>

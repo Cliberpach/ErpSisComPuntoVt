@@ -1135,7 +1135,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosCuadreEfectivo')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
+            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1182,7 +1182,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
+            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
                 $totalIngresos = $totalIngresos + ($item->documento->importe + $item->documento->efectivo);
             }
         }
@@ -1195,7 +1195,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaEfectivo')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
+            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1213,7 +1213,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaTransferencia')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
+            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 2) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1228,7 +1228,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaYapePlin')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
+            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 3) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1243,7 +1243,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaPos')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
+            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 4) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }

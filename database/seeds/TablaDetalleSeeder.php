@@ -1257,6 +1257,15 @@ class TablaDetalleSeeder extends Seeder
         $detalle->tabla_id = 31;
         $detalle->save();
 
+        //CUENTAS
+        $detalle = new Detalle();
+        $detalle->descripcion = "DEVOLUCION";
+        $detalle->simbolo = 'DEV';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 32;
+        $detalle->editable = 1;
+        $detalle->save();
+
         //Tipo nota de credito
         //TIPO DE DOCUMENTO (VENTA)
         $detalle = new Detalle();

@@ -5,6 +5,8 @@ namespace App\Ventas;
 use App\Mantenimiento\Condicion;
 use Illuminate\Database\Eloquent\Model;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
+use App\Pos\DetalleMovimientoEgresosCaja;
+use App\Pos\Egreso;
 use App\Ventas\DetalleCuentaCliente;
 use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Detalle;
@@ -122,6 +124,20 @@ class Nota extends Model
                 $documento->sunat = '2';
                 $documento->update();
             }
+
+            $cuenta = TablaDetalle::find(165);
+            $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->first()->id : null);
+            $egreso = new Egreso();
+            $egreso->tipodocumento_id = 120;
+            $egreso->cuenta_id = $cuenta_id;
+            $egreso->documento = $nota->documento->serie.' - '.$nota->documento->correlativo;
+            $egreso->descripcion = 'EGRESO POR DEVOLUCION';
+            $egreso->importe = $nota->mtoImpVenta;
+            $egreso->save();
+            $detalleMovimientoEgreso = new DetalleMovimientoEgresosCaja();
+            $detalleMovimientoEgreso->mcaja_id = movimientoUser()->id;
+            $detalleMovimientoEgreso->egreso_id = $egreso->id;
+            $detalleMovimientoEgreso->save();
         });
 
     }
