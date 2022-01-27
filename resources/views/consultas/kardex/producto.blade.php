@@ -49,14 +49,14 @@
                         style="text-transform:uppercase">
                             <thead>
                                 <tr>
-                                    <th class="text-center">PRODUCTO</th>
-                                    <th class="text-center">STOCK INI.</th>
-                                    <th class="text-center">COMPRAS</th>
-                                    <th class="text-center">INGRESOS</th>
-                                    <th class="text-center">VENTAS</th>
-                                    <th class="text-center">DEVOLUCIONES</th>
-                                    <th class="text-center">SALIDAS</th>
-                                    <th class="text-center">STOCK</th>
+                                    <th class="text-center" style="width: 30%;">PRODUCTO</th>
+                                    <th class="text-center" style="width: 10%;">STOCK INI.</th>
+                                    <th class="text-center" style="width: 10%;">COMPRAS</th>
+                                    <th class="text-center" style="width: 10%;">INGRESOS</th>
+                                    <th class="text-center" style="width: 10%;">VENTAS</th>
+                                    <th class="text-center" style="width: 10%;">DEVOLUCIONES</th>
+                                    <th class="text-center" style="width: 10%;">SALIDAS</th>
+                                    <th class="text-center" style="width: 10%;">STOCK</th>
                                 </tr>
                             </thead>
                             <tbody>
