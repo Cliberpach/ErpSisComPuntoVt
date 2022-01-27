@@ -51,7 +51,7 @@
                                 <tr>
                                     <th class="text-center">PRODUCTO</th>
                                     <th class="text-center">STOCK INI.</th>
-                                    <th class="text-center">COMRPAS</th>
+                                    <th class="text-center">COMPRAS</th>
                                     <th class="text-center">INGRESOS</th>
                                     <th class="text-center">VENTAS</th>
                                     <th class="text-center">DEVOLUCIONES</th>
