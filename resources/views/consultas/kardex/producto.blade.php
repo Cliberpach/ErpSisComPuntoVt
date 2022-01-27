@@ -50,13 +50,12 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">PRODUCTO</th>
-                                    <th class="text-center">ORIGEN</th>
-                                    <th class="text-center"># DOC</th>
-                                    <th class="text-center">FECHA</th>
-                                    <th class="text-center">CANTIDAD</th>
-                                    <th class="text-center">DESCRIPCION</th>
-                                    <th class="text-center">PRECIO</th>
-                                    <th class="text-center">IMPORTE</th>
+                                    <th class="text-center">STOCK INI.</th>
+                                    <th class="text-center">COMRPAS</th>
+                                    <th class="text-center">INGRESOS</th>
+                                    <th class="text-center">VENTAS</th>
+                                    <th class="text-center">DEVOLUCIONES</th>
+                                    <th class="text-center">SALIDAS</th>
                                     <th class="text-center">STOCK</th>
                                 </tr>
                             </thead>
@@ -103,19 +102,19 @@ function initTable()
     let verificar = true;
     var fecha_desde = $('#fecha_desde').val();
     var fecha_hasta = $('#fecha_hasta').val();
-    if (fecha_desde !== '' && fecha_desde !== null && fecha_hasta == '') {
+    if (fecha_hasta == '') {
         verificar = false;
-        toastr.error('Ingresar fecha hasta');
+        toastr.error('Ingresar fecha de inicio');
     }
 
-    if (fecha_hasta !== '' && fecha_hasta !== null && fecha_desde == '') {
+    if (fecha_desde == '') {
         verificar = false;
-        toastr.error('Ingresar fecha desde');
+        toastr.error('Ingresar fecha final');
     }
 
-    if (fecha_desde > fecha_hasta && fecha_hasta !== '' && fecha_desde !== '') {
+    if (fecha_desde > fecha_hasta && fecha_hasta != '' && fecha_desde != '') {
         verificar = false;
-        toastr.error('Fecha desde debe ser menor que fecha hasta');
+        toastr.error('Fecha de inicio debe ser menor que fecha final');
     }
 
     if(verificar)
@@ -213,15 +212,14 @@ function loadTable()
             //kardex INTERNA
             //{ data: 'id',className: "text-center"},
 
-            { data: 'producto',className: "text-center"},
-            { data: 'origen',className: "text-center"},
-            { data: 'numero_doc',className: "text-center"},
-            { data: 'fecha',className: "text-center"},
-            { data: 'cantidad',className: "text-center"},
-            { data: 'descripcion',className: "text-center"},
-            { data: 'precio',className: "text-center"},
-            { data: 'importe',className: "text-center"},
-            { data: 'stock',className: "text-center"},
+            { data: 'nombre',className: "text-center"},
+            { data: 'STOCKINI',className: "text-center"},
+            { data: 'COMPRAS',className: "text-center"},
+            { data: 'INGRESOS',className: "text-center"},
+            { data: 'VENTAS',className: "text-center"},
+            { data: 'DEVOLUCIONES',className: "text-center"},
+            { data: 'SALIDAS',className: "text-center"},
+            { data: 'STOCK',className: "text-center"},
         ],
         "language": {
                     "url": "{{asset('Spanish.json')}}"

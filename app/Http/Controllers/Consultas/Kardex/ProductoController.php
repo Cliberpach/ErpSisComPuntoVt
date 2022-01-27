@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductoController extends Controller
 {
@@ -18,36 +19,14 @@ class ProductoController extends Controller
 
     public function getTable(Request $request){
 
-        if($request->fecha_desde && $request->fecha_hasta)
-        {
-            $kardex = Kardex::whereBetween('fecha', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
-        }
-        else
-        {
-            $kardex = Kardex::orderBy('id', 'desc')->get();
-        }
+        $fecini = $request->fecha_desde;
+        $fecfin = $request->fecha_hasta;
+        $kardex = DB::select("call Sp_Rpte_Stock_fecha("."'".$fecini."'".","."'".$fecfin."'".")");
 
-
-
-        $coleccion = collect();
-        foreach($kardex as $item){
-
-            $coleccion->push([
-                'producto' => $item->producto->nombre,
-                'origen' => $item->origen,
-                'numero_doc' => $item->numero_doc,
-                'fecha' => $item->fecha,
-                'cantidad' => $item->cantidad,
-                'descripcion' => $item->descripcion,
-                'precio' => $item->precio,
-                'importe' =>  $item->importe,
-                'stock' =>  $item->stock
-            ]);
-        }
 
         return response()->json([
             'success' => true,
-            'kardex' => $coleccion,
+            'kardex' => $kardex,
         ]);
     }
 
