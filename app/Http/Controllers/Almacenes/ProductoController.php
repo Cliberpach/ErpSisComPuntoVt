@@ -9,6 +9,7 @@ use App\Almacenes\Producto;
 use App\Almacenes\ProductoDetalle;
 use App\Almacenes\TipoCliente;
 use App\Exports\Producto\CodigoBarra;
+use App\Exports\Producto\ProductosExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -406,5 +407,12 @@ class ProductoController extends Controller
         ob_start();
         $producto = Producto::find($id);
         return  Excel::download(new CodigoBarra($producto), $producto->codigo_barra.'.xlsx');
+    }
+
+    public function getExcel()
+    {
+        ob_end_clean(); // this
+        ob_start();
+        return  Excel::download(new ProductosExport, 'productos.xlsx');
     }
 }

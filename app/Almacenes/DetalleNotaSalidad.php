@@ -62,8 +62,8 @@ class DetalleNotaSalidad extends Model
             $kardex->cantidad = $detalle->cantidad;
             $kardex->producto_id = $detalle->producto_id;
             $kardex->descripcion = $detalle->nota_salidad->destino;
-            $kardex->precio = $detalle->producto->precio_venta_minimo;
-            $kardex->importe = $detalle->producto->precio_venta_minimo * $detalle->cantidad;
+            $kardex->precio = $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : $detalle->lote->detalle_nota->costo_soles;
+            $kardex->importe = ($detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : $detalle->lote->detalle_nota->costo_soles) * $detalle->cantidad;
             $kardex->stock = $detalle->producto->stock;
             $kardex->save();
 

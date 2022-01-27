@@ -243,6 +243,11 @@
                     <td>{{ $movimiento->monto_inicial }}</td>
                     {{-- <td>{{ getFechaFormato( $documento->fecha_documento ,'d/m/Y')}}</td> --}}
                 </tr>
+                <tr>
+                    <td style="padding-left: 5px;">Fecha</td>
+                    <td>:</td>
+                    <td>{{ date_format($movimiento->created_at, 'Y/m/d') }}</td>
+                </tr>
             </tbody>
         </table>
     </div><br>

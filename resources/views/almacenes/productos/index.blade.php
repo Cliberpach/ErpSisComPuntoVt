@@ -28,26 +28,43 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox ">
+                <div class="ibox-title">
+                    <h5>Productos</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                </div>
                 <div class="ibox-content" id="div_productos">
-                    <div class="table-responsive">
-                        <table class="table dataTables-producto table-striped table-bordered table-hover"
-                            style="text-transform:uppercase" id="table_productos">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">CÓDIGO</th>
-                                    <th class="text-center">CÓDIGO BARRA</th>
-                                    <th class="text-center">NOMBRE</th>
-                                    <th class="text-center">ALMACEN</th>
-                                    <th class="text-center">MARCA</th>
-                                    <th class="text-center">CATEGORIA</th>
-                                    <th class="text-center">STOCK</th>
-                                    <th class="text-center">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <div class="row justify-content-center">
+                        <div class="col-12 col-md-1">
+                            <div class="form-group">
+                                <a href="{{ route('almacenes.producto.getExcel') }}" class="btn btn-primary btn-block"><i class="fa fa-file-excel-o"></i></a>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table dataTables-producto table-striped table-bordered table-hover"
+                                    style="text-transform:uppercase" id="table_productos">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">CÓDIGO</th>
+                                            <th class="text-center">CÓDIGO BARRA</th>
+                                            <th class="text-center">NOMBRE</th>
+                                            <th class="text-center">ALMACEN</th>
+                                            <th class="text-center">MARCA</th>
+                                            <th class="text-center">CATEGORIA</th>
+                                            <th class="text-center">STOCK</th>
+                                            <th class="text-center">ACCIONES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
 
-                            </tbody>
-                        </table>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

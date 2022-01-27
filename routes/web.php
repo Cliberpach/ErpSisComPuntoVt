@@ -194,6 +194,8 @@ function(){
         Route::post('/getCodigo', 'Almacenes\ProductoController@getCodigo')->name('almacenes.producto.getCodigo');
         Route::get('/codigoBarras/{id}', 'Almacenes\ProductoController@codigoBarras')->name('almacenes.producto.codigoBarras');
 
+        Route::get('/getExcel', 'Almacenes\ProductoController@getExcel')->name('almacenes.producto.getExcel');
+
         Route::get('getProductos','Almacenes\ProductoController@getProductos')->name('getProductos');
         Route::get('getProducto/{id}','Almacenes\ProductoController@getProducto')->name('getProducto');
         Route::get('generarCode','Almacenes\ProductoController@generarCode')->name('generarCode');

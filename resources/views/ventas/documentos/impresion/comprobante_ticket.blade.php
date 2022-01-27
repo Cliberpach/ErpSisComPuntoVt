@@ -132,7 +132,7 @@
                 <tr>
                     <td>F. EMISIÓN</td>
                     <td>:</td>
-                    <td>{{ getFechaFormato( $documento->fecha_documento ,'d/m/Y')}}</td>
+                    <td>{{ getFechaFormato( $documento->fecha_documento ,'d/m/Y')}} {{ date_format($documento->created_at, 'H:i') }}</td>
                 </tr>
                 <tr>
                     <td>F. VENC.</td>
