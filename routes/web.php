@@ -636,6 +636,10 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
+    $fecini = '2020-01-11';
+    $fecfin = '2020-01-25';
+    $reporte = DB::select("call Sp_Rpte_Stock_fecha("."'".$fecini."'".","."'".$fecfin."'".")");
+    return $reporte;
     // $pdf = PDF::loadview('ventas.documentos.impresion.example')->setPaper('a4')->setWarnings(false);
 
     // return $pdf->stream('example.pdf');

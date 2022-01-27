@@ -27,9 +27,9 @@ class SalidaController extends Controller
         {
             $documentos = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
         }
-        
 
-        
+
+
         $coleccion = collect();
         foreach($documentos as $documento){
             $detalles = Detalle::where('estado','ACTIVO')->where('documento_id',$documento->id)->get();
@@ -39,7 +39,7 @@ class SalidaController extends Controller
                     'codigo' => $detalle->lote->producto->codigo,
                     'cantidad' => $detalle->cantidad,
                     'producto' => $detalle->lote->producto->nombre,
-                    'costo' => $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : 0.00,
+                    'costo' => $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : $detalle->lote->detalle_nota->costo_soles,
                     'precio' => $detalle->precio_nuevo,
                     'importe' => number_format($detalle->precio_nuevo * $detalle->cantidad, 2)
                 ]);
@@ -78,7 +78,7 @@ class SalidaController extends Controller
                         'cantidad' => $detalle->cantidad,
                         'motivo' => $nota->destino,
                         'producto' => $detalle->lote->producto->nombre,
-                        'costo' => $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : 0.00,
+                        'costo' => $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : $detalle->lote->detalle_nota->costo_soles,
                         'precio' => $detalle->lote->producto->precio_venta_minimo,
                     ]);
                 }
