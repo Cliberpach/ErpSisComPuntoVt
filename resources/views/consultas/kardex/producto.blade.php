@@ -91,8 +91,6 @@
 $(document).ready(function() {
     var kardex = [];
     // DataTables
-    initTable();
-
     tablaDatos = $('.dataTables-kardex').DataTable();
 
 });
