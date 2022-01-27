@@ -91,7 +91,11 @@
 $(document).ready(function() {
     var kardex = [];
     // DataTables
-    tablaDatos = $('.dataTables-kardex').DataTable();
+    tablaDatos = $('.dataTables-kardex').DataTable({
+        "language": {
+                    "url": "{{asset('Spanish.json')}}"
+        },
+    });
 
 });
 
