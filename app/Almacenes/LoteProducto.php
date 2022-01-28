@@ -78,6 +78,15 @@ class LoteProducto extends Model
             $producto->update();
         });
 
+        static::created(function(LoteProducto $loteProducto){
+            //RECORRER DETALLE NOTAS
+            $cantidadProductos = LoteProducto::where('producto_id',$loteProducto->producto_id)->where('estado','1')->sum('cantidad');
+            //ACTUALIZAR EL STOCK DEL PRODUCTO
+            $producto = Producto::findOrFail($loteProducto->producto_id);
+            $producto->stock = $cantidadProductos ? $cantidadProductos : 0.00;
+            $producto->update();
+        });
+
         static::updated(function(LoteProducto $loteProducto){
             //RECORRER DETALLE NOTAS
             $cantidadProductos = LoteProducto::where('producto_id',$loteProducto->producto_id)->where('estado','1')->sum('cantidad');
