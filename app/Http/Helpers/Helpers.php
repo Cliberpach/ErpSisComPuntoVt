@@ -1544,6 +1544,29 @@ if (!function_exists('CEC')) {
     }
 }
 
+if (!function_exists('FullAccess')) {
+    function FullAccess()
+    {
+        $user = Auth::user();
+        $fullaccess = false;
+        if(count($user->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count($user->roles))
+            {
+                if($user->roles[$cont]['full-access'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count($user->roles);
+                }
+
+                $cont = $cont + 1;
+            }
+        }
+        return $fullaccess;
+    }
+}
+
 
 
 

@@ -51,7 +51,16 @@ class DocumentoController extends Controller
 
     public function getDocument(){
 
-        $documentos = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
+        $documentos = [];
+        if(FullAccess())
+        {
+
+            $documentos = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
+        }
+        else {
+
+            $documentos = Documento::where('estado','!=','ANULADO')->where('user_id',auth()->user()->id)->orderBy('id', 'desc')->get();
+        }
         $coleccion = collect([]);
 
         $hoy = Carbon::now();
