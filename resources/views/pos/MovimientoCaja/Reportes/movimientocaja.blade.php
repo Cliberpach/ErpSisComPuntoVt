@@ -184,6 +184,68 @@
             padding: 0;
         }
 
+        .cont-check{
+            position: relative;
+        }
+
+        .checkmark {
+            display:inline-block;
+            width: 22px;
+            height:22px;
+            -ms-transform: rotate(45deg); /* IE 9 */
+            -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+            transform: rotate(45deg);
+        }
+
+        .checkmark_stem {
+            position: absolute;
+            width:3px;
+            height:12px;
+            background-color:#229954;
+            left:11px;
+            top:6px;
+        }
+
+        .checkmark_kick {
+            position: absolute;
+            width:3px;
+            height:3px;
+            background-color:#229954;
+            left:8px;
+            top:15px;
+        }
+
+        .cont-remove{
+            position: relative;
+        }
+
+        .remove {
+            display:inline-block;
+            width: 22px;
+            height:22px;
+            -ms-transform: rotate(45deg); /* IE 9 */
+            -webkit-transform: rotate(45deg); /* Chrome, Safari, Opera */
+            transform: rotate(45deg);
+        }
+
+        .remove_stem {
+            position: absolute;
+            width:3px;
+            height:12px;
+            background-color: brown;
+            left:11px;
+            top:6px;
+        }
+
+        .remove_kick {
+            position: absolute;
+            width:12px;
+            height:3px;
+            background-color:brown;
+            left:7px;
+            top:10px;
+        }
+
     </style>
 </head>
 
@@ -259,6 +321,7 @@
                 <tr>
                     <th style="text-align: center;border-right: 2px solid #52BE80">NUMERO</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">CLIENTE</th>
+                    <th style="text-align: center; border-right: 2px solid #52BE80">DEV</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">EFECTIVO</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">TRANSFERENCIA</th>
@@ -274,6 +337,23 @@
                                 {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
                             <td style="text-align: center; border-right: 2px solid #52BE80">
                                 {{ $ventas->documento->clienteEntidad->nombre }}</td>
+                            <td style="text-align: center; border-right: 2px solid #52BE80;">
+                                @if (count($ventas->documento->notas) > 0)
+                                <div class="cont-check">
+                                    <span class="checkmark">
+                                        <div class="checkmark_stem"></div>
+                                        <div class="checkmark_kick"></div>
+                                    </span>
+                                </div>
+                                @else
+                                <div class="cont-remove">
+                                    <span class="remove">
+                                        <div class="remove_stem"></div>
+                                        <div class="remove_kick"></div>
+                                    </span>
+                                </div>
+                                @endif
+                            </td>
                             <td style="text-align: center; border-right: 2px solid #52BE80">
                                 {{ $ventas->documento->total }}
                             </td>
@@ -298,7 +378,7 @@
                     @endif
                 @endforeach
                 <tr>
-                    <td colspan="3" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>
+                    <td colspan="4" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>
                     <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaEfectivo($movimiento), 2) }}</td>
                     <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaTransferencia($movimiento), 2) }}</td>
                     <td style="text-align: center; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaYapePlin($movimiento), 2) }}</td>

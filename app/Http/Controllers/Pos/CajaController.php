@@ -195,9 +195,12 @@ class CajaController extends Controller
     {
         $movimiento=MovimientoCaja::findOrFail($id);
         $empresa = Empresa::first();
+        $fecha = Carbon::now()->toDateString();
+
         $pdf = PDF::loadview('pos.MovimientoCaja.Reportes.movimientocaja',[
             'movimiento' => $movimiento,
-            'empresa' => $empresa
+            'empresa' => $empresa,
+            'fecha' => $fecha,
             ])->setPaper('a4')->setWarnings(false);
         return $pdf->stream();
     }

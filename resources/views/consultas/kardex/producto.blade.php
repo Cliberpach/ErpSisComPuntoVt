@@ -106,12 +106,12 @@ function initTable()
     var fecha_hasta = $('#fecha_hasta').val();
     if (fecha_hasta == '') {
         verificar = false;
-        toastr.error('Ingresar fecha de inicio');
+        toastr.error('Ingresar fecha final');
     }
 
     if (fecha_desde == '') {
         verificar = false;
-        toastr.error('Ingresar fecha final');
+        toastr.error('Ingresar fecha de inicio');
     }
 
     if (fecha_desde > fecha_hasta && fecha_hasta != '' && fecha_desde != '') {
@@ -226,7 +226,7 @@ function loadTable()
         "language": {
                     "url": "{{asset('Spanish.json')}}"
         },
-        "order": [[ 0, "desc" ]],
+        "order": [[ 7, "desc" ]],
 
 
     });

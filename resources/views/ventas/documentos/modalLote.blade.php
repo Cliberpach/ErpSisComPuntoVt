@@ -22,8 +22,8 @@
                                 <th class="text-center"></th>
                                 <th class="text-center">PRODUCTO</th>
                                 <th class="text-center">UM</th>
-                                <th class="text-center">LOTE</th>
-                                <th class="text-center">F. V.</th>
+                                <th class="text-center">CATEGORIA</th>
+                                <th class="text-center">MARCA</th>
                                 <th class="text-center">CANTID.</th>
                                 <th class="text-center">COD. BARRA</th>
                                 <th class="text-center">P. NORMAL</th>
@@ -155,8 +155,8 @@
                 {data: 'id', className: "text-center", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
                 {data: 'nombre', className: "text-left", name:"productos.nombre", sWidth: '35%' },
                 {data: 'unidad_producto', className: "text-center", name:"tabladetalles.simbolo", sWidth: '5%' },
-                {data: 'codigo_lote', className: "text-center", name:"lote_productos.codigo_lote",visible: false, sWidth: '15%' },
-                {data: 'fecha_venci', className: "text-center", name:"lote_productos.fecha_vencimiento",visible: false, sWidth: '5%' },
+                {data: 'categoria', className: "text-center", name:"categorias.descripcion", sWidth: '15%' },
+                {data: 'marca', className: "text-center", name:"marcas.marca", sWidth: '5%' },
                 {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
                 {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
                 {

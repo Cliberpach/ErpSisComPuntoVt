@@ -64,13 +64,13 @@ class Detalle extends Model
 
         static::updated(function(Detalle $detalle){
 
-            if($detalle->estado == 'ANULADO')
-            {
-                $lote = LoteProducto::find($detalle->lote_id);
-                $lote->cantidad = $lote->cantidad + $detalle->cantidad;
-                $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
-                $lote->update();
-            }
+            // if($detalle->estado == 'ANULADO')
+            // {
+            //     $lote = LoteProducto::find($detalle->lote_id);
+            //     $lote->cantidad = $lote->cantidad + $detalle->cantidad;
+            //     $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
+            //     $lote->update();
+            // }
         });
     }
 }
