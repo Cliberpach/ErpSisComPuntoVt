@@ -304,10 +304,9 @@
                         <table class="tbl-qr">
                             <tr>
                                 <td>
-                                    <p class="m-0 p-0" style="color: #229954;"><em>¡¡Gracias por su confianza y preferencia!!</em></p>
-                                    <div style="width: 90%; text-align: right;">
-                                        <img src="{{ public_path() . '/img/gota.png' }}" style="width: 50px;height: 45px;">
-                                    </div>
+                                    @foreach($empresa->bancos as $banco)
+                                        <p class="m-0 p-0 text-cuerpo"><b class="text-uppercase">{{ $banco->descripcion}}</b> {{ $banco->tipo_moneda}} <b>N°: </b> {{ $banco->num_cuenta}} <b>CCI:</b> {{ $banco->cci}}</p>
+                                    @endforeach
                                 </td>
                             </tr>
                         </table>

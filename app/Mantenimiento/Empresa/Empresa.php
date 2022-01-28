@@ -56,6 +56,6 @@ class Empresa extends Model
 
     public function bancos()
     {
-        return $this->hasMany('App\Mantenimiento\Empresa\Banco');
+        return $this->hasMany('App\Mantenimiento\Empresa\Banco')->where('estado','ACTIVO');
     }
 }
