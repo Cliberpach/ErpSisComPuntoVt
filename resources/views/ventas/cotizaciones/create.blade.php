@@ -25,305 +25,307 @@
         <div class="col-lg-12">
             <div class="ibox">
                 <div class="ibox-content">
-                    <form action="{{ route('ventas.cotizacion.store') }}" method="POST"
-                        id="form_registrar_cotizacion">
-                        @csrf
-                        <div class="row">
-                            <div class="col-lg-12 col-xs-12">
-                                <h4><b>Datos Generales</b></h4>
-                            </div>
-                            <div class="col-lg-12 col-xs-12 d-none">
-                                <div class="form-group row">
-                                    <div class="col-lg-6 col-xs-12">
-                                        <label class="required">Fecha de Documento</label>
-                                        <div class="input-group date">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-calendar"></i>
-                                            </span>
-                                            <input type="date" id="fecha_documento" name="fecha_documento"
-                                                class="form-control input-required {{ $errors->has('fecha_documento') ? ' is-invalid' : '' }}"
-                                                value="{{ old('fecha_documento', $fecha_hoy) }}"
-                                                autocomplete="off" required readonly>
-                                            @if ($errors->has('fecha_documento'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('fecha_documento') }}</strong>
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-lg-6 col-xs-12 select-required">
-                                        <label class="___class_+?31___">Moneda</label>
-                                        <select id="moneda" name="moneda"
-                                            class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
-                                            disabled>
-                                            <option selected>SOLES</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-lg-6 col-xs-12 select-required">
-                                        <label class="required">Empresa</label>
-                                        <select id="empresa" name="empresa"
-                                            class="select2_form form-control {{ $errors->has('empresa') ? ' is-invalid' : '' }}"
-                                            required>
-                                            <option></option>
-                                            @foreach ($empresas as $empresa)
-                                                <option value="{{ $empresa->id }}"
-                                                    {{ old('empresa') == $empresa->id || $empresa->id === 1 ? 'selected' : '' }}>
-                                                    {{ $empresa->razon_social }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @if ($errors->has('empresa'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('empresa') }}</strong>
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-12 col-xs-12">
+                    <div class="row">
+                        <div class="col-12">
+                            <form action="{{ route('ventas.cotizacion.store') }}" method="POST"
+                                id="form_registrar_cotizacion">
+                                @csrf
                                 <div class="row">
-                                    <div class="col-lg-4 col-xs-12">
-                                        <label class="required">Fecha de Atención</label>
-                                        <div class="input-group date">
-                                            <span class="input-group-addon">
-                                                <i class="fa fa-calendar"></i>
-                                            </span>
-                                            <input type="date" id="fecha_atencion" name="fecha_atencion"
-                                                class="form-control {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
-                                                value="{{ old('fecha_atencion', $fecha_hoy) }}"
-                                                autocomplete="off" required readonly>
-                                            @if ($errors->has('fecha_atencion'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('fecha_atencion') }}</strong>
-                                                </span>
-                                            @endif
-                                        </div>
+                                    <div class="col-lg-12 col-xs-12">
+                                        <h4><b>Datos Generales</b></h4>
                                     </div>
-                                    <div class="col-lg-4 col-xs-12">
-                                        <div class="form-group">
-                                            <label id="igv_requerido">IGV (%):</label>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
+                                    <div class="col-lg-12 col-xs-12 d-none">
+                                        <div class="form-group row">
+                                            <div class="col-lg-6 col-xs-12">
+                                                <label class="required">Fecha de Documento</label>
+                                                <div class="input-group date">
                                                     <span class="input-group-addon">
-                                                        <input type="checkbox" id="igv_check" name="igv_check" checked>
+                                                        <i class="fa fa-calendar"></i>
                                                     </span>
+                                                    <input type="date" id="fecha_documento" name="fecha_documento"
+                                                        class="form-control input-required {{ $errors->has('fecha_documento') ? ' is-invalid' : '' }}"
+                                                        value="{{ old('fecha_documento', $fecha_hoy) }}"
+                                                        autocomplete="off" required readonly>
+                                                    @if ($errors->has('fecha_documento'))
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $errors->first('fecha_documento') }}</strong>
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                <input type="text" value="{{ old('igv', '18') }}"
-                                                    class="form-control input-required {{ $errors->has('igv') ? ' is-invalid' : '' }}"
-                                                    name="igv" id="igv" maxlength="3" onkeyup="return mayus(this)" required>
-                                                @if ($errors->has('igv'))
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-lg-6 col-xs-12 select-required">
+                                                <label class="___class_+?31___">Moneda</label>
+                                                <select id="moneda" name="moneda"
+                                                    class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
+                                                    disabled>
+                                                    <option selected>SOLES</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-lg-6 col-xs-12 select-required">
+                                                <label class="required">Empresa</label>
+                                                <select id="empresa" name="empresa"
+                                                    class="select2_form form-control {{ $errors->has('empresa') ? ' is-invalid' : '' }}"
+                                                    required>
+                                                    <option></option>
+                                                    @foreach ($empresas as $empresa)
+                                                        <option value="{{ $empresa->id }}"
+                                                            {{ old('empresa') == $empresa->id || $empresa->id === 1 ? 'selected' : '' }}>
+                                                            {{ $empresa->razon_social }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @if ($errors->has('empresa'))
                                                     <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('igv') }}</strong>
+                                                        <strong>{{ $errors->first('empresa') }}</strong>
                                                     </span>
                                                 @endif
-
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-4 col-xs-12">
-                                        <div class="form-group">
-                                            <label class="">Vendedor</label>
-                                            <select id="vendedor" name="vendedor" class="select2_form form-control">
-                                                <option value=""></option>
-                                                @foreach (vendedores() as $vendedor)
-                                                    <option value="{{ $vendedor->id }}" {{ $vendedor->id === 1 ? 'selected' : '' }}>
-                                                        {{ $vendedor->persona->apellido_paterno . ' ' . $vendedor->persona->apellido_materno . ' ' . $vendedor->persona->nombres }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6 col-xs-12 select-required">
-                                        <label class="required">Cliente</label>
-                                        <select id="cliente" name="cliente"
-                                            class="select2_form form-control {{ $errors->has('cliente') ? ' is-invalid' : '' }}"
-                                            onchange="obtenerTipo(this)" required>
-                                            <option></option>
-                                            @foreach ($clientes as $cliente)
-                                                <option value="{{ $cliente->id }}"
-                                                    {{ old('cliente') == $cliente->id ? 'selected' : '' }}>
-                                                    {{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @if ($errors->has('cliente'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('cliente') }}</strong>
-                                            </span>
-                                        @endif
-                                    </div>
-                                    <div class="col-lg-6 col-xs-12">
-                                        <label class="required">Condición</label>
-                                        <select id="condicion_id" name="condicion_id"
-                                            class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                            required>
-                                            <option></option>
-                                            @foreach ($condiciones as $condicion)
-                                                <option value="{{ $condicion->id }}"
-                                                    {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
-                                                    {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @if ($errors->has('condicion_id'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('condicion_id') }}</strong>
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                <!-- OBTENER TIPO DE CLIENTE -->
-                                <input type="hidden" name="" id="tipo_cliente">
-                                <!-- OBTENER DATOS DEL PRODUCTO -->
-                                <input type="hidden" name="" id="presentacion_producto">
-                                <input type="hidden" name="" id="codigo_nombre_producto">
-                                <!-- LLENAR DATOS EN UN ARRAY -->
-                                <input type="hidden" id="productos_tabla" name="productos_tabla[]">
-
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-lg-12 col-xs-12">
-                                <div class="panel panel-primary">
-                                    <div class="panel-heading">
-                                        <h4><b>Detalle de la Cotización</b></h4>
-                                    </div>
-                                    <div class="panel-body">
+                                    <div class="col-lg-12 col-xs-12">
                                         <div class="row">
-                                            <div class="col-lg-12">
-                                                <div class="form-group row">
-                                                    <div class="col-lg-4 col-xs-12">
-                                                        <label class="required">Producto</label>
-                                                        <select id="producto"
-                                                            class="select2_form form-control {{ $errors->has('producto') ? ' is-invalid' : '' }}"
-                                                            onchange="obtenerMonto(this)" disabled>
-                                                            <option></option>
-                                                            @foreach ($lotes as $lote)
-                                                                <option value="{{ $lote->id }}"
-                                                                    {{ old('producto') == $lote->id ? 'selected' : '' }}>
-                                                                    {{ $lote->nombre }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        <div class="invalid-feedback"><b><span
-                                                                    id="error-producto"></span></b></div>
-                                                    </div>
-                                                    <div class="col-lg-2 col-xs-12">
-                                                        <label class="required">Cantidad</label>
-                                                        <input type="numer" id="cantidad" class="form-control"
-                                                            maxlength="10" onkeypress="return isNumber(event);"
-                                                            disabled>
-                                                        <div class="invalid-feedback"><b><span
-                                                                    id="error-cantidad"></span></b></div>
-                                                    </div>
-                                                    <div class="col-lg-2 col-xs-12">
-                                                        <label class="required">Precio</label>
-                                                        <input type="text" id="precio" class="form-control"
-                                                            maxlength="15" onkeypress="return filterFloat(event, this);"
-                                                            disabled>
-                                                        <div class="invalid-feedback"><b><span
-                                                                    id="error-precio"></span></b></div>
-                                                    </div>
-                                                    <div class="col-lg-2 col-xs-12">
-                                                        <label class="required">Descuento (%)</label>
-                                                        <input type="text" id="pdescuento" class="form-control"
-                                                            maxlength="15" onkeypress="return filterFloat(event, this);">
-                                                        <div class="invalid-feedback"><b><span
-                                                                    id="error-precio"></span></b></div>
-                                                    </div>
-                                                    <div class="col-lg-2 col-xs-12">
-                                                        <button type="button" id="btn_agregar_detalle"
-                                                            class="btn btn-warning btn-block m-t-lg"><i
-                                                                class="fa fa-plus"></i> AGREGAR</button>
+                                            <div class="col-lg-4 col-xs-12">
+                                                <label class="required">Fecha de Atención</label>
+                                                <div class="input-group date">
+                                                    <span class="input-group-addon">
+                                                        <i class="fa fa-calendar"></i>
+                                                    </span>
+                                                    <input type="date" id="fecha_atencion" name="fecha_atencion"
+                                                        class="form-control {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
+                                                        value="{{ old('fecha_atencion', $fecha_hoy) }}"
+                                                        autocomplete="off" required readonly>
+                                                    @if ($errors->has('fecha_atencion'))
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $errors->first('fecha_atencion') }}</strong>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-xs-12">
+                                                <div class="form-group">
+                                                    <label id="igv_requerido">IGV (%):</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" id="igv_check" name="igv_check" checked>
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" value="{{ old('igv', '18') }}"
+                                                            class="form-control input-required {{ $errors->has('igv') ? ' is-invalid' : '' }}"
+                                                            name="igv" id="igv" maxlength="3" onkeyup="return mayus(this)" required>
+                                                        @if ($errors->has('igv'))
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $errors->first('igv') }}</strong>
+                                                            </span>
+                                                        @endif
+
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="row m-t-sm" style="text-transform:uppercase">
-                                            <div class="col-lg-12">
-                                                <div class="table-responsive">
-                                                    <table
-                                                        class="table dataTables-detalle-cotizacion table-striped table-bordered table-hover">
-                                                        <thead>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th class="text-center">ACCIONES</th>
-                                                                <th class="text-center">CANT</th>
-                                                                <th class="text-center">PRODUCTO</th>
-                                                                <th class="text-center">V. UNITARIO</th>
-                                                                <th class="text-center">P. UNITARIO</th>
-                                                                <th class="text-center">DESCUENTO</th>
-                                                                <th class="text-center">P. NUEVO</th>
-                                                                <th class="text-center">TOTAL</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-
-                                                        </tbody>
-                                                        <tfoot>
-                                                            {{-- <tr>
-                                                                <th colspan="7" style="text-align: right !important;">
-                                                                    Sub Total:</th>
-                                                                <th class="text-center"><span
-                                                                        id="subtotal">0.00</span></th>
-
-                                                            </tr>
-                                                            <tr>
-                                                                <th colspan="7" class="text-right">IGV <span
-                                                                        id="igv_int"></span>:</th>
-                                                                <th class="text-center"><span
-                                                                        id="igv_monto">0.00</span></th>
-                                                            </tr> --}}
-                                                            <tr>
-                                                                <th colspan="8" class="text-right">TOTAL:</th>
-                                                                <th class="text-center"><span id="total">0.00</span>
-                                                                </th>
-                                                            </tr>
-                                                        </tfoot>
-                                                    </table>
+                                            <div class="col-lg-4 col-xs-12">
+                                                <div class="form-group">
+                                                    <label class="">Vendedor</label>
+                                                    <select id="vendedor" name="vendedor" class="select2_form form-control">
+                                                        <option value=""></option>
+                                                        @foreach (vendedores() as $vendedor)
+                                                            <option value="{{ $vendedor->id }}" {{ $vendedor->id === 1 ? 'selected' : '' }}>
+                                                                {{ $vendedor->persona->apellido_paterno . ' ' . $vendedor->persona->apellido_materno . ' ' . $vendedor->persona->nombres }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
                                             </div>
-
-
                                         </div>
+                                        <div class="row">
+                                            <div class="col-lg-6 col-xs-12 select-required">
+                                                <label class="required">Cliente</label>
+                                                <select id="cliente" name="cliente"
+                                                    class="select2_form form-control {{ $errors->has('cliente') ? ' is-invalid' : '' }}"
+                                                    onchange="obtenerTipo(this)" required>
+                                                    <option></option>
+                                                    @foreach ($clientes as $cliente)
+                                                        <option value="{{ $cliente->id }}"
+                                                            {{ old('cliente') == $cliente->id ? 'selected' : '' }}>
+                                                            {{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @if ($errors->has('cliente'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('cliente') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                            <div class="col-lg-6 col-xs-12 select-required">
+                                                <label class="required">Condición</label>
+                                                <select id="condicion_id" name="condicion_id"
+                                                    class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                                    required>
+                                                    <option></option>
+                                                    @foreach ($condiciones as $condicion)
+                                                        <option value="{{ $condicion->id }}"
+                                                            {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
+                                                            {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @if ($errors->has('condicion_id'))
+                                                    <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $errors->first('condicion_id') }}</strong>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <!-- OBTENER TIPO DE CLIENTE -->
+                                        <input type="hidden" name="" id="tipo_cliente">
+                                        <!-- OBTENER DATOS DEL PRODUCTO -->
+                                        <input type="hidden" name="" id="presentacion_producto">
+                                        <input type="hidden" name="" id="codigo_nombre_producto">
+                                        <!-- LLENAR DATOS EN UN ARRAY -->
+                                        <input type="hidden" id="productos_tabla" name="productos_tabla[]">
+
+                                    </div>
+                                </div>
+                                <input type="hidden" name="monto_sub_total" id="monto_sub_total"
+                                    value="{{ old('monto_sub_total') }}">
+                                <input type="hidden" name="monto_total_igv" id="monto_total_igv"
+                                    value="{{ old('monto_total_igv') }}">
+                                <input type="hidden" name="monto_total" id="monto_total" value="{{ old('monto_total') }}">
+                            </form>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-12 col-xs-12">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <h4><b>Detalle de la Cotización</b></h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group row">
+                                                <div class="col-lg-4 col-xs-12">
+                                                    <label class="required">Producto</label>
+                                                    <select id="producto"
+                                                        class="select2_form form-control {{ $errors->has('producto') ? ' is-invalid' : '' }}"
+                                                        onchange="obtenerMonto(this)" disabled>
+                                                        <option></option>
+                                                        @foreach ($lotes as $lote)
+                                                            <option value="{{ $lote->id }}"
+                                                                {{ old('producto') == $lote->id ? 'selected' : '' }}>
+                                                                {{ $lote->nombre }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <div class="invalid-feedback"><b><span
+                                                                id="error-producto"></span></b></div>
+                                                </div>
+                                                <div class="col-lg-2 col-xs-12">
+                                                    <label class="required">Cantidad</label>
+                                                    <input type="numer" id="cantidad" class="form-control"
+                                                        maxlength="10" onkeypress="return isNumber(event);"
+                                                        disabled>
+                                                    <div class="invalid-feedback"><b><span
+                                                                id="error-cantidad"></span></b></div>
+                                                </div>
+                                                <div class="col-lg-2 col-xs-12">
+                                                    <label class="required">Precio</label>
+                                                    <input type="text" id="precio" class="form-control"
+                                                        maxlength="15" onkeypress="return filterFloat(event, this);"
+                                                        disabled>
+                                                    <div class="invalid-feedback"><b><span
+                                                                id="error-precio"></span></b></div>
+                                                </div>
+                                                <div class="col-lg-2 col-xs-12">
+                                                    <label class="required">Descuento (%)</label>
+                                                    <input type="text" id="pdescuento" class="form-control"
+                                                        maxlength="15" onkeypress="return filterFloat(event, this);">
+                                                    <div class="invalid-feedback"><b><span
+                                                                id="error-precio"></span></b></div>
+                                                </div>
+                                                <div class="col-lg-2 col-xs-12">
+                                                    <button type="button" id="btn_agregar_detalle"
+                                                        class="btn btn-warning btn-block m-t-lg"><i
+                                                            class="fa fa-plus"></i> AGREGAR</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row m-t-sm" style="text-transform:uppercase">
+                                        <div class="col-lg-12">
+                                            <div class="table-responsive">
+                                                <table
+                                                    class="table dataTables-detalle-cotizacion table-striped table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th class="text-center">ACCIONES</th>
+                                                            <th class="text-center">CANT</th>
+                                                            <th class="text-center">PRODUCTO</th>
+                                                            <th class="text-center">V. UNITARIO</th>
+                                                            <th class="text-center">P. UNITARIO</th>
+                                                            <th class="text-center">DESCUENTO</th>
+                                                            <th class="text-center">P. NUEVO</th>
+                                                            <th class="text-center">TOTAL</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    </tbody>
+                                                    <tfoot>
+                                                        {{-- <tr>
+                                                            <th colspan="7" style="text-align: right !important;">
+                                                                Sub Total:</th>
+                                                            <th class="text-center"><span
+                                                                    id="subtotal">0.00</span></th>
+
+                                                        </tr>
+                                                        <tr>
+                                                            <th colspan="7" class="text-right">IGV <span
+                                                                    id="igv_int"></span>:</th>
+                                                            <th class="text-center"><span
+                                                                    id="igv_monto">0.00</span></th>
+                                                        </tr> --}}
+                                                        <tr>
+                                                            <th colspan="8" class="text-right">TOTAL:</th>
+                                                            <th class="text-center"><span id="total">0.00</span>
+                                                            </th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        </div>
+
+
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-
-                        <input type="hidden" name="monto_sub_total" id="monto_sub_total"
-                            value="{{ old('monto_sub_total') }}">
-                        <input type="hidden" name="monto_total_igv" id="monto_total_igv"
-                            value="{{ old('monto_total_igv') }}">
-                        <input type="hidden" name="monto_total" id="monto_total" value="{{ old('monto_total') }}">
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <div class="form-group row">
-                                    <div class="col-md-6 text-left">
-                                        <i class="fa fa-exclamation-circle leyenda-required"></i> <small
-                                            class="leyenda-required">Los campos marcados con asterisco
-                                            (<label class="required"></label>) son obligatorios.</small>
-                                    </div>
-                                    <div class="col-md-6 text-right">
-                                        <a href="{{ route('almacenes.producto.index') }}" id="btn_cancelar"
-                                            class="btn btn-w-m btn-default">
-                                            <i class="fa fa-arrow-left"></i> Regresar
-                                        </a>
-                                        <button type="submit" id="btn_grabar" class="btn btn-w-m btn-primary">
-                                            <i class="fa fa-save"></i> Grabar
-                                        </button>
-                                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group row">
+                                <div class="col-md-6 text-left">
+                                    <i class="fa fa-exclamation-circle leyenda-required"></i> <small
+                                        class="leyenda-required">Los campos marcados con asterisco
+                                        (<label class="required"></label>) son obligatorios.</small>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <a href="{{ route('almacenes.producto.index') }}" id="btn_cancelar"
+                                        class="btn btn-w-m btn-default">
+                                        <i class="fa fa-arrow-left"></i> Regresar
+                                    </a>
+                                    <button type="submit" id="btn_grabar" form="form_registrar_cotizacion" class="btn btn-w-m btn-primary">
+                                        <i class="fa fa-save"></i> Grabar
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

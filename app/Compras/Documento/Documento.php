@@ -30,7 +30,18 @@ class Documento extends Model
 
             'sub_total',
             'total_igv',
+            'percepcion',
             'total',
+
+            'sub_total_soles',
+            'total_igv_soles',
+            'percepcion_soles',
+            'total_soles',
+
+            'sub_total_dolares',
+            'total_igv_dolares',
+            'percepcion_dolares',
+            'total_dolares',
 
             'serie_tipo',
             'numero_tipo',

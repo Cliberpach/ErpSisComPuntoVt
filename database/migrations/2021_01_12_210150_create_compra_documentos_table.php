@@ -40,14 +40,17 @@ class CreateCompraDocumentosTable extends Migration
 
             $table->unsignedDecimal('sub_total', 15, 4)->nullable();
             $table->unsignedDecimal('total_igv', 15, 4)->nullable();
+            $table->unsignedDecimal('percepcion', 15, 4)->nullable();
             $table->unsignedDecimal('total', 15, 4)->nullable();
 
             $table->unsignedDecimal('sub_total_soles', 15, 4)->nullable();
             $table->unsignedDecimal('total_igv_soles', 15, 4)->nullable();
+            $table->unsignedDecimal('percepcion_soles', 15, 4)->nullable();
             $table->unsignedDecimal('total_soles', 15, 4)->nullable();
 
             $table->unsignedDecimal('sub_total_dolares', 15, 4)->nullable();
             $table->unsignedDecimal('total_igv_dolares', 15, 4)->nullable();
+            $table->unsignedDecimal('percepcion_dolares', 15, 4)->nullable();
             $table->unsignedDecimal('total_dolares', 15, 4)->nullable();
 
             $table->mediumText('observacion')->nullable();

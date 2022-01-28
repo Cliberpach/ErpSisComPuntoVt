@@ -478,11 +478,14 @@
                                     <input type="hidden" name="monto_sub_total" id="monto_sub_total" value="{{ old('monto_sub_total') }}">
                                     <input type="hidden" name="monto_total_igv" id="monto_total_igv" value="{{ old('monto_total_igv') }}">
                                     <input type="hidden" name="monto_total" id="monto_total" value="{{ old('monto_total') }}">
+                                    <input type="hidden" name="monto_percepcion" id="monto_percepcion" value="{{ old('monto_percepcion') }}">
 
                                 </div>
                             </form>
                         </div>
                     </div>
+
+                    <hr>
 
                     <div class="row">
 
@@ -622,7 +625,14 @@
                                                     <th colspan="7" class="text-center">IGV <span
                                                             id="igv_int"></span>:</th>
                                                     <th class="text-center"><span id="igv_monto">0.0</span></th>
-
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="7" class="text-center">Percepcion:</th>
+                                                    <th class="text-center">
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" value="0.00" id="percepcion" onkeypress="return filterFloat(event, this, false);">
+                                                        </div>
+                                                    </th>
                                                 </tr>
                                                 <tr>
                                                     <th colspan="7" class="text-center">TOTAL:</th>
@@ -934,6 +944,7 @@
                             $('#monto_sub_total').val($('#subtotal').text())
                             $('#monto_total_igv').val($('#igv_monto').text())
                             $('#monto_total').val($('#total').text())
+                            $('#monto_percepcion').val($('#percepcion').val())
 
                             @if (!empty($orden))
                                 var validar = montosFlete()
@@ -1365,6 +1376,10 @@
 
     })
 
+    $("#percepcion").on('keyup', function() {
+        sumaTotal()
+    })
+
     function limpiarDetalle() {
         $('#presentacion').val('')
         $('#precio').val('')
@@ -1499,8 +1514,9 @@
 
     function sinIgv(subtotal) {
         // calular igv (calcular la base)
+        var percepcion = convertFloat($('#percepcion').val())
         var igv =  subtotal * 0.18
-        var total = subtotal + igv
+        var total = subtotal + igv + percepcion
         $('#igv_int').text('18%')
         $('#subtotal').text(subtotal.toFixed(2))
         $('#igv_monto').text(igv.toFixed(2))
@@ -1511,6 +1527,7 @@
     function conIgv(subtotal) {
         // CALCULAR IGV (BASE)
         var igv = $('#igv').val()
+        var percepcion = convertFloat($('#percepcion').val())
         if (igv) {
             var calcularIgv = igv/100
             var base = subtotal / (1 + calcularIgv)
@@ -1518,7 +1535,7 @@
             $('#igv_int').text(igv+'%')
             $('#subtotal').text(base.toFixed(2))
             $('#igv_monto').text(nuevo_igv.toFixed(2))
-            $('#total').text(subtotal.toFixed(2))
+            $('#total').text((subtotal + percepcion).toFixed(2))
 
         }else{
             toastr.error('Ingrese Igv.', 'Error');

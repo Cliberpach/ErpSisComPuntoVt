@@ -117,7 +117,7 @@
                                             <select
                                                 class="select2_form form-control {{ $errors->has('proveedor_id') ? ' is-invalid' : '' }}"
                                                 style="text-transform: uppercase; width:100%" value="{{old('proveedor_id',$documento->proveedor_id)}}"
-                                                name="proveedor_id" id="proveedor_id" required>
+                                                name="proveedor_id" id="proveedor_id" required @if (!empty($documento->orden_id)) disabled @endif>
                                                 <option></option>
                                                 @foreach ($proveedores as $proveedor)
                                                 @if($proveedor->ruc)
@@ -141,7 +141,7 @@
                                             <select
                                                 class="select2_form form-control {{ $errors->has('proveedor_razon') ? ' is-invalid' : '' }}"
                                                 style="text-transform: uppercase; width:100%" value="{{old('proveedor_razon')}}"
-                                                name="proveedor_razon" id="proveedor_razon" required>
+                                                name="proveedor_razon" id="proveedor_razon" required @if (!empty($documento->orden_id)) disabled @endif>
                                                 <option></option>
                                                 @foreach ($proveedores as $proveedor)
                                                     @if($proveedor->ruc)
@@ -174,7 +174,7 @@
                                                     class="select2_form form-control {{ $errors->has('modo_compra') ? ' is-invalid' : '' }}"
                                                     style="text-transform: uppercase; width:100%"
                                                     value="{{old('modo_compra',$documento->modo_compra)}}" name="modo_compra"
-                                                    id="modo_compra" required>
+                                                    id="modo_compra" required @if (!empty($documento->orden_id)) disabled @endif>
                                                     <option></option>
                                                     @foreach (modo_compra() as $modo)
                                                     <option value="{{$modo->descripcion}}" @if(old('modo_compra',$documento->
@@ -195,7 +195,7 @@
                                                 <select
                                                     class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
                                                     style="text-transform: uppercase; width:100%"
-                                                    value="{{old('moneda',$documento->moneda)}}" name="moneda" id="moneda" required>
+                                                    value="{{old('moneda',$documento->moneda)}}" name="moneda" id="moneda" required @if (!empty($documento->orden_id)) disabled @endif>
                                                     <option></option>
                                                     @foreach (tipos_moneda() as $moneda)
                                                     <option value="{{$moneda->descripcion}}" @if(old('moneda',$documento->
@@ -280,7 +280,7 @@
                                                 <div class="input-group">
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-addon">
-                                                            <input type="checkbox" id="igv_check" name="igv_check">
+                                                            <input type="checkbox" id="igv_check" name="igv_check" @if (!empty($documento->orden_id)) disabled @endif>
                                                         </span>
                                                     </div>
                                                     <input type="text" value="{{old('igv',$documento->igv)}}" maxlength="3"
@@ -301,7 +301,7 @@
                                             <textarea type="text" placeholder=""
                                                 class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
                                                 name="observacion" id="observacion"  onkeyup="return mayus(this)"
-                                                value="{{old('observacion', $documento->observacion)}}">{{old('observacion',$documento->observacion)}}</textarea>
+                                                value="{{old('observacion', $documento->observacion)}}" @if (!empty($documento->orden_id)) disabled @endif>{{old('observacion',$documento->observacion)}}</textarea>
                                             @if ($errors->has('observacion'))
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $errors->first('observacion') }}</strong>
@@ -313,9 +313,10 @@
 
                                     </div>
 
-                                    <input type="hidden" name="monto_sub_total" id="monto_sub_total" value="{{ old('monto_sub_total') }}">
-                                    <input type="hidden" name="monto_total_igv" id="monto_total_igv" value="{{ old('monto_total_igv') }}">
-                                    <input type="hidden" name="monto_total" id="monto_total" value="{{ old('monto_total') }}">
+                                    <input type="hidden" name="monto_sub_total" id="monto_sub_total" value="{{ old('monto_sub_total',$documento->sub_total) }}">
+                                    <input type="hidden" name="monto_total_igv" id="monto_total_igv" value="{{ old('monto_total_igv',$documento->total_igv) }}">
+                                    <input type="hidden" name="monto_total" id="monto_total" value="{{ old('monto_total',$documento->total) }}">
+                                    <input type="hidden" name="monto_percepcion" id="monto_percepcion" value="{{ old('monto_percepcion',$documento->percepcion) }}">
 
                                 </div>
                             </form>
@@ -451,6 +452,14 @@
                                                             id="igv_int"></span>:</th>
                                                     <th class="text-center"><span id="igv_monto"></span></th>
 
+                                                </tr>
+                                                <tr>
+                                                    <th colspan="7" class="text-center">Percepcion:</th>
+                                                    <th class="text-center">
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" value="{{old('monto_percepcion',$documento->percepcion)}}" id="percepcion" onkeypress="return filterFloat(event, this, false);">
+                                                        </div>
+                                                    </th>
                                                 </tr>
                                                 <tr>
                                                     <th colspan="7" class="text-center">TOTAL:</th>
@@ -770,11 +779,25 @@ $('#enviar_orden').submit(function(e) {
             cancelButtonText: "No, Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
-                cargarproductos()
                 $('#monto_sub_total').val($('#subtotal').text())
                 $('#monto_total_igv').val($('#igv_monto').text())
                 $('#monto_total').val($('#total').text())
-                this.submit();
+                $('#monto_percepcion').val($('#percepcion').val())
+                @if (!empty($documento->orden_id))
+                cargarproductos()
+                    document.getElementById("modo_compra").disabled = false;
+                    document.getElementById("igv_check").disabled = false;
+                    document.getElementById("moneda").disabled = false;
+                    document.getElementById("observacion").disabled = false;
+                    document.getElementById("proveedor_razon").disabled = false;
+                    document.getElementById("proveedor_id").disabled = false;
+                    document.getElementById("fecha_documento_campo").disabled = false;
+                    document.getElementById("fecha_entrega_campo").disabled = false;
+                    this.submit();
+                @else
+                    cargarproductos()
+                    this.submit();
+                @endif
 
             } else if (
                 /* Read more about handling dismissals below */
@@ -1140,6 +1163,10 @@ $(".enviar_producto").click(function() {
     });
 })
 
+$("#percepcion").on('keyup', function() {
+    sumaTotal()
+})
+
 function limpiarDetalle() {
     $('#presentacion').val('')
     $('#precio').val('')
@@ -1313,8 +1340,9 @@ function sumaTotal() {
 
     function sinIgv(subtotal) {
         // calular igv (calcular la base)
+        var percepcion = convertFloat($('#percepcion').val())
         var igv =  subtotal * 0.18
-        var total = subtotal + igv
+        var total = subtotal + igv + percepcion
         $('#igv_int').text('18%')
         $('#subtotal').text(subtotal.toFixed(2))
         $('#igv_monto').text(igv.toFixed(2))
@@ -1324,6 +1352,7 @@ function sumaTotal() {
 
     function conIgv(subtotal) {
         // CALCULAR IGV (BASE)
+        var percepcion = convertFloat($('#percepcion').val())
         var igv = $('#igv').val()
         if (igv) {
             var calcularIgv = igv/100
@@ -1332,7 +1361,7 @@ function sumaTotal() {
             $('#igv_int').text(igv+'%')
             $('#subtotal').text(base.toFixed(2))
             $('#igv_monto').text(nuevo_igv.toFixed(2))
-            $('#total').text(subtotal.toFixed(2))
+            $('#total').text((subtotal + percepcion).toFixed(2))
 
         }else{
             toastr.error('Ingrese Igv.', 'Error');
