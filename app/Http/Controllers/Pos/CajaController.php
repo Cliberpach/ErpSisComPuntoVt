@@ -102,6 +102,7 @@ class CajaController extends Controller
         $movimiento->monto_inicial = $request->saldo_inicial;
         $movimiento->estado_movimiento = "APERTURA";
         $movimiento->fecha_apertura = date('Y-m-d h:i:s');
+        $movimiento->fecha = date('Y-m-d');
         $movimiento->save();
         $caja = Caja::findOrFail($request->caja);
         $caja->estado_caja = "ABIERTA";
@@ -128,9 +129,6 @@ class CajaController extends Controller
         $colaborador = $movimiento->colaborador;
         $ingresos = cuadreMovimientoCajaIngresosCuadreEfectivo($movimiento);
         $egresos = cuadreMovimientoCajaEgresosCuadreEfectivo($movimiento);
-
-        Log::info($egresos);
-        Log::info($ingresos);
         return array(
             "caja" => $movimiento->caja->nombre,
             "monto_inicial" => $movimiento->monto_inicial,
@@ -146,7 +144,7 @@ class CajaController extends Controller
         try
         {
             if (MovimientoCaja::where('estado_movimiento', 'APERTURA')->count() != 0) {
-                if (Auth::user()->usuario == 'ADMINISTRADOR') {
+                if (FullAccess() || PuntoVenta()) {
                     return response()->json([
                         'success' => true
                     ]);

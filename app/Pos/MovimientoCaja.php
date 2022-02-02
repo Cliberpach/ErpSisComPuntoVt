@@ -16,6 +16,7 @@ class MovimientoCaja extends Model
         'monto_inicial', 'monto_final',
         'fecha_apertura', 'fecha_cierre',
         'estado_movimiento',
+        'fecha',
         'estado',
     ];
     public $timestamps = true;

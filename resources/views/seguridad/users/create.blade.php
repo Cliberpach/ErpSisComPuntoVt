@@ -40,9 +40,9 @@
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $errors->first('usuario') }}</strong>
                                         </span>
-                                    @endif                                    
+                                    @endif
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label class="required">Email</label>
                                     <input type="email" id="email" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }} text-uppercase" name="email" value="{{old('email') ? old('email') : ''}}{{session('email') ? session('email') : ''}}" required>
@@ -78,7 +78,7 @@
                                                 <strong>{{ session('mpassword') }}</strong>
                                             </span>
                                             @endif
-                                        </div> 
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -92,7 +92,7 @@
                                             </span>
                                             @endif
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -119,10 +119,10 @@
                                             </div>
                                             @endforeach
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
-                        </div>                       
+                        </div>
                         <div class="hr-line-dashed"></div>
                         <div class="row">
                             <div class="col-lg-12">

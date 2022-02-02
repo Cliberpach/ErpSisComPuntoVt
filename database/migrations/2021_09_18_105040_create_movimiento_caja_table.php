@@ -21,6 +21,7 @@ class CreateMovimientoCajaTable extends Migration
             $table->decimal('monto_inicial');
             $table->decimal('monto_final')->nullable();
             $table->dateTime('fecha_apertura');
+            $table->date('fecha'); //nuevo
             $table->dateTime('fecha_cierre')->nullable();
             $table->enum('estado_movimiento',['APERTURA','CIERRE']);
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');

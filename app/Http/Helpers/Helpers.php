@@ -1072,10 +1072,10 @@ if (!function_exists('clientes')) {
 if (!function_exists('movimientoUser')) {
     function movimientoUser()
     {
-        if (Auth::user()->usuario == "ADMINISTRADOR") {
+        if (FullAccess() || PuntoVenta()) {
 
             $consulta = MovimientoCaja::where('caja_id', 1)->where('estado_movimiento', 'APERTURA');
-            if ($consulta->count() !== 0) {
+            if ($consulta->count() != 0) {
                 return $consulta->first();
             } else {
                 return MovimientoCaja::where('estado_movimiento', 'APERTURA')->first();
@@ -1564,6 +1564,37 @@ if (!function_exists('FullAccess')) {
             }
         }
         return $fullaccess;
+    }
+}
+
+if (!function_exists('PuntoVenta')) {
+    function PuntoVenta()
+    {
+        $user = Auth::user();
+        $fullaccess = false;
+        if(count($user->roles)>0)
+        {
+            $cont = 0;
+            while($cont < count($user->roles))
+            {
+                if($user->roles[$cont]['punto-venta'] == 'SI')
+                {
+                    $fullaccess = true;
+                    $cont = count($user->roles);
+                }
+
+                $cont = $cont + 1;
+            }
+        }
+        return $fullaccess;
+    }
+}
+
+if (!function_exists('tipos_pago')) {
+    function tipos_pago()
+    {
+        $tipos = TipoPago::where('estado','ACTIVO')->get();
+        return $tipos;
     }
 }
 

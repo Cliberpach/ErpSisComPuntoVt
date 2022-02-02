@@ -19,6 +19,7 @@ class CreateRolesTable extends Migration
             $table->string('slug');
             $table->text('description')->nullable();
             $table->enum('full-access',['SI','NO'])->nullable();
+            $table->enum('punto-venta',['SI','NO'])->nullable();
             $table->timestamps();
         });
     }

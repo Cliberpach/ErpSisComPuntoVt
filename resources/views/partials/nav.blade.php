@@ -197,13 +197,13 @@
             class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
         @can('haveaccess','reporte_cajadiaria.index')
-        <li class="@yield('caja_diaria-active')"><a href="#">Caja Diaria</a></li>
+        <li class="@yield('caja_diaria-active')"><a href="{{ route('reporte.pos.cajadiaria') }}">Caja Diaria</a></li>
         @endcan
         @can('haveaccess','reporte_venta.index')
-        <li class="@yield('ventas_reporte-active')"><a href="#">Ventas</a></li>
+        <li class="@yield('ventas_reporte-active')"><a href="{{ route('reporte.ventas.documento') }}">Ventas</a></li>
         @endcan
         @can('haveaccess','reporte_compra.index')
-        <li class="@yield('compras_reporte-active')"><a href="#">Compras</a></li>
+        <li class="@yield('compras_reporte-active')"><a href="{{ route('reporte.compras.documento') }}">Compras</a></li>
         @endcan
         @can('haveaccess','reporte_nota_salida.index')
         <li class="@yield('nota_salida_reporte-active')"><a href="#">Nota Salida</a></li>
@@ -212,10 +212,10 @@
         <li class="@yield('nota_ingreso_reporte-active')"><a href="#">Nota Ingreso</a></li>
         @endcan
         @can('haveaccess','reporte_cuenta_cobrar.index')
-        <li class="@yield('cuentas_x_cobrar_reporte-active')"><a href="#">Cuentas por Cobrar</a></li>
+        <li class="@yield('cuentas_x_cobrar_reporte-active')"><a href="{{ route('reporte.cuentas.cliente') }}">Cuentas por Cobrar</a></li>
         @endcan
         @can('haveaccess','reporte_cuenta_pagar.index')
-        <li class="@yield('cuentas_x_pagar_reporte-active')"><a href="#">Cuentas por Pagar</a></li>
+        <li class="@yield('cuentas_x_pagar_reporte-active')"><a href="{{ route('reporte.cuentas.proveedor') }}">Cuentas por Pagar</a></li>
         @endcan
         @can('haveaccess','reporte_stock_valorizado.index')
         <li class="@yield('stock_valorizado_reporte-active')"><a href="#">Stock Valorizado</a></li>

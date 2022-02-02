@@ -41,9 +41,9 @@
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $errors->first('usuario') }}</strong>
                                         </span>
-                                    @endif                                     
+                                    @endif
                                 </div>
-                                
+
                                 <div class="form-group">
                                     <label class="required">Email</label>
                                     <input type="text" id="email" id="email" class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }} text-uppercase" name="email" value="{{old('email')? old('email') : $user->email}}" required>
@@ -58,7 +58,7 @@
                                     <select name="colaborador_id" id="colaborador_id" class="form-control select2_form {{ $errors->has('colaborador_id') ? ' is-invalid' : '' }}">
                                         <option></option>
                                         @foreach($colaboradores as $colaborador)
-                                            <option value="{{$colaborador->id}}"  {{old('colaborador_id') ? (old('colaborador_id') == $colaborador->id ? "selected" : "") : ($user->colaborador->id == $colaborador->id ? "selected" : "")}} {{session('colaborador_id') == $colaborador->id ? "selected" : ""}}>{{$colaborador->colaborador}} - {{$colaborador->area}}</option>
+                                            <option value="{{$colaborador->id}}"  {{old('colaborador_id') ? (old('colaborador_id') == $colaborador->id ? "selected" : "") : (($user->colaborador ? $user->colaborador->id : null) == $colaborador->id ? "selected" : "")}} {{session('colaborador_id') == $colaborador->id ? "selected" : ""}}>{{$colaborador->colaborador}} - {{$colaborador->area}}</option>
                                         @endforeach
                                     </select>
                                     @if ($errors->has('colaborador_id'))
@@ -78,7 +78,7 @@
                                                 <strong>{{ session('mpassword') }}</strong>
                                             </span>
                                             @endif
-                                        </div> 
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -92,7 +92,7 @@
                                             </span>
                                             @endif
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -121,10 +121,10 @@
                                             </div>
                                             @endforeach
                                         </div>
-                                    </div> 
+                                    </div>
                                 </div>
                             </div>
-                        </div>                       
+                        </div>
                         <div class="hr-line-dashed"></div>
                         <div class="row">
                             <div class="col-lg-12">

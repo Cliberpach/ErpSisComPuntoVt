@@ -21,7 +21,7 @@ class CreateDetalleCuentaClienteTable extends Migration
             $table->date('fecha');
             $table->text('observacion')->nullable();
             $table->text('ruta_imagen')->nullable();
-            $table->unsignedDecimal('monto');
+            $table->unsignedDecimal('monto',15,2);
             $table->unsignedInteger('tipo_pago_id');
             $table->foreign('tipo_pago_id')->references('id')->on('tipos_pago')->onDelete('cascade');
             $table->unsignedDecimal('efectivo', 15, 2)->nullable()->default(0.00);

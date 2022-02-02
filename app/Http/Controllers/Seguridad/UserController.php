@@ -40,7 +40,7 @@ class UserController extends Controller
                 array_push($colaboradores,$colaborador);
             }
         }
-        
+
         $role_user = [];
 
         $roles = Role::all();
@@ -175,10 +175,10 @@ class UserController extends Controller
 
         $auxs = Persona::where('estado','ACTIVO')->get();
 
-        $colaboradores = array();
+        $colaboradores = [];
         foreach($auxs as $aux)
         {
-            if(!$aux->user_persona)
+            if(!$aux->user_persona && $aux->colaborador)
             {
                 $colaborador = new stdClass();
                 $colaborador->id = $aux->id;
@@ -203,7 +203,7 @@ class UserController extends Controller
                 }
             }
         }
-        
+
         $role_user = [];
 
         $roles = Role::all();
@@ -219,7 +219,7 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::find($id);
-        
+
         $this->authorize('view',[$user,['user.edit','userown.edit']]);
 
         $request->validate([

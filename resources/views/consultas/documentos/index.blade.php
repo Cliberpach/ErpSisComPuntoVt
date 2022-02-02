@@ -139,7 +139,7 @@
             toastr.error('Ingresar fecha desde');
         }
 
-        if (fecha_desde > fecha_hasta && fecha_hasta == '' && fecha_desde == '') {
+        if (fecha_desde > fecha_hasta && fecha_hasta != '' && fecha_desde != '') {
             verificar = false;
             toastr.error('Fecha desde debe ser menor que fecha hasta');
         }

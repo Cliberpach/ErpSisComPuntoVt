@@ -629,6 +629,46 @@ function(){
 
     });
 
+    // Reportes - Pos - CajaDiaria
+    Route::prefix('reportes/pos')->group(function(){
+
+        Route::get('cajadiaria', 'Reportes\Pos\CajaController@index')->name('reporte.pos.cajadiaria');
+        Route::post('cajadiaria/getTable', 'Reportes\Pos\CajaController@getTable')->name('reporte.pos.cajadiaria.getTable');
+
+    });
+
+    // Reportes - Ventas - Documento
+    Route::prefix('reportes/ventas')->group(function(){
+
+        Route::get('documento', 'Reportes\Ventas\DocumentoController@index')->name('reporte.ventas.documento');
+        Route::post('documento/getTable', 'Reportes\Ventas\DocumentoController@getTable')->name('reporte.ventas.documento.getTable');
+
+    });
+
+    // Reportes - Compras - Documento
+    Route::prefix('reportes/compras')->group(function(){
+
+        Route::get('documento', 'Reportes\Compras\DocumentoController@index')->name('reporte.compras.documento');
+        Route::post('documento/getTable', 'Reportes\Compras\DocumentoController@getTable')->name('reporte.compras.documento.getTable');
+
+    });
+
+    // Reportes - Cuentas - Proveedor
+    Route::prefix('reportes/cuentas')->group(function(){
+
+        Route::get('proveedor', 'Reportes\Cuentas\ProveedorController@index')->name('reporte.cuentas.proveedor');
+        Route::post('proveedor/getTable', 'Reportes\Cuentas\ProveedorController@getTable')->name('reporte.cuentas.proveedor.getTable');
+
+    });
+
+    // Reportes - Cuentas - Proveedor
+    Route::prefix('reportes/cuentas')->group(function(){
+
+        Route::get('cliente', 'Reportes\Cuentas\ClienteController@index')->name('reporte.cuentas.cliente');
+        Route::post('cliente/getTable', 'Reportes\Cuentas\ClienteController@getTable')->name('reporte.cuentas.cliente.getTable');
+
+    });
+
     Route::prefix('configuracion')->group(function(){
         Route::get('index', 'Configuracion\ConfiguracionController@index')->name('configuracion.index');
         Route::put('update/{id}', 'Configuracion\ConfiguracionController@update')->name('configuracion.update');
@@ -638,10 +678,13 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    $fecini = '2020-01-11';
-    $fecfin = '2020-01-25';
-    $reporte = DB::select("call Sp_Rpte_Stock_fecha("."'".$fecini."'".","."'".$fecfin."'".")");
-    return $reporte;
+    if(Auth::user()->user->persona->colaborador)
+    {
+        return Auth::user()->user->persona->colaborador;
+    }
+    else{
+        return Auth::user();
+    }
     // $pdf = PDF::loadview('ventas.documentos.impresion.example')->setPaper('a4')->setWarnings(false);
 
     // return $pdf->stream('example.pdf');

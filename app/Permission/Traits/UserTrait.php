@@ -6,10 +6,10 @@ use App\UserPersona;
 
 trait UserTrait
 {
-    public function colaborador()
-    {
-        return $this->hasOne(UserPersona::class,'user_id');
-    }
+    // public function colaborador()
+    // {
+    //     return $this->hasOne(UserPersona::class,'user_id');
+    // }
 
     public function roles()
     {

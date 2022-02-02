@@ -14,7 +14,7 @@ class RoleController extends Controller
 {
     public function index()
     {
-        
+
         $this->authorize('haveaccess','role.index');
         return view('seguridad.roles.index');
     }
@@ -39,7 +39,8 @@ class RoleController extends Controller
         $rules = [
             'name' => 'required|max:50|unique:roles,name',
             'slug' => 'required|max:50|unique:roles,slug',
-            'full-access' => 'required|in:SI,NO'
+            'full-access' => 'required|in:SI,NO',
+            'punto-venta' => 'required|in:SI,NO'
         ];
 
         $message = [
@@ -47,7 +48,8 @@ class RoleController extends Controller
             'name.unique' => 'El campo nombre debe ser único.',
             'slug.required' => 'El campo slug es obligatorio.',
             'slug.unique' => 'El campo slug debe ser único.',
-            'full-access' => 'El campo full-access acepta SI/NO.'
+            'full-access' => 'El campo full-access acepta SI/NO.',
+            'punto-venta' => 'El campo punto-venta acepta SI/NO.',
         ];
 
         Validator::make($data, $rules, $message)->validate();
@@ -108,7 +110,8 @@ class RoleController extends Controller
         $rules = [
             'name' => 'required|max:50|unique:roles,name,'.$role->id,
             'slug' => 'required|max:50|unique:roles,slug,'.$role->id,
-            'full-access' => 'required|in:SI,NO'
+            'full-access' => 'required|in:SI,NO',
+            'punto-venta' => 'required|in:SI,NO',
         ];
 
         $message = [
@@ -116,7 +119,8 @@ class RoleController extends Controller
             'name.unique' => 'El campo nombre debe ser único.',
             'slug.required' => 'El campo slug es obligatorio.',
             'slug.unique' => 'El campo slug debe ser único.',
-            'full-access' => 'El campo full-access acepta SI/NO.'
+            'full-access' => 'El campo full-access acepta SI/NO.',
+            'punto-venta' => 'El campo punto-venta acepta SI/NO.',
         ];
 
         Validator::make($data, $rules, $message)->validate();
@@ -145,7 +149,7 @@ class RoleController extends Controller
     public function destroy($id)
     {
         $role = Role::find($id);
-        
+
         //Registro de actividad
         $descripcion = "SE ELIMINÓ EL ROL CON EL NOMBRE: ". $role->name;
         $gestion = "ROLES";
