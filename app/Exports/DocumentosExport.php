@@ -59,141 +59,58 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        if((int)$this->tipo < 130)
-        {
-
-            $consulta = Documento::where('estado','!=','ANULADO')->where('tipo_venta', $this->tipo);
+        $consulta = Documento::where('estado','!=','ANULADO')->where('tipo_venta', $this->tipo);
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $consulta = $consulta->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
             }
 
-            $consulta = $consulta->orderBy('id', 'desc')->get();
+        $consulta = $consulta->orderBy('id', 'desc')->get();
 
-            $coleccion = collect();
-            foreach($consulta as $doc){
-                $transferencia = 0.00;
-                $otros = 0.00;
-                $efectivo = 0.00;
+        $coleccion = collect();
+        foreach($consulta as $doc){
+            $transferencia = 0.00;
+            $otros = 0.00;
+            $efectivo = 0.00;
 
-                if($doc->tipo_pago_id)
-                {
-                    if ($doc->tipo_pago_id == 1) {
-                        $efectivo = $doc->importe;
-                    }
-                    else if ($doc->tipo_pago_id == 2){
-                        $transferencia = $doc->importe ;
-                        $efectivo = $doc->efectivo;
-                    }
-                    else {
-                        $otros = $doc->importe;
-                        $efectivo = $doc->efectivo;
-                    }
+            if($doc->tipo_pago_id)
+            {
+                if ($doc->tipo_pago_id == 1) {
+                    $efectivo = $doc->importe;
                 }
-                $coleccion->push([
-                    'RUC-EMISOR' => $doc->ruc_empresa,
-                    'DOC.' => $doc->nombreDocumento(),
-                    'CODIGO.DOC' => $doc->tipoDocumento(),
-                    'TICKET' => $doc->serie.' - '.$doc->correlativo,
-                    'TIENDA' => $doc->empresa,
-                    'RUC/DNI' => $doc->documento_cliente,
-                    'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
-                    'CLIENTE' => $doc->cliente,
-                    'ESTADO' => $doc->estado,
-                    'MONEDA' => $doc->simboloMoneda(),
-                    'MONTO' => $doc->total,
-                    'OP.GRAVADA' => $doc->sub_total,
-                    'IVG' => $doc->total_igv,
-                    'EFECTIVO' => $efectivo,
-                    'TRANSFERENCIA' => $transferencia,
-                    'YAPE/PLIN' => $otros,
-                    'FECHA' => $doc->fecha_documento,
-                    'ENVIADA' => $doc->sunat == '1' ? 'SI' : 'NO',
-                    'HASH' => $doc->hash
-                ]);
+                else if ($doc->tipo_pago_id == 2){
+                    $transferencia = $doc->importe ;
+                    $efectivo = $doc->efectivo;
+                }
+                else {
+                    $otros = $doc->importe;
+                    $efectivo = $doc->efectivo;
+                }
             }
-
-            return $coleccion;
+            $coleccion->push([
+                'RUC-EMISOR' => $doc->ruc_empresa,
+                'DOC.' => $doc->nombreDocumento(),
+                'CODIGO.DOC' => $doc->tipoDocumento(),
+                'TICKET' => $doc->serie.' - '.$doc->correlativo,
+                'TIENDA' => $doc->empresa,
+                'RUC/DNI' => $doc->documento_cliente,
+                'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                'CLIENTE' => $doc->cliente,
+                'ESTADO' => $doc->estado,
+                'MONEDA' => $doc->simboloMoneda(),
+                'MONTO' => $doc->total,
+                'OP.GRAVADA' => $doc->sub_total,
+                'IVG' => $doc->total_igv,
+                'EFECTIVO' => $efectivo,
+                'TRANSFERENCIA' => $transferencia,
+                'YAPE/PLIN' => $otros,
+                'FECHA' => $doc->fecha_documento,
+                'ENVIADA' => $doc->sunat == '1' ? 'SI' : 'NO',
+                'HASH' => $doc->hash
+            ]);
         }
-        /*else if($this->tipo == 130)
-        {
-            $consulta = Nota::where('estado','!=','ANULADO')->where('tipo_nota',"0");
-            if($this->fecha_desde && $this->fecha_hasta)
-            {
-                $consulta = $consulta->whereBetween('fechaEmision', [$this->fecha_desde, $this->fecha_hasta]);
-            }
 
-            $consulta = $consulta->orderBy('id', 'desc')->get();
-
-            $coleccion = collect();
-            foreach($consulta as $doc){
-                $coleccion->push([
-                    'RUC-EMISOR' => ,
-                    'DOC.' => ,
-                    'CODIGO.DOC' => ,
-                    'TICKET' => ,
-                    'TIENDA' => ,
-                    'RUC/DNI' => ,
-                    'TIPO.CLIENTE' => ,
-                    'CLIENTE' => ,
-                    'ESTADO' => ,
-                    'MONEDA' => ,
-                    'MONTO' => ,
-                    'OP.GRAVADA' => ,
-                    'IVG' => ,
-                    'EFECTIVO' => ,
-                    'TRANSFERENCIA' => ,
-                    'YAPE/PLIN' => ,
-                    'FECHA' => ,
-                    'ENVIADA' => ,
-                    'HASH'
-                ]);
-            }
-
-            return $coleccion;
-        }
-        else if($this->tipo == 132)
-        {
-            $consulta = Guia::where('estado','!=','NULO');
-            if($this->fecha_desde && $this->fecha_hasta)
-            {
-                $consulta = $consulta->whereBetween('created_at', [$this->fecha_desde, $this->fecha_hasta]);
-            }
-
-            $consulta = $consulta->orderBy('id', 'desc')->get();
-
-            $coleccion = collect();
-            foreach($consulta as $doc){
-                $coleccion->push([
-                    'RUC-EMISOR' => ,
-                    'DOC.' => ,
-                    'CODIGO.DOC' => ,
-                    'TICKET' => ,
-                    'TIENDA' => ,
-                    'RUC/DNI' => ,
-                    'TIPO.CLIENTE' => ,
-                    'CLIENTE' => ,
-                    'ESTADO' => ,
-                    'MONEDA' => ,
-                    'MONTO' => ,
-                    'OP.GRAVADA' => ,
-                    'IVG' => ,
-                    'EFECTIVO' => ,
-                    'TRANSFERENCIA' => ,
-                    'YAPE/PLIN' => ,
-                    'FECHA' => ,
-                    'ENVIADA' => ,
-                    'HASH'
-                ]);
-            }
-
-            $coleccion = collect();
-            return $coleccion;
-        }*/
-        else{
-            $coleccion = collect();
-            return $coleccion;
-        }
+        return $coleccion;
     }
 
     public function registerEvents(): array
