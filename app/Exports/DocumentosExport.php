@@ -52,7 +52,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
     {
         $this->tipo = $tipo;
         $this->fecha_desde = $fecha_desde;
-        $this->fecha_hasta = $tipo;
+        $this->fecha_hasta = $fecha_hasta;
     }
     /**
     * @return \Illuminate\Support\Collection
