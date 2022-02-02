@@ -38,6 +38,25 @@ class CuentaClienteController extends Controller
                 $cuenta->estado='PAGADO';
                 $cuenta->update();
             }
+
+            $detalle_ultimo = DetalleCuentaCliente::where('cuenta_cliente_id',2)->get()->last();
+
+            if(!empty($detalle_ultimo))
+            {
+                if($detalle_ultimo->saldo == 0)
+                {
+                    $cuenta = CuentaCliente::find($value->id);
+                    $cuenta->saldo=0;
+                    $cuenta->estado='PAGADO';
+                    $cuenta->update();
+                }
+                else{
+                    $cuenta = CuentaCliente::find($value->id);
+                    $cuenta->saldo=$detalle_ultimo->saldo;
+                    $cuenta->update();
+                }
+            }
+
             array_push($datos,array(
                 "id"=>$value->id,
                 "cliente"=>$value->documento->clienteEntidad->nombre,
@@ -102,7 +121,7 @@ class CuentaClienteController extends Controller
                 $detallepago->importe=$request->importe_venta;
                 $detallepago->efectivo=$request->efectivo_venta;
                 $detallepago->tipo_pago_id=$request->modo_pago;
-                $detallepago->observacion = $request->observacion;
+                $detallepago->observacion = $request->pago.' - '.$request->observacion;
                 $detallepago->fecha = $request->fecha;
                 $detallepago->save();
 
@@ -130,21 +149,18 @@ class CuentaClienteController extends Controller
                 $cantidadRecibidaEfectivo=$request->efectivo_venta;
                 $cantidadRecibidaImporte=$request->importe_venta;
                 foreach ($cuentasFaltantes as $key => $cuenta) {
-                    if($cliente->id == $cliente->id && $cantidadRecibida != 0)
+                    if($cuenta->documento->clienteEntidad->id == $cliente->id && $cantidadRecibida != 0)
                     {
                         $detallepago = new DetalleCuentaCliente();
                         $detallepago->mcaja_id = movimientoUser()->id;
                         $detallepago->cuenta_cliente_id = $cuenta->id;
                         $detallepago->monto = 0;
-                        $detallepago->observacion=$request->observacion;
+                        $detallepago->observacion=$request->pago.' - '.$request->observacion;
                         $detallepago->fecha = $request->fecha;
                         $detallepago->tipo_pago_id=$request->modo_pago;
                         $detallepago->save();
                         if($cuenta->saldo > $cantidadRecibida)
                         {
-                            // $detallepago->monto = $cantidadRecibida;
-                            // $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
-                            // $cantidadRecibida = 0;
                             if($cantidadRecibidaEfectivo == 0)
                             {
                                 $detallepago->efectivo = 0;
@@ -184,7 +200,8 @@ class CuentaClienteController extends Controller
                                 $detallepago->monto = $cuenta->saldo;
                                 $cantidadRecibidaImporte = $importe;
                                 $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
-                                $cuenta->saldo = 0;
+
+                                $cuenta->update();
                             }
                             else
                             {
