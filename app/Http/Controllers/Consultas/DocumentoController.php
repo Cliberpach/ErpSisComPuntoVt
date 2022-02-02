@@ -176,6 +176,7 @@ class DocumentoController extends Controller
     {
         ob_end_clean();
         ob_start();
+        return $request;
         $tipo = $request->tipo;
         $fecha_desde = $request->fecha_desde;
         $fecha_hasta = $request->fecha_hasta;

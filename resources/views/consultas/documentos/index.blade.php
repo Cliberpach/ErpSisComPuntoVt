@@ -338,6 +338,10 @@
             toastr.error('Solo se hace reporte en excel de los documentos de ventas.');
         }
 
+        console.log(tipo)
+        console.log(fecha_desde)
+        console.log(fecha_hasta)
+
         if(verificar)
         {
             window.location = '/consultas/documentos/getDownload?fecha_desde='+fecha_desde+'&fecha_hasta='+fecha_hasta+'&tipo='+tipo;
