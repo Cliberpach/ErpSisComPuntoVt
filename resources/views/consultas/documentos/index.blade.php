@@ -168,7 +168,7 @@
                             if (response.success) {
                                 documentos = [];
                                 documentos = response.documentos;
-                                console.log(documentos)
+                                console.log(response)
                                 loadTable();
                                 timerInterval = 0;
                                 Swal.resumeTimer();

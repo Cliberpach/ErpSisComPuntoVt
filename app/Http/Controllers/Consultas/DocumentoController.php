@@ -90,7 +90,8 @@ class DocumentoController extends Controller
 
             return response()->json([
                 'success' => true,
-                'documentos' => $coleccion
+                'documentos' => $coleccion,
+                'request' => $request->all()
             ]);
         }
         else if($request->tipo == 132)

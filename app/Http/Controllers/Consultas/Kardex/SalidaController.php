@@ -79,7 +79,7 @@ class SalidaController extends Controller
                         'motivo' => $nota->destino,
                         'producto' => $detalle->lote->producto->nombre,
                         'costo' => $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : $detalle->lote->detalle_nota->costo_soles,
-                        'precio' => $detalle->lote->producto->precio_venta_minimo,
+                        'precio' => $detalle->lote->detalle_compra ? $detalle->lote->detalle_compra->precio : $detalle->lote->detalle_nota->costo_soles,
                     ]);
                 }
             }
