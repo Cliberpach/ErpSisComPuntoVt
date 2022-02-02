@@ -191,7 +191,6 @@ class UserController extends Controller
             {
                 if(!empty($user->colaborador['persona_id']))
                 {
-                    return $user->colaborador['persona_id'];
                     if($aux->id == $user->colaborador['persona_id'])
                     {
                         $colaborador = new stdClass();
