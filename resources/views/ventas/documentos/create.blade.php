@@ -54,14 +54,14 @@
                                                 </span>
                                                 @if (!empty($cotizacion))
                                                     <input type="date" id="fecha_documento_campo" name="fecha_documento_campo"
-                                                        class="form-control {{ $errors->has('fecha_documento') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_documento', $cotizacion->fecha_documento) }}"
+                                                        class="form-control {{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}"
+                                                        value="{{ old('fecha_documento_campo', $cotizacion->fecha_documento) }}"
                                                         autocomplete="off" required readonly>
                                                 @else
                                                     <input type="date" id="fecha_documento_campo" name="fecha_documento_campo"
-                                                        class="form-control input-required{{ $errors->has('fecha_documento') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_documento', $fecha_hoy) }}" autocomplete="off"
-                                                        required readonly>
+                                                        class="form-control input-required{{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}"
+                                                        value="{{ old('fecha_documento_campo', $fecha_hoy) }}" autocomplete="off"
+                                                        required>
                                                 @endif
 
                                                 @if ($errors->has('fecha_documento_campo'))
@@ -1450,8 +1450,16 @@
 
     //OBTENER TIPOS DE COMPROBANTES
     function obtenerTiposComprobantes() {
-
+        $('#fecha_documento_campo').attr("readonly",true);
         if ($('#empresa_id').val() != '' && $('#tipo_venta').val() != '') {
+            if($('#tipo_venta').val() == 129)
+            {
+                $('#fecha_documento_campo').removeAttr("readonly");
+            }
+            else{
+                $('#fecha_documento_campo').val("{{$fecha_hoy}}");
+                $('#fecha_documento_campo').attr("readonly",true);
+            }
             $.ajax({
                 dataType: 'json',
                 url: '{{ route('ventas.vouchersAvaible') }}',

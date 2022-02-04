@@ -1464,8 +1464,15 @@
 
     //OBTENER TIPOS DE COMPROBANTES
     function obtenerTiposComprobantes() {
-
+        document.getElementById("fecha_documento_campo").disabled = true;
         if ($('#empresa_id').val() != '' && $('#tipo_venta').val() != '') {
+            if($('#tipo_venta').val() == 129)
+            {
+                document.getElementById("fecha_documento_campo").disabled = false;
+            }
+            else{
+                document.getElementById("fecha_documento_campo").disabled = true;
+            }
             $.ajax({
                 dataType: 'json',
                 url: '{{ route('ventas.vouchersAvaible') }}',
