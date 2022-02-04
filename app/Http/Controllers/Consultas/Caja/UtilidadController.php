@@ -41,8 +41,8 @@ class UtilidadController extends Controller
                         "producto" => $detalle->lote->producto->nombre,
                         "precio_venta" => $detalle->precio_nuevo,
                         "precio_compra" => $precom,
-                        "utilidad" => $detalle->precio_nuevo - $precom,
-                        "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
+                        "utilidad" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad,
+                        "importe" => ($detalle->precio_nuevo) * $detalle->cantidad
                     ]);
                 }
             }
