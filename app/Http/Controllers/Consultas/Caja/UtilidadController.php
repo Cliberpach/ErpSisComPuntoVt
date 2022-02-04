@@ -39,10 +39,10 @@ class UtilidadController extends Controller
                         "fecha_doc" => $venta->fecha_documento,
                         "cantidad" => $detalle->cantidad,
                         "producto" => $detalle->lote->producto->nombre,
-                        "precio_venta" => $detalle->precio_nuevo,
-                        "precio_compra" => $precom,
-                        "utilidad" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad,
-                        "importe" => ($detalle->precio_nuevo) * $detalle->cantidad
+                        "precio_venta" => number_format($detalle->precio_nuevo,2),
+                        "precio_compra" => number_format($precom,2),
+                        "utilidad" => number_format(($detalle->precio_nuevo - $precom) * $detalle->cantidad,2),
+                        "importe" => number_format(($detalle->precio_nuevo) * $detalle->cantidad,2)
                     ]);
                 }
             }
