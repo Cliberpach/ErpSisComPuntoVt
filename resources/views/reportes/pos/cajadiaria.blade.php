@@ -43,9 +43,14 @@
                         <input type="date" id="fecha_fin" class="form-control">
                     </div>
                 </div>
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-1">
                     <div class="form-group">
-                        <button class="btn btn-primary btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
+                        <button class="btn btn-success btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-1">
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-block" onclick="excelTable()"><i class="fa fa-file-excel-o"></i></button>
                     </div>
                 </div>
             </div>
@@ -291,6 +296,40 @@
         var url="{{route('Caja.reporte.movimiento',':id')}}"
         url = url.replace(':id',id);
         window.open(url, "REPORTE CAJA", "width=900, height=600")
+    }
+
+    function excelTable()
+    {
+        let verificar = true;
+        var fecha_ini = $('#fecha_ini').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var caja_id = $('#caja_id').val();
+
+        if (caja_id == '') {
+            verificar = false;
+            toastr.error('Seleccionar caja.');
+        }
+
+        if (fecha_ini == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha de inicio');
+        }
+
+        if (fecha_fin == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha final');
+        }
+
+        if (fecha_ini > fecha_fin) {
+            verificar = false;
+            toastr.error('Fecha de inicio debe ser menor que fecha final');
+        }
+
+        if(verificar)
+        {
+            window.location = '/reportes/pos/cajadiaria/getExcel?fecha_ini='+fecha_ini+'&fecha_fin='+fecha_fin+'&caja_id='+caja_id;
+        }
+        return false;
     }
 </script>
 @endpush

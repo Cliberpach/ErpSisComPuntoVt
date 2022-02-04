@@ -46,11 +46,13 @@ class CajaController extends Controller
         // update moviemiento_caja fecha = DATE_FORMAT(fecha_apertura, "%Y-%m-d")
     }
 
-    public function getExcel($id)
+    public function getExcel(Request $request)
     {
         ob_end_clean();
         ob_start();
-        $movimiento = MovimientoCaja::find($id);
-        return  Excel::download(new CajaExport($movimiento), 'CAJA_'.$movimiento->colaborador->persona->nombres.'.xlsx');
+        $caja = $request->caja_id;
+        $fecha_ini = $request->fecha_ini;
+        $fecha_fin = $request->fecha_fin;
+        return  Excel::download(new CajaExport($caja,$fecha_ini,$fecha_fin), 'CAJA '.$fecha_ini.'-'.$fecha_fin.'.xlsx');
     }
 }

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Reportes\Compras;
 
+use App\Exports\Reportes\Compras\DocumentoExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DocumentoController extends Controller
 {
@@ -30,7 +32,18 @@ class DocumentoController extends Controller
                 'compra_documentos.numero_doc as documento',
             )
             ->where('compra_documentos.proveedor_id',$proveedor)
+            ->where('compra_documentos.estado','!=','ANULADO')
             ->whereBetween('compra_documentos.fecha_emision',[$fecha_ini,$fecha_fin])
         )->toJson();
+    }
+
+    public function getExcel(Request $request)
+    {
+        ob_end_clean();
+        ob_start();
+        $proveedor = $request->proveedor_id;
+        $fecha_ini = $request->fecha_ini;
+        $fecha_fin = $request->fecha_fin;
+        return  Excel::download(new DocumentoExport($proveedor,$fecha_ini,$fecha_fin), 'COMPRAS '.$fecha_ini.'-'.$fecha_fin.'.xlsx');
     }
 }

@@ -634,6 +634,7 @@ function(){
 
         Route::get('cajadiaria', 'Reportes\Pos\CajaController@index')->name('reporte.pos.cajadiaria');
         Route::post('cajadiaria/getTable', 'Reportes\Pos\CajaController@getTable')->name('reporte.pos.cajadiaria.getTable');
+        Route::get('cajadiaria/getExcel', 'Reportes\Pos\CajaController@getExcel')->name('reporte.pos.cajadiaria.getExcel');
 
     });
 
@@ -642,6 +643,7 @@ function(){
 
         Route::get('documento', 'Reportes\Ventas\DocumentoController@index')->name('reporte.ventas.documento');
         Route::post('documento/getTable', 'Reportes\Ventas\DocumentoController@getTable')->name('reporte.ventas.documento.getTable');
+        Route::get('documento/getExcel', 'Reportes\Ventas\DocumentoController@getExcel')->name('reporte.ventas.documento.getExcel');
 
     });
 
@@ -650,6 +652,7 @@ function(){
 
         Route::get('documento', 'Reportes\Compras\DocumentoController@index')->name('reporte.compras.documento');
         Route::post('documento/getTable', 'Reportes\Compras\DocumentoController@getTable')->name('reporte.compras.documento.getTable');
+        Route::get('documento/getExcel', 'Reportes\Compras\DocumentoController@getExcel')->name('reporte.compras.documento.getExcel');
 
     });
 
@@ -658,15 +661,16 @@ function(){
 
         Route::get('proveedor', 'Reportes\Cuentas\ProveedorController@index')->name('reporte.cuentas.proveedor');
         Route::post('proveedor/getTable', 'Reportes\Cuentas\ProveedorController@getTable')->name('reporte.cuentas.proveedor.getTable');
+        Route::get('proveedor/getExcel', 'Reportes\Cuentas\ProveedorController@getExcel')->name('reporte.cuentas.proveedor.getExcel');
 
     });
 
-    // Reportes - Cuentas - Proveedor
+    // Reportes - Cuentas - Cliente
     Route::prefix('reportes/cuentas')->group(function(){
 
         Route::get('cliente', 'Reportes\Cuentas\ClienteController@index')->name('reporte.cuentas.cliente');
         Route::post('cliente/getTable', 'Reportes\Cuentas\ClienteController@getTable')->name('reporte.cuentas.cliente.getTable');
-
+        Route::get('cliente/getExcel', 'Reportes\Cuentas\ClienteController@getExcel')->name('reporte.cuentas.cliente.getExcel');
     });
 
     // Reportes - Notas - Ingreso
@@ -674,6 +678,7 @@ function(){
 
         Route::get('ingreso', 'Reportes\Notas\IngresoController@index')->name('reporte.notas.ingreso');
         Route::post('ingreso/getTable', 'Reportes\Notas\IngresoController@getTable')->name('reporte.notas.ingreso.getTable');
+        Route::get('ingreso/getExcel', 'Reportes\Notas\IngresoController@getExcel')->name('reporte.notas.ingreso.getExcel');
 
     });
 
@@ -682,6 +687,7 @@ function(){
 
         Route::get('salida', 'Reportes\Notas\SalidaController@index')->name('reporte.notas.salida');
         Route::post('salida/getTable', 'Reportes\Notas\SalidaController@getTable')->name('reporte.notas.salida.getTable');
+        Route::get('salida/getExcel', 'Reportes\Notas\SalidaController@getExcel')->name('reporte.notas.salida.getExcel');
 
     });
 

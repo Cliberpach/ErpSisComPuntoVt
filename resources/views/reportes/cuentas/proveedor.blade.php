@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-12">
             <div class="row align-items-end">
-                <div class="col-12 col-md-5">
+                <div class="col-12 col-md-4">
                     <div class="form-group">
                         <label for="proveedor_id">Proveedor</label>
                         <select name="proveedor_id" id="proveedor_id" class="select2_form form-control">
@@ -46,6 +46,11 @@
                 <div class="col-12 col-md-1">
                     <div class="form-group">
                         <button class="btn btn-success btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-1">
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-block" onclick="excelTable()"><i class="fa fa-file-excel-o"></i></button>
                     </div>
                 </div>
             </div>
@@ -270,6 +275,40 @@
         var url = '{{ route("cuentaProveedor.reporte", ":id")}}';
         url = url.replace(':id', id);
         window.open(url, "Cuenta proveedor SISCOM", "width=900, height=600")
+    }
+
+    function excelTable()
+    {
+        let verificar = true;
+        var fecha_ini = $('#fecha_ini').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var proveedor_id = $('#proveedor_id').val();
+
+        if (proveedor_id == '') {
+            verificar = false;
+            toastr.error('Seleccionar proveedor');
+        }
+
+        if (fecha_ini == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha de inicio');
+        }
+
+        if (fecha_fin == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha final');
+        }
+
+        if (fecha_ini > fecha_fin && fecha_hasta != '' && fecha_ini != '') {
+            verificar = false;
+            toastr.error('Fecha de inicio debe ser menor que fecha final');
+        }
+
+        if(verificar)
+        {
+            window.location = '/reportes/cuentas/proveedor/getExcel?fecha_ini='+fecha_ini+'&fecha_fin='+fecha_fin+'&proveedor_id='+proveedor_id;
+        }
+        return false;
     }
 </script>
 @endpush

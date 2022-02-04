@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Reportes\Cuentas;
 
+use App\Exports\Reportes\Cuentas\ClienteExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ClienteController extends Controller
 {
@@ -48,5 +50,15 @@ class ClienteController extends Controller
             ->where('cotizacion_documento.cliente_id',$cliente)
             ->whereBetween('cuenta_cliente.fecha_doc',[$fecha_ini,$fecha_fin])
         )->toJson();
+    }
+
+    public function getExcel(Request $request)
+    {
+        ob_end_clean();
+        ob_start();
+        $cliente = $request->cliente_id;
+        $fecha_ini = $request->fecha_ini;
+        $fecha_fin = $request->fecha_fin;
+        return  Excel::download(new ClienteExport($cliente,$fecha_ini,$fecha_fin), 'CUENTAS CLIENTES '.$fecha_ini.'-'.$fecha_fin.'.xlsx');
     }
 }

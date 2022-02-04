@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Exports\Reportes\Pos;
+namespace App\Exports\Reportes\Notas;
 
-use App\Pos\MovimientoCaja;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -10,23 +9,19 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class CajaExport implements FromCollection,WithHeadings,WithEvents
+class SalidaExport implements FromCollection,WithHeadings,WithEvents
 {
-    public $caja,$fecha_ini,$fecha_fin;
+    public $producto,$destino,$fecha_ini,$fecha_fin;
     use Exportable;
 
     public function headings(): array
     {
         return [
             [
-                "CAJA",
                 "FECHA",
-                "MONTO INICIAL",
-                "VENTAS",
-                "COBRANZAS",
-                "PAGOS",
-                "EGRESOS",
-                "SALDO",
+                "PRODUCTO",
+                "CANTIDAD",
+                "DESTINO",
             ]
         ];
     }
@@ -36,9 +31,10 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
         return "MOVIMIENTO CAJA ".$this->fecha_ini."-".$this->fecha_fin;
     }
 
-    public function __construct($caja,$fecha_ini,$fecha_fin)
+    public function __construct($producto,$destino,$fecha_ini,$fecha_fin)
     {
-        $this->caja = $caja;
+        $this->producto = $producto;
+        $this->destino = $destino;
         $this->fecha_ini = $fecha_ini;
         $this->fecha_fin = $fecha_fin;
     }
@@ -47,30 +43,27 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('movimiento_caja')
-        ->join('caja','movimiento_caja.caja_id','=','caja.id')
-        ->select(
-            'caja.nombre as caja',
-            'movimiento_caja.fecha_apertura',
-            'movimiento_caja.monto_inicial as inicio',
-            DB::raw('ifnull((select sum(cv.total) from  detalle_movimiento_venta  dmv inner join cotizacion_documento cv on dmv.cdocumento_id = cv.id where dmv.mcaja_id = movimiento_caja.id and cv.condicion_id = 1 and cv.estado_pago = "PAGADA"), 0) as ventas'),
-            DB::raw('ifnull((select sum(dcc.monto) from  detalle_cuenta_cliente dcc where dcc.mcaja_id = movimiento_caja.id), 0) as cobranzas'),
-            DB::raw('ifnull((select sum(dcp.importe + dcp.efectivo) from  detalle_cuenta_proveedor dcp where dcp.mcaja_id = movimiento_caja.id), 0) as pagos'),
-            DB::raw('ifnull((select sum(e.importe) from  detalle_movimiento_egresos dme inner join egreso e on dme.egreso_id = e.id where dme.mcaja_id = movimiento_caja.id), 0) as egresos'),
-            'movimiento_caja.monto_final as saldo'
-        )
-        ->where('movimiento_caja.estado_movimiento','CIERRE')
-        ->where('movimiento_caja.caja_id',$this->caja)
-        ->whereBetween('movimiento_caja.fecha',[$this->fecha_ini,$this->fecha_fin])->get();
-
+        return DB::table('productos')
+            ->join('detalle_nota_salidad','productos.id','=','detalle_nota_salidad.producto_id')
+            ->join('nota_salidad','nota_salidad.id','=','detalle_nota_salidad.nota_salidad_id')
+            ->select(
+                DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d") as fecha'),
+                'productos.nombre',
+                'detalle_nota_salidad.cantidad',
+                'nota_salidad.destino',
+            )
+            ->where('productos.id',$this->producto)
+            ->where('nota_salidad.destino',$this->destino)
+            ->whereBetween(DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d")'),[$this->fecha_ini,$this->fecha_fin])->get();
     }
+
     public function registerEvents(): array
     {
         return [
 
             BeforeWriting::class => [self::class, 'beforeWriting'],
             AfterSheet::class    => function(AfterSheet $event) {
-                $event->sheet->getStyle('A1:H1')->applyFromArray([
+                $event->sheet->getStyle('A1:D1')->applyFromArray([
 
                         'fill' => [
                             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
@@ -87,7 +80,7 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
                     ]
 
                 );
-                $event->sheet->getStyle('A1:H1')->applyFromArray([
+                $event->sheet->getStyle('A1:D1')->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                         'rotation' => 90,
@@ -107,7 +100,7 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
 
 
             $event->sheet->getColumnDimension('A')->setWidth(20);
-            $event->sheet->getColumnDimension('B')->setWidth(20);
+            $event->sheet->getColumnDimension('B')->setWidth(30);
             $event->sheet->getColumnDimension('C')->setWidth(15);
             //    $event->sheet->getColumnDimension('D')->setWidth(20);
             //    $event->sheet->getColumnDimension('E')->setWidth(20);

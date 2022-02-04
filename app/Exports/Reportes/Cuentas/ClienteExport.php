@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Exports\Reportes\Pos;
+namespace App\Exports\Reportes\Cuentas;
 
-use App\Pos\MovimientoCaja;
+
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -10,35 +10,35 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class CajaExport implements FromCollection,WithHeadings,WithEvents
+class ClienteExport implements FromCollection,WithHeadings,WithEvents
 {
-    public $caja,$fecha_ini,$fecha_fin;
+
+    public $cliente,$fecha_ini,$fecha_fin;
     use Exportable;
 
     public function headings(): array
     {
         return [
             [
-                "CAJA",
                 "FECHA",
-                "MONTO INICIAL",
-                "VENTAS",
-                "COBRANZAS",
-                "PAGOS",
-                "EGRESOS",
+                "CLIENTE",
+                "MONTO",
+                "NUMERO",
+                "ACTA",
                 "SALDO",
+                "FECHA ULT. PAGO",
             ]
         ];
     }
 
     function title(): String
     {
-        return "MOVIMIENTO CAJA ".$this->fecha_ini."-".$this->fecha_fin;
+        return "CUENTAS CLIENTE ".$this->fecha_ini."-".$this->fecha_fin;
     }
 
-    public function __construct($caja,$fecha_ini,$fecha_fin)
+    public function __construct($cliente,$fecha_ini,$fecha_fin)
     {
-        $this->caja = $caja;
+        $this->cliente = $cliente;
         $this->fecha_ini = $fecha_ini;
         $this->fecha_fin = $fecha_fin;
     }
@@ -47,21 +47,25 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('movimiento_caja')
-        ->join('caja','movimiento_caja.caja_id','=','caja.id')
+        return DB::table('cuenta_cliente')
+        ->join('cotizacion_documento','cotizacion_documento.id','=','cuenta_cliente.cotizacion_documento_id')
+        ->join('condicions','condicions.id','=','cotizacion_documento.condicion_id')
+        ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
         ->select(
-            'caja.nombre as caja',
-            'movimiento_caja.fecha_apertura',
-            'movimiento_caja.monto_inicial as inicio',
-            DB::raw('ifnull((select sum(cv.total) from  detalle_movimiento_venta  dmv inner join cotizacion_documento cv on dmv.cdocumento_id = cv.id where dmv.mcaja_id = movimiento_caja.id and cv.condicion_id = 1 and cv.estado_pago = "PAGADA"), 0) as ventas'),
-            DB::raw('ifnull((select sum(dcc.monto) from  detalle_cuenta_cliente dcc where dcc.mcaja_id = movimiento_caja.id), 0) as cobranzas'),
-            DB::raw('ifnull((select sum(dcp.importe + dcp.efectivo) from  detalle_cuenta_proveedor dcp where dcp.mcaja_id = movimiento_caja.id), 0) as pagos'),
-            DB::raw('ifnull((select sum(e.importe) from  detalle_movimiento_egresos dme inner join egreso e on dme.egreso_id = e.id where dme.mcaja_id = movimiento_caja.id), 0) as egresos'),
-            'movimiento_caja.monto_final as saldo'
+            'cotizacion_documento.fecha_documento as fecha',
+            'clientes.nombre as cliente',
+            'cotizacion_documento.total as monto',
+            DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero'),
+            DB::raw('(cotizacion_documento.total - cuenta_cliente.saldo) as acta'),
+            'cuenta_cliente.saldo',
+            DB::raw('ifnull((select fecha
+            from detalle_cuenta_cliente dcc
+            where dcc.cuenta_cliente_id = cuenta_cliente.id
+           order by id desc
+           limit 1),"-") as fecha_ultima'),
         )
-        ->where('movimiento_caja.estado_movimiento','CIERRE')
-        ->where('movimiento_caja.caja_id',$this->caja)
-        ->whereBetween('movimiento_caja.fecha',[$this->fecha_ini,$this->fecha_fin])->get();
+        ->where('cotizacion_documento.cliente_id',$this->cliente)
+        ->whereBetween('cuenta_cliente.fecha_doc',[$this->fecha_ini,$this->fecha_fin])->get();
 
     }
     public function registerEvents(): array
@@ -70,7 +74,7 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
 
             BeforeWriting::class => [self::class, 'beforeWriting'],
             AfterSheet::class    => function(AfterSheet $event) {
-                $event->sheet->getStyle('A1:H1')->applyFromArray([
+                $event->sheet->getStyle('A1:G1')->applyFromArray([
 
                         'fill' => [
                             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
@@ -87,7 +91,7 @@ class CajaExport implements FromCollection,WithHeadings,WithEvents
                     ]
 
                 );
-                $event->sheet->getStyle('A1:H1')->applyFromArray([
+                $event->sheet->getStyle('A1:G1')->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                         'rotation' => 90,

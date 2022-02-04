@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Reportes\Cuentas;
 
+use App\Exports\Reportes\Cuentas\ProveedorExport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProveedorController extends Controller
 {
@@ -41,5 +43,15 @@ class ProveedorController extends Controller
             ->where('compra_documentos.proveedor_id',$proveedor)
             ->whereBetween('cuenta_proveedor.fecha_doc',[$fecha_ini,$fecha_fin])
         )->toJson();
+    }
+
+    public function getExcel(Request $request)
+    {
+        ob_end_clean();
+        ob_start();
+        $proveedor = $request->proveedor_id;
+        $fecha_ini = $request->fecha_ini;
+        $fecha_fin = $request->fecha_fin;
+        return  Excel::download(new ProveedorExport($proveedor,$fecha_ini,$fecha_fin), 'CUENTAS PROVEEDOR '.$fecha_ini.'-'.$fecha_fin.'.xlsx');
     }
 }

@@ -31,7 +31,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-3">
                     <div class="form-group">
                         <label for="origen">Destino</label>
                         <select name="destino" id="destino" class="select2_form form-control">
@@ -42,13 +42,13 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                     <div class="form-group">
                         <label for="fecha_desde">Fecha de inicio</label>
                         <input type="date" id="fecha_ini" class="form-control">
                     </div>
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                     <div class="form-group">
                         <label for="fecha_desde">Fecha final</label>
                         <input type="date" id="fecha_fin" class="form-control">
@@ -57,6 +57,11 @@
                 <div class="col-12 col-md-1">
                     <div class="form-group">
                         <button class="btn btn-success btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-1">
+                    <div class="form-group">
+                        <button class="btn btn-primary btn-block" onclick="excelTable()"><i class="fa fa-file-excel-o"></i></button>
                     </div>
                 </div>
             </div>
@@ -245,6 +250,46 @@
         var url = '{{ route("ventas.documento.comprobante", ":id")}}';
         url = url.replace(':id',id+'-100');
         window.open(url, "Comprobante SISCOM", "width=900, height=600")
+    }
+
+    function excelTable()
+    {
+        let verificar = true;
+        var fecha_ini = $('#fecha_ini').val();
+        var fecha_fin = $('#fecha_fin').val();
+        var producto_id = $('#producto_id').val();
+        var destino = $('#destino').val();
+
+        if (producto_id == '') {
+            verificar = false;
+            toastr.error('Seleccionar producto');
+        }
+
+        if (destino == '') {
+            verificar = false;
+            toastr.error('Seleccionar destino');
+        }
+
+        if (fecha_ini == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha de inicio');
+        }
+
+        if (fecha_fin == '') {
+            verificar = false;
+            toastr.error('Ingresar fecha final');
+        }
+
+        if (fecha_ini > fecha_fin && fecha_hasta != '' && fecha_ini != '') {
+            verificar = false;
+            toastr.error('Fecha de inicio debe ser menor que fecha final');
+        }
+
+        if(verificar)
+        {
+            window.location = '/reportes/notas/salida/getExcel?fecha_ini='+fecha_ini+'&fecha_fin='+fecha_fin+'&producto_id='+producto_id+'&destino='+destino;
+        }
+        return false;
     }
 </script>
 @endpush
