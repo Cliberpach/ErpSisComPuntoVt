@@ -27,19 +27,19 @@
                         style="text-transform:uppercase">
                             <thead>
                                 <tr>
-                                    
-                                  
+
+
                                     <th colspan="4" class="text-center">DOCUMENTO DE VENTA</th>
-                                    
+
                                     <th colspan="6" class="text-center">GUIA DE REMISION</th>
 
                                 </tr>
                                 <tr>
-                                    <th class="text-center">N°</th>
+                                    <th class="text-center">Doc Afec.</th>
                                     <th class="text-center">FEC.DOCUMENTO</th>
                                     <th class="text-center">TIPO</th>
                                     <th class="text-center">CLIENTE</th>
-                                
+
                                     <th class="text-center">N°</th>
                                     <th class="text-center">CANTIDAD</th>
                                     <th class="text-center">PESO</th>
@@ -179,11 +179,11 @@ $(document).ready(function() {
                     url_detalle = url_detalle.replace(':id', data.id);
 
                     return "<div class='btn-group' style='text-transform:capitalize;'><button data-toggle='dropdown' class='btn btn-primary btn-sm  dropdown-toggle'><i class='fa fa-bars'></i></button><ul class='dropdown-menu'>" +
-                    
+
                         "<li><a class='dropdown-item' onclick='detalle(" +data.id+ ")' title='Detalle'><b><i class='fa fa-eye'></i> Detalle</a></b></li>" +
                         "<li class='dropdown-divider'></li>" +
                         "<li><a class='dropdown-item' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><b><i class='fa fa-file'></i> Enviar Sunat</a></b></li>"
-                        
+
                     "</ul></div>"
                 }
             }
@@ -269,7 +269,7 @@ function enviarSunat(id , sunat) {
         // showLoaderOnConfirm: true,
     }).then((result) => {
         if (result.value) {
-            
+
             var url = '{{ route("ventas.guiasremision.sunat", ":id")}}';
             url = url.replace(':id',id);
 

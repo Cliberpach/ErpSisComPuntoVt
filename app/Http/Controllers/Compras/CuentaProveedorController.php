@@ -27,10 +27,28 @@ class CuentaProveedorController extends Controller
         $datos=array();
         $cuentaProveedor=CuentaProveedor::get();
         foreach ($cuentaProveedor as $key => $value) {
+            $detalle_ultimo = DetalleCuentaProveedor::where('cuenta_proveedor_id',$value->id)->get()->last();
+
+            if(!empty($detalle_ultimo))
+            {
+                if($detalle_ultimo->saldo == 0)
+                {
+                    $cuenta = CuentaProveedor::find($value->id);
+                    $cuenta->saldo=0;
+                    $cuenta->estado='PAGADO';
+                    $cuenta->update();
+                }
+                else{
+                    $cuenta = CuentaProveedor::find($value->id);
+                    $cuenta->saldo=$detalle_ultimo->saldo;
+                    $cuenta->estado='PENDIENTE';
+                    $cuenta->update();
+                }
+            }
             array_push($datos,array(
                 "id"=>$value->id,
                 "proveedor"=>$value->documento->proveedor->descripcion,
-                "numero_doc"=>$value->documento->numero_doc,
+                "numero_doc"=>$value->documento->serie_tipo.' - '.$value->documento->numero_tipo,
                 "fecha_doc"=>strval($value->documento->created_at) ,
                 "monto"=>$value->documento->total,
                 "acta"=>number_format(round($value->documento->total - $value->saldo, 2), 2),

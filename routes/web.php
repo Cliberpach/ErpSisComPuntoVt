@@ -669,6 +669,22 @@ function(){
 
     });
 
+    // Reportes - Notas - Ingreso
+    Route::prefix('reportes/notas')->group(function(){
+
+        Route::get('ingreso', 'Reportes\Notas\IngresoController@index')->name('reporte.notas.ingreso');
+        Route::post('ingreso/getTable', 'Reportes\Notas\IngresoController@getTable')->name('reporte.notas.ingreso.getTable');
+
+    });
+
+    // Reportes - Notas - Salida
+    Route::prefix('reportes/notas')->group(function(){
+
+        Route::get('salida', 'Reportes\Notas\SalidaController@index')->name('reporte.notas.salida');
+        Route::post('salida/getTable', 'Reportes\Notas\SalidaController@getTable')->name('reporte.notas.salida.getTable');
+
+    });
+
     Route::prefix('configuracion')->group(function(){
         Route::get('index', 'Configuracion\ConfiguracionController@index')->name('configuracion.index');
         Route::put('update/{id}', 'Configuracion\ConfiguracionController@update')->name('configuracion.update');

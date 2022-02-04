@@ -26,6 +26,8 @@
                         <label for="tipo_id">Documento</label>
                         <select name="tipo_id" id="tipo_id" class="select2_form form-control">
                             <option value=""></option>
+                            <option value="126">Ventas</option>
+                            <option value="125">Fact., Boletas y Nota Crédito</option>
                             @foreach(comprobantes_empresa() as $doc)
                                 <option value="{{$doc->tipo_comprobante}}">{{ $doc->descripcion }}</option>
                             @endforeach
@@ -65,6 +67,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">CLIENTE</th>
+                                    <th class="text-center">TIPO DOC</th>
                                     <th class="text-center"># DOC</th>
                                     <th class="text-center">FECHA</th>
                                     <th class="text-center">MONTO</th>
@@ -174,6 +177,7 @@
                                 Swal.resumeTimer();
                                 //console.log(colaboradores);
                             } else {
+                                toastr.error(response.mensaje)
                                 Swal.resumeTimer();
                                 documentos = [];
                                 loadTable();
@@ -222,6 +226,10 @@
             "columns": [
                 {
                     data: 'cliente'
+                },
+                {
+                    data: 'tipo_doc',
+                    className: "text-center",
                 },
                 {
                     data: 'numero',
@@ -287,6 +295,8 @@
                             cadena =  cadena + "<a class='btn btn-sm btn-info m-1' href='"+ url_nota +"' target='_blank' title='Vista'><i class='fa fa-eye'></i> </a>";
                         }
 
+                        console.log(data.convertir);
+
                         if(data.tipo == 129 && (data.convertir == '' || data.convertir == null))
                         {
                             cadena = cadena + "<a class='btn btn-sm btn-warning m-1' href='"+ url_convertir +"' title='Convertir'><i class='fa fa-exchange'></i> </a>"
@@ -300,7 +310,7 @@
             "language": {
                         "url": "{{asset('Spanish.json')}}"
             },
-            "order": [[ 0, "desc" ]],
+            "order": [[ 2, "desc" ]],
         });
         return false;
     }
@@ -331,16 +341,6 @@
             verificar = false;
             toastr.error('Fecha desde debe ser menor que fecha hasta');
         }
-
-        if(convertFloat(tipo) > 129)
-        {
-            verificar = false;
-            toastr.error('Solo se hace reporte en excel de los documentos de ventas.');
-        }
-
-        console.log(tipo)
-        console.log(fecha_desde)
-        console.log(fecha_hasta)
 
         if(verificar)
         {

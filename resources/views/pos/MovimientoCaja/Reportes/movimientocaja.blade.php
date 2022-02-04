@@ -323,9 +323,20 @@
                     <th style="text-align: center; border-right: 2px solid #52BE80">CLIENTE</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">DEV</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">EFECTIVO</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">TRANSFERENCIA</th>
-                    <th style="text-align: right">YAPE/PLIN</th>
+                    @php
+                        $cont = 0;
+                        while($cont < count(tipos_pago()))
+                        {
+                            if($cont == count(tipos_pago()) - 1)
+                            {
+                                echo '<th style="text-align: center;">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            else {
+                                echo '<th style="text-align: center; border-right: 2px solid #52BE80">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            $cont++;
+                        }
+                    @endphp
                 </tr>
             </thead>
             <tbody>
@@ -357,31 +368,29 @@
                             <td style="text-align: center; border-right: 2px solid #52BE80">
                                 {{ $ventas->documento->total }}
                             </td>
-                            @if ($ventas->documento->tipo_pago_id == 1)
-                                <td style="text-align: center; border-right: 2px solid #52BE80">{{ $ventas->documento->importe }}</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                            @elseif ($ventas->documento->tipo_pago_id==2)
-                                <td style="text-align: center; border-right: 2px solid #52BE80">{{ $ventas->documento->efectivo }}</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">{{ $ventas->documento->importe }}</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                            @elseif ($ventas->documento->tipo_pago_id==3)
-                                <td style="text-align: center; border-right: 2px solid #52BE80">{{ $ventas->documento->efectivo }}</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">{{ $ventas->documento->importe }}</td>
-                            @else
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                            @endif
+                            @foreach(tipos_pago() as $tipo)
+                                @if($tipo->id == 1)
+                                    @if($tipo->id == $ventas->documento->tipo_pago_id)
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->importe}}</td>';
+                                    @else
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->efectivo}}</td>';
+                                    @endif
+                                @else
+                                    @if($tipo->id == $ventas->documento->tipo_pago_id)
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->importe}}</td>';
+                                    @else
+                                        <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>';
+                                    @endif
+                                @endif
+                            @endforeach
                         </tr>
                     @endif
                 @endforeach
                 <tr>
                     <td colspan="4" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaEfectivo($movimiento), 2) }}</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaTransferencia($movimiento), 2) }}</td>
-                    <td style="text-align: center; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaYapePlin($movimiento), 2) }}</td>
+                    @foreach (tipos_pago() as $tipo)
+                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosVentaResum($movimiento,$tipo->id), 2) }}</td>
+                    @endforeach
                 </tr>
             </tbody>
         </table>
@@ -395,9 +404,20 @@
                     <th style="text-align: center;border-right: 2px solid #52BE80">NUMERO</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">CLIENTE</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">EFECTIVO</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">TRANSFERENCIA</th>
-                    <th style="text-align: center">YAPE/PLIN</th>
+                    @php
+                        $cont = 0;
+                        while($cont < count(tipos_pago()))
+                        {
+                            if($cont == count(tipos_pago()) - 1)
+                            {
+                                echo '<th style="text-align: center;">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            else {
+                                echo '<th style="text-align: center; border-right: 2px solid #52BE80">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            $cont++;
+                        }
+                    @endphp
                 </tr>
             </thead>
             <tbody>
@@ -410,26 +430,28 @@
                         <td style="text-align: center; border-right: 2px solid #52BE80">
                             {{ $cuentaCliente->cuenta_cliente->monto }}
                         </td>
-                        @if ($cuentaCliente->tipo_pago_id == 1)
-                            <td style="text-align: center; border-right: 2px solid #52BE80">{{ $cuentaCliente->efectivo }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                        @elseif ($cuentaCliente->tipo_pago_id == 2)
-                            <td style="text-align: center; border-right: 2px solid #52BE80">{{ $cuentaCliente->efectivo }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">{{ $cuentaCliente->importe }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                        @elseif ($cuentaCliente->tipo_pago_id == 3)
-                            <td style="text-align: center; border-right: 2px solid #52BE80">{{ $cuentaCliente->efectivo }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">{{ $cuentaCliente->importe }}</td>
-                        @endif
+                        @foreach(tipos_pago() as $tipo)
+                            @if($tipo->id == 1)
+                                @if($tipo->id == $cuentaCliente->tipo_pago_id)
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">{{$cuentaCliente->efectivo}}</td>';
+                                @else
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">{{$cuentaCliente->efectivo}}</td>';
+                                @endif
+                            @else
+                                @if($tipo->id == $cuentaCliente->tipo_pago_id)
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">{{$cuentaCliente->importe}}</td>';
+                                @else
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>';
+                                @endif
+                            @endif
+                        @endforeach
                     </tr>
                 @endforeach
                 <tr>
                     <td colspan="3" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosCobranzaEfectivo($movimiento), 2) }}</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosCobranzaTransferencia($movimiento), 2) }}</td>
-                    <td style="text-align: center; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosCobranzaYapePlin($movimiento), 2) }}</td>
+                    @foreach (tipos_pago() as $tipo)
+                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaIngresosCobranzaResum($movimiento,$tipo->id), 2) }}</td>
+                    @endforeach
                 </tr>
             </tbody>
         </table>
@@ -477,9 +499,20 @@
                     <th style="text-align: center;border-right: 2px solid #52BE80">NUMERO</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">CLIENTE</th>
                     <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">EFECTIVO</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">TRANSFERENCIA</th>
-                    <th style="text-align: right">YAPE/PLIN</th>
+                    @php
+                        $cont = 0;
+                        while($cont < count(tipos_pago()))
+                        {
+                            if($cont == count(tipos_pago()) - 1)
+                            {
+                                echo '<th style="text-align: center;">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            else {
+                                echo '<th style="text-align: center; border-right: 2px solid #52BE80">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            $cont++;
+                        }
+                    @endphp
                 </tr>
             </thead>
             <tbody>
@@ -488,32 +521,34 @@
                     <td style="text-align: center; border-right: 2px solid #52BE80">
                         {{ $detalleProveedor->cuenta_proveedor->documento->tipo_compra }}</td>
                     <td style="text-align: center; border-right: 2px solid #52BE80">
-                        {{ $detalleProveedor->cuenta_proveedor->documento->numero_tipo }}</td>
+                        {{ $detalleProveedor->cuenta_proveedor->documento->serie_tipo.' - '.$detalleProveedor->cuenta_proveedor->documento->numero_tipo }}</td>
                     <td style="text-align: center; border-right: 2px solid #52BE80">
                         {{ $detalleProveedor->cuenta_proveedor->documento->proveedor->descripcion }}</td>
                     <td style="text-align: center; border-right: 2px solid #52BE80">
                         {{ $detalleProveedor->efectivo + $detalleProveedor->importe }}
                     </td>
-                    @if ($detalleProveedor->tipo_pago_id == 1)
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $detalleProveedor->efectivo }}</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                    @elseif ($detalleProveedor->tipo_pago_id == 2)
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $detalleProveedor->efectivo }}</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $detalleProveedor->importe }}</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                    @elseif ($detalleProveedor->tipo_pago_id == 3)
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $detalleProveedor->efectivo }}</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>
-                        <td style="text-align: center; border-right: 2px solid #52BE80">{{ $detalleProveedor->importe }}</td>
-                    @endif
+                    @foreach(tipos_pago() as $tipo)
+                        @if($tipo->id == 1)
+                            @if($tipo->id == $detalleProveedor->tipo_pago_id)
+                                <td style="text-align: center; border-right: 2px solid #52BE80">{{$detalleProveedor->efectivo}}</td>';
+                            @else
+                                <td style="text-align: center; border-right: 2px solid #52BE80">{{$detalleProveedor->efectivo}}</td>';
+                            @endif
+                        @else
+                            @if($tipo->id == $detalleProveedor->tipo_pago_id)
+                                <td style="text-align: center; border-right: 2px solid #52BE80">{{$detalleProveedor->importe}}</td>';
+                            @else
+                                <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>';
+                            @endif
+                        @endif
+                    @endforeach
                 </tr>
                 @endforeach
                 <tr>
-                    <td colspan="4" style="text-align: center; border-right: 2px solid #52BE80">TOTAL</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaEgresosPagoEfectivo($movimiento), 2) }}</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaEgresosPagoTransferencia($movimiento), 2) }}</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaEgresosPagoYapePlin($movimiento), 2) }}</td>
+                    <td colspan="4" style="text-align: center; border-top: 2px solid #52BE80 ;border-right: 2px solid #52BE80">TOTAL</td>
+                    @foreach (tipos_pago() as $tipo)
+                    <td style="text-align: center;border-top: 2px solid #52BE80 ;border-right: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaEgresosPagoResum($movimiento, $tipo->id), 2) }}</td>
+                    @endforeach
                 </tr>
             </tbody>
         </table>

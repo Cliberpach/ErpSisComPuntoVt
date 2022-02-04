@@ -39,7 +39,7 @@ class CuentaClienteController extends Controller
                 $cuenta->update();
             }
 
-            $detalle_ultimo = DetalleCuentaCliente::where('cuenta_cliente_id',2)->get()->last();
+            $detalle_ultimo = DetalleCuentaCliente::where('cuenta_cliente_id',$value->id)->get()->last();
 
             if(!empty($detalle_ultimo))
             {
@@ -53,6 +53,7 @@ class CuentaClienteController extends Controller
                 else{
                     $cuenta = CuentaCliente::find($value->id);
                     $cuenta->saldo=$detalle_ultimo->saldo;
+                    $cuenta->estado='PENDIENTE';
                     $cuenta->update();
                 }
             }
@@ -60,7 +61,7 @@ class CuentaClienteController extends Controller
             array_push($datos,array(
                 "id"=>$value->id,
                 "cliente"=>$value->documento->clienteEntidad->nombre,
-                "numero_doc"=>$value->documento->numero_doc,
+                "numero_doc"=>$value->documento->serie.' - '.$value->documento->correlativo,
                 "fecha_doc"=>$value->fecha_doc,
                 "monto"=>$value->monto,
                 "acta"=> number_format(round($acta, 2), 2),

@@ -666,6 +666,10 @@
                 {
                     "targets": [11],
                     'visible': false
+                },
+                {
+                    "targets": [12],
+                    'visible': false
                 }
             ],
             'bAutoWidth': false,
@@ -687,6 +691,10 @@
                 {
                     sWidth: '25%',
                     sClass: 'text-left'
+                },
+                {
+                    sWidth: '15%',
+                    sClass: 'text-center'
                 },
                 {
                     sWidth: '15%',
@@ -967,7 +975,7 @@
                 'detalles' : $("#productos_detalle").val()
             }
         }).done(function(result) {
-            alert('DEVOLUCION REALIZADA')
+            console.log('DEVOLUCION REALIZADA')
         });
     }
 
@@ -1342,7 +1350,7 @@
                 },
                 success: function(cliente) {
                     $('#buscarLotes').prop("disabled", false)
-                    obtenerLotesproductos(cliente.tabladetalles_id)
+                    $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
                 },
             })
         }

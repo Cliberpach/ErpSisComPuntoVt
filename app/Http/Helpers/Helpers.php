@@ -1190,6 +1190,39 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
     }
 }
 
+if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
+    function cuadreMovimientoCajaIngresosVentaResum(MovimientoCaja $movimiento,$id)
+    {
+       if($id == 1)
+       {
+            $totalIngresos = 0;
+            foreach ($movimiento->detalleMovimientoVentas as $item) {
+                if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+                    if ($item->documento->tipo_pago_id == $id) {
+                        $totalIngresos = $totalIngresos + $item->documento->importe;
+                    }
+                    else{
+                        $totalIngresos = $totalIngresos + $item->documento->efectivo;
+                    }
+                }
+            }
+            return $totalIngresos;
+       }
+       else
+       {
+            $totalIngresos = 0;
+            foreach ($movimiento->detalleMovimientoVentas as $item) {
+                if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+                    if ($item->documento->tipo_pago_id == $id) {
+                        $totalIngresos = $totalIngresos + $item->documento->importe;
+                    }
+                }
+            }
+            return $totalIngresos;
+       }
+    }
+}
+
 if (!function_exists('cuadreMovimientoCajaIngresosVentaEfectivo')) {
     function cuadreMovimientoCajaIngresosVentaEfectivo(MovimientoCaja $movimiento)
     {
@@ -1263,6 +1296,35 @@ if (!function_exists('cuadreMovimientoCajaIngresosCobranza')) {
             $totalIngresos = $totalIngresos  + $item->monto;
         }
         return $totalIngresos;
+    }
+}
+
+if (!function_exists('cuadreMovimientoCajaIngresosCobranzaResum')) {
+    function cuadreMovimientoCajaIngresosCobranzaResum(MovimientoCaja $movimiento, $id)
+    {
+        if($id == 1)
+        {
+            $totalIngresos = 0;
+
+            foreach ($movimiento->detalleCuentaCliente as $item) {
+                if($item->tipo_pago_id == $id)
+                {
+                    $totalIngresos = $totalIngresos  + $item->efectivo;
+                }
+            }
+            return $totalIngresos;
+        }
+        else{
+            $totalIngresos = 0;
+
+            foreach ($movimiento->detalleCuentaCliente as $item) {
+                if($item->tipo_pago_id == $id)
+                {
+                    $totalIngresos = $totalIngresos  + $item->importe;
+                }
+            }
+            return $totalIngresos;
+        }
     }
 }
 
@@ -1351,6 +1413,34 @@ if (!function_exists('cuadreMovimientoCajaEgresosPago')) {
             $totalEgresos = $totalEgresos + ($item->efectivo + $item->importe);
         }
         return $totalEgresos;
+    }
+}
+
+if (!function_exists('cuadreMovimientoCajaEgresosPagoResum')) {
+    function cuadreMovimientoCajaEgresosPagoResum($movimiento, $id)
+    {
+        if($id == 1)
+        {
+            $totalEgresos = 0;
+            foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
+                if($item->tipo_pago_id == $id)
+                {
+                    $totalEgresos = $totalEgresos + $item->efectivo;
+                }
+            }
+            return $totalEgresos;
+        }
+        else
+        {
+            $totalEgresos = 0;
+            foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
+                if($item->tipo_pago_id == $id)
+                {
+                    $totalEgresos = $totalEgresos + $item->importe;
+                }
+            }
+            return $totalEgresos;
+        }
     }
 }
 

@@ -193,7 +193,7 @@
 
 @can('restore', [Auth::user(),['reporte_cajadiaria.index','reporte_venta.index','reporte_compra.index','reporte_nota_salida.index','reporte_nota_ingreso.index','reporte_cuenta_cobrar.index','reporte_cuenta_pagar.index','reporte_stock_valorizado.index']])
 <li class="@yield('reporte-active')">
-    <a href="#"><i class="fa fa-money"></i> <span class="nav-label">Reporte </span><span
+    <a href="#"><i class="fa fa-money"></i> <span class="nav-label">Reportes </span><span
             class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
         @can('haveaccess','reporte_cajadiaria.index')
@@ -206,10 +206,10 @@
         <li class="@yield('compras_reporte-active')"><a href="{{ route('reporte.compras.documento') }}">Compras</a></li>
         @endcan
         @can('haveaccess','reporte_nota_salida.index')
-        <li class="@yield('nota_salida_reporte-active')"><a href="#">Nota Salida</a></li>
+        <li class="@yield('nota_salida_reporte-active')"><a href="{{ route('reporte.notas.salida') }}">Nota Salida</a></li>
         @endcan
         @can('haveaccess','reporte_nota_ingreso.index')
-        <li class="@yield('nota_ingreso_reporte-active')"><a href="#">Nota Ingreso</a></li>
+        <li class="@yield('nota_ingreso_reporte-active')"><a href="{{ route('reporte.notas.ingreso') }}">Nota Ingreso</a></li>
         @endcan
         @can('haveaccess','reporte_cuenta_cobrar.index')
         <li class="@yield('cuentas_x_cobrar_reporte-active')"><a href="{{ route('reporte.cuentas.cliente') }}">Cuentas por Cobrar</a></li>
