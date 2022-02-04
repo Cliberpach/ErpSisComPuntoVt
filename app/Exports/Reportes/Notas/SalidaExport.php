@@ -43,18 +43,32 @@ class SalidaExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('productos')
-            ->join('detalle_nota_salidad','productos.id','=','detalle_nota_salidad.producto_id')
-            ->join('nota_salidad','nota_salidad.id','=','detalle_nota_salidad.nota_salidad_id')
-            ->select(
-                DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d") as fecha'),
-                'productos.nombre',
-                'detalle_nota_salidad.cantidad',
-                'nota_salidad.destino',
-            )
-            ->where('productos.id',$this->producto)
-            ->where('nota_salidad.destino',$this->destino)
-            ->whereBetween(DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d")'),[$this->fecha_ini,$this->fecha_fin])->get();
+        $consulta = DB::table('productos')
+        ->join('detalle_nota_salidad','productos.id','=','detalle_nota_salidad.producto_id')
+        ->join('nota_salidad','nota_salidad.id','=','detalle_nota_salidad.nota_salidad_id')
+        ->select(
+            DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d") as fecha'),
+            'productos.nombre',
+            'detalle_nota_salidad.cantidad',
+            'nota_salidad.destino',
+        );
+
+        if($this->producto)
+        {
+            $consulta = $consulta->where('productos.id',$this->producto);
+        }
+
+        if($this->destino)
+        {
+            $consulta = $consulta->where('nota_salidad.destino',$this->destino);
+        }
+
+        if($this->fecha_ini && $this->fecha_fin)
+        {
+            $consulta = $consulta->whereBetween(DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d")'),[$this->fecha_ini,$this->fecha_fin]);
+        }
+
+        return $consulta->get();
     }
 
     public function registerEvents(): array

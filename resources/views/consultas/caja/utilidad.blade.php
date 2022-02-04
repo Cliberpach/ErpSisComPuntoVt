@@ -100,17 +100,17 @@ function initTable()
     let verificar = true;
     var fecha_desde = $('#fecha_desde').val();
     var fecha_hasta = $('#fecha_hasta').val();
-    if (fecha_desde !== '' && fecha_desde !== null && fecha_hasta == '') {
+    if (fecha_desde != '' && fecha_desde != null && fecha_hasta == '') {
         verificar = false;
         toastr.error('Ingresar fecha hasta');
     }
 
-    if (fecha_hasta !== '' && fecha_hasta !== null && fecha_desde == '') {
+    if (fecha_hasta != '' && fecha_hasta != null && fecha_desde == '') {
         verificar = false;
         toastr.error('Ingresar fecha desde');
     }
 
-    if (fecha_desde > fecha_hasta && fecha_hasta !== '' && fecha_desde !== '') {
+    if (fecha_desde > fecha_hasta && fecha_hasta != '' && fecha_desde != '') {
         verificar = false;
         toastr.error('Fecha desde debe ser menor que fecha hasta');
     }
@@ -195,12 +195,12 @@ function loadTable()
                 className: "text-center",
             },
             {
-                data: 'cantidad',
-                className: "text-center"
-            },
-            {
                 data: 'producto',
                 className: "text-center",
+            },
+            {
+                data: 'cantidad',
+                className: "text-center"
             },
             {
                 data: 'precio_venta',

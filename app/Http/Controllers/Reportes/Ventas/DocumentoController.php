@@ -20,8 +20,8 @@ class DocumentoController extends Controller
         $cliente = $request->cliente_id;
         $fecha_ini = $request->fecha_ini;
         $fecha_fin = $request->fecha_fin;
-        return datatables()->query(
-            DB::table('cotizacion_documento')
+
+        $consulta = DB::table('cotizacion_documento')
             ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
             ->join('condicions','condicions.id','=','cotizacion_documento.condicion_id')
             ->leftjoin('tipos_pago','tipos_pago.id','=','cotizacion_documento.tipo_pago_id')
@@ -32,10 +32,21 @@ class DocumentoController extends Controller
                 'clientes.nombre as cliente',
                 'condicions.descripcion as modo_pago',
                 'tipos_pago.descripcion as tipo_pago',
-                'cotizacion_documento.serie','cotizacion_documento.correlativo',
-            )
-            ->where('cotizacion_documento.cliente_id',$cliente)
-            ->whereBetween('cotizacion_documento.fecha_documento',[$fecha_ini,$fecha_fin])
+                'cotizacion_documento.serie','cotizacion_documento.correlativo'
+        );
+        if($cliente)
+        {
+            $consulta->where('cotizacion_documento.cliente_id',$cliente);
+        }
+
+        if($fecha_ini && $fecha_ini)
+        {
+            $consulta->whereBetween('cotizacion_documento.fecha_documento',[$fecha_ini,$fecha_fin]);
+        }
+
+
+        return datatables()->query(
+            $consulta
         )->toJson();
     }
 

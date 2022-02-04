@@ -47,7 +47,7 @@ class ClienteExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('cuenta_cliente')
+       $consulta = DB::table('cuenta_cliente')
         ->join('cotizacion_documento','cotizacion_documento.id','=','cuenta_cliente.cotizacion_documento_id')
         ->join('condicions','condicions.id','=','cotizacion_documento.condicion_id')
         ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
@@ -63,9 +63,19 @@ class ClienteExport implements FromCollection,WithHeadings,WithEvents
             where dcc.cuenta_cliente_id = cuenta_cliente.id
            order by id desc
            limit 1),"-") as fecha_ultima'),
-        )
-        ->where('cotizacion_documento.cliente_id',$this->cliente)
-        ->whereBetween('cuenta_cliente.fecha_doc',[$this->fecha_ini,$this->fecha_fin])->get();
+        );
+
+        if($this->cliente)
+        {
+            $consulta = $consulta->where('cotizacion_documento.cliente_id',$this->cliente);
+        }
+
+        if($this->fecha_ini && $this->fecha_fin)
+        {
+            $consulta = $consulta->whereBetween('cuenta_cliente.fecha_doc',[$this->fecha_ini,$this->fecha_fin]);
+        }
+
+        return $consulta->get();
 
     }
     public function registerEvents(): array

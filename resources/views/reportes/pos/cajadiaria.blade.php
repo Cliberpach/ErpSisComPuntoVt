@@ -168,24 +168,19 @@
         var fecha_fin = $('#fecha_fin').val();
         var caja_id = $('#caja_id').val();
 
-        if (caja_id == '') {
-            verificar = false;
-            toastr.error('Seleccionar caja.');
-        }
-
-        if (fecha_ini == '') {
-            verificar = false;
-            toastr.error('Ingresar fecha de inicio');
-        }
-
-        if (fecha_fin == '') {
+        if (fecha_ini != '' && fecha_ini != null && fecha_fin == '') {
             verificar = false;
             toastr.error('Ingresar fecha final');
         }
 
-        if (fecha_ini > fecha_fin) {
+        if (fecha_fin != '' && fecha_fin != null && fecha_ini == '') {
             verificar = false;
-            toastr.error('Fecha de inicio debe ser menor que fecha final');
+            toastr.error('Ingresar fecha de inicio');
+        }
+
+        if (fecha_ini > fecha_fin && fecha_fin != '' && fecha_ini !== '') {
+            verificar = false;
+            toastr.error('Fecha desde debe ser menor que fecha hasta');
         }
 
         if(verificar)
@@ -299,30 +294,24 @@
     }
 
     function excelTable()
-    {
-        let verificar = true;
+    {let verificar = true;
         var fecha_ini = $('#fecha_ini').val();
         var fecha_fin = $('#fecha_fin').val();
         var caja_id = $('#caja_id').val();
 
-        if (caja_id == '') {
-            verificar = false;
-            toastr.error('Seleccionar caja.');
-        }
-
-        if (fecha_ini == '') {
-            verificar = false;
-            toastr.error('Ingresar fecha de inicio');
-        }
-
-        if (fecha_fin == '') {
+        if (fecha_ini != '' && fecha_ini != null && fecha_fin == '') {
             verificar = false;
             toastr.error('Ingresar fecha final');
         }
 
-        if (fecha_ini > fecha_fin) {
+        if (fecha_fin != '' && fecha_fin != null && fecha_ini == '') {
             verificar = false;
-            toastr.error('Fecha de inicio debe ser menor que fecha final');
+            toastr.error('Ingresar fecha de inicio');
+        }
+
+        if (fecha_ini > fecha_fin && fecha_fin != '' && fecha_ini !== '') {
+            verificar = false;
+            toastr.error('Fecha desde debe ser menor que fecha hasta');
         }
 
         if(verificar)

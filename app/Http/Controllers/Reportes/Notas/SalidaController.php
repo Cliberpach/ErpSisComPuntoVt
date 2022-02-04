@@ -29,20 +29,34 @@ class SalidaController extends Controller
         $destino = $request->destino;
         $fecha_ini = $request->fecha_ini;
         $fecha_fin = $request->fecha_fin;
+        $consulta = DB::table('productos')
+        ->join('detalle_nota_salidad','productos.id','=','detalle_nota_salidad.producto_id')
+        ->join('nota_salidad','nota_salidad.id','=','detalle_nota_salidad.nota_salidad_id')
+        ->select(
+            'productos.id',
+            'productos.nombre',
+            'detalle_nota_salidad.cantidad',
+            'nota_salidad.destino',
+            DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d") as fecha')
+        );
+
+        if($producto)
+        {
+            $consulta = $consulta->where('productos.id',$producto);
+        }
+
+        if($destino)
+        {
+            $consulta = $consulta->where('nota_salidad.destino',$destino);
+        }
+
+        if($fecha_ini && $fecha_fin)
+        {
+            $consulta = $consulta->whereBetween(DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d")'),[$fecha_ini,$fecha_fin]);
+        }
+
         return datatables()->query(
-            DB::table('productos')
-            ->join('detalle_nota_salidad','productos.id','=','detalle_nota_salidad.producto_id')
-            ->join('nota_salidad','nota_salidad.id','=','detalle_nota_salidad.nota_salidad_id')
-            ->select(
-                'productos.id',
-                'productos.nombre',
-                'detalle_nota_salidad.cantidad',
-                'nota_salidad.destino',
-                DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d") as fecha')
-            )
-            ->where('productos.id',$producto)
-            ->where('nota_salidad.destino',$destino)
-            ->whereBetween(DB::raw('DATE_FORMAT(nota_salidad.created_at, "%Y-%m-%d")'),[$fecha_ini,$fecha_fin])
+            $consulta
         )->toJson();
     }
 

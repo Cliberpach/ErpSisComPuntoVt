@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-12">
             <div class="ibox ">
-                <div class="ibox-content">
+                <div class="ibox-content dot-matrix">
                     <div class="row align-items-end">
                         <div class="col-12 col-md-4 text-danger text-center"><h1><b>INVERSIÓN</b></h1></div>
                         <div class="col-12 col-md-4">

@@ -700,16 +700,6 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    if(Auth::user()->user->persona->colaborador)
-    {
-        return Auth::user()->user->persona->colaborador;
-    }
-    else{
-        return Auth::user();
-    }
-    // $pdf = PDF::loadview('ventas.documentos.impresion.example')->setPaper('a4')->setWarnings(false);
-
-    // return $pdf->stream('example.pdf');
     $dato = 'Actualizar';
     broadcast(new VentasCajaEvent($dato));
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';

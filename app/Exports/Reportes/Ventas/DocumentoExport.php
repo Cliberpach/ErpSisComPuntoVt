@@ -44,7 +44,7 @@ class DocumentoExport implements  FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('cotizacion_documento')
+        $consulta = DB::table('cotizacion_documento')
         ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
         ->join('condicions','condicions.id','=','cotizacion_documento.condicion_id')
         ->leftjoin('tipos_pago','tipos_pago.id','=','cotizacion_documento.tipo_pago_id')
@@ -55,9 +55,19 @@ class DocumentoExport implements  FromCollection,WithHeadings,WithEvents
             'condicions.descripcion as modo_pago',
             'tipos_pago.descripcion as tipo_pago',
             DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero'),
-        )
-        ->where('cotizacion_documento.cliente_id',$this->cliente)
-        ->whereBetween('cotizacion_documento.fecha_documento',[$this->fecha_ini,$this->fecha_fin])->get();
+        );
+
+        if($this->cliente)
+        {
+            $consulta = $consulta->where('cotizacion_documento.cliente_id',$this->cliente);
+        }
+
+        if($this->fecha_ini && $this->fecha_fin)
+        {
+            $consulta->whereBetween('cotizacion_documento.fecha_documento',[$this->fecha_ini,$this->fecha_fin]);
+        }
+
+        return $consulta->get();
 
     }
     public function registerEvents(): array

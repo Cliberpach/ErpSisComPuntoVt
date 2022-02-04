@@ -37,6 +37,7 @@ use App\Ventas\TipoPago;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
+use App\Movimientos\MovimientoAlmacen;
 use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use App\Ventas\Documento\Documento as DocumentoDocumento;
@@ -1685,6 +1686,49 @@ if (!function_exists('tipos_pago')) {
     {
         $tipos = TipoPago::where('estado','ACTIVO')->get();
         return $tipos;
+    }
+}
+
+if (!function_exists('addComprasLote')) {
+    function addComprasLote()
+    {
+        $detalles = Detalle_Documento::where('estado','ACTIVO')->get();
+
+        foreach($detalles as $detalle)
+        {
+            $lote = new LoteProducto();
+            $lote->compra_documento_id = $detalle->documento->id;
+            $lote->codigo_lote = $detalle->lote;
+            $lote->producto_id = $detalle->producto_id;
+            $lote->cantidad = $detalle->cantidad;
+            $lote->cantidad_logica = $detalle->cantidad;
+            $lote->cantidad_inicial = $detalle->cantidad;
+            $lote->fecha_vencimiento = $detalle->fecha_vencimiento;
+            $lote->fecha_entrega = $detalle->documento->fecha_entrega;
+            $lote->observacion = 'DOC. COMPRA';
+            $lote->estado = '1';
+            $lote->save();
+
+            $detalle->lote_id = $lote->id;
+            $detalle->update();
+
+            //MOVIMIENTO
+            $producto = Producto::findOrFail($detalle->producto_id);
+
+            $movimiento = new MovimientoAlmacen();
+            $movimiento->almacen_final_id = $detalle->producto->almacen->id;
+            $movimiento->cantidad = $detalle->cantidad;
+            $movimiento->nota = 'COMPRA';
+            $movimiento->observacion = $producto->codigo.' - '.$producto->descripcion;
+            $movimiento->usuario_id = auth()->user()->id;
+            $movimiento->movimiento = 'INGRESO';
+            $movimiento->producto_id = $detalle->producto_id;
+            $movimiento->lote_id = $lote->id;
+            $movimiento->compra_documento_id = $detalle->documento_id; //DOCUMENTO DE COMPRA
+            $movimiento->save();
+        }
+
+        return 'Exito';
     }
 }
 

@@ -42,7 +42,7 @@ class IngresoExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('productos')
+        $consulta = DB::table('productos')
         ->join('detalle_nota_ingreso','productos.id','=','detalle_nota_ingreso.producto_id')
         ->join('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
         ->select(
@@ -50,10 +50,24 @@ class IngresoExport implements FromCollection,WithHeadings,WithEvents
             'productos.nombre',
             'detalle_nota_ingreso.cantidad',
             'nota_ingreso.origen',
-        )
-        ->where('productos.id',$this->producto)
-        ->where('nota_ingreso.origen',$this->origen)
-        ->whereBetween(DB::raw('DATE_FORMAT(nota_ingreso.created_at, "%Y-%m-%d")'),[$this->fecha_ini,$this->fecha_fin])->get();
+        );
+
+        if($this->producto)
+        {
+            $consulta = $consulta->where('productos.id',$this->producto);
+        }
+
+        if($this->origen)
+        {
+            $consulta = $consulta->where('nota_ingreso.origen',$this->origen);
+        }
+
+        if($this->fecha_ini && $this->fecha_fin)
+        {
+            $consulta = $consulta->whereBetween(DB::raw('DATE_FORMAT(nota_ingreso.created_at, "%Y-%m-%d")'),[$this->fecha_ini,$this->fecha_fin]);
+        }
+
+        return $consulta->get();
     }
 
     public function registerEvents(): array

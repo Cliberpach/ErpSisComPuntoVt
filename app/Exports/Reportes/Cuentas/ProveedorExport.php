@@ -48,25 +48,34 @@ class ProveedorExport implements FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('cuenta_proveedor')
-        ->join('compra_documentos','compra_documentos.id','=','cuenta_proveedor.compra_documento_id')
-        ->join('proveedores','proveedores.id','=','compra_documentos.proveedor_id')
-        ->select(
-            'compra_documentos.fecha_emision as fecha',
-            'proveedores.descripcion as proveedor',
-            'compra_documentos.total as monto',
-            'compra_documentos.moneda',
-            'compra_documentos.numero_doc as documento',
-            DB::raw('(compra_documentos.total - cuenta_proveedor.saldo) as acta'),
-            'cuenta_proveedor.saldo',
-            DB::raw('ifnull((select fecha
-            from detalle_cuenta_proveedor dcp
-            where dcp.cuenta_proveedor_id = cuenta_proveedor.id
-           order by id desc
-           limit 1),"-") as fecha_ultima'),
-        )
-        ->where('compra_documentos.proveedor_id',$this->proveedor)
-        ->whereBetween('cuenta_proveedor.fecha_doc',[$this->fecha_ini,$this->fecha_fin])->get();
+        $consulta = DB::table('cuenta_proveedor')
+            ->join('compra_documentos','compra_documentos.id','=','cuenta_proveedor.compra_documento_id')
+            ->join('proveedores','proveedores.id','=','compra_documentos.proveedor_id')
+            ->select(
+                'compra_documentos.fecha_emision as fecha',
+                'proveedores.descripcion as proveedor',
+                'compra_documentos.total as monto',
+                'compra_documentos.moneda',
+                'compra_documentos.numero_doc as documento',
+                DB::raw('(compra_documentos.total - cuenta_proveedor.saldo) as acta'),
+                'cuenta_proveedor.saldo',
+                DB::raw('ifnull((select fecha
+                from detalle_cuenta_proveedor dcp
+                where dcp.cuenta_proveedor_id = cuenta_proveedor.id
+            order by id desc
+            limit 1),"-") as fecha_ultima'),
+            );
+        if($this->proveedor)
+        {
+            $consulta = $consulta->where('compra_documentos.proveedor_id',$this->proveedor);
+        }
+
+        if($this->fecha_ini && $this->fecha_fin)
+        {
+            $consulta = $consulta->whereBetween('cuenta_proveedor.fecha_doc',[$this->fecha_ini,$this->fecha_fin]);
+        }
+
+        return $consulta->get();
 
     }
     public function registerEvents(): array
