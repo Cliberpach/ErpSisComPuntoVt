@@ -34,15 +34,15 @@ class UtilidadController extends Controller
                 $detalles = Detalle::where('estado','ACTIVO')->where('documento_id',$venta->id)->get();
                 foreach($detalles as $detalle)
                 {
-                    $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio + ($detalle->lote->detalle_compra->costo_flete / $detalle->lote->detalle_compra->cantidad)) : 0.00;
+                    $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
                     $coleccion->push([
                         "fecha_doc" => $venta->fecha_documento,
                         "cantidad" => $detalle->cantidad,
                         "producto" => $detalle->lote->producto->nombre,
                         "precio_venta" => $detalle->precio_nuevo,
-                        "precio_compra" => number_format($precom, 2),
-                        "utilidad" => number_format($detalle->precio_nuevo - $precom,2),
-                        "importe" => number_format(($detalle->precio_nuevo - $precom) * $detalle->cantidad, 2)
+                        "precio_compra" => $precom,
+                        "utilidad" => $detalle->precio_nuevo - $precom,
+                        "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
                     ]);
                 }
             }
