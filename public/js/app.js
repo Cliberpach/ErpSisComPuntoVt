@@ -2357,6 +2357,15 @@ __webpack_require__.r(__webpack_exports__);
       $('#modal_ventas').modal('show');
       $this.initTableVentas(data.cliente_id, data.condicion_id);
     });
+    $this.table.on('click', '.btn-pdf', function () {
+      var data = $this.table.row($(this).closest("tr")).data();
+      var fn_pdf = 'comprobanteElectronico(' + data.id + ')';
+      var fn_ticket = 'comprobanteElectronicoTicket(' + data.id + ')';
+      $('.descarga-title').html(data.serie + '-' + data.correlativo);
+      $('.file-pdf').attr('onclick', fn_pdf);
+      $('.file-ticket').attr('onclick', fn_ticket);
+      $('#modal_descargas_pdf').modal('show');
+    });
     $this.tableVentas.on('click', '.pagar', function () {
       var data = $this.tableVentas.row($(this).closest("tr")).data();
       $('.pago-title').html(data.numero_doc);
@@ -71729,28 +71738,28 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
-/*En el servidor*/
+/*En el servidor
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+    wssPort: 6001,
+    encrypted:false,
+    disableStats:true,
+    enabledTransports: ['ws', 'wss'],
+    //forceTLS:false,
+});*/
+
+/*En el local*/
 
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: 'ASDASF2121',
   wsHost: window.location.hostname,
-  wssPort: 6001,
-  encrypted: false,
-  disableStats: true,
-  enabledTransports: ['ws', 'wss'] //forceTLS:false,
-
+  wsPort: 6001,
+  forceTLS: false,
+  disableStats: true
 });
-/*En el local
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: 'ASDASF2121',
-    wsHost: window.location.hostname,
-    wsPort: 6001,
-    forceTLS:false,
-    disableStats: true,
-});*/
 
 /***/ }),
 

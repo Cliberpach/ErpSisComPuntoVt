@@ -60,6 +60,11 @@ class NotaIngreso implements ToCollection, WithHeadingRow, WithValidation
             foreach ($collection as $row) {
                 if ($row['codigo'] != null) {
                     $producto = DB::table('productos')->where('codigo', $row['codigo'])->first();
+
+                    if($row['costo_total'] < 0)
+                    {
+                        $row['costo_total'] = (-1) * $row['costo_total'];
+                    }
                     $costo_soles = (float)  $row['costo_total'] / (float) $row['cantidad'];
                     $costo_dolares = $costo_soles / (float) $dolar;
 

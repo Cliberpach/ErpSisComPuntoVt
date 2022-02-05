@@ -402,11 +402,22 @@ export default {
             toastr.success("Nueva venta registrada");
             $this.actualizarTable();
         });
+
         $this.table.on('click','.pagar',function(){
             let data = $this.table.row($(this).closest("tr")).data();
             $('.ventas-title').html(data.cliente);
             $('#modal_ventas').modal('show');
             $this.initTableVentas(data.cliente_id, data.condicion_id);
+        });
+
+        $this.table.on('click','.btn-pdf',function(){
+            let data = $this.table.row($(this).closest("tr")).data();
+            let fn_pdf = 'comprobanteElectronico(' + data.id + ')';
+            let fn_ticket = 'comprobanteElectronicoTicket(' + data.id + ')';
+            $('.descarga-title').html(data.serie + '-' + data.correlativo);
+            $('.file-pdf').attr('onclick',fn_pdf);
+            $('.file-ticket').attr('onclick',fn_ticket);
+            $('#modal_descargas_pdf').modal('show');
         });
 
         $this.tableVentas.on('click','.pagar',function(){
@@ -980,6 +991,16 @@ export default {
                 let sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
                 toastr.error(sHtmlMensaje);
             }).then(() => $this.iPagando = 0);
+        },
+        comprobanteElectronico: function(id) {
+            var url = '{{ route("ventas.documento.comprobante", ":id")}}';
+            url = url.replace(':id',id+'-100');
+            window.open(url, "Comprobante SISCOM", "width=900, height=600")
+        },
+        comprobanteElectronicoTicket: function(id) {
+            var url = '{{ route("ventas.documento.comprobante", ":id")}}';
+            url = url.replace(':id',id+'-80');
+            window.open(url, "Comprobante SISCOM", "width=900, height=600");
         }
     },
     updated() {
