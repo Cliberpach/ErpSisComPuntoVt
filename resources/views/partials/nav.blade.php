@@ -266,7 +266,7 @@
         <li class="@yield('colaboradores-active')"><a href="{{ route('mantenimiento.colaborador.index') }}">Colaboradores</a></li>
         @endcan
         @can('haveaccess', 'vendedor.index')
-        <li class="@yield('vendedores-active')"><a href="{{ route('mantenimiento.vendedor.index') }}">Vendedores</a></li>
+        <li class="@yield('vendedores-active') d-none"><a href="{{ route('mantenimiento.vendedor.index') }}">Vendedores</a></li>
         @endcan
         @can('haveaccess', 'empresa.index')
         <li class="@yield('empresas-active')"><a href="{{ route('mantenimiento.empresas.index') }}">Empresas</a></li>

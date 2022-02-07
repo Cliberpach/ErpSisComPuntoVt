@@ -148,24 +148,19 @@
         var fecha_fin = $('#fecha_fin').val();
         var proveedor_id = $('#proveedor_id').val();
 
-        if (proveedor_id == '') {
-            verificar = false;
-            toastr.error('Seleccionar proveedor');
-        }
-
-        if (fecha_ini == '') {
-            verificar = false;
-            toastr.error('Ingresar fecha de inicio');
-        }
-
-        if (fecha_fin == '') {
+        if (fecha_ini != '' && fecha_ini != null && fecha_fin == '') {
             verificar = false;
             toastr.error('Ingresar fecha final');
         }
 
-        if (fecha_ini > fecha_fin && fecha_hasta != '' && fecha_ini != '') {
+        if (fecha_fin != '' && fecha_fin != null && fecha_ini == '') {
             verificar = false;
-            toastr.error('Fecha de inicio debe ser menor que fecha final');
+            toastr.error('Ingresar fecha de inicio');
+        }
+
+        if (fecha_ini > fecha_fin && fecha_fin != '' && fecha_ini !== '') {
+            verificar = false;
+            toastr.error('Fecha desde debe ser menor que fecha hasta');
         }
 
         if(verificar)

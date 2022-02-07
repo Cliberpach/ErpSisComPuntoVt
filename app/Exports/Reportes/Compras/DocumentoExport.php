@@ -43,7 +43,8 @@ class DocumentoExport implements  FromCollection,WithHeadings,WithEvents
     */
     public function collection()
     {
-        return DB::table('compra_documentos')
+
+        $consulta = DB::table('compra_documentos')
         ->join('proveedores','proveedores.id','=','compra_documentos.proveedor_id')
         ->select(
             'compra_documentos.fecha_emision as fecha',
@@ -51,10 +52,17 @@ class DocumentoExport implements  FromCollection,WithHeadings,WithEvents
             'compra_documentos.total as monto',
             'compra_documentos.modo_compra as modo_pago',
             'compra_documentos.numero_doc as documento',
-        )
-        ->where('compra_documentos.proveedor_id',$this->proveedor)
-        ->where('compra_documentos.estado','!=','ANULADO')
-        ->whereBetween('compra_documentos.fecha_emision',[$this->fecha_ini,$this->fecha_fin])->get();
+        )->where('compra_documentos.estado','!=','ANULADO');
+        if($this->proveedor)
+        {
+            $consulta = $consulta->where('compra_documentos.proveedor_id',$this->proveedor);
+        }
+        if($this->fecha_ini && $this->fecha_fin)
+        {
+            $consulta = $consulta->whereBetween('compra_documentos.fecha_emision',[$this->fecha_ini,$this->fecha_fin]);
+        }
+
+        return $consulta->get();
 
     }
     public function registerEvents(): array

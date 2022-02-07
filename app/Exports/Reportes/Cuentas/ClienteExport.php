@@ -49,7 +49,6 @@ class ClienteExport implements FromCollection,WithHeadings,WithEvents
     {
        $consulta = DB::table('cuenta_cliente')
         ->join('cotizacion_documento','cotizacion_documento.id','=','cuenta_cliente.cotizacion_documento_id')
-        ->join('condicions','condicions.id','=','cotizacion_documento.condicion_id')
         ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
         ->select(
             'cotizacion_documento.fecha_documento as fecha',
