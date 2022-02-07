@@ -166,7 +166,7 @@
                     sWidth: '10%',
                     render: function(data) {
                         if (data.precio_compra == null) {
-                            let cambio = $('#dolar').val();
+                            let cambio = convertFloat(data.dolar_ingreso);
                             let precio = 0;
                             var precio_ = data.precio_ingreso;
                             let porcentaje = 0;
@@ -184,7 +184,7 @@
                             }
                             return convertFloat(precio_nuevo).toFixed(2);
                         }else{
-                            let cambio = $('#dolar').val();
+                            let cambio = convertFloat(data.dolar_compra);
                             let precio = 0;
                             var precio_ = data.precio_compra;
                             let porcentaje = 0;
@@ -227,7 +227,7 @@
                     sWidth: '10%',
                     render: function(data) {
                         if (data.precio_compra == null) {
-                            let cambio = $('#dolar').val();
+                            let cambio = convertFloat(data.dolar_ingreso);
                             let precio = 0;
                             var precio_ = data.precio_ingreso;
                             let porcentaje_ = data.porcentaje_distribuidor;
@@ -244,7 +244,7 @@
                             }
                             return convertFloat(precio_nuevo).toFixed(2);
                         }else{
-                            let cambio = $('#dolar').val();
+                            let cambio = convertFloat(data.dolar_compra);
                             let precio = 0;
                             var precio_ = data.precio_compra;
                             let porcentaje = 0;
@@ -361,7 +361,7 @@
 
     function evaluarPrecioigv(producto) {
         if (producto.precio_compra == null) {
-            let cambio = $('#dolar').val();
+            let cambio = convertFloat(producto.dolar_ingreso);
             let precio = 0;
             var precio_ = producto.precio_ingreso;
             let porcentaje_ = producto.porcentaje;
@@ -378,7 +378,7 @@
             }
             return convertFloat(precio_nuevo).toFixed(2);
         }else{
-            let cambio = $('#dolar').val();
+            let cambio = convertFloat(producto.dolar_compra);
             let precio = 0;
             let precio_ = producto.precio_compra;
             let porcentaje_ = producto.porcentaje;

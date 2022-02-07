@@ -147,7 +147,7 @@
                                             <option></option>
                                             @foreach ($condiciones as $condicion)
                                                 <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                    {{ old('condicion_id') == $condicion->id || $documento->condicion_id == $condicion->id ? 'selected' : '' }}>
+                                                    {{ old('condicion_id') == $condicion->id || $documento->condicion_id == $condicion->id ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
                                                     {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                 </option>
                                             @endforeach
@@ -743,14 +743,31 @@
     function changeFormaPago()
     {
         let condicion_id = $('#condicion_id').val();
-        let cadena = condicion_id.split('-');
-        if(cadena[1] == 'CONTADO')
+        if(condicion_id)
         {
-            $('#fecha_vencimiento').addClass('d-none');
+            let cadena = condicion_id.split('-');
+            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
+            let fecha = new Date('{{ $fecha_hoy }}')
+
+            fecha.setDate(fecha.getDate() + dias)
+
+            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
+            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
+            let resultado = fecha.getFullYear() + '-' + month + '-' + day
+            $("#fecha_vencimiento_campo").val(resultado);
+            if(cadena[1] == 'CONTADO')
+            {
+                $('#fecha_vencimiento').addClass('d-none');
+            }
+            else
+            {
+                $('#fecha_vencimiento').removeClass('d-none');
+            }
         }
         else
         {
-            $('#fecha_vencimiento').removeClass('d-none');
+            $('#fecha_vencimiento').addClass('d-none');
+            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
         }
     }
 
@@ -965,7 +982,7 @@
     function devolverCantidades() {
         //CARGAR PRODUCTOS PARA DEVOLVER LOTE
         cargarProductos()
-        $.ajax({
+        return $.ajax({
             dataType: 'json',
             type: 'post',
             url: '{{ route('consultas.ventas.documento.no.devolver.cantidades') }}',
@@ -973,10 +990,9 @@
                 '_token': $('input[name=_token]').val(),
                 'cantidades': $('#productos_tabla').val(),
                 'detalles' : $("#productos_detalle").val()
-            }
-        }).done(function(result) {
-            console.log('DEVOLUCION REALIZADA')
-        });
+            },
+            async: true
+        }).responseText();
     }
 
     function sumaTotal() {
@@ -1518,11 +1534,11 @@
 
 <script>
     window.onbeforeunload = function() {
-        //DEVOLVER CANTIDADES
         if ($('#asegurarCierre').val() == 1) {
-            devolverCantidades();
+            while (true) {
+                devolverCantidades()
+            }
         }
-
     };
 </script>
 @endpush

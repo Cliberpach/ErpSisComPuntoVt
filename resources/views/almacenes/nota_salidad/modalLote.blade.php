@@ -166,7 +166,7 @@ function obtenerLotesproductos() {
                 sWidth: '10%',
                 render: function(data) {
                     if (data.precio_compra == null) {
-                        let cambio = $('#dolar').val();
+                        let cambio = convertFloat(data.dolar_ingreso);
                         let precio = 0;
                         var precio_ = data.precio_ingreso;
                         let porcentaje = 0;
@@ -184,7 +184,7 @@ function obtenerLotesproductos() {
                         }
                         return convertFloat(precio_nuevo).toFixed(2);
                     }else{
-                        let cambio = $('#dolar').val();
+                        let cambio = convertFloat(data.dolar_compra);
                         let precio = 0;
                         var precio_ = data.precio_compra;
                         let porcentaje = 0;
@@ -227,7 +227,7 @@ function obtenerLotesproductos() {
                 sWidth: '10%',
                 render: function(data) {
                     if (data.precio_compra == null) {
-                        let cambio = $('#dolar').val();
+                        let cambio = convertFloat(data.dolar_ingreso)
                         let precio = 0;
                         var precio_ = data.precio_ingreso;
                         let porcentaje_ = data.porcentaje_distribuidor;
@@ -244,7 +244,7 @@ function obtenerLotesproductos() {
                         }
                         return convertFloat(precio_nuevo).toFixed(2);
                     }else{
-                        let cambio = $('#dolar').val();
+                        let cambio = convertFloat(data.dolar_compra);
                         let precio = 0;
                         var precio_ = data.precio_compra;
                         let porcentaje = 0;
@@ -365,22 +365,8 @@ function ingresarProducto(producto) {
 }
 
 function evaluarPrecioigv(producto) {
-    // if ( producto.moneda == 4 ) {
-    //     //PRODUCTO SIN IGV
-    //     if ( producto.igv == '0' ) {
-    //         var precio = Number(producto.precio_venta * 0.18) + Number(producto.precio_venta)
-    //         return Number(precio).toFixed(2)
-    //     }else{
-    //         //PRODUCTO CON IGV
-    //         var precio = producto.precio_venta
-    //         return Number(precio).toFixed(2)
-    //     }
-    // }else{
-    //     toastr.error('Precio registrado diferente a Soles (S/.).', 'Error');
-    //     return 0.00
-    // }
     if (producto.precio_compra == null) {
-        let cambio = $('#dolar').val();
+        let cambio = convertFloat(data.dolar_ingreso);
         let precio = 0;
         var precio_ = data.precio_ingreso;
         let porcentaje_ = data.porcentaje;
@@ -397,7 +383,7 @@ function evaluarPrecioigv(producto) {
         }
         return convertFloat(precio_nuevo).toFixed(2);
     }else{
-        let cambio = $('#dolar').val();
+        let cambio =  convertFloat(data.precio_compra);
         let precio = 0;
         let precio_ = producto.precio_compra;
         let porcentaje_ = producto.porcentaje;
@@ -435,6 +421,9 @@ function evaluarPrecioigv(producto) {
 function limpiarModallote() {
     //ACTUALIZAR DATATABLE
     $('.dataTables-lotes').DataTable().ajax.reload();
+    setTimeout(function() {
+        $('#modal_lote div.dataTables_filter input').focus();
+    }, 10);
     //CERRAR MODAL
     $('#modal_lote').modal('hide');
 }
@@ -442,6 +431,9 @@ function limpiarModallote() {
 $('#modal_lote').on('show.bs.modal', function(e) {
     //ACTUALIZAR DATATABLE
     $('.dataTables-lotes').DataTable().ajax.reload();
+    setTimeout(function() {
+        $('#modal_lote div.dataTables_filter input').focus();
+    }, 10);
 });
 
 

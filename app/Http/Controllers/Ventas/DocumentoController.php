@@ -285,10 +285,11 @@ class DocumentoController extends Controller
         $productos = Producto::where('estado', 'ACTIVO')->get();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
 
-        $dolar_aux = json_encode(precio_dolar(), true);
-        $dolar_aux = json_decode($dolar_aux, true);
+        // $dolar_aux = json_encode(precio_dolar(), true);
+        // $dolar_aux = json_decode($dolar_aux, true);
 
-        $dolar = (float)$dolar_aux['original']['venta'];
+        // $dolar = (float)$dolar_aux['original']['venta'];
+        $dolar = 0;
 
         $fullaccess = false;
 
@@ -1766,10 +1767,12 @@ class DocumentoController extends Controller
             ->select(
                 'nota_ingreso.moneda as moneda_ingreso',
                 'compra_documentos.moneda as moneda_compra',
+                'compra_documentos.dolar as dolar_compra',
                 'compra_documentos.igv_check as igv_compra',
                 'compra_documento_detalles.precio_soles',
                 'compra_documento_detalles.precio as precio_compra',
                 'detalle_nota_ingreso.costo as precio_ingreso',
+                'nota_ingreso.dolar as dolar_ingreso',
                 'compra_documento_detalles.precio_mas_igv_soles',
                 'lote_productos.*','productos.nombre',
                 'productos.igv',

@@ -980,7 +980,7 @@
                 'detalles' : $("#productos_detalle").val()
             },
             async: true
-        }).responseText()
+        }).responseText();
     }
 
     function sumaTotal() {
@@ -1354,7 +1354,7 @@
                 },
                 success: function(cliente) {
                     $('#buscarLotes').prop("disabled", false)
-                    obtenerLotesproductos(cliente.tabladetalles_id)
+                    $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
                 },
             })
         }
