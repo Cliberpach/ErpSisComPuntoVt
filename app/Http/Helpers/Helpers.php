@@ -1129,8 +1129,8 @@ if (!function_exists('cuadreMovimientoCajaEgresosCuadreEfectivo')) {
             }
         }
         foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
-            if ($item->egreso->estado == "ACTIVO") {
-                $totalEgresos = $totalEgresos + $item->egreso->importe;
+            if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == 1) {
+                $totalEgresos = $totalEgresos + $item->egreso->efectivo;
             }
         }
         return $totalEgresos;
@@ -1186,69 +1186,6 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
     }
 }
 
-if (!function_exists('cuadreMovimientoCajaIngresosVentaEfectivo')) {
-    function cuadreMovimientoCajaIngresosVentaEfectivo(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-        foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
-                if ($item->documento->tipo_pago_id == 1) {
-                    $totalIngresos = $totalIngresos + $item->documento->importe;
-                }
-                else{
-                    $totalIngresos = $totalIngresos + $item->documento->efectivo;
-                }
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaIngresosVentaTransferencia')) {
-    function cuadreMovimientoCajaIngresosVentaTransferencia(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-        foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
-                if ($item->documento->tipo_pago_id == 2) {
-                    $totalIngresos = $totalIngresos + $item->documento->importe;
-                }
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaIngresosVentaYapePlin')) {
-    function cuadreMovimientoCajaIngresosVentaYapePlin(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-        foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
-                if ($item->documento->tipo_pago_id == 3) {
-                    $totalIngresos = $totalIngresos + $item->documento->importe;
-                }
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaIngresosVentaPos')) {
-    function cuadreMovimientoCajaIngresosVentaPos(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-        foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
-                if ($item->documento->tipo_pago_id == 4) {
-                    $totalIngresos = $totalIngresos + $item->documento->importe;
-                }
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
 /*COBRANZA */
 if (!function_exists('cuadreMovimientoCajaIngresosCobranza')) {
     function cuadreMovimientoCajaIngresosCobranza(MovimientoCaja $movimiento)
@@ -1291,66 +1228,6 @@ if (!function_exists('cuadreMovimientoCajaIngresosCobranzaResum')) {
     }
 }
 
-if (!function_exists('cuadreMovimientoCajaIngresosCobranzaEfectivo')) {
-    function cuadreMovimientoCajaIngresosCobranzaEfectivo(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-
-        foreach ($movimiento->detalleCuentaCliente as $item) {
-            if($item->tipo_pago_id == 1)
-            {
-                $totalIngresos = $totalIngresos  + $item->efectivo;
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaIngresosCobranzaTransferencia')) {
-    function cuadreMovimientoCajaIngresosCobranzaTransferencia(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-
-        foreach ($movimiento->detalleCuentaCliente as $item) {
-            if($item->tipo_pago_id == 2)
-            {
-                $totalIngresos = $totalIngresos  + $item->importe;
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaIngresosCobranzaYapePlin')) {
-    function cuadreMovimientoCajaIngresosCobranzaYapePlin(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-
-        foreach ($movimiento->detalleCuentaCliente as $item) {
-            if($item->tipo_pago_id == 3)
-            {
-                $totalIngresos = $totalIngresos  + $item->importe;
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaIngresosCobranzaPos')) {
-    function cuadreMovimientoCajaIngresosCobranzaPos(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-
-        foreach ($movimiento->detalleCuentaCliente as $item) {
-            if($item->tipo_pago_id == 4)
-            {
-                $totalIngresos = $totalIngresos  + $item->importe;
-            }
-        }
-        return $totalIngresos;
-    }
-}
-
 /**EGRESOS */
 
 if (!function_exists('cuadreMovimientoCajaEgresosEgreso')) {
@@ -1360,10 +1237,36 @@ if (!function_exists('cuadreMovimientoCajaEgresosEgreso')) {
         $totalEgresos = 0;
         foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
             if ($item->egreso->estado == "ACTIVO") {
-                $totalEgresos = $totalEgresos + $item->egreso->importe;
+                $totalEgresos = $totalEgresos + ($item->egreso->efectivo + $item->egreso->importe);
             }
         }
         return $totalEgresos;
+    }
+}
+
+if (!function_exists('cuadreMovimientoCajaEgresosEgresoResum')) {
+    function cuadreMovimientoCajaEgresosEgresoResum($movimiento, $id)
+    {
+        if($id == 1)
+        {
+            $totalEgresos = 0;
+            foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
+                if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == $id) {
+                    $totalEgresos = $totalEgresos + $item->egreso->efectivo;
+                }
+            }
+            return $totalEgresos;
+        }
+        else
+        {
+            $totalEgresos = 0;
+            foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
+                if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == $id) {
+                    $totalEgresos = $totalEgresos + $item->egreso->importe;
+                }
+            }
+            return $totalEgresos;
+        }
     }
 }
 
@@ -1404,65 +1307,6 @@ if (!function_exists('cuadreMovimientoCajaEgresosPagoResum')) {
             }
             return $totalEgresos;
         }
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaEgresosPagoEfectivo')) {
-    function cuadreMovimientoCajaEgresosPagoEfectivo($movimiento)
-    {
-        $totalEgresos = 0;
-        foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-            if($item->tipo_pago_id == 1)
-            {
-                $totalEgresos = $totalEgresos + $item->efectivo;
-            }
-        }
-        return $totalEgresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaEgresosPagoTransferencia')) {
-    function cuadreMovimientoCajaEgresosPagoTransferencia($movimiento)
-    {
-
-        $totalEgresos = 0;
-        foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-            if($item->tipo_pago_id == 2)
-            {
-                $totalEgresos = $totalEgresos + $item->importe;
-            }
-        }
-        return $totalEgresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaEgresosPagoYapePlin')) {
-    function cuadreMovimientoCajaEgresosPagoYapePlin($movimiento)
-    {
-
-        $totalEgresos = 0;
-        foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-            if($item->tipo_pago_id == 3)
-            {
-                $totalEgresos = $totalEgresos + $item->importe;
-            }
-        }
-        return $totalEgresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaEgresosPagoPos')) {
-    function cuadreMovimientoCajaEgresosPagoPos($movimiento)
-    {
-
-        $totalEgresos = 0;
-        foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-            if($item->tipo_pago_id == 4)
-            {
-                $totalEgresos = $totalEgresos + $item->importe;
-            }
-        }
-        return $totalEgresos;
     }
 }
 

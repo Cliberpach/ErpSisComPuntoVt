@@ -465,7 +465,21 @@
                 <tr>
                     <th style="text-align: center; border-right: 2px solid #52BE80;">ID RECIBO </th>
                     <th style="text-align: center;border-right: 2px solid #52BE80">DESCRIPCION</th>
-                    <th style="text-align: center; border-right: 2px solid #52BE80">IMPORTE</th>
+                    <th style="text-align: center; border-right: 2px solid #52BE80">MONTO</th>
+                    @php
+                        $cont = 0;
+                        while($cont < count(tipos_pago()))
+                        {
+                            if($cont == count(tipos_pago()) - 1)
+                            {
+                                echo '<th style="text-align: center;">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            else {
+                                echo '<th style="text-align: center; border-right: 2px solid #52BE80">'.tipos_pago()[$cont]->descripcion.'</th>';
+                            }
+                            $cont++;
+                        }
+                    @endphp
                 </tr>
             </thead>
             <tbody>
@@ -477,13 +491,29 @@
                         <td style="text-align: center; border-right: 2px solid #52BE80">
                             {{ $detalleEgreso->egreso->descripcion }}</td>
                         <td style="text-align: center; border-right: 2px solid #52BE80">
-                            {{ $detalleEgreso->egreso->importe }}</td>
+                            {{ $detalleEgreso->egreso->monto }}</td>
+                        @foreach(tipos_pago() as $tipo)
+                            @if($tipo->id == 1)
+                                @if($tipo->id == $detalleEgreso->egreso->tipo_pago_id)
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">{{$detalleEgreso->egreso->efectivo}}</td>';
+                                @else
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">{{$detalleEgreso->egreso->efectivo}}</td>';
+                                @endif
+                            @else
+                                @if($tipo->id == $detalleEgreso->egreso->tipo_pago_id)
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">{{$detalleEgreso->egreso->importe}}</td>';
+                                @else
+                                    <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>';
+                                @endif
+                            @endif
+                        @endforeach
                     </tr>
                 @endforeach
                 <tr>
-                    <td colspan="2" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>
-                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">
-                        {{ number_format(cuadreMovimientoCajaEgresosEgreso($movimiento), 2) }}</td>
+                    <td colspan="3" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>
+                    @foreach (tipos_pago() as $tipo)
+                    <td style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">{{ number_format(cuadreMovimientoCajaEgresosEgresoResum($movimiento,$tipo->id), 2) }}</td>
+                    @endforeach
                 </tr>
             </tbody>
         </table>
