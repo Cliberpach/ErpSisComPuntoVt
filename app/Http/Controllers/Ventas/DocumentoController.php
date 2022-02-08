@@ -193,7 +193,7 @@ class DocumentoController extends Controller
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(7 - $diff < 0 ? 0  : 7 - $diff),
+                'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -603,6 +603,14 @@ class DocumentoController extends Controller
             $documento->tipo_pago_id = $request->get('tipo_pago_id');
             $documento->importe = $request->get('importe');
             $documento->efectivo = $request->get('efectivo');
+            if($request->convertir)
+            {
+                $documento->convertir = $request->convertir;
+            }
+            else
+            {
+                $documento->convertir = null;
+            }
 
             if(!empty($request->get('tipo_pago_id')) && $condicion->descripcion == 'CONTADO')
             {
@@ -657,7 +665,16 @@ class DocumentoController extends Controller
                 $doc_a_convertir->update();
 
                 $documento = Documento::find($documento->id);
+                $documento->estado_pago = $doc_a_convertir->estado_pago;
                 $documento->convertir = $doc_a_convertir->id;
+                $documento->importe = $doc_a_convertir->importe;
+                $documento->efectivo = $doc_a_convertir->efectivo;
+
+                if($doc_a_convertir->estado_pago == 'PAGADA')
+                {
+                    $documento->tipo_pago_id = $doc_a_convertir->tipo_pago_id;
+                }
+
                 $documento->update();
 
                 foreach ($productotabla as $producto) {

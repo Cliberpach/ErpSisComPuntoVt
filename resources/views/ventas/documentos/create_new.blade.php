@@ -197,7 +197,7 @@
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }}>
+                                                        {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
                                                 @endforeach

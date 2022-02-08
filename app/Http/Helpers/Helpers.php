@@ -1087,44 +1087,6 @@ if (!function_exists('movimientoUser')) {
     }
 }
 
-/*if (!function_exists('cuadreMovimientoCajaIngresos')) {
-    function cuadreMovimientoCajaIngresos(MovimientoCaja $movimiento)
-    {
-        $totalIngresos = 0;
-        foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && $item->documento->sunat != '2') {
-                if ($item->documento->tipo_pago_id == 1) {
-                    $totalIngresos = $totalIngresos + $item->documento->importe;
-                } else {
-                    $totalIngresos = $totalIngresos + $item->documento->efectivo;
-                }
-            }
-        }
-
-        foreach ($movimiento->detalleCuentaCliente as $item) {
-            $totalIngresos = $totalIngresos  + $item->efectivo;
-        }
-        return $totalIngresos;
-    }
-}
-
-if (!function_exists('cuadreMovimientoCajaEgresos')) {
-    function cuadreMovimientoCajaEgresos($movimiento)
-    {
-
-        $totalEgresos = 0;
-        foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
-            if ($item->egreso->estado == "ACTIVO") {
-                $totalEgresos = $totalEgresos + $item->egreso->importe;
-            }
-        }
-        foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-            $totalEgresos = $totalEgresos + $item->efectivo;
-        }
-        return $totalEgresos;
-    }
-}*/
-
 /**
  * CUADRE CAJA
  */
@@ -1136,7 +1098,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosCuadreEfectivo')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1183,7 +1145,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                 $totalIngresos = $totalIngresos + ($item->documento->importe + $item->documento->efectivo);
             }
         }
@@ -1198,7 +1160,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
        {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
-                if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+                if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                     if ($item->documento->tipo_pago_id == $id) {
                         $totalIngresos = $totalIngresos + $item->documento->importe;
                     }
@@ -1213,7 +1175,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
        {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
-                if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+                if ($item->documento->condicion_id == 1  && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                     if ($item->documento->tipo_pago_id == $id) {
                         $totalIngresos = $totalIngresos + $item->documento->importe;
                     }
@@ -1229,7 +1191,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaEfectivo')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1247,7 +1209,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaTransferencia')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 2) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1262,7 +1224,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaYapePlin')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 3) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1277,7 +1239,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaPos')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 4) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1686,6 +1648,26 @@ if (!function_exists('tipos_pago')) {
     {
         $tipos = TipoPago::where('estado','ACTIVO')->get();
         return $tipos;
+    }
+}
+
+if (!function_exists('ifNoConvertido')) {
+    function ifNoConvertido($id)
+    {
+        $doc = DocumentoDocumento::find($id);
+        if($doc->tipo_venta != 129)
+        {
+            return true;
+        }
+        else
+        {
+            if($doc->convertir)
+            {
+                return false;
+            }else{
+                return true;
+            }
+        }
     }
 }
 

@@ -6,9 +6,9 @@
                     <span aria-hidden="true">&times;</span>
                     <span class="sr-only">Close</span>
                 </button>
-                <i class="fa fa-cogs modal-icon"></i>
-                <h4 class="modal-title"></h4>
-                <small class="font-bold"></small>
+                <i class="fa fa-cogs modal-icon d-none"></i>
+                <h4 class="modal-title d-none"></h4>
+                <small class="font-bold d-none"></small>
             </div>
             <div class="modal-body">
                 <div class="form-group m-l">

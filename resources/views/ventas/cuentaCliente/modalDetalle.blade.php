@@ -102,7 +102,7 @@
                                     <div class="form-group">
                                         <label class="col-form-label required">Efectivo</label>
                                         <input type="text" value="0.00" class="form-control" id="efectivo_venta"
-                                            onkeypress="return filterFloat(event, this);" onkeyup="changeEfectivo(this)"
+                                            onkeypress="return filterFloat(event, this);" onkeyup="changeEfectivo()"
                                             name="efectivo_venta" required>
                                     </div>
                                     <div class="form-group">
@@ -119,7 +119,7 @@
                                     <div class="form-group">
                                         <label class="col-form-label required">Importe</label>
                                         <input type="text" class="form-control" id="importe_venta" value="0.00"
-                                            onkeypress="return filterFloat(event, this);" onkeyup="changeImporte(this)"
+                                            onkeypress="return filterFloat(event, this);" onkeyup="changeImporte()"
                                             name="importe_venta" required>
                                     </div>
                                 </div>
@@ -200,9 +200,9 @@
             if (pago.length == 0 || fecha.length == 0 || fecha.length == 0 || cantidad.length == 0) {
                 correcto = false;
                 toastr.error('Ingrese todo los datos');
-            } 
+            }
 
-            if(cantidad < 1)
+            if(cantidad == 0 || cantidad < 0)
             {
                 correcto = false;
                 toastr.error('El monto de pago debe ser mayor a 0.');
@@ -271,6 +271,8 @@
             if(b.value == 1) {
                     $("#efectivo_venta").attr('readonly',false)
                     $("#importe_venta").attr('readonly',true)
+                    $("#importe_venta").val(0.00)
+                    changeEfectivo()
             }
             else{
                 $("#efectivo_venta").attr('readonly',false)
@@ -278,7 +280,7 @@
             }
         }
 
-        function changeEfectivo(b)
+        function changeEfectivo()
         {
             let efectivo = convertFloat($('#efectivo_venta').val());
             let importe = convertFloat($('#importe_venta').val());
@@ -286,7 +288,7 @@
             $('#cantidad').val(suma.toFixed(2))
         }
 
-        function changeImporte(b)
+        function changeImporte()
         {
             let efectivo = convertFloat($('#efectivo_venta').val());
             let importe = convertFloat($('#importe_venta').val());

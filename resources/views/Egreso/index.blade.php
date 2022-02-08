@@ -181,8 +181,12 @@
             $("#frm_editar_egreso").attr('action', url);
             $("#modal_editar_egreso #descripcion_editar").html(value.data.descripcion)
             $("#modal_editar_egreso #importe_editar").val(value.data.importe)
+            $("#modal_editar_egreso #monto_editar").val(value.data.monto)
+            $("#modal_editar_egreso #efectivo_editar").val(value.data.efectivo)
+            $("#modal_editar_egreso #documento_editar").val(value.data.documento)
             $("#modal_editar_egreso #cuenta_editar").val(value.data.cuenta_id).trigger('change');
-            $("#modal_editar_egreso #tipo_documento_editar").val(value.data.tipodocumento_id).trigger('change');
+            $("#modal_editar_egreso #modo_pago_editar").val(value.data.tipo_pago_id).trigger('change');
+            //$("#modal_editar_egreso #tipo_documento_editar").val(value.data.tipodocumento_id).trigger('change');
             $("#modal_editar_egreso").modal("show");
         }).catch((value) => {
 

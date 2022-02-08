@@ -150,11 +150,11 @@
                                             <label class="required">Condición</label>
                                             <select id="condicion_id" name="condicion_id"
                                                 class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                                required disabled>
+                                                required disabled onchange="changeFormaPago()">
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ old('condicion_id') == $condicion->id || $documento->condicion_id == $condicion->id ? 'selected' : '' }}>
+                                                        {{ old('condicion_id') == $condicion->id || $documento->condicion_id == $condicion->id ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
                                                 @endforeach
@@ -747,14 +747,31 @@
     function changeFormaPago()
     {
         let condicion_id = $('#condicion_id').val();
-        let cadena = condicion_id.split('-');
-        if(cadena[1] == 'CONTADO')
+        if(condicion_id)
         {
-            $('#fecha_vencimiento').addClass('d-none');
+            let cadena = condicion_id.split('-');
+            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
+            let fecha = new Date('{{ $fecha_hoy }}')
+
+            fecha.setDate(fecha.getDate() + dias)
+
+            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
+            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
+            let resultado = fecha.getFullYear() + '-' + month + '-' + day
+            $("#fecha_vencimiento_campo").val(resultado);
+            if(cadena[1] == 'CONTADO')
+            {
+                $('#fecha_vencimiento').addClass('d-none');
+            }
+            else
+            {
+                $('#fecha_vencimiento').removeClass('d-none');
+            }
         }
         else
         {
-            $('#fecha_vencimiento').removeClass('d-none');
+            $('#fecha_vencimiento').addClass('d-none');
+            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
         }
     }
 

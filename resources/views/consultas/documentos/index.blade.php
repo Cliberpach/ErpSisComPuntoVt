@@ -247,26 +247,15 @@
                     data: null,
                     className: "text-center",
                     render: function(data) {
-                        switch (data.estado) {
-                            case "PENDIENTE":
-                                return "<span class='badge badge-warning' d-block>" + data
-                                    .estado +
-                                    "</span>";
+                        switch (data.sunat) {
+                            case "0":
+                                return "<span class='badge badge-success' d-block>REGISTRADO</span>";
                                 break;
-                            case "VENCIDA":
-                                return "<span class='badge badge-danger' d-block>" + data
-                                    .estado +
-                                    "</span>";
-                                break;
-                            case "ATENDIDA":
-                                return "<span class='badge badge-success' d-block>" + data
-                                    .estado +
-                                    "</span>";
+                            case "1":
+                                return "<span class='badge badge-primary' d-block>ENVIADO</span>";
                                 break;
                             default:
-                                return "<span class='badge badge-success' d-block>" + data
-                                    .estado +
-                                    "</span>";
+                                return "<span class='badge badge-danger' d-block>NULO</span>";
                         }
                     },
                 },
@@ -295,9 +284,7 @@
                             cadena =  cadena + "<a class='btn btn-sm btn-info m-1' href='"+ url_nota +"' target='_blank' title='Vista'><i class='fa fa-eye'></i> </a>";
                         }
 
-                        console.log(data.convertir);
-
-                        if(data.tipo == 129 && (data.convertir == '' || data.convertir == null))
+                        if(data.tipo == 129 && (data.convertir == '' || data.convertir == null) && data.sunat != '2')
                         {
                             cadena = cadena + "<a class='btn btn-sm btn-warning m-1' href='"+ url_convertir +"' title='Convertir'><i class='fa fa-exchange'></i> </a>"
                         }

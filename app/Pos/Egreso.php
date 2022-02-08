@@ -13,7 +13,10 @@ class Egreso extends Model
         'cuenta_id',
         'documento',
         'descripcion',
+        'monto',
         'importe',
+        'efectivo',
+        'tipo_pago_id',
         'estado'
     ];
     public $timestamps=true;
