@@ -597,12 +597,25 @@ class NoEnviadosController extends Controller
                 'lote_productos.*','productos.nombre',
                 'productos.igv',
                 'productos.codigo_barra',
-                'productos.porcentaje_normal',
-                'productos.porcentaje_distribuidor',
+               //'productos.porcentaje_normal',
+                DB::raw('ifnull((select porcentaje
+                    from productos_clientes pc
+                    where pc.producto_id = lote_productos.producto_id
+                    and pc.cliente = 121
+                    and pc.estado = "ACTIVO"
+                order by id desc
+                limit 1),20) as porcentaje_normal'),
+                //'productos.porcentaje_distribuidor',
+                DB::raw('ifnull((select porcentaje
+                    from productos_clientes pc
+                    where pc.producto_id = lote_productos.producto_id
+                    and pc.cliente = 122
+                    and pc.estado = "ACTIVO"
+                order by id desc
+                limit 1),20) as porcentaje_distribuidor'),
                 'productos_clientes.cliente',
                 'productos_clientes.moneda',
                 'tabladetalles.simbolo as unidad_producto',
-                'productos_clientes.porcentaje',
                 'categorias.descripcion as categoria',
                 'marcas.marca',
                 DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
