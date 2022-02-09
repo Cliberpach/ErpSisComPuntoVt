@@ -607,16 +607,22 @@
                                     <p class="m-0 p-0">DEVOLUCIONES</p>
                                 </td>
                                 <td style="text-align:right; padding: 5px;">
-                                    <p class="p-0 m-0">{{ number_format(cuadreMovimientoDevolucionesEfectivo($movimiento), 2) }}</p>
+                                    <p class="p-0 m-0">{{ number_format(cuadreMovimientoDevolucionesResum($movimiento,1), 2) }}</p>
                                 </td>
                             </tr>
-                            <tr style="background-color: #7DCEA0;">
+                            <tr>
+                                <td colspan="2"><hr></td>
+                            </tr>
+                            <tr>
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="m-0 p-0">VENTAS EFECTIVA</p>
                                 </td>
                                 <td style="text-align:right; padding: 5px;">
-                                    <p class="p-0 m-0">{{ number_format((cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesEfectivo($movimiento)), 2) }}</p>
+                                    <p class="p-0 m-0">{{ number_format((cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)), 2) }}</p>
                                 </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><hr></td>
                             </tr>
                             <tr>
                                 <td style="text-align:left; padding: 5px;">
@@ -639,7 +645,7 @@
                                     <p class="m-0 p-0">EGRESOS</p>
                                 </td>
                                 <td style="text-align:right; padding: 5px;">
-                                    <p class="p-0 m-0">{{ number_format((cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoDevolucionesEfectivo($movimiento)), 2) }}</p>
+                                    <p class="p-0 m-0">{{ number_format((cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)), 2) }}</p>
                                 </td>
                             </tr>
                             <tr>
@@ -647,7 +653,7 @@
                                     <p class="m-0 p-0">EFECTIVO</p>
                                 </td>
                                 <td style="text-align:right; padding: 5px;">
-                                    <p class="p-0 m-0">{{ number_format((cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesEfectivo($movimiento)) - (cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoDevolucionesEfectivo($movimiento)), 2) }}</p>
+                                    <p class="p-0 m-0">{{ number_format(cuadreMovimientoCajaIngresosVentaResum($movimiento,1) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1) - cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoCajaEgresosPagoResum($movimiento,1), 2) }}</p>
                                 </td>
                             </tr>
                             <tr>
@@ -659,11 +665,14 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td colspan="2"><hr></td>
+                            </tr>
+                            <tr>
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="m-0 p-0">SALDO CAJA DEL DIA</p>
                                 </td>
                                 <td style="text-align:right; padding: 5px;">
-                                    <p class="p-0 m-0">{{ number_format($movimiento->monto_inicial + (cuadreMovimientoCajaIngresosVentaResum($movimiento,1)) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1) - (cuadreMovimientoCajaEgresosEgresoResum($movimiento,1)) - cuadreMovimientoCajaEgresosPagoResum($movimiento,1), 2) }}</p>
+                                    <p class="p-0 m-0">{{ number_format($movimiento->monto_inicial + cuadreMovimientoCajaIngresosVentaResum($movimiento,1) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1) - cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoCajaEgresosPagoResum($movimiento,1), 2) }}</p>
                                 </td>
                             </tr>
                         </tbody>
@@ -692,16 +701,38 @@
                                     <p class="p-0 m-0">{{ number_format(cuadreMovimientoCajaIngresosVentaResum($movimiento,$tipo->id), 2) }}</p>
                                 </td>
                             </tr>
-                            @endif
-                            @endforeach
-
                             <tr>
                                 <td style="text-align:left; padding: 5px;">
-                                    <p class="p-0 m-0">TOTAL VENTA DEL DIA:</p>
+                                    <p class="m-0 p-0">{{$tipo->descripcion}} DEVOLUCIONES</p>
+                                </td>
+                                <td style="text-align:right; padding: 5px;">
+                                    <p class="p-0 m-0">{{ number_format(cuadreMovimientoDevolucionesResum($movimiento,$tipo->id), 2) }}</p>
+                                </td>
+                            </tr>
+                            @endif
+                            @endforeach
+                            <tr>
+                                <td colspan="2"><hr></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left; padding: 5px;">
+                                    <p class="p-0 m-0">TOTAL VENTA ELECTRONICO</p>
                                 </td>
                                 <td style="text-align:right; padding: 5px;">
                                     <p class="p-0 m-0">
-                                        {{ number_format(cuadreMovimientoCajaIngresosVenta($movimiento) - cuadreMovimientoCajaIngresosVentaResum($movimiento, 1) + (cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesEfectivo($movimiento)), 2) }}</p>
+                                        {{ number_format(cuadreMovimientoCajaIngresosVentaElectronico($movimiento), 2) }}</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><hr></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align:left; padding: 5px;">
+                                    <p class="p-0 m-0">TOTAL VENTA DEL DIA</p>
+                                </td>
+                                <td style="text-align:right; padding: 5px;">
+                                    <p class="p-0 m-0">
+                                        {{ number_format(cuadreMovimientoCajaIngresosVenta($movimiento) - cuadreMovimientoDevoluciones($movimiento), 2) }}</p>
                                 </td>
                             </tr>
                         </tbody>

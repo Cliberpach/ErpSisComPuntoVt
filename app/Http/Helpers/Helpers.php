@@ -1153,6 +1153,21 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
     }
 }
 
+if (!function_exists('cuadreMovimientoCajaIngresosVentaElectronico')) {
+    function cuadreMovimientoCajaIngresosVentaElectronico(MovimientoCaja $movimiento)
+    {
+        $totalIngresos = 0;
+        foreach(tipos_pago() as $tipo)
+        {
+            if($tipo->id > 1)
+            {
+                $totalIngresos = $totalIngresos + (cuadreMovimientoCajaIngresosVentaResum($movimiento, $tipo->id) - cuadreMovimientoDevolucionesResum($movimiento, $tipo->id));
+            }
+        }
+        return $totalIngresos;
+    }
+}
+
 if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
     function cuadreMovimientoCajaIngresosVentaResum(MovimientoCaja $movimiento,$id)
     {
@@ -1190,21 +1205,52 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
  * DEVOLUCION
  */
 
-if (!function_exists('cuadreMovimientoDevolucionesEfectivo')) {
-    function cuadreMovimientoDevolucionesEfectivo(MovimientoCaja $movimiento)
+if (!function_exists('cuadreMovimientoDevoluciones')) {
+    function cuadreMovimientoDevoluciones(MovimientoCaja $movimiento)
     {
         $cuenta = TablaDetalle::find(165);
         $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->first()->id : null);
         $totalEgresos = 0;
         foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
-            if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == 1 && $item->egreso->cuenta_id == $cuenta_id) {
-                $totalEgresos = $totalEgresos + $item->egreso->efectivo;
+            if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
+                $totalEgresos = $totalEgresos + ($item->egreso->efectivo + $item->egreso->importe);
             }
         }
+            return $totalEgresos;
         return $totalEgresos;
     }
 }
 
+if (!function_exists('cuadreMovimientoDevolucionesResum')) {
+    function cuadreMovimientoDevolucionesResum(MovimientoCaja $movimiento, $id)
+    {
+        $cuenta = TablaDetalle::find(165);
+        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->first()->id : null);
+        if($id == 1)
+        {
+            $totalEgresos = 0;
+            foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
+                if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
+                    $totalEgresos = $totalEgresos + $item->egreso->efectivo;
+                }
+            }
+            return $totalEgresos;
+        }
+        else
+        {
+            $totalEgresos = 0;
+            foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
+                if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
+                    if($item->egreso->tipo_pago_id == $id)
+                    {
+                        $totalEgresos = $totalEgresos + $item->egreso->importe;
+                    }
+                }
+            }
+            return $totalEgresos;
+        }
+    }
+}
 
 /*COBRANZA */
 if (!function_exists('cuadreMovimientoCajaIngresosCobranza')) {
@@ -1227,10 +1273,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosCobranzaResum')) {
             $totalIngresos = 0;
 
             foreach ($movimiento->detalleCuentaCliente as $item) {
-                if($item->tipo_pago_id == $id)
-                {
-                    $totalIngresos = $totalIngresos  + $item->efectivo;
-                }
+                $totalIngresos = $totalIngresos  + $item->efectivo;
             }
             return $totalIngresos;
         }
@@ -1271,9 +1314,7 @@ if (!function_exists('cuadreMovimientoCajaEgresosEgresoResum')) {
         {
             $totalEgresos = 0;
             foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
-                if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == $id) {
-                    $totalEgresos = $totalEgresos + $item->egreso->efectivo;
-                }
+                $totalEgresos = $totalEgresos + $item->egreso->efectivo;
             }
             return $totalEgresos;
         }
