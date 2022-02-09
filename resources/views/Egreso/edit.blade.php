@@ -152,7 +152,7 @@
             let efectivo = convertFloat($('#efectivo_editar').val());
             let importe = convertFloat($('#importe_editar').val());
             let suma = efectivo + importe;
-            $('#monto').val(suma.toFixed(2))
+            $('#monto_editar').val(suma.toFixed(2))
         }
 
         function changeImporteEditar()
