@@ -1,6 +1,7 @@
 @extends('layout') @section('content')
     {{-- @include('pos.caja_chica.edit') --}}
 @section('egreso-active', 'active')
+@section('caja-chica-active', 'active')
 @include('Egreso.create')
 @include('Egreso.edit')
 @include('Egreso.modalImpreso')
