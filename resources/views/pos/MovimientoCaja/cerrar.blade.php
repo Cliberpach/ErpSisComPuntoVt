@@ -6,7 +6,7 @@
                     <span aria-hidden="true">&times;</span>
                     <span class="sr-only">Close</span>
                 </button>
-                <i class="fa fa-cogs modal-icon"></i>
+                <i class="fa fa-cogs modal-icon d-none"></i>
                 <h4 class="modal-title">Caja</h4>
                 <small class="font-bold">Cerrar de Caja</small>
             </div>

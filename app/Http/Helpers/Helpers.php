@@ -1098,7 +1098,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosCuadreEfectivo')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
                 if ($item->documento->tipo_pago_id == 1) {
                     $totalIngresos = $totalIngresos + $item->documento->importe;
                 }
@@ -1145,7 +1145,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
     {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
-            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
+            if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
                 $totalIngresos = $totalIngresos + ($item->documento->importe + $item->documento->efectivo);
             }
         }
@@ -1185,6 +1185,26 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
        }
     }
 }
+
+/**
+ * DEVOLUCION
+ */
+
+if (!function_exists('cuadreMovimientoDevolucionesEfectivo')) {
+    function cuadreMovimientoDevolucionesEfectivo(MovimientoCaja $movimiento)
+    {
+        $cuenta = TablaDetalle::find(165);
+        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->first()->id : null);
+        $totalEgresos = 0;
+        foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
+            if ($item->egreso->estado == "ACTIVO" && $item->egreso->tipo_pago_id == 1 && $item->egreso->cuenta_id == $cuenta_id) {
+                $totalEgresos = $totalEgresos + $item->egreso->efectivo;
+            }
+        }
+        return $totalEgresos;
+    }
+}
+
 
 /*COBRANZA */
 if (!function_exists('cuadreMovimientoCajaIngresosCobranza')) {
@@ -1309,6 +1329,8 @@ if (!function_exists('cuadreMovimientoCajaEgresosPagoResum')) {
         }
     }
 }
+
+//==================================================================================================================================
 
 if (!function_exists('comprobantes_empresa')) {
     function comprobantes_empresa()

@@ -60,7 +60,10 @@ class EgresoController extends Controller
         $egreso->cuenta_id = $request->cuenta_editar;
         $egreso->documento = $request->documento_editar;
         $egreso->descripcion = $request->descripcion_editar;
+        $egreso->monto = $request->monto_editar;
         $egreso->importe = $request->importe_editar;
+        $egreso->efectivo = $request->efectivo_editar;
+        $egreso->tipo_pago_id = $request->modo_pago_editar;
         $egreso->save();
         return redirect()->route('Egreso.index');
     }

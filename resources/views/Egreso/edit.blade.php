@@ -26,7 +26,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="required">Tipo Documento:</label>
-                                <input type="text" name="tipo_documento" id="tipo_documento_editar" class="form-control" value="RECIBO" readonly>
+                                <input type="text" name="tipo_documento_editar" id="tipo_documento_editar" class="form-control" value="RECIBO" readonly>
                                 {{-- <select name="tipo_documento_editar" id="tipo_documento_editar" class="form-control select2_form" required>
                                     <option value=""></option>
                                     @foreach (tipo_compra() as $documento)
@@ -53,11 +53,11 @@
                                 <label class="col-form-label required">Efectivo</label>
                                 <input type="text" value="0.00" class="form-control" id="efectivo_editar"
                                     onkeypress="return filterFloat(event, this);" onkeyup="changeEfectivoEditar()"
-                                    name="efectivo" required>
+                                    name="efectivo_editar" required>
                             </div>
                             <div class="form-group">
                                 <label class="col-form-label required">Modo de pago</label>
-                                <select name="modo_pago" id="modo_pago_editar" class="select2_form form-control"
+                                <select name="modo_pago_editar" id="modo_pago_editar" class="select2_form form-control"
                                     onchange="changeModoPagoEditar(this)" required>
                                     <option></option>
                                     @foreach (modos_pago() as $modo)
@@ -70,7 +70,7 @@
                                 <label class="col-form-label required">Importe</label>
                                 <input type="text" class="form-control" id="importe_editar" value="0.00"
                                     onkeypress="return filterFloat(event, this);" onkeyup="changeImporteEditar()"
-                                    name="importe" required>
+                                    name="importe_editar" required>
                             </div>
                         </div>
                     </div>
