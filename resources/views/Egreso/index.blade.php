@@ -37,7 +37,7 @@
                                     <th class="text-center">DESCRIPCION</th>
                                     <th class="text-center">TIPO DOCUMENTO</th>
                                     <th class="text-center">DOCUMENTO</th>
-                                    <th class="text-center">IMPORTE</th>
+                                    <th class="text-center">MONTO</th>
                                     <th class="text-center">FECHA</th>
                                     <th class="text-center">ACCIONES</th>
                                 </tr>
@@ -116,7 +116,7 @@
                 className: "text-center"
             },
             {
-                data: 'importe',
+                data: 'monto',
                 className: "text-center"
             },
             {

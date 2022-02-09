@@ -25,7 +25,7 @@ class EgresoController extends Controller
             array_push($data, array(
                 'id' => $value->id,
                 'descripcion' => $value->descripcion,
-                'importe' => $value->importe + $value->efectivo,
+                'monto' => $value->importe + $value->efectivo,
                 'estado' => $value->estado,
                 'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $value->created_at)->format('Y-m-d h:i:s'),
                 'tipoDocumento' => $value->tipoDocumento->descripcion,
