@@ -36,7 +36,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="required">Monto</label>
-                                <input type="text" class="form-control" id="monto_editar" name="monto_editar" required>
+                                <input type="text" class="form-control" id="monto_editar" name="monto_editar" required readonly>
                             </div>
                             <div class="form-group">
                                 <label class="">Documento</label>
