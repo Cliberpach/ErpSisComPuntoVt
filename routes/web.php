@@ -5,6 +5,7 @@ use App\Almacenes\LoteProducto;
 use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Almacenes\NotaSalidadController;
 use App\Mantenimiento\Empresa\Empresa;
+use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Pos\MovimientoCaja;
 use App\User;
 use App\Ventas\CuentaCliente;
@@ -700,6 +701,9 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
+    $cuenta = TablaDetalle::find(165);
+    $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first()->id : null);
+    return $cuenta_id;
     $dato = 'Actualizar';
     broadcast(new VentasCajaEvent($dato));
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';

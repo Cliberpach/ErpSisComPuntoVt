@@ -1209,7 +1209,7 @@ if (!function_exists('cuadreMovimientoDevoluciones')) {
     function cuadreMovimientoDevoluciones(MovimientoCaja $movimiento)
     {
         $cuenta = TablaDetalle::find(165);
-        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->first()->id : null);
+        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first()->id : null);
         $totalEgresos = 0;
         foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
             if ($item->egreso->estado == "ACTIVO" && $item->egreso->cuenta_id == $cuenta_id) {
@@ -1225,7 +1225,7 @@ if (!function_exists('cuadreMovimientoDevolucionesResum')) {
     function cuadreMovimientoDevolucionesResum(MovimientoCaja $movimiento, $id)
     {
         $cuenta = TablaDetalle::find(165);
-        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->first()->id : null);
+        $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first()->id : null);
         if($id == 1)
         {
             $totalEgresos = 0;

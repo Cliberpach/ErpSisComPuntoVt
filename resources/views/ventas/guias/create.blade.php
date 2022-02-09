@@ -234,7 +234,7 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <div class="col-lg-8 col-xs-12">
+                                    <div class="col-lg-12 col-xs-12">
                                         <label class="">Tienda (Opcional): </label>
                                         <input type="text" id="tienda" class="form-control {{ $errors->has('tienda') ? ' is-invalid' : '' }}"  name="tienda" value="{{ old('tienda')}}">
                                         @if ($errors->has('tienda'))
@@ -244,13 +244,65 @@
                                         @endif
                                     </div>
 
-                                    <div class="col-lg-4 col-xs-12">
-                                        <label class="required">Ubigeo: </label>
+                                    <div class="col-lg-12 col-xs-12">
+                                        <label class="required">Departamento</label>
+                                        <select id="departamento" name="departamento"
+                                            class="select2_form form-control {{ $errors->has('departamento') ? ' is-invalid' : '' }}"
+                                            style="width: 100%">
+                                            <option></option>
+                                            @foreach (departamentos() as $departamento)
+                                                <option value="{{ $departamento->id }}"
+                                                    {{ (old('departamento') == $departamento->id ? 'selected' : '') }}>
+                                                    {{ $departamento->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if ($errors->has('departamento'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('departamento') }}</strong>
+                                            </span>
+                                        @endif
+                                        {{-- <label class="required">Ubigeo: </label>
                                         <input type="text" id="ubigeo_llegada" class="form-control input-required {{ $errors->has('ubigeo_llegada') ? ' is-invalid' : '' }}" required  name="ubigeo_llegada" value="{{ old('ubigeo_llegada')}}">
                                         @if ($errors->has('ubigeo_llegada'))
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $errors->first('ubigeo_llegada') }}</strong>
                                         </span>
+                                        @endif --}}
+                                    </div>
+                                    <div class="col-lg-6 col-xs-12">
+                                        <label class="required">Provincia</label>
+                                        <select id="provincia" name="provincia"
+                                            class="select2_form form-control {{ $errors->has('provincia') ? ' is-invalid' : '' }}"
+                                            style="width: 100%">
+                                            <option></option>
+                                            @foreach (provincias() as $provincia)
+                                                <option value="{{ $provincia->id }}"
+                                                    {{ (old('provincia') == $provincia->id ? 'selected' : '') }}>
+                                                    {{ $provincia->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if ($errors->has('provincia'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('provincia') }}</strong>
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div class="col-lg-6 col-xs-12">
+                                        <label class="required">Distrito</label>
+                                        <select id="distrito" name="ubigeo_llegada"
+                                            class="select2_form form-control {{ $errors->has('ubigeo_llegada') ? ' is-invalid' : '' }}"
+                                            style="width: 100%">
+                                            <option></option>
+                                            @foreach (distritos() as $distrito)
+                                                <option value="{{ $distrito->id }}"
+                                                    {{ (old('ubigeo_llegada') == $distrito->id ? 'selected' : '') }}>
+                                                    {{ $distrito->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                        @if ($errors->has('ubigeo_llegada'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('ubigeo_llegada') }}</strong>
+                                            </span>
                                         @endif
                                     </div>
 
@@ -478,18 +530,97 @@
                 width: '100%',
             });
 
-            $('.input-group.date').datepicker({
-                todayBtn: "linked",
-                keyboardNavigation: false,
-                forceParse: false,
-                autoclose: true,
-                language: 'es',
-                format: "dd/mm/yyyy"
-            });
+            $("#departamento").on("change", cargarProvincias);
+
+            $('#provincia').on("change", cargarDistritos);
         });
 
+        function cargarProvincias() {
+            var departamento_id = $("#departamento").val();
+            if (departamento_id !== "" || departamento_id.length > 0) {
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        _token: $('input[name=_token]').val(),
+                        departamento_id: departamento_id
+                    },
+                    url: "{{ route('mantenimiento.ubigeo.provincias') }}",
+                    success: function(data) {
+                        // Limpiamos data
+                        $("#provincia").empty();
+                        $("#distrito").empty();
+
+                        if (!data.error) {
+                            // Mostramos la información
+                            if (data.provincias != null) {
+                                if (provincia_api != '') {
+                                    $("#provincia").select2({
+                                        data: data.provincias
+                                    }).val(provincia_api).trigger('change');
+                                    provincia_api='';
+                                } else {
+                                    $("#provincia").select2({
+                                        data: data.provincias
+                                    }).val($('#provincia').find(':selected').val()).trigger('change');
+
+                                }
+                            }
+                        } else {
+                            toastr.error(data.message, 'Mensaje de Error', {
+                                "closeButton": true,
+                                positionClass: 'toast-bottom-right'
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        function cargarDistritos() {
+            var provincia_id = $("#provincia").val();
+            if (provincia_id !== "" || provincia_id.length > 0) {
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        _token: $('input[name=_token]').val(),
+                        provincia_id: provincia_id
+                    },
+                    url: "{{ route('mantenimiento.ubigeo.distritos') }}",
+                    success: function(data) {
+                        // Limpiamos data
+                        $("#ubigeo_llegada").empty();
+
+                        if (!data.error) {
+                            // Mostramos la información
+                            if (data.distritos != null) {
+                                var selected = $('#ubigeo_llegada').find(':selected').val();
+                                if (distrito_api != '') {
+                                    $("#ubigeo_llegada").select2({
+                                        data: data.distritos
+                                    }).val(distrito_api).trigger('change');
+                                    distrito_api='';
+                                } else {
+                                    $("#ubigeo_llegada").select2({
+                                        data: data.distritos
+                                    });
+                                }
+                            }
+                        } else {
+                            toastr.error(data.message, 'Mensaje de Error', {
+                                "closeButton": true,
+                                positionClass: 'toast-bottom-right'
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+
         // Solo campos numericos
-        $('#ubigeo_llegada , #ubigeo_partida , #dni_conductor').on('input', function() {
+        $('#ubigeo_llegada , #dni_conductor').on('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
