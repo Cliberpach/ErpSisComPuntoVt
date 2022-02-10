@@ -127,8 +127,8 @@ class CajaController extends Controller
     {
         $movimiento = MovimientoCaja::findOrFail($request->id);
         $colaborador = $movimiento->colaborador;
-        $ingresos = cuadreMovimientoCajaIngresosCuadreEfectivo($movimiento);
-        $egresos = cuadreMovimientoCajaEgresosCuadreEfectivo($movimiento);
+        $ingresos = number_format((cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1), 2);
+        $egresos = number_format((cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)) + cuadreMovimientoCajaEgresosPagoResum($movimiento,1), 2);
         return array(
             "caja" => $movimiento->caja->nombre,
             "monto_inicial" => $movimiento->monto_inicial,

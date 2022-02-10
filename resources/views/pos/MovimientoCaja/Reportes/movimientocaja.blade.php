@@ -584,10 +584,10 @@
         </table>
     </div><br>
     <div class="info-total-qr">
-        <table class="tbl-qr">
+        <table class="tbl-qr" cellpadding="2" cellspacing="0">
             <tr>
                 <td style="width: 100%;">
-                    <table class="tbl-total text-uppercase">
+                    <table class="tbl-total text-uppercase" cellpadding="2" cellspacing="0">
                         <thead style="background-color: #52BE80; color: white;">
                             <tr>
                                 <th style="text-align:center; padding: 5px;" colspan="2">DETALLES EFECTIVO</th>
@@ -613,7 +613,7 @@
                             <tr>
                                 <td colspan="2"><hr></td>
                             </tr>
-                            <tr>
+                            <tr style="background-color: #A2D9CE;">
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="m-0 p-0">VENTAS EFECTIVA</p>
                                 </td>
@@ -649,6 +649,9 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td colspan="2"><hr></td>
+                            </tr>
+                            <tr style="background-color: #FCF3CF;">
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="m-0 p-0">EFECTIVO</p>
                                 </td>
@@ -656,7 +659,7 @@
                                     <p class="p-0 m-0">{{ number_format(cuadreMovimientoCajaIngresosVentaResum($movimiento,1) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1) - cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoCajaEgresosPagoResum($movimiento,1), 2) }}</p>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr style="background-color: #FCF3CF;">
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="m-0 p-0">SALDO ANTERIOR</p>
                                 </td>
@@ -667,7 +670,7 @@
                             <tr>
                                 <td colspan="2"><hr></td>
                             </tr>
-                            <tr>
+                            <tr style="background-color: #FCF3CF;">
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="m-0 p-0">SALDO CAJA DEL DIA</p>
                                 </td>
@@ -681,10 +684,10 @@
             </tr>
         </table>
         <br>
-        <table class="tbl-qr">
+        <table class="tbl-qr" cellpadding="2" cellspacing="0">
             <tr>
                 <td style="width: 100%;">
-                    <table class="tbl-total text-uppercase">
+                    <table class="tbl-total text-uppercase" cellpadding="2" cellspacing="0">
                         <thead style="background-color: #52BE80; color: white;">
                             <tr>
                                 <th style="text-align:center; padding: 5px;" colspan="2">VENTAS</th>
@@ -714,7 +717,7 @@
                             <tr>
                                 <td colspan="2"><hr></td>
                             </tr>
-                            <tr>
+                            <tr style="background-color: #A2D9CE;">
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="p-0 m-0">TOTAL VENTA ELECTRONICO</p>
                                 </td>
@@ -726,7 +729,7 @@
                             <tr>
                                 <td colspan="2"><hr></td>
                             </tr>
-                            <tr>
+                            <tr style="background-color: #A2D9CE;">
                                 <td style="text-align:left; padding: 5px;">
                                     <p class="p-0 m-0">TOTAL VENTA DEL DIA</p>
                                 </td>

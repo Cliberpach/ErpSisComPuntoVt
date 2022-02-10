@@ -1350,10 +1350,7 @@ if (!function_exists('cuadreMovimientoCajaEgresosPagoResum')) {
         {
             $totalEgresos = 0;
             foreach ($movimiento->detalleCuentaProveedor as $key => $item) {
-                if($item->tipo_pago_id == $id)
-                {
-                    $totalEgresos = $totalEgresos + $item->efectivo;
-                }
+                $totalEgresos = $totalEgresos + $item->efectivo;
             }
             return $totalEgresos;
         }
