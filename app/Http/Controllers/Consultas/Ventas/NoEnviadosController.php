@@ -304,7 +304,6 @@ class NoEnviadosController extends Controller
 
                         };
 
-
                         Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
                         return view('consultas.ventas.documentos_no.index',[
                             'id_sunat' =>  $id_sunat,
@@ -615,6 +614,7 @@ class NoEnviadosController extends Controller
                 limit 1),20) as porcentaje_distribuidor'),
                 'productos_clientes.cliente',
                 'productos_clientes.moneda',
+                'productos_clientes.porcentaje',
                 'tabladetalles.simbolo as unidad_producto',
                 'categorias.descripcion as categoria',
                 'marcas.marca',

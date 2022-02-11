@@ -2,6 +2,7 @@
 
 namespace App\Ventas\Documento;
 
+use App\Events\NotifySunatEvent;
 use App\Mantenimiento\Condicion;
 use Illuminate\Database\Eloquent\Model;
 
@@ -201,6 +202,9 @@ class Documento extends Model
                     $cuenta_cliente->save();
                 }
             }
+
+            $dato = "Message";
+            broadcast(new NotifySunatEvent($dato));
         });
 
         static::updated(function(Documento $documento){
@@ -280,6 +284,15 @@ class Documento extends Model
                }
             }
 
+            if($documento->sunat == '2' || $documento->estado == 'ANULADO' && $documento->cuenta)
+            {
+                $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+                $cuenta_cliente->estado = 'ANULADO';
+                $cuenta_cliente->update();
+            }
+
+            $dato = "Message";
+            broadcast(new NotifySunatEvent($dato));
         });
 
         static::deleted(function(Documento $documento){

@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Listeners\BroadcastUserLogin;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -42,6 +44,12 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\NotaRegistrada::class => [
             \App\Listeners\GeneraNota::class,
         ],
+        Login::class => [
+            BroadcastUserLogin::class,
+        ],
+        \App\Events\NotifySunatEvent::class => [
+            BroadcastUserLogin::class,
+        ]
     ];
 
     /**

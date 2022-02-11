@@ -66,49 +66,8 @@
                             </a>
                         </li>
                     </ul>
-                    <ul class="nav navbar-top-links navbar-right">
-                        <li class="dropdown d-none">
-                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                                <i class="fa fa-bell"></i>  <span class="label label-primary">8</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-alerts">
-                                <li>
-                                    <a href="mailbox.html" class="dropdown-item">
-                                        <div>
-                                            <i class="fa fa-envelope fa-fw"></i> You have 16 messages
-                                            <span class="float-right text-muted small">4 minutes ago</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li class="dropdown-divider"></li>
-                                <li>
-                                    <a href="profile.html" class="dropdown-item">
-                                        <div>
-                                            <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                            <span class="float-right text-muted small">12 minutes ago</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li class="dropdown-divider"></li>
-                                <li>
-                                    <a href="grid_options.html" class="dropdown-item">
-                                        <div>
-                                            <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                            <span class="float-right text-muted small">4 minutes ago</span>
-                                        </div>
-                                    </a>
-                                </li>
-                                <li class="dropdown-divider"></li>
-                                <li>
-                                    <div class="text-center link-block">
-                                        <a href="#" class="dropdown-item">
-                                            <strong>See All Alerts</strong>
-                                            <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
+                    <ul class="nav navbar-top-links navbar-right" id="appNotify">
+                        <notify-component></notify-component>
                         <li>
                             <span class="m-r-sm text-muted welcome-message">Bienvenid@ <b>
                                     {{auth()->user()->usuario}}</b></span>
@@ -168,6 +127,7 @@
         </a>
     </div>
 
+    <script src="{{ asset('js/appNotify.js?v='.rand()) }}"></script>
     @yield('vue-js')
 
     <!-- Mainly scripts -->
@@ -207,6 +167,16 @@
 
     //Mensaje de Session
     @if(session('guardar') == 'success')
+    Swal.fire({
+        icon: 'success',
+        title: 'Guardado',
+        text: '¡Acción realizada satisfactoriamente!',
+        showConfirmButton: false,
+        timer: 1500
+    })
+    @endif
+
+    @if(session('error'))
     Swal.fire({
         icon: 'success',
         title: 'Guardado',

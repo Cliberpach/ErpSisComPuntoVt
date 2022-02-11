@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
 class ParametroController extends Controller
@@ -62,5 +63,20 @@ class ParametroController extends Controller
 
         // return response()->json($arreglo);
         return $data;
+    }
+
+    public function notifications()
+    {
+        $notifications = Auth::user()->unreadNotifications;
+
+        foreach($notifications as $notify)
+        {
+            $data = $notify->data;
+            $data['time'] = timeago($data['body']['updated_at']);
+            $notify->data = $data;
+        }
+        return response()->json([
+            'notifications' => $notifications
+        ]);
     }
 }

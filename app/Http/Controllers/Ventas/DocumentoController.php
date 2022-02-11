@@ -7,7 +7,6 @@ use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
 use App\Events\ComprobanteRegistrado;
 use App\Events\DocumentoNumeracion;
-use App\Events\NotaRegistrada;
 use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
@@ -18,6 +17,7 @@ use App\Pos\MovimientoCaja;
 use App\Ventas\Cliente;
 use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Banco;
+use App\Notifications\FacturacionNotification;
 use App\Ventas\Cotizacion;
 use App\Ventas\CotizacionDetalle;
 use App\Ventas\Documento\Detalle;
@@ -132,7 +132,7 @@ class DocumentoController extends Controller
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. '.number_format($total, 2, '.', ''),
-                'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
+                'dias' => (int)(3 - $diff < 0 ? 0  : 3 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -717,10 +717,7 @@ class DocumentoController extends Controller
                 if($request->envio_sunat)
                 {
                     $envio_ = self::sunat_valida($documento->id);
-                    //$documento->envio_sunat = '1';
                 }
-                //$vp = self::venta_comprobante($documento->id);
-                //$ve = self::venta_email($documento->id);
                 Session::flash('success','Documento de venta creado.');
 
                 return response()->json([
@@ -1812,6 +1809,7 @@ class DocumentoController extends Controller
                 limit 1),20) as porcentaje_distribuidor'),
                 'productos_clientes.cliente',
                 'productos_clientes.moneda',
+                'productos_clientes.porcentaje',
                 'tabladetalles.simbolo as unidad_producto',
                 'categorias.descripcion as categoria',
                 'marcas.marca',

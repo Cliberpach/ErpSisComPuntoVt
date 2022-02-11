@@ -485,6 +485,7 @@
             <tbody>
 
                 @foreach ($movimiento->detalleMoviemientoEgresos as $detalleEgreso)
+                    @if ($detalleEgreso->egreso->estado == 'ACTIVO')
                     <tr>
                         <td style="text-align: center; border-right: 2px solid #52BE80">
                             {{ $detalleEgreso->egreso->documento }}</td>
@@ -508,6 +509,7 @@
                             @endif
                         @endforeach
                     </tr>
+                    @endif
                 @endforeach
                 <tr>
                     <td colspan="3" style="text-align: center; border-right: 2px solid #52BE80; border-top: 2px solid #52BE80">TOTAL</td>

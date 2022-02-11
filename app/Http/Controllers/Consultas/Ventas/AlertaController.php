@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Ventas\Electronico;
+namespace App\Http\Controllers\Consultas\Ventas;
 
 use App\Events\DocumentoNumeracion;
 use App\Http\Controllers\Controller;
@@ -10,39 +10,90 @@ use App\Ventas\Documento\Documento;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Luecano\NumeroALetras\NumeroALetras;
 use stdClass;
-use Yajra\DataTables\Facades\DataTables;
 
-class ComprobanteController extends Controller
+class AlertaController extends Controller
 {
-    public function index()
+    public function envio()
     {
-        return view('ventas.comprobantes.index');
+        return view('consultas.ventas.alertas.envio');
     }
 
-    public function getVouchers(){
+    public function getTableEnvio()
+    {
+        $fecha_hoy = Carbon::now()->toDateString();
+        $consulta =  DB::table('cotizacion_documento')
+        ->join('tabladetalles','tabladetalles.id','=','cotizacion_documento.tipo_venta')
+        ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
+        ->select(
+            DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
+            'cotizacion_documento.id',
+            'cotizacion_documento.fecha_documento',
+            'cotizacion_documento.estado',
+            'tabladetalles.descripcion as tipo',
+            'clientes.nombre as cliente',
+            'cotizacion_documento.total as monto',
+            DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
+            'cotizacion_documento.sunat',
+            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code')
+        )
+        ->orderBy('cotizacion_documento.id','DESC')
+        ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
+        ->where('cotizacion_documento.estado', '!=','ANULADO')
+        ->where('cotizacion_documento.sunat','0');
 
-        $documentos = Documento::where('sunat',"1")->orderBy('id','DESC')->get();
-
-        $coleccion = collect([]);
-        foreach($documentos as $documento){
-
-            $coleccion->push([
-                'id' => $documento->id,
-                'numero' => $documento->serie.'-'.$documento->correlativo,
-                'tipo_venta' => $documento->descripcionTipo(),
-                'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
-                'empresa' => $documento->empresa,
-                'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
-                'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
-                'ruta_comprobante_archivo' => $documento->ruta_comprobante_archivo,
-                'nombre_comprobante_archivo' => $documento->nombre_comprobante_archivo,
-                'sunat' => $documento->sunat,
-            ]);
+        if(!PuntoVenta() && !FullAccess())
+        {
+            $consulta = $consulta->where('user_id',Auth::user()->id);
         }
-        return DataTables::of($coleccion)->toJson();
+
+        return datatables()->query(
+            $consulta->where(DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))'),'!=','1033')
+        )->toJson();
+    }
+
+    public function regularize()
+    {
+        return view('consultas.ventas.alertas.envio');
+    }
+
+    public function getTableRegularize()
+    {
+        $fecha_hoy = Carbon::now()->toDateString();
+        $consulta =  DB::table('cotizacion_documento')
+        ->join('tabladetalles','tabladetalles.id','=','cotizacion_documento.tipo_venta')
+        ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
+        ->select(
+            DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
+            'cotizacion_documento.id',
+            'cotizacion_documento.fecha_documento',
+            'cotizacion_documento.estado',
+            'tabladetalles.descripcion as tipo',
+            'clientes.nombre as cliente',
+            'cotizacion_documento.total as monto',
+            DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
+            'cotizacion_documento.sunat',
+            'cotizacion_documento.getRegularizeResponse',
+        )
+        ->orderBy('cotizacion_documento.id','DESC')
+        ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
+        ->where('cotizacion_documento.estado', '!=','ANULADO')
+        ->where('cotizacion_documento.sunat', '!=','2')
+        ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'),'1033')
+        ->where('cotizacion_documento.regularize','1');
+
+        if(!PuntoVenta() && !FullAccess())
+        {
+            $consulta = $consulta->where('user_id',Auth::user()->id);
+        }
+
+        return datatables()->query(
+            $consulta
+        )->toJson();
     }
 
     public function obtenerLeyenda($documento)
@@ -283,7 +334,7 @@ class ComprobanteController extends Controller
                             crearRegistro($documento , $descripcion , $gestion);
 
                             Session::flash('success','Documento de Venta enviada a Sunat con exito.');
-                            return view('ventas.documentos.index',[
+                            return view('consultas.ventas.alertas.envio',[
 
                                 'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
                                 'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
@@ -321,7 +372,7 @@ class ComprobanteController extends Controller
 
                             $documento->update();
                             Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
-                            return view('ventas.documentos.index',[
+                            return view('consultas.ventas.alertas.envio',[
                                 'id_sunat' =>  $id_sunat,
                                 'descripcion_sunat' =>  $descripcion_sunat,
                                 'sunat_error' => true,
@@ -332,15 +383,15 @@ class ComprobanteController extends Controller
                         $documento->sunat = '1';
                         $documento->update();
                         Session::flash('error','Documento de venta fue enviado a Sunat.');
-                        return redirect()->route('ventas.documento.index')->with('sunat_existe', 'error');
+                        return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
                     }
                 }else{
                     Session::flash('error','Tipo de Comprobante no registrado en la empresa.');
-                    return redirect()->route('ventas.documento.index')->with('sunat_existe', 'error');
+                    return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
                 }
             }else{
                 Session::flash('error','Empresa sin parametros para emitir comprobantes electronicos');
-                return redirect()->route('ventas.documento.index');
+                return redirect()->route('consultas.ventas.alerta.envio');
             }
         }
         catch(Exception $e)
@@ -355,8 +406,8 @@ class ComprobanteController extends Controller
             $respuesta_error = json_decode($respuesta_error, true);
             $documento->getRegularizeResponse = $respuesta_error;
             $documento->update();
-            Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
-            return redirect()->route('ventas.documento.index');
+            Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.');
+            return redirect()->route('consultas.ventas.alerta.envio');
         }
 
     }
@@ -374,7 +425,7 @@ class ComprobanteController extends Controller
                 $documento->sunat = '1';
                 $documento->update();
                 Session::flash('success','Documento de Venta regularizado con exito.');
-                return view('ventas.documentos.index',[
+                return view('consultas.ventas.alertas.envio',[
 
                     'id_sunat' => $documento->serie.'-'.$documento->correlativo,
                     'descripcion_sunat' => 'CDR regularizado.',
@@ -386,13 +437,13 @@ class ComprobanteController extends Controller
             else
             {
                 Session::flash('error','Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
-                return redirect()->route('ventas.documento.index')->with('sunat_existe', 'error');
+                return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
             }
         }
         catch(Exception $e)
         {
             Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
-            return redirect()->route('ventas.documento.index');
+            return redirect()->route('consultas.ventas.alerta.envio');
         }
 
     }

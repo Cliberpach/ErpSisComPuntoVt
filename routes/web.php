@@ -2,6 +2,7 @@
 
 use App\Almacenes\Kardex;
 use App\Almacenes\LoteProducto;
+use App\Events\NotifySunatEvent;
 use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Almacenes\NotaSalidadController;
 use App\Mantenimiento\Empresa\Empresa;
@@ -56,6 +57,7 @@ function(){
     //Parametro
     Route::get('parametro/getApiruc/{ruc}', 'ParametroController@apiRuc')->name('getApiruc');
     Route::get('parametro/getApidni/{dni}', 'ParametroController@apiDni')->name('getApidni');
+    Route::get('parametro/notifications', 'ParametroController@notifications')->name('getNotifications');
 
     // Mantenimiento
     //Tabla General - Protegido con crud_general
@@ -478,7 +480,7 @@ function(){
         Route::post('proveedor','ImportExcelController@uploadproveedor')->name('ImportExcel.uploadproveedor');
     });
 
-    // Cosultas - Documentos
+    // Consultas - Documentos
     Route::prefix('consultas/documentos')->group(function(){
 
         Route::get('index', 'Consultas\DocumentoController@index')->name('consultas.documento.index');
@@ -488,7 +490,7 @@ function(){
 
     });
 
-    // Cosultas - Ventas - Documentos
+    // Consultas - Ventas - Documentos
     Route::prefix('consultas/ventas/documentos')->group(function(){
 
         Route::get('index', 'Consultas\Ventas\DocumentoController@index')->name('consultas.ventas.documento.index');
@@ -496,7 +498,7 @@ function(){
 
     });
 
-    // Cosultas - Ventas - Documentos - NO
+    // Consultas - Ventas - Documentos - NO
     Route::prefix('consultas/ventas/documentos-no')->group(function(){
 
         Route::get('index', 'Consultas\Ventas\NoEnviadosController@index')->name('consultas.ventas.documento.no.index');
@@ -516,7 +518,7 @@ function(){
 
     });
 
-    // Cosultas - Ventas - Cotizaciones
+    // Consultas - Ventas - Cotizaciones
     Route::prefix('consultas/ventas/cotizaciones')->group(function(){
 
         Route::get('index', 'Consultas\Ventas\CotizacionController@index')->name('consultas.ventas.cotizacion.index');
@@ -524,7 +526,19 @@ function(){
 
     });
 
-     // Cosultas - Compras - Ordenes
+    // Consultas - Alertas
+    Route::prefix('consultas/ventas/alertas')->group(function(){
+
+        Route::get('envio', 'Consultas\Ventas\AlertaController@envio')->name('consultas.ventas.alerta.envio');
+        Route::get('getTableEnvio', 'Consultas\Ventas\AlertaController@getTableEnvio')->name('consultas.ventas.alerta.getTableEnvio');
+        Route::get('sunat/{id}', 'Consultas\Ventas\AlertaController@sunat')->name('consultas.ventas.alerta.sunat');
+        Route::get('regularize','Consultas\Ventas\AlertaController@regularize')->name('consultas.ventas.alerta.regularize');
+        Route::get('getTableRegularize','Consultas\Ventas\AlertaController@getTableRegularize')->name('consultas.ventas.alerta.getTableRegularize');
+        Route::get('cdr/{id}','Consultas\Ventas\AlertaController@cdr')->name('consultas.ventas.alerta.cdr');
+
+    });
+
+     // Consultas - Compras - Ordenes
      Route::prefix('consultas/compras/cotizaciones')->group(function(){
 
         Route::get('index', 'Consultas\Compras\OrdenController@index')->name('consultas.compras.orden.index');
@@ -532,7 +546,7 @@ function(){
 
     });
 
-    // Cosultas - Compras - Documentos
+    // Consultas - Compras - Documentos
     Route::prefix('consultas/compras/documentos')->group(function(){
 
         Route::get('index', 'Consultas\Compras\DocumentoController@index')->name('consultas.compras.documento.index');
@@ -540,7 +554,7 @@ function(){
 
     });
 
-     // Cosultas - Cuentas - Proveedores
+     // Consultas - Cuentas - Proveedores
      Route::prefix('consultas/cuentas/proveedores')->group(function(){
 
         Route::get('index', 'Consultas\Cuentas\ProveedorController@index')->name('consultas.cuentas.proveedor.index');
@@ -548,7 +562,7 @@ function(){
 
     });
 
-     // Cosultas - Cuentas - Clientes
+     // Consultas - Cuentas - Clientes
      Route::prefix('consultas/cuentas/clientes')->group(function(){
 
         Route::get('index', 'Consultas\Cuentas\ClienteController@index')->name('consultas.cuentas.cliente.index');
@@ -556,7 +570,7 @@ function(){
 
     });
 
-     // Cosultas - Notas - Salida
+     // Consultas - Notas - Salida
      Route::prefix('consultas/notas/salidad')->group(function(){
 
         Route::get('index', 'Consultas\Notas\SalidadController@index')->name('consultas.notas.salidad.index');
@@ -564,7 +578,7 @@ function(){
 
     });
 
-     // Cosultas - Notas - Ingreso
+     // Consultas - Notas - Ingreso
      Route::prefix('consultas/notas/ingreso')->group(function(){
 
         Route::get('index', 'Consultas\Notas\IngresoController@index')->name('consultas.notas.ingreso.index');
@@ -572,7 +586,7 @@ function(){
 
     });
 
-    // Cosultas - Kardex - Producto
+    // Consultas - Kardex - Producto
     Route::prefix('consultas/kardex/producto')->group(function(){
 
         Route::get('index', 'Consultas\Kardex\ProductoController@index')->name('consultas.kardex.producto.index');
@@ -582,7 +596,7 @@ function(){
 
     });
 
-    // Cosultas - Kardex - Cliente
+    // Consultas - Kardex - Cliente
     Route::prefix('consultas/kardex/cliente')->group(function(){
 
         Route::get('index', 'Consultas\Kardex\ClienteController@index')->name('consultas.kardex.cliente.index');
@@ -591,7 +605,7 @@ function(){
     });
 
 
-    // Cosultas - Kardex - Salida -Ventas
+    // Consultas - Kardex - Salida -Ventas
     Route::prefix('consultas/kardex/salidas')->group(function(){
 
         Route::get('index-V', 'Consultas\Kardex\SalidaController@ventas')->name('consultas.kardex.ventas.index');
@@ -602,7 +616,7 @@ function(){
 
     });
 
-    // Cosultas - Caja - Utilidad
+    // Consultas - Caja - Utilidad
     Route::prefix('consultas/caja/utilidad')->group(function(){
 
         Route::get('index', 'Consultas\Caja\UtilidadController@index')->name('consultas.caja.utilidad.index');
@@ -610,7 +624,7 @@ function(){
 
     });
 
-    // Cosultas - Utilidad
+    // Consultas - Utilidad
     Route::prefix('consultas/utilidad')->group(function(){
 
         Route::get('index', 'Consultas\UtilidadController@index')->name('consultas.utilidad.index');
@@ -701,10 +715,9 @@ function(){
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
 
 Route::get('ruta', function () {
-    $cuenta = TablaDetalle::find(165);
-    $cuenta_id = $cuenta->descripcion == 'DEVOLUCION' ? $cuenta->id : (TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','DEVOLUCION')->where('tabla_id',32)->first()->id : null);
-    return $cuenta_id;
+
+    return timeago('2022-02-11 08:43:04');
     $dato = 'Actualizar';
-    broadcast(new VentasCajaEvent($dato));
+    broadcast(new NotifySunatEvent($dato));
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';
 });

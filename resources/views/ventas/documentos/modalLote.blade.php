@@ -378,6 +378,7 @@
             }
             return convertFloat(precio_nuevo).toFixed(2);
         }else{
+            console.log(producto.dolar_compra)
             let cambio = convertFloat(producto.dolar_compra);
             let precio = 0;
             let precio_ = producto.precio_compra;

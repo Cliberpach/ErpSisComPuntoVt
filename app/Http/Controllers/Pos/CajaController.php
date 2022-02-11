@@ -127,15 +127,15 @@ class CajaController extends Controller
     {
         $movimiento = MovimientoCaja::findOrFail($request->id);
         $colaborador = $movimiento->colaborador;
-        $ingresos = number_format((cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1), 2);
-        $egresos = number_format((cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)) + cuadreMovimientoCajaEgresosPagoResum($movimiento,1), 2);
+        $ingresos = (cuadreMovimientoCajaIngresosVentaResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)) + cuadreMovimientoCajaIngresosCobranzaResum($movimiento,1);
+        $egresos = (cuadreMovimientoCajaEgresosEgresoResum($movimiento,1) - cuadreMovimientoDevolucionesResum($movimiento,1)) + cuadreMovimientoCajaEgresosPagoResum($movimiento,1);
         return array(
             "caja" => $movimiento->caja->nombre,
             "monto_inicial" => $movimiento->monto_inicial,
             "colaborador" => $colaborador->persona->apellido_paterno . " " . $colaborador->persona->apellido_paterno . " " . $colaborador->persona->nombre,
-            "egresos" => $egresos,
-            "ingresos" => $ingresos,
-            "saldo" => ($movimiento->monto_inicial + $ingresos) - $egresos
+            "egresos" => number_format($egresos, 2),
+            "ingresos" => number_format($ingresos,2),
+            "saldo" => number_format(($movimiento->monto_inicial + $ingresos) - $egresos, 2)
         );
     }
 

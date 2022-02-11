@@ -369,6 +369,7 @@ class NotaSalidadController extends Controller
                 limit 1),20) as porcentaje_distribuidor'),
                 'productos_clientes.cliente',
                 'productos_clientes.moneda',
+                'productos_clientes.porcentaje',
                 'tabladetalles.simbolo as unidad_producto',
                 'categorias.descripcion as categoria',
                 'marcas.marca',
