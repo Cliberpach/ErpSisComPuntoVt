@@ -133,9 +133,9 @@ class CajaController extends Controller
             "caja" => $movimiento->caja->nombre,
             "monto_inicial" => $movimiento->monto_inicial,
             "colaborador" => $colaborador->persona->apellido_paterno . " " . $colaborador->persona->apellido_paterno . " " . $colaborador->persona->nombre,
-            "egresos" => number_format($egresos, 2),
-            "ingresos" => number_format($ingresos,2),
-            "saldo" => number_format(($movimiento->monto_inicial + $ingresos) - $egresos, 2)
+            "egresos" => $egresos,
+            "ingresos" => $ingresos,
+            "saldo" => ($movimiento->monto_inicial + $ingresos) - $egresos
         );
     }
 
