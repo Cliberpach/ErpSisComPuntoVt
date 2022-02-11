@@ -166,9 +166,9 @@
             $("#modal_cerrar_caja #caja").val(datos.caja);
             $("#modal_cerrar_caja #colaborador").val(datos.colaborador);
             $("#modal_cerrar_caja #monto_inicial").val(datos.monto_inicial);
-            $("#modal_cerrar_caja #ingreso").val(datos.ingresos);
-            $("#modal_cerrar_caja #egreso").val(datos.egresos);
-            $("#modal_cerrar_caja #saldo").val(datos.saldo);
+            $("#modal_cerrar_caja #ingreso").val(convertFloat(datos.ingresos));
+            $("#modal_cerrar_caja #egreso").val(convertFloat(datos.egresos));
+            $("#modal_cerrar_caja #saldo").val(convertFloat(datos.saldo));
             $("#modal_cerrar_caja").modal("show");
         }).catch((value) => {})
     }
