@@ -115,7 +115,7 @@ class CajaController extends Controller
         $movimiento = MovimientoCaja::findOrFail($request->movimiento_id);
         $movimiento->estado_movimiento = "CIERRE";
         $movimiento->fecha_cierre = date('Y-m-d h:i:s');
-        $movimiento->monto_final = $request->saldo;
+        $movimiento->monto_final = (float)$request->saldo;
         $movimiento->save();
         $caja = $movimiento->caja;
         $caja->estado_caja = "CERRADA";
