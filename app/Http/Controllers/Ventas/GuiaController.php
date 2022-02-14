@@ -31,7 +31,7 @@ class GuiaController extends Controller
 
     public function create($id)
     {
-        
+
         $empresas = Empresa::where('estado','ACTIVO')->get();
         $documento = Documento::findOrFail($id);
         $detalles = Detalle::where('documento_id',$id)->get();
@@ -51,8 +51,8 @@ class GuiaController extends Controller
             $peso_item = $detalle->cantidad * $detalle->lote->producto->peso_producto;
             $pesos_productos = $pesos_productos + $peso_item;
         }
-        
-        
+
+
         $cantidad_productos =  DB::table('cotizacion_documento_detalles')
                     ->where('cotizacion_documento_detalles.documento_id','=',$id)
                     ->sum("cotizacion_documento_detalles.cantidad");
@@ -97,7 +97,7 @@ class GuiaController extends Controller
         }
 
         return DataTables::of($coleccion)->toJson();
-  
+
     }
 
     public function store(Request $request)
@@ -115,8 +115,8 @@ class GuiaController extends Controller
                 'direccion_empresa' => 'required',
                 'ubigeo_llegada'=> 'required',
                 'ubigeo_partida'=> 'required',
-                
-                
+
+
             ];
             $message = [
                 'documento_id.required' => 'El campo Documento es obligatorio.',
@@ -148,11 +148,11 @@ class GuiaController extends Controller
                 $guia->cantidad_productos = $request->get('cantidad_productos');
                 $guia->peso_productos = $request->get('peso_productos');
                 $guia->observacion = $request->get('observacion');
-                $guia->ubigeo_llegada = $request->get('ubigeo_llegada');
-                $guia->ubigeo_partida = $request->get('ubigeo_partida');
+                $guia->ubigeo_llegada = str_pad($request->get('ubigeo_llegada'), 6, "0", STR_PAD_LEFT);
+                $guia->ubigeo_partida = str_pad($request->get('ubigeo_partida'), 6, "0", STR_PAD_LEFT);
                 $guia->dni_conductor = $request->get('dni_conductor');
                 $guia->placa_vehiculo = $request->get('placa_vehiculo');
-                $guia->save(); 
+                $guia->save();
 
                 $envio_prev = self::sunat_prev($guia->id);
 
@@ -162,8 +162,8 @@ class GuiaController extends Controller
                     Session::flash('error',$envio_prev['mensaje']);
                     return back()->with('sunat_error', 'error');
                 }
-                
-                
+
+
                 DB::commit();
                 $envio_post = self::sunat_post($guia->id);
                 $guia_pdf = self::guia_pdf($guia->id);
@@ -173,19 +173,19 @@ class GuiaController extends Controller
                 Session::flash('error','Guia de Remision ya ha sido creado.');
                 return redirect()->route('ventas.guiasremision.index');
             }
-        }  
+        }
         catch(Exception $e)
         {
             DB::rollBack();
             return back()->with('error' , $e->getMessage());
-        }      
+        }
     }
 
     public function obtenerFecha($guia)
     {
         $date = strtotime($guia->documento->fecha_documento);
-        $fecha_emision = date('Y-m-d', $date); 
-        $hora_emision = date('H:i:s', $date); 
+        $fecha_emision = date('Y-m-d', $date);
+        $hora_emision = date('H:i:s', $date);
         $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
 
         return $fecha;
@@ -194,7 +194,7 @@ class GuiaController extends Controller
     public function obtenerProductos($guia)
     {
         $detalles = Detalle::where('documento_id',$guia->documento_id)->get();
-        
+
         $arrayProductos = Array();
         for($i = 0; $i < count($detalles); $i++){
 
@@ -212,7 +212,7 @@ class GuiaController extends Controller
 
     public function condicionReparto($guia)
     {
-        $Transportista = array(  
+        $Transportista = array(
             "tipoDoc"=> "6",
             "numDoc"=> $guia->ruc_transporte_domicilio,
             "rznSocial"=> $guia->nombre_transporte_domicilio,
@@ -225,11 +225,11 @@ class GuiaController extends Controller
     }
 
     public function limitarDireccion($cadena, $limite, $sufijo){
-        
+
         if(strlen($cadena) > $limite){
             return substr($cadena, 0, $limite) . $sufijo;
         }
-        
+
         return $cadena;
     }
 
@@ -244,7 +244,7 @@ class GuiaController extends Controller
                     "correlativo"=> "000",
                     "fechaEmision" => self::obtenerFecha($guia),
 
-                    "company" => array(  
+                    "company" => array(
                         "ruc" => $guia->documento->ruc_empresa,
                         "razonSocial" => $guia->documento->empresa,
                         "address" => array(
@@ -252,7 +252,7 @@ class GuiaController extends Controller
                         )),
 
 
-                    "destinatario" => array(  
+                    "destinatario" => array(
                         "tipoDoc" =>  $guia->documento->tipoDocumentoCliente(),
                         "numDoc" => $guia->documento->documento_cliente,
                         "rznSocial" => $guia->documento->cliente,
@@ -262,7 +262,7 @@ class GuiaController extends Controller
                     ),
 
                     "observacion" => $guia->observacion,
-                    
+
                     "envio" => array(
                         "modTraslado" =>  "01",
                         "codTraslado" =>  "01",
@@ -286,8 +286,8 @@ class GuiaController extends Controller
 
                     "details" =>  self::obtenerProductos($guia),
             );
-            
-            
+
+
             $numeracion= json_encode($arreglo_guia);
             $data = pdfGuiaapi($numeracion);
             $name = $guia->id.'.pdf';
@@ -329,7 +329,7 @@ class GuiaController extends Controller
 
 
     }
-    
+
     public function sunat($id)
     {
         $guia = Guia::findOrFail($id);
@@ -345,7 +345,7 @@ class GuiaController extends Controller
                             "correlativo"=> $guia->correlativo,
                             "fechaEmision" => self::obtenerFecha($guia),
 
-                            "company" => array(  
+                            "company" => array(
                                 "ruc" => $guia->documento->ruc_empresa,
                                 "razonSocial" => $guia->documento->empresa,
                                 "address" => array(
@@ -353,7 +353,7 @@ class GuiaController extends Controller
                                 )),
 
 
-                            "destinatario" => array(  
+                            "destinatario" => array(
                                 "tipoDoc" =>  $guia->documento->tipoDocumentoCliente(),
                                 "numDoc" => $guia->documento->documento_cliente,
                                 "rznSocial" => $guia->documento->cliente,
@@ -363,7 +363,7 @@ class GuiaController extends Controller
                             ),
 
                             "observacion" => $guia->observacion,
-                            
+
                             "envio" => array(
                                 "modTraslado" =>  "01",
                                 "codTraslado" =>  "01",
@@ -387,13 +387,13 @@ class GuiaController extends Controller
 
                             "details" =>  self::obtenerProductos($guia),
                     );
-                    
+
                     $data = enviarGuiaapi(json_encode($arreglo_guia));
                     //RESPUESTA DE LA SUNAT EN JSON
                     $json_sunat = json_decode($data);
 
                     if ($json_sunat->sunatResponse->success == true) {
-                
+
                         $guia->sunat = '1';
                         $data = pdfGuiaapi(json_encode($arreglo_guia));
                         $name = $existe[0]->get('numeracion')->serie."-".$guia->correlativo.'.pdf';
@@ -412,16 +412,16 @@ class GuiaController extends Controller
 
                         $guia->nombre_comprobante_archivo = $name;
                         $guia->ruta_comprobante_archivo = 'public/sunat/guia/'.$name;
-                        $guia->update(); 
+                        $guia->update();
 
                         //Registro de actividad
                         $descripcion = "SE AGREGÓ LA GUIA DE REMISION ELECTRONICA: ". $existe[0]->get('numeracion')->serie."-".$guia->correlativo;
                         $gestion = "GUIA DE REMISION ELECTRONICA";
                         crearRegistro($guia , $descripcion , $gestion);
-                        
+
                         Session::flash('success','Guia de remision enviada a Sunat con exito.');
                         return view('ventas.guias.index',[
-                            
+
                             'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
                             'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
                             'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
@@ -431,19 +431,19 @@ class GuiaController extends Controller
 
                     }else{
 
-                        //COMO SUNAT NO LO ADMITE VUELVE A SER 0 
+                        //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                         $guia->sunat = '0';
-                        $guia->update(); 
-                        
+                        $guia->update();
+
                         if ($json_sunat->sunatResponse->error) {
                             $id_sunat = $json_sunat->sunatResponse->error->code;
                             $descripcion_sunat = $json_sunat->sunatResponse->error->message;
 
-                        
+
                         }else {
                             $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                             $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-                            
+
                         };
 
 
@@ -531,7 +531,7 @@ class GuiaController extends Controller
                         "correlativo"=> $guia->correlativo,
                         "fechaEmision" => self::obtenerFecha($guia),
 
-                        "company" => array(  
+                        "company" => array(
                             "ruc" => $guia->documento->ruc_empresa,
                             "razonSocial" => $guia->documento->empresa,
                             "address" => array(
@@ -539,7 +539,7 @@ class GuiaController extends Controller
                             )),
 
 
-                        "destinatario" => array(  
+                        "destinatario" => array(
                             "tipoDoc" =>  $guia->documento->tipoDocumentoCliente(),
                             "numDoc" => $guia->documento->documento_cliente,
                             "rznSocial" => $guia->documento->cliente,
@@ -549,7 +549,7 @@ class GuiaController extends Controller
                         ),
 
                         "observacion" => $guia->observacion,
-                        
+
                         "envio" => array(
                             "modTraslado" =>  "01",
                             "codTraslado" =>  "01",
@@ -573,13 +573,13 @@ class GuiaController extends Controller
 
                         "details" =>  self::obtenerProductos($guia),
                 );
-                
+
                 $data = enviarGuiaapi(json_encode($arreglo_guia));
                 //RESPUESTA DE LA SUNAT EN JSON
                 $json_sunat = json_decode($data);
 
                 if ($json_sunat->sunatResponse->success == true) {
-            
+
                     $guia->sunat = '1';
                     $data = pdfGuiaapi(json_encode($arreglo_guia));
                     $name = $guia->serie."-".$guia->correlativo.'.pdf';
@@ -589,20 +589,20 @@ class GuiaController extends Controller
                     }
 
                     //file_put_contents($pathToFile, $data);
-                    
+
 
                     $guia->nombre_comprobante_archivo = $name;
                     $guia->ruta_comprobante_archivo = 'public/sunat/guia/'.$name;
-                    $guia->update(); 
+                    $guia->update();
 
                     //Registro de actividad
                     $descripcion = "SE AGREGÓ LA GUIA DE REMISION ELECTRONICA: ". $guia->serie."-".$guia->correlativo;
                     $gestion = "GUIA DE REMISION ELECTRONICA";
                     crearRegistro($guia , $descripcion , $gestion);
-                    
+
                     // Session::flash('success','Guia de remision enviada a Sunat con exito.');
                     // return view('ventas.guias.index',[
-                        
+
                     //     'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
                     //     'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
                     //     'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
@@ -614,19 +614,19 @@ class GuiaController extends Controller
 
                 }else{
 
-                    //COMO SUNAT NO LO ADMITE VUELVE A SER 0 
+                    //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                     $guia->sunat = '0';
-                    $guia->update(); 
-                    
+                    $guia->update();
+
                     if ($json_sunat->sunatResponse->error) {
                         $id_sunat = $json_sunat->sunatResponse->error->code;
                         $descripcion_sunat = $json_sunat->sunatResponse->error->message;
 
-                    
+
                     }else {
                         $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                         $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-                        
+
                     };
 
 
