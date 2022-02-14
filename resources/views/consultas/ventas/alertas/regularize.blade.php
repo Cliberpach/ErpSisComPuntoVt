@@ -6,7 +6,7 @@
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-12 col-md-12">
-       <h2  style="text-transform:uppercase"><b>Listado de Documentos de Venta No Enviados</b></h2>
+       <h2  style="text-transform:uppercase"><b>Listado de Documentos de Venta Por Regularizar</b></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="{{route('home')}}">Panel de Control</a>
@@ -20,27 +20,6 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-12">
-            <div class="row align-items-end">
-                <div class="col-12 col-md-5">
-                    <div class="form-group">
-                        <label for="fecha_desde">Fecha desde</label>
-                        <input type="date" id="fecha_desde" class="form-control">
-                    </div>
-                </div>
-                <div class="col-12 col-md-5">
-                    <div class="form-group">
-                        <label for="fecha_desde">Fecha hasta</label>
-                        <input type="date" id="fecha_hasta" class="form-control">
-                    </div>
-                </div>
-                <div class="col-12 col-md-2">
-                    <div class="form-group">
-                        <button class="btn btn-primary btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="col-lg-12">
             <div class="ibox ">
                 <div class="ibox-content">
@@ -165,7 +144,7 @@ function loadTable()
         "bInfo": true,
         "bAutoWidth": false,
         "processing": true,
-        "ajax": "{{ route('consultas.ventas.alerta.getTableEnvio') }}",
+        "ajax": "{{ route('consultas.ventas.alerta.getTableRegularize') }}",
         "columns": [
             {
                 data: "id",
@@ -274,12 +253,6 @@ function loadTable()
             },
 
         ],
-        "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-            if(aData.code == '1033')
-            {
-                $('td', nRow).css('display', 'none');
-            }
-        },
         "language": {
             "url": "{{asset('Spanish.json')}}"
         },

@@ -67,6 +67,7 @@ class ParametroController extends Controller
 
     public function notifications()
     {
+        refreshNotifications();
         $notifications = Auth::user()->unreadNotifications;
 
         foreach($notifications as $notify)

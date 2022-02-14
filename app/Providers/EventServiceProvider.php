@@ -47,9 +47,6 @@ class EventServiceProvider extends ServiceProvider
         Login::class => [
             BroadcastUserLogin::class,
         ],
-        \App\Events\NotifySunatEvent::class => [
-            BroadcastUserLogin::class,
-        ]
     ];
 
     /**

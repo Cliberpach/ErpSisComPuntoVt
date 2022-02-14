@@ -1949,6 +1949,20 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1981,6 +1995,12 @@ __webpack_require__.r(__webpack_exports__);
           return notify.data.head == 'regularize';
         });
       });
+    },
+    locationEnvio: function locationEnvio() {
+      window.location = route('consultas.ventas.alerta.envio');
+    },
+    locationRegularize: function locationRegularize() {
+      window.location = route('consultas.ventas.alerta.regularize');
     }
   },
   updated: function updated() {
@@ -57362,27 +57382,72 @@ var render = function() {
     _vm._v(" "),
     _c(
       "ul",
-      { staticClass: "dropdown-menu dropdown-alerts" },
+      { staticClass: "dropdown-menu dropdown-alerts list-alerts" },
       [
+        _vm.lstNotifyEnvio.length > 0
+          ? _c("li", [
+              _c(
+                "a",
+                {
+                  staticClass: "dropdown-item",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      return _vm.locationEnvio()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "content-alert text-center" }, [
+                    _c("b", [
+                      _vm._v(
+                        _vm._s(_vm.lstNotifyEnvio.length) +
+                          " " +
+                          _vm._s(
+                            _vm.lstNotifyEnvio.length > 1
+                              ? "notificaciones"
+                              : "notificacion"
+                          ) +
+                          " de envío"
+                      )
+                    ])
+                  ])
+                ]
+              )
+            ])
+          : _vm._e(),
+        _vm._v(" "),
         _vm._l(_vm.lstNotifyEnvio, function(notify) {
           return _c("li", { key: notify.id }, [
-            _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-              _c("div", [
-                _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
-                _vm._v(
-                  " Documento no enviado: " +
-                    _vm._s(
-                      notify.data.body.serie +
-                        " - " +
-                        notify.data.body.correlativo
-                    ) +
-                    "\n                    "
-                ),
-                _c("span", { staticClass: "float-right text-muted small" }, [
-                  _vm._v(_vm._s(notify.data.time))
+            _c(
+              "a",
+              {
+                staticClass: "dropdown-item",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.locationEnvio()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "content-alert" }, [
+                  _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
+                  _vm._v(
+                    " Documento no enviado: " +
+                      _vm._s(
+                        notify.data.body.serie +
+                          " - " +
+                          notify.data.body.correlativo
+                      ) +
+                      "\n                    "
+                  ),
+                  _c("span", { staticClass: "float-right text-muted small" }, [
+                    _vm._v(_vm._s(notify.data.time))
+                  ])
                 ])
-              ])
-            ])
+              ]
+            )
           ])
         }),
         _vm._v(" "),
@@ -57390,25 +57455,70 @@ var render = function() {
           ? _c("li", { staticClass: "dropdown-divider" })
           : _vm._e(),
         _vm._v(" "),
+        _vm.lstNotifyRegularize.length > 0
+          ? _c("li", [
+              _c(
+                "a",
+                {
+                  staticClass: "dropdown-item",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      return _vm.locationRegularize()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "content-alert text-center" }, [
+                    _c("b", [
+                      _vm._v(
+                        _vm._s(_vm.lstNotifyRegularize.length) +
+                          " " +
+                          _vm._s(
+                            _vm.lstNotifyRegularize.length > 1
+                              ? "notificaciones"
+                              : "notificacion"
+                          ) +
+                          " de regularizar"
+                      )
+                    ])
+                  ])
+                ]
+              )
+            ])
+          : _vm._e(),
+        _vm._v(" "),
         _vm._l(_vm.lstNotifyRegularize, function(notify) {
           return _c("li", { key: notify.id }, [
-            _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-              _c("div", [
-                _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
-                _vm._v(
-                  " Documento por regularizar: " +
-                    _vm._s(
-                      notify.data.body.serie +
-                        " - " +
-                        notify.data.body.correlativo
-                    ) +
-                    "\n                    "
-                ),
-                _c("span", { staticClass: "float-right text-muted small" }, [
-                  _vm._v(_vm._s(notify.data.time))
+            _c(
+              "a",
+              {
+                staticClass: "dropdown-item",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.locationRegularize()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "content-alert" }, [
+                  _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
+                  _vm._v(
+                    " Documento por regularizar: " +
+                      _vm._s(
+                        notify.data.body.serie +
+                          " - " +
+                          notify.data.body.correlativo
+                      ) +
+                      "\n                    "
+                  ),
+                  _c("span", { staticClass: "float-right text-muted small" }, [
+                    _vm._v(_vm._s(notify.data.time))
+                  ])
                 ])
-              ])
-            ])
+              ]
+            )
           ])
         }),
         _vm._v(" "),
@@ -57424,7 +57534,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("a", { staticClass: "dropdown-item", attrs: { href: "#" } }, [
-      _c("div", [
+      _c("div", { staticClass: "content-alert" }, [
         _c("i", { staticClass: "fa fa-exclamation" }),
         _vm._v(" No tiene notificatciones\n                    "),
         _c("span", { staticClass: "float-right text-muted small" }, [
@@ -69745,28 +69855,28 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
 
 window.Pusher = __webpack_require__(/*! pusher-js */ "./node_modules/pusher-js/dist/web/pusher.js");
-/*En el servidor*/
+/*En el servidor
+window.Echo = new Echo({
+    broadcaster: 'pusher',
+    key: 'ASDASF2121',
+    wsHost: window.location.hostname,
+    wssPort: 6001,
+    encrypted:false,
+    disableStats:true,
+    enabledTransports: ['ws', 'wss'],
+    //forceTLS:false,
+});*/
+
+/*En el local*/
 
 window.Echo = new laravel_echo__WEBPACK_IMPORTED_MODULE_0__["default"]({
   broadcaster: 'pusher',
   key: 'ASDASF2121',
   wsHost: window.location.hostname,
-  wssPort: 6001,
-  encrypted: false,
-  disableStats: true,
-  enabledTransports: ['ws', 'wss'] //forceTLS:false,
-
+  wsPort: 6001,
+  forceTLS: false,
+  disableStats: true
 });
-/*En el local
-
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: 'ASDASF2121',
-    wsHost: window.location.hostname,
-    wsPort: 6001,
-    forceTLS:false,
-    disableStats: true,
-});*/
 
 /***/ }),
 

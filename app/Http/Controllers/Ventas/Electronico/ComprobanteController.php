@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Ventas\Electronico;
 
 use App\Events\DocumentoNumeracion;
+use App\Events\NotifySunatEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Condicion;
 use App\Ventas\Documento\Detalle;
@@ -321,6 +322,8 @@ class ComprobanteController extends Controller
 
                             $documento->update();
                             Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
+                            $dato = "Message";
+                            broadcast(new NotifySunatEvent($dato));
                             return view('ventas.documentos.index',[
                                 'id_sunat' =>  $id_sunat,
                                 'descripcion_sunat' =>  $descripcion_sunat,

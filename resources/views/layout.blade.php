@@ -11,6 +11,56 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{asset('img/siscom.ico')}}" />
 
+    <style>
+        .list-alerts {
+            max-height: calc(100vh - 325px);
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .content-alert {
+            min-height: 20px;
+            max-height: 80px;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .content-alert::-webkit-scrollbar,
+        .list-alerts::-webkit-scrollbar {
+            -webkit-appearance: none;
+        }
+
+        .content-alert::-webkit-scrollbar:vertical,
+        .list-alerts::-webkit-scrollbar:vertical {
+            width: 8px;
+        }
+
+        .content-alert::-webkit-scrollbar-button:increment,
+        .content-alert::-webkit-scrollbar-button,
+        .list-alerts::-webkit-scrollbar-button:increment,
+        .list-alerts::-webkit-scrollbar-button{
+            display: none;
+        }
+
+        .content-alert::-webkit-scrollbar:horizontal,
+        .list-alerts::-webkit-scrollbar:horizontal {
+            height: 10px;
+        }
+
+        .content-alert::-webkit-scrollbar-thumb,
+        .list-alerts::-webkit-scrollbar-thumb {
+            background-color: #6BBD99;
+            border-radius: 20px;
+            border: 1px solid #f1f2f3;
+        }
+
+        .content-alert::-webkit-scrollbar-track,
+        .list-alerts::-webkit-scrollbar-track {
+            border-radius: 10px;
+        }
+    </style>
     @yield('vue-css')
 
     <link href="{{asset('Inspinia/css/bootstrap.min.css')}}" rel="stylesheet">

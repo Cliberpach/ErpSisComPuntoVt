@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Consultas\Ventas;
 
 use App\Events\DocumentoNumeracion;
+use App\Events\NotifySunatEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Condicion;
 use App\Ventas\Documento\Detalle;
@@ -20,6 +21,8 @@ class AlertaController extends Controller
 {
     public function envio()
     {
+        $dato = "Message";
+        broadcast(new NotifySunatEvent($dato));
         return view('consultas.ventas.alertas.envio');
     }
 
@@ -44,7 +47,8 @@ class AlertaController extends Controller
         ->orderBy('cotizacion_documento.id','DESC')
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
         ->where('cotizacion_documento.estado', '!=','ANULADO')
-        ->where('cotizacion_documento.sunat','0');
+        ->where('cotizacion_documento.sunat','0')
+        ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
         if(!PuntoVenta() && !FullAccess())
         {
@@ -52,13 +56,13 @@ class AlertaController extends Controller
         }
 
         return datatables()->query(
-            $consulta->where(DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))'),'!=','1033')
+            $consulta
         )->toJson();
     }
 
     public function regularize()
     {
-        return view('consultas.ventas.alertas.envio');
+        return view('consultas.ventas.alertas.regularize');
     }
 
     public function getTableRegularize()
@@ -77,7 +81,7 @@ class AlertaController extends Controller
             'cotizacion_documento.total as monto',
             DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
             'cotizacion_documento.sunat',
-            'cotizacion_documento.getRegularizeResponse',
+            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code')
         )
         ->orderBy('cotizacion_documento.id','DESC')
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
@@ -334,6 +338,8 @@ class AlertaController extends Controller
                             crearRegistro($documento , $descripcion , $gestion);
 
                             Session::flash('success','Documento de Venta enviada a Sunat con exito.');
+                            $dato = "Message";
+                            broadcast(new NotifySunatEvent($dato));
                             return view('consultas.ventas.alertas.envio',[
 
                                 'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
@@ -406,6 +412,7 @@ class AlertaController extends Controller
             $respuesta_error = json_decode($respuesta_error, true);
             $documento->getRegularizeResponse = $respuesta_error;
             $documento->update();
+
             Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.');
             return redirect()->route('consultas.ventas.alerta.envio');
         }
@@ -425,7 +432,7 @@ class AlertaController extends Controller
                 $documento->sunat = '1';
                 $documento->update();
                 Session::flash('success','Documento de Venta regularizado con exito.');
-                return view('consultas.ventas.alertas.envio',[
+                return view('consultas.ventas.alertas.regularize',[
 
                     'id_sunat' => $documento->serie.'-'.$documento->correlativo,
                     'descripcion_sunat' => 'CDR regularizado.',
@@ -437,13 +444,13 @@ class AlertaController extends Controller
             else
             {
                 Session::flash('error','Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
-                return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
+                return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_existe', 'error');
             }
         }
         catch(Exception $e)
         {
             Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
-            return redirect()->route('consultas.ventas.alerta.envio');
+            return redirect()->route('consultas.ventas.alerta.regularize');
         }
 
     }

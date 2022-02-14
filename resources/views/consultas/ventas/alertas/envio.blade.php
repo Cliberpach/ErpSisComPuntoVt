@@ -20,27 +20,6 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-12">
-            <div class="row align-items-end">
-                <div class="col-12 col-md-5">
-                    <div class="form-group">
-                        <label for="fecha_desde">Fecha desde</label>
-                        <input type="date" id="fecha_desde" class="form-control">
-                    </div>
-                </div>
-                <div class="col-12 col-md-5">
-                    <div class="form-group">
-                        <label for="fecha_desde">Fecha hasta</label>
-                        <input type="date" id="fecha_hasta" class="form-control">
-                    </div>
-                </div>
-                <div class="col-12 col-md-2">
-                    <div class="form-group">
-                        <button class="btn btn-primary btn-block" onclick="initTable()"><i class="fa fa-refresh"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="col-lg-12">
             <div class="ibox ">
                 <div class="ibox-content">

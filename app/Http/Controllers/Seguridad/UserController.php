@@ -31,7 +31,7 @@ class UserController extends Controller
         $colaboradores = array();
         foreach($auxs as $aux)
         {
-            if(!$aux->user_persona)
+            if(!$aux->user_persona && $aux->colaborador)
             {
                 $colaborador = new stdClass();
                 $colaborador->id = $aux->id;

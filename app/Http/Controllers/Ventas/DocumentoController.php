@@ -7,6 +7,7 @@ use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
 use App\Events\ComprobanteRegistrado;
 use App\Events\DocumentoNumeracion;
+use App\Events\NotifySunatEvent;
 use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
@@ -46,6 +47,8 @@ class DocumentoController extends Controller
     public function index()
     {
         $this->authorize('haveaccess','documento_venta.index');
+        $dato = "Message";
+        broadcast(new NotifySunatEvent($dato));
         return view('ventas.documentos.index');
     }
 

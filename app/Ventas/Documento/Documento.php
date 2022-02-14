@@ -284,15 +284,15 @@ class Documento extends Model
                }
             }
 
-            if($documento->sunat == '2' || $documento->estado == 'ANULADO' && $documento->cuenta)
+            if($documento->sunat == '2' || $documento->estado == 'ANULADO')
             {
-                $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
-                $cuenta_cliente->estado = 'ANULADO';
-                $cuenta_cliente->update();
+                if($documento->cuenta)
+                {
+                    $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+                    $cuenta_cliente->estado = 'ANULADO';
+                    $cuenta_cliente->update();
+                }
             }
-
-            $dato = "Message";
-            broadcast(new NotifySunatEvent($dato));
         });
 
         static::deleted(function(Documento $documento){
