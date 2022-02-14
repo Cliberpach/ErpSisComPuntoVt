@@ -613,7 +613,7 @@
 
 
         // Solo campos numericos
-        $('#ubigeo_llegada , #dni_conductor').on('input', function() {
+        $('#ubigeo_partida, #dni_conductor').on('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
 
