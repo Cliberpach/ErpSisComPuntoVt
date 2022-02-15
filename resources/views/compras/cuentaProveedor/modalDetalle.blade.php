@@ -84,7 +84,7 @@
                                             <label for="" class="col-form-label required">Pago</label>
                                             <select name="pago" id="pago" class="form-control select2_form" required>
                                                 <option value="A CUENTA">A CUENTA</option>
-                                                <option value="TODO">VARIAS CUENTAS</option>
+                                                <option value="TODO">TODO</option>
                                             </select>
                                         </div>
                                     </div>
@@ -214,15 +214,22 @@
                 } else {
                     var enviar = true;
                     if (pago == "TODO") {
-                        console.log(cantidad, saldo)
-                        if (cantidad < saldo || cantidad == saldo) {
+                        /*if (cantidad < saldo || cantidad == saldo) {
                             toastr.error("El monto a pagar, no cumple para el pago a varias cuentas")
+                            enviar = false
+                        }*/
+                        if (cantidad != saldo) {
+                            toastr.error("El monto a pagar, no cumple para el pago de todo el saldo: " + saldo)
                             enviar = false
                         }
                     } else {
-                        if (cantidad > saldo) {
+                        /*if (cantidad > saldo) {
                             toastr.error('El tipo de pago se puede hacer a varios, seleccione de nuevo')
                             enviar = false
+                        }*/
+                        if (cantidad > saldo) {
+                            toastr.error('La cantidad a pagar excede el saldo: ' + saldo);
+                            enviar = false;
                         }
                     }
                     axios.get("{{ route('Caja.movimiento.verificarestado') }}").then((value) => {

@@ -182,7 +182,7 @@ function loadTable()
                 data: null,
                 className: "text-center letrapequeña",
                 render: function(data){
-                    return data.dias > 3 ? 0 : 3 - data.dias;
+                    return data.dias > 4 ? 0 : 4 - data.dias;
                 }
             },
             {

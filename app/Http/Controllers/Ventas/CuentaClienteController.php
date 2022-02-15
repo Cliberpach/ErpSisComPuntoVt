@@ -112,151 +112,200 @@ class CuentaClienteController extends Controller
     public function detallePago(Request $request, $id)
     {
         DB::beginTransaction();
-            $CuentaCliente = CuentaCliente::findOrFail($id);
-            if($request->pago == "A CUENTA")
+        $CuentaCliente = CuentaCliente::findOrFail($id);
+        if($request->pago == "A CUENTA")
+        {
+            $detallepago = new DetalleCuentaCliente();
+            $detallepago->cuenta_cliente_id = $CuentaCliente->id;
+            $detallepago->mcaja_id = movimientoUser()->id;
+            $detallepago->monto = $request->cantidad;
+            $detallepago->importe=$request->importe_venta;
+            $detallepago->efectivo=$request->efectivo_venta;
+            $detallepago->tipo_pago_id=$request->modo_pago;
+            $detallepago->observacion = $request->pago.' - '.$request->observacion;
+            $detallepago->fecha = $request->fecha;
+            $detallepago->save();
+
+            if($CuentaCliente->saldo - $request->cantidad < 0)
             {
-                $detallepago = new DetalleCuentaCliente();
-                $detallepago->cuenta_cliente_id = $CuentaCliente->id;
-                $detallepago->mcaja_id = movimientoUser()->id;
-                $detallepago->monto = $request->cantidad;
-                $detallepago->importe=$request->importe_venta;
-                $detallepago->efectivo=$request->efectivo_venta;
-                $detallepago->tipo_pago_id=$request->modo_pago;
-                $detallepago->observacion = $request->pago.' - '.$request->observacion;
-                $detallepago->fecha = $request->fecha;
-                $detallepago->save();
-
-                $CuentaCliente->saldo = $CuentaCliente->saldo - $request->cantidad;
-                $CuentaCliente->update();
-
-                $detallepago->saldo = $CuentaCliente->saldo;
-                $detallepago->update();
-
-                if($request->hasFile('imagen')){
-                    $detallepago->ruta_imagen = $request->file('imagen')->store('public/cuenta/cobrar');
-                    $detallepago->update();
-                }
-
-                if($CuentaCliente->saldo == 0)
-                {
-                    $CuentaCliente->estado='PAGADO';
-                    $CuentaCliente->save();
-                }
+                DB::rollBack();
+                Session::flash('error', 'Ocurrió un error, al parecer ingreso un monto superior al saldo.');
+                return redirect()->route('cuentaCliente.index');
             }
-            else{
-                $cliente = $CuentaCliente->documento->clienteEntidad;
-                $cuentasFaltantes = CuentaCliente::where('estado','PENDIENTE')->get();
-                $cantidadRecibida = $request->cantidad;
-                $cantidadRecibidaEfectivo=$request->efectivo_venta;
-                $cantidadRecibidaImporte=$request->importe_venta;
-                foreach ($cuentasFaltantes as $key => $cuenta) {
-                    if($cuenta->documento->clienteEntidad->id == $cliente->id && $cantidadRecibida != 0)
+
+            $CuentaCliente->saldo = $CuentaCliente->saldo - $request->cantidad;
+            $CuentaCliente->update();
+
+            $detallepago->saldo = $CuentaCliente->saldo;
+            $detallepago->update();
+
+            if($request->hasFile('imagen')){
+                $detallepago->ruta_imagen = $request->file('imagen')->store('public/cuenta/cobrar');
+                $detallepago->update();
+            }
+
+            if($CuentaCliente->saldo == 0)
+            {
+                $CuentaCliente->estado='PAGADO';
+                $CuentaCliente->save();
+            }
+        }
+        else{
+            if($CuentaCliente->saldo != $request->cantidad)
+            {
+                DB::rollBack();
+                Session::flash('error', 'Ocurrió un error, al parecer ingreso un monto diferente al saldo.');
+                return redirect()->route('cuentaCliente.index');
+            }
+            $detallepago = new DetalleCuentaCliente();
+            $detallepago->cuenta_cliente_id = $CuentaCliente->id;
+            $detallepago->mcaja_id = movimientoUser()->id;
+            $detallepago->monto = $request->cantidad;
+            $detallepago->importe=$request->importe_venta;
+            $detallepago->efectivo=$request->efectivo_venta;
+            $detallepago->tipo_pago_id=$request->modo_pago;
+            $detallepago->observacion = $request->pago.' - '.$request->observacion;
+            $detallepago->fecha = $request->fecha;
+            $detallepago->save();
+
+            if($CuentaCliente->saldo - $request->cantidad < 0)
+            {
+                DB::rollBack();
+                Session::flash('error', 'Ocurrió un error, al parecer ingreso un monto superior al saldo.');
+                return redirect()->route('cuentaCliente.index');
+            }
+
+            $CuentaCliente->saldo = $CuentaCliente->saldo - $request->cantidad;
+            $CuentaCliente->update();
+
+            $detallepago->saldo = $CuentaCliente->saldo;
+            $detallepago->update();
+
+            if($request->hasFile('imagen')){
+                $detallepago->ruta_imagen = $request->file('imagen')->store('public/cuenta/cobrar');
+                $detallepago->update();
+            }
+
+            if($CuentaCliente->saldo == 0)
+            {
+                $CuentaCliente->estado='PAGADO';
+                $CuentaCliente->save();
+            }
+        }
+        /*else{
+            $cliente = $CuentaCliente->documento->clienteEntidad;
+            $cuentasFaltantes = CuentaCliente::where('estado','PENDIENTE')->get();
+            $cantidadRecibida = $request->cantidad;
+            $cantidadRecibidaEfectivo=$request->efectivo_venta;
+            $cantidadRecibidaImporte=$request->importe_venta;
+            foreach ($cuentasFaltantes as $key => $cuenta) {
+                if($cuenta->documento->clienteEntidad->id == $cliente->id && $cantidadRecibida != 0)
+                {
+                    $detallepago = new DetalleCuentaCliente();
+                    $detallepago->mcaja_id = movimientoUser()->id;
+                    $detallepago->cuenta_cliente_id = $cuenta->id;
+                    $detallepago->monto = 0;
+                    $detallepago->observacion=$request->pago.' - '.$request->observacion;
+                    $detallepago->fecha = $request->fecha;
+                    $detallepago->tipo_pago_id=$request->modo_pago;
+                    $detallepago->save();
+                    if($cuenta->saldo > $cantidadRecibida)
                     {
-                        $detallepago = new DetalleCuentaCliente();
-                        $detallepago->mcaja_id = movimientoUser()->id;
-                        $detallepago->cuenta_cliente_id = $cuenta->id;
-                        $detallepago->monto = 0;
-                        $detallepago->observacion=$request->pago.' - '.$request->observacion;
-                        $detallepago->fecha = $request->fecha;
-                        $detallepago->tipo_pago_id=$request->modo_pago;
-                        $detallepago->save();
-                        if($cuenta->saldo > $cantidadRecibida)
+                        if($cantidadRecibidaEfectivo == 0)
                         {
-                            if($cantidadRecibidaEfectivo == 0)
+                            $detallepago->efectivo = 0;
+                            $detallepago->importe = $cantidadRecibidaImporte;
+                            $detallepago->monto = $cantidadRecibida;
+                            $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
+                            $cantidadRecibidaImporte = 0;
+
+                            $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
+                        }
+                        else
+                        {
+                            $detallepago->efectivo = $cantidadRecibidaEfectivo;
+                            $detallepago->importe = $cantidadRecibidaImporte;
+                            $detallepago->monto = $cantidadRecibida;
+                            $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
+                            $cantidadRecibidaEfectivo = 0;
+                            $cantidadRecibidaImporte = 0;
+
+                            $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
+                        }
+                    }
+                    else{
+                        if($cantidadRecibidaEfectivo == 0)
+                        {
+                            $importe = 0;
+                            if($cantidadRecibidaImporte > $cuenta->saldo)
                             {
-                                $detallepago->efectivo = 0;
+                                $importe = $cantidadRecibidaImporte - $cuenta->saldo;
+                            }else
+                            {
+                                $importe = $cantidadRecibidaImporte;
+                            }
+
+                            $detallepago->efectivo  = $cantidadRecibidaEfectivo;
+                            $detallepago->importe = $cuenta->saldo;
+                            $detallepago->monto = $cuenta->saldo;
+                            $cantidadRecibidaImporte = $importe;
+                            $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
+
+                            $cuenta->update();
+                        }
+                        else
+                        {
+                            if($cantidadRecibidaImporte == 0)
+                            {
+                                $efectivo = 0;
+                                if($cantidadRecibidaEfectivo > $cuenta->saldo)
+                                {
+                                    $efectivo = $cantidadRecibidaEfectivo - $cuenta->saldo;
+                                }else
+                                {
+                                    $efectivo = $cantidadRecibidaEfectivo;
+                                }
+                                $detallepago->efectivo  = $efectivo;
                                 $detallepago->importe = $cantidadRecibidaImporte;
-                                $detallepago->monto = $cantidadRecibida;
-                                $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
-                                $cantidadRecibidaImporte = 0;
+                                $detallepago->monto = $cuenta->saldo;
+                                $cantidadRecibidaEfectivo = $cantidadRecibidaEfectivo - $efectivo;
 
                                 $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
                             }
                             else
                             {
                                 $detallepago->efectivo = $cantidadRecibidaEfectivo;
-                                $detallepago->importe = $cantidadRecibidaImporte;
-                                $detallepago->monto = $cantidadRecibida;
-                                $cuenta->saldo = $cuenta->saldo - $cantidadRecibida;
+                                $detallepago->importe = $cuenta->saldo - $cantidadRecibidaEfectivo;
+                                $detallepago->monto = $detallepago->efectivo + $detallepago->importe;
+                                $cantidadRecibidaImporte =  $cantidadRecibidaImporte - ($cuenta->saldo - $cantidadRecibidaEfectivo);
                                 $cantidadRecibidaEfectivo = 0;
-                                $cantidadRecibidaImporte = 0;
-
                                 $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
                             }
                         }
-                        else{
-                            if($cantidadRecibidaEfectivo == 0)
-                            {
-                                $importe = 0;
-                                if($cantidadRecibidaImporte > $cuenta->saldo)
-                                {
-                                    $importe = $cantidadRecibidaImporte - $cuenta->saldo;
-                                }else
-                                {
-                                    $importe = $cantidadRecibidaImporte;
-                                }
+                        $cuenta->saldo = 0;
+                    }
 
-                                $detallepago->efectivo  = $cantidadRecibidaEfectivo;
-                                $detallepago->importe = $cuenta->saldo;
-                                $detallepago->monto = $cuenta->saldo;
-                                $cantidadRecibidaImporte = $importe;
-                                $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
-
-                                $cuenta->update();
-                            }
-                            else
-                            {
-                                if($cantidadRecibidaImporte == 0)
-                                {
-                                    $efectivo = 0;
-                                    if($cantidadRecibidaEfectivo > $cuenta->saldo)
-                                    {
-                                        $efectivo = $cantidadRecibidaEfectivo - $cuenta->saldo;
-                                    }else
-                                    {
-                                        $efectivo = $cantidadRecibidaEfectivo;
-                                    }
-                                    $detallepago->efectivo  = $efectivo;
-                                    $detallepago->importe = $cantidadRecibidaImporte;
-                                    $detallepago->monto = $cuenta->saldo;
-                                    $cantidadRecibidaEfectivo = $cantidadRecibidaEfectivo - $efectivo;
-
-                                    $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
-                                }
-                                else
-                                {
-                                    $detallepago->efectivo = $cantidadRecibidaEfectivo;
-                                    $detallepago->importe = $cuenta->saldo - $cantidadRecibidaEfectivo;
-                                    $detallepago->monto = $detallepago->efectivo + $detallepago->importe;
-                                    $cantidadRecibidaImporte =  $cantidadRecibidaImporte - ($cuenta->saldo - $cantidadRecibidaEfectivo);
-                                    $cantidadRecibidaEfectivo = 0;
-                                    $cantidadRecibida = $cantidadRecibidaEfectivo + $cantidadRecibidaImporte;
-                                }
-                            }
-                            $cuenta->saldo = 0;
-                        }
-
+                    $detallepago->update();
+                    if($request->hasFile('imagen')){
+                        $detallepago->ruta_imagen = $request->file('imagen')->store('public/cuenta/cobrar');
                         $detallepago->update();
-                        if($request->hasFile('imagen')){
-                            $detallepago->ruta_imagen = $request->file('imagen')->store('public/cuenta/cobrar');
-                            $detallepago->update();
-                        }
+                    }
 
+                    $cuenta->update();
+
+                    if($cuenta->saldo == 0)
+                    {
+                        $cuenta->estado='PAGADO';
                         $cuenta->update();
-
-                        if($cuenta->saldo == 0)
-                        {
-                            $cuenta->estado='PAGADO';
-                            $cuenta->update();
-                        }
                     }
                 }
-
             }
 
-            DB::commit();
-            Session::flash('success', 'Pago agregado correctamene');
-            return redirect()->route('cuentaCliente.index');
+        }*/
+
+        DB::commit();
+        Session::flash('success', 'Pago agregado correctamene');
+        return redirect()->route('cuentaCliente.index');
     }
 
     public function reporte($id)

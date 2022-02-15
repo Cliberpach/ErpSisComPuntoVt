@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
 class CuentaProveedorController extends Controller
@@ -99,6 +100,7 @@ class CuentaProveedorController extends Controller
     public function detallePago(Request $request)
     {
         $this->authorize('haveaccess','cuenta_proveedor.index');
+        DB::beginTransaction();
         $cuentaProveedor=CuentaProveedor::findOrFail($request->id);
         if($request->pago=="A CUENTA")
         {
@@ -111,9 +113,18 @@ class CuentaProveedorController extends Controller
             $detallepago->efectivo=$request->efectivo_venta;
             $detallepago->tipo_pago_id=$request->modo_pago;
             $detallepago->save();
+
             $cant=$request->efectivo_venta+$request->importe_venta;
+            if($cuentaProveedor->saldo - $cant < 0)
+            {
+                DB::rollBack();
+                Session::flash('error', 'Ocurrió un error, al parecer ingreso un monto superior al saldo.');
+                return redirect()->route('cuentaProveedor.index');
+            }
+
             $cuentaProveedor->saldo=$cuentaProveedor->saldo-$cant;
             $cuentaProveedor->save();
+
             $detallepago->saldo =$cuentaProveedor->saldo;
             $detallepago->update();
 
@@ -128,6 +139,47 @@ class CuentaProveedorController extends Controller
             }
         }
         else{
+            $cant=$request->efectivo_venta+$request->importe_venta;
+            if($cuentaProveedor->saldo != $cant)
+            {
+                DB::rollBack();
+                Session::flash('error', 'Ocurrió un error, al parecer ingreso un monto diferente al saldo.');
+                return redirect()->route('cuentaProveedor.index');
+            }
+            $detallepago=new DetalleCuentaProveedor();
+            $detallepago->cuenta_proveedor_id=$cuentaProveedor->id;
+            $detallepago->mcaja_id= movimientoUser()->id;
+            $detallepago->observacion=$request->observacion;
+            $detallepago->fecha=$request->fecha;
+            $detallepago->importe=$request->importe_venta;
+            $detallepago->efectivo=$request->efectivo_venta;
+            $detallepago->tipo_pago_id=$request->modo_pago;
+            $detallepago->save();
+
+            if($cuentaProveedor->saldo - $cant < 0)
+            {
+                DB::rollBack();
+                Session::flash('error', 'Ocurrió un error, al parecer ingreso un monto superior al saldo.');
+                return redirect()->route('cuentaProveedor.index');
+            }
+
+            $cuentaProveedor->saldo=$cuentaProveedor->saldo-$cant;
+            $cuentaProveedor->save();
+
+            $detallepago->saldo =$cuentaProveedor->saldo;
+            $detallepago->update();
+
+            if($request->hasFile('file')){
+                $detallepago->ruta_imagen = $request->file('file')->store('public/cuenta/proveedor');
+                $detallepago->update();
+            }
+            if($cuentaProveedor->saldo==0)
+            {
+                $cuentaProveedor->estado='PAGADO';
+                $cuentaProveedor->save();
+            }
+        }
+        /*else{
             $proveedor=$cuentaProveedor->documento->proveedor;
             $cuentasFaltantes=CuentaProveedor::where('estado','PENDIENTE')->get();
             $cantidadRecibidaEfectivo=$request->efectivo_venta;
@@ -202,7 +254,11 @@ class CuentaProveedorController extends Controller
                     }
             }
 
-        }
+        }*/
+
+        DB::commit();
+        Session::flash('success', 'Pago agregado correctamene');
+        return redirect()->route('cuentaProveedor.index');
     }
 
     public function reporte($id)

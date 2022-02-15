@@ -214,13 +214,22 @@
                 } else {
                     var enviar = true;
                     if (pago == "TODO") {
-                        if (cantidad < saldo || cantidad == saldo) {
+
+                        /*if (cantidad < saldo || cantidad == saldo) {
                             toastr.error("El monto a pagar, no cumple para el pago a varias cuentas")
+                            enviar = false
+                        }*/
+                        if (cantidad != saldo) {
+                            toastr.error("El monto a pagar, no cumple para el pago de todo el saldo: " + saldo)
                             enviar = false
                         }
                     } else {
-                        if (cantidad > saldo) {
+                        /*if (cantidad > saldo) {
                             toastr.error('El tipo de pago se puede hacer a varios, seleccione de nuevo');
+                            enviar = false;
+                        }*/
+                        if (cantidad > saldo) {
+                            toastr.error('La cantidad a pagar excede el saldo: ' + saldo);
                             enviar = false;
                         }
                     }
