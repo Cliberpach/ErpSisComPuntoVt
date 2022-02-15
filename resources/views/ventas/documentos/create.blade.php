@@ -269,7 +269,7 @@
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <div class="checkbox input-required pt-2">
+                                            <div class="checkbox pt-2">
                                                 <input type="checkbox" name="envio_sunat" id="envio_sunat" value="1">
                                                 <label for="envio_sunat" title="Enviar ahora" class="text-danger font-weight-bold">
                                                     Enviar a sunat

@@ -208,90 +208,114 @@ class ComprobanteController extends Controller
 
                         if ($json_sunat->sunatResponse->success == true) {
 
-                            $documento->sunat = '1';
-                            $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
-                            $respuesta_cdr = json_decode($respuesta_cdr, true);
-                            $documento->getCdrResponse = $respuesta_cdr;
+                            if($json_sunat->sunatResponse->cdrResponse->code == "0")
+                            {
+                                $documento->sunat = '1';
+                                $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                                $respuesta_cdr = json_decode($respuesta_cdr, true);
+                                $documento->getCdrResponse = $respuesta_cdr;
 
-                            $data_comprobante = generarComprobanteapi(json_encode($arreglo_comprobante), $documento->empresa_id);
-                            $name = $documento->serie."-".$documento->correlativo.'.pdf';
+                                $data_comprobante = generarComprobanteapi(json_encode($arreglo_comprobante), $documento->empresa_id);
+                                $name = $documento->serie."-".$documento->correlativo.'.pdf';
 
-                            $data_cdr = base64_decode($json_sunat->sunatResponse->cdrZip);
-                            $name_cdr = 'R-'.$documento->serie."-".$documento->correlativo.'.zip';
+                                $data_cdr = base64_decode($json_sunat->sunatResponse->cdrZip);
+                                $name_cdr = 'R-'.$documento->serie."-".$documento->correlativo.'.zip';
 
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
+                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                                }
+
+                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'))) {
+                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'));
+                                }
+
+                                $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.$name);
+                                $pathToFile_cdr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'.DIRECTORY_SEPARATOR.$name_cdr);
+
+                                file_put_contents($pathToFile, $data_comprobante);
+                                file_put_contents($pathToFile_cdr, $data_cdr);
+
+                                $arreglo_qr = array(
+                                    "ruc" => $documento->ruc_empresa,
+                                    "tipo" => $documento->tipoDocumento(),
+                                    "serie" => $documento->serie,
+                                    "numero" => $documento->correlativo,
+                                    "emision" => self::obtenerFechaEmision($documento),
+                                    "igv" => 18,
+                                    "total" => (float)$documento->total,
+                                    "clienteTipo" => $documento->tipoDocumentoCliente(),
+                                    "clienteNumero" => $documento->documento_cliente
+                                );
+
+                                /********************************/
+                                $data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
+
+                                $name_qr = $documento->serie."-".$documento->correlativo.'.svg';
+
+                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'))) {
+                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'));
+                                }
+
+                                $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'.DIRECTORY_SEPARATOR.$name_qr);
+
+                                file_put_contents($pathToFile_qr, $data_qr);
+
+                                /********************************/
+
+                                $data_xml = generarXmlapi(json_encode($arreglo_comprobante), $documento->empresa_id);
+                                $name_xml = $documento->serie.'-'.$documento->correlativo.'.xml';
+                                $pathToFile_xml = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'.DIRECTORY_SEPARATOR.$name_xml);
+                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'))) {
+                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'));
+                                }
+                                file_put_contents($pathToFile_xml, $data_xml);
+
+                                /********************************* */
+
+                                $documento->nombre_comprobante_archivo = $name;
+                                $documento->hash = $json_sunat->hash;
+                                $documento->xml = $name_xml;
+                                $documento->ruta_comprobante_archivo = 'public/sunat/'.$name;
+                                $documento->ruta_qr = 'public/qrs/'.$name_qr;
+                                $documento->update();
+
+
+                                //Registro de actividad
+                                $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: ". $documento->serie."-".$documento->correlativo;
+                                $gestion = "COMPROBANTES ELECTRONICOS";
+                                crearRegistro($documento , $descripcion , $gestion);
+
+                                Session::flash('success','Documento de Venta enviada a Sunat con exito.');
+                                return view('ventas.documentos.index',[
+
+                                    'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
+                                    'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
+                                    'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
+                                    'sunat_exito' => true
+
+                                ])->with('sunat_exito', 'success');
                             }
+                            else
+                            {
+                                $documento->sunat = '0';
+                                $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
+                                $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'));
+                                $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                                $respuesta_error = json_decode($respuesta_error, true);
+                                $documento->getCdrResponse = $respuesta_error;
+
+                                $documento->update();
+                                Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
+                                $dato = "Message";
+                                broadcast(new NotifySunatEvent($dato));
+                                return view('ventas.documentos.index',[
+                                    'id_sunat' =>  $id_sunat,
+                                    'descripcion_sunat' =>  $descripcion_sunat,
+                                    'sunat_error' => true,
+
+                                ])->with('sunat_error', 'error');
                             }
-
-                            $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.$name);
-                            $pathToFile_cdr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'.DIRECTORY_SEPARATOR.$name_cdr);
-
-                            file_put_contents($pathToFile, $data_comprobante);
-                            file_put_contents($pathToFile_cdr, $data_cdr);
-
-                            $arreglo_qr = array(
-                                "ruc" => $documento->ruc_empresa,
-                                "tipo" => $documento->tipoDocumento(),
-                                "serie" => $documento->serie,
-                                "numero" => $documento->correlativo,
-                                "emision" => self::obtenerFechaEmision($documento),
-                                "igv" => 18,
-                                "total" => (float)$documento->total,
-                                "clienteTipo" => $documento->tipoDocumentoCliente(),
-                                "clienteNumero" => $documento->documento_cliente
-                            );
-
-                            /********************************/
-                            $data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
-
-                            $name_qr = $documento->serie."-".$documento->correlativo.'.svg';
-
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'));
-                            }
-
-                            $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'.DIRECTORY_SEPARATOR.$name_qr);
-
-                            file_put_contents($pathToFile_qr, $data_qr);
-
-                            /********************************/
-
-                            $data_xml = generarXmlapi(json_encode($arreglo_comprobante), $documento->empresa_id);
-                            $name_xml = $documento->serie.'-'.$documento->correlativo.'.xml';
-                            $pathToFile_xml = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'.DIRECTORY_SEPARATOR.$name_xml);
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'));
-                            }
-                            file_put_contents($pathToFile_xml, $data_xml);
-
-                            /********************************* */
-
-                            $documento->nombre_comprobante_archivo = $name;
-                            $documento->hash = $json_sunat->hash;
-                            $documento->xml = $name_xml;
-                            $documento->ruta_comprobante_archivo = 'public/sunat/'.$name;
-                            $documento->ruta_qr = 'public/qrs/'.$name_qr;
-                            $documento->update();
-
-
-                            //Registro de actividad
-                            $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: ". $documento->serie."-".$documento->correlativo;
-                            $gestion = "COMPROBANTES ELECTRONICOS";
-                            crearRegistro($documento , $descripcion , $gestion);
-
-                            Session::flash('success','Documento de Venta enviada a Sunat con exito.');
-                            return view('ventas.documentos.index',[
-
-                                'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
-                                'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
-                                'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
-                                'sunat_exito' => true
-
-                            ])->with('sunat_exito', 'success');
 
                         }else{
 
