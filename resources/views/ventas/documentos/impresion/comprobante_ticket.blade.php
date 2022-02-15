@@ -157,8 +157,15 @@
                 <tr>
                     <td>MODO DE PAGO</td>
                     <td>:</td>
-                    <td>{{ $documento->formaPago() }}</td>
+                    <td class="text-uppercase">{{ $documento->formaPago() }}</td>
                 </tr>
+                @if ($documento->observacion)
+                <tr>
+                    <td>PLACA</td>
+                    <td>:</td>
+                    <td class="text-uppercase">{{ $documento->observacion }}</td>
+                </tr>
+                @endif
             </table>
         </div><br>
         <div class="cuerpo">
