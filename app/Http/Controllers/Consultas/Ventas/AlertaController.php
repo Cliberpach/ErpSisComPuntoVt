@@ -378,6 +378,8 @@ class AlertaController extends Controller
 
                             $documento->update();
                             Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
+                            $dato = "Message";
+                            broadcast(new NotifySunatEvent($dato));
                             return view('consultas.ventas.alertas.envio',[
                                 'id_sunat' =>  $id_sunat,
                                 'descripcion_sunat' =>  $descripcion_sunat,

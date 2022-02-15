@@ -2,7 +2,7 @@
 
 @section('consulta-active', 'active')
 @section('consulta-alertas-active', 'active')
-@section('consulta-ventas-alertas-envio-active', 'active')
+@section('consulta-ventas-alertas-regularize-active', 'active')
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-12 col-md-12">
