@@ -2,7 +2,7 @@
 
     <li class="dropdown">
         <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-            <i class="fa fa-bell"></i>  <span class="label label-primary" v-if="notifyCount > 0">{{ notifyCount }}</span>
+            <i class="fa fa-bell"></i>  <span class="label label-danger" v-if="notifyCount > 0">{{ notifyCount }}</span>
         </a>
         <ul class="dropdown-menu dropdown-alerts list-alerts">
             <li v-if="lstNotifyEnvio.length > 0">
