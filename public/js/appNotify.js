@@ -57373,7 +57373,7 @@ var render = function() {
         _c("i", { staticClass: "fa fa-bell" }),
         _vm._v(" "),
         _vm.notifyCount > 0
-          ? _c("span", { staticClass: "label label-primary" }, [
+          ? _c("span", { staticClass: "label label-danger" }, [
               _vm._v(_vm._s(_vm.notifyCount))
             ])
           : _vm._e()

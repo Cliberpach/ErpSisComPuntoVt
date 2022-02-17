@@ -242,7 +242,7 @@ function loadTable()
                 render: function(data) {
                     let cadena = "";
 
-                    let dias = data.dias > 4 ? 0 : 4 - data.dias;
+                    var dias = data.dias > 4 ? 0 : 4 - data.dias;
 
                     if(data.code != '1033' && dias > 0)
                     {

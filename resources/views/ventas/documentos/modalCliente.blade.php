@@ -1,4 +1,4 @@
-<div class="modal inmodal" id="modal_cliente" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal inmodal" id="modal_cliente" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content animated bounceInRight">
             <div class="modal-header">
@@ -25,24 +25,24 @@
                                                 <option value="{{ $tipo_documento->simbolo }}">{{ $tipo_documento->simbolo }}</option>
                                             @endforeach
                                         </select>
-                                       
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <div class="form-group">
                                         <label class="required" for="documento">Nro. Documento</label>
-        
+
                                         <div class="input-group">
                                             <input type="text" id="documento" name="documento"
                                                 class="form-control"
                                                 maxlength="8" onkeypress="return isNumber(event)" required>
                                             <span class="input-group-append"><a style="color:white" class="btn btn-primary" onclick="consultarDocumento()"><i class="fa fa-search"></i> <span
                                                         id="entidad">Entidad</span></a></span>
-                                            
-        
+
+
                                         </div>
                                     </div>
-                                </div> 
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-12 col-md-6">
@@ -54,7 +54,7 @@
                                                 <option value="{{ $tipo_cliente->id }}">{{ $tipo_cliente->descripcion }}</option>
                                             @endforeach
                                         </select>
-                                        
+
                                     </div>
                                 </div>
                                 <input type="hidden" id="codigo_verificacion" name="codigo_verificacion">
@@ -62,7 +62,7 @@
                                     <div class="form-group">
                                         <label class="" for="activo">Estado</label>
                                         <input type="text" id="activo" name="activo" class="form-control text-center" value="SIN VERIFICAR" readonly>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -71,18 +71,18 @@
                                     <div class="form-group">
                                         <label class="required" id="lblNombre" for="nombre">Nombre</label>
                                         <input type="text" id="nombre" name="nombre" class="form-control" maxlength="191" onkeyup="return mayus(this)" required>
-                                        
+
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label for="direccion" class="required">Dirección Fiscal</label>
                                         <input type="text" id="direccion" name="direccion" class="form-control" value="Direccion Trujillo" maxlength="191" onkeyup="return mayus(this)" required>
-                                        
+
                                     </div>
                                 </div>
                             </div>
-                        </div> 
+                        </div>
                         <div class="col-12 col-md-6">
                             <div class="row">
                                 <div class="col-12 col-md-6">
@@ -96,7 +96,7 @@
                                                 <option value="{{ $departamento->id }}">{{ $departamento->nombre }}</option>
                                             @endforeach
                                         </select>
-                                        
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
@@ -110,7 +110,7 @@
                                                 <option value="{{ $provincia->id }}">{{ $provincia->nombre }}</option>
                                             @endforeach
                                         </select>
-                                       
+
                                     </div>
                                 </div>
                             </div>
@@ -141,7 +141,7 @@
                                     <div class="form-group">
                                         <label for="telefono_movil" class="required">Teléfono móvil</label>
                                         <input type="text" id="telefono_movil" name="telefono_movil" class="form-control" onkeypress="return isNroPhone(event)" maxlength="9" value="999999999" required>
-                                        
+
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
@@ -157,7 +157,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>                      
+                        </div>
                     </div>
                 </form>
             </div>
@@ -345,7 +345,7 @@
                                 if (!response.ok) {
                                     throw new Error(response.statusText)
                                 }
-                                
+
                                 return response.json();
                             })
                             .catch(error => {
@@ -638,8 +638,8 @@
                     if (respuesta.result === 'success') {
                         document.getElementById('frmCliente').reset();
                         let cliente = respuesta.cliente;
-                        obtenerClientes_(cliente);                 
-                        $('#modal_cliente').modal('hide'); 
+                        obtenerClientes_(cliente);
+                        $('#modal_cliente').modal('hide');
                     }
                     let mensaje = sHtmlErrores(respuesta.data.mensajes);
                     toastr[respuesta.result](mensaje);
@@ -680,7 +680,7 @@
                         success: function(data) {
                             timerInterval = 0;
                             Swal.resumeTimer();
-                            
+
                             clientes_global = data.clientes;
                             if (data.clientes.length > 0) {
                                 $('#cliente_id').append('<option></option>').trigger('change');
@@ -693,14 +693,14 @@
 
                                 if(cliente.tipo_documento === 'RUC')
                                 {
-                                    //$('#tipo_venta').val("127").trigger("change"); 
-                                    $('#cliente_id').val(cliente.id).trigger("change"); 
+                                    //$('#tipo_venta').val("127").trigger("change");
+                                    $('#cliente_id').val(cliente.id).trigger("change");
                                 }
                                 else
                                 {
-                                    //$('#tipo_venta').val("128").trigger("change"); 
-                                    $('#cliente_id').val(cliente.id).trigger("change"); 
-                                }      
+                                    //$('#tipo_venta').val("128").trigger("change");
+                                    $('#cliente_id').val(cliente.id).trigger("change");
+                                }
                             } else {
                                 toastr.error('Clientes no encontrados.', 'Error');
                             }

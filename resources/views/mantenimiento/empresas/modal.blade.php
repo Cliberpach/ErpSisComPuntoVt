@@ -1,4 +1,4 @@
-<div class="modal inmodal" id="modal_agregar_entidad" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal inmodal" id="modal_agregar_entidad" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content animated bounceInRight">
             <div class="modal-header">
@@ -92,7 +92,7 @@
     </div>
 </div>
 
-<div class="modal inmodal" id="modal_editar_entidad" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal inmodal" id="modal_editar_entidad" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content animated bounceInRight">
             <div class="modal-header">
@@ -185,7 +185,7 @@
     </div>
 </div>
 
-<div class="modal inmodal" id="modal_certificado" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal inmodal" id="modal_certificado" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content animated bounceInRight">
             <div class="modal-header">
@@ -250,7 +250,7 @@
     </div>
 </div>
 
-<div class="modal inmodal" id="modal_numeracion_facturacion" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal inmodal" id="modal_numeracion_facturacion" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content animated bounceInRight">
             <div class="modal-header">

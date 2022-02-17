@@ -54,27 +54,46 @@ class DocumentoController extends Controller
 
     public function getDocument(){
 
-        /*$documentos = DB::table('cotizacion_documento')
+        $documentos = DB::table('cotizacion_documento')
         ->join('tabladetalles','tabladetalles.id','=','cotizacion_documento.tipo_venta')
-        ->join('condicions','condicions.id','=')
+        ->join('condicions','condicions.id','=','cotizacion_documento.condicion_id')
         ->select(
             'cotizacion_documento.id',
             'tabladetalles.nombre as tipo_venta',
             'cotizacion_documento.tipo_venta as tipo_venta_id',
             DB::raw('(CONCAT(cotizacion_documento.serie, "-" ,cotizacion_documento.correlativo)) as numero_doc'),
+            'cotizacion_documento.serie',
+            'cotizacion_documento.correlativo',
             'cotizacion_documento.cliente',
             'cotizacion_documento.empresa',
             'cotizacion_documento.cliente_id',
             'cotizacion_documento.empresa_id',
-
+            'cotizacion_documento.cotizacion_venta',
+            'cotizacion_documento.fecha_documento',
+            'cotizacion_documento.estado_pago',
+            'condicions.descripcion as condicion',
+            'cotizacion_documento.condicion_id',
+            'cotizacion_documento.sunat',
+            'cotizacion_documento.regularize',
+            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code'),
+            'cotizacion_documento.total',
+            DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
+            DB::raw('(select count(id) from nota_electronica where documento_id = cotizacion_documento.id) as notas')
         )
         ->where('cotizacion_documento.estado','!=','ANULADO');
 
+        if(!PuntoVenta() && !FullAccess())
+        {
+            $documentos = $documentos->where('user_id',Auth::user()->id);
+        }
+
+        $documentos = $documentos->orderBy('id', 'desc');
+
         return datatables()->query(
             $documentos
-        )->toJson();*/
+        )->toJson();
 
-        $documentos = [];
+        /*$documentos = [];
         if(FullAccess())
         {
 
@@ -160,7 +179,7 @@ class DocumentoController extends Controller
             ]);
         }
 
-        return DataTables::of($coleccion)->toJson();
+        return DataTables::of($coleccion)->toJson();*/
     }
 
     public function getDocumentClient(Request $request)

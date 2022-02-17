@@ -36,14 +36,6 @@
                             <thead>
                                 <tr>
 
-                                    <th colspan="2" class="text-center"></th>
-                                    <th colspan="5" class="text-center">DOCUMENTO DE VENTA</th>
-                                    <th colspan="4" class="text-center">FORMAS DE PAGO</th>
-                                    <th colspan="4" class="text-center"></th>
-
-                                </tr>
-                                <tr>
-
                                     <th style="display:none;"></th>
                                     <th class="text-center">C.O</th>
                                     <th class="text-center"># DOC</th>
@@ -51,10 +43,8 @@
                                     <th class="text-center">TIPO</th>
                                     <th class="text-center">CLIENTE</th>
                                     <th class="text-center">MONTO</th>
-                                    <th class="text-center">TRANSF.</th>
-                                    <th class="text-center">OTROS</th>
-                                    <th class="text-center">EFECT.</th>
                                     <th class="text-center">TIEMPO</th>
+                                    <th class="text-center">MODO</th>
                                     <th class="text-center">ESTADO</th>
                                     <th class="text-center">SUNAT</th>
                                     <th class="text-center">DESCARGAS</th>
@@ -174,8 +164,9 @@ $(document).ready(function() {
         "columns": [
             //DOCUMENTO DE VENTA
             {
-                data: 'cotizacion_venta',
+                data: 'id',
                 className: "text-center letrapequeña",
+                name: 'cotizacion_documento.id',
                 visible: false
             },
 
@@ -193,76 +184,75 @@ $(document).ready(function() {
             },
 
             {
-                data: 'numero_doc',
+                data: null,
                 className: "text-center letrapequeña",
+                render: function(data) {
+                    return data.numero_doc
+                }
             },
 
             {
                 data: 'fecha_documento',
-                className: "text-center letrapequeña"
+                className: "text-center letrapequeña",
+                name: 'cotizacion_documento.fecha_documento'
             },
 
             {
-                data: 'tipo_venta',
+                data: 'tipo_venta_id',
                 className: "text-center letrapequeña",
+                name: 'cotizacion_documento.condicion_id',
                 visible: false
             },
 
             {
                 data: 'cliente',
-                className: "text-left letrapequeña"
+                className: "text-left letrapequeña",
+                name: 'cotizacion_documento.cliente'
             },
-
             {
                 data: 'total',
-                className: "text-center letrapequeña"
+                className: "text-center letrapequeña",
+                name: 'cotizacion_documento.total'
             },
             {
-                data: 'transferencia',
-                className: "text-center letrapequeña"
-            },
-
-            {
-                data: 'otros',
-                className: "text-center letrapequeña"
+                data: null,
+                className: "text-center letrapequeña",
+                render: function(data){
+                    return data.dias > 4 ? 0 : 4 - data.dias;
+                }
             },
             {
-                data: 'efectivo',
-                className: "text-center letrapequeña"
+                data: 'condicion',
+                className: "text-center letrapequeña",
+                name: 'condicions.descripcion'
             },
-            {
-                data: 'dias',
-                className: "text-center letrapequeña"
-            },
-
             {
                 data: null,
                 className: "text-center letrapequeña",
                 render: function(data) {
-                    switch (data.estado) {
+                    switch (data.estado_pago) {
                         case "PENDIENTE":
-                            return "<span class='badge badge-danger' d-block>" + data.estado +
+                            return "<span class='badge badge-danger' d-block>" + data.estado_pago+
                                 "</span>";
                             break;
                         case "PAGADA":
-                            return "<span class='badge badge-primary verPago' style='cursor: pointer;' d-block>" + data.estado +
+                            return "<span class='badge badge-primary verPago' style='cursor: pointer;' d-block>" + data.estado_pago+
                                 "</span>";
                             break;
                         case "ADELANTO":
-                            return "<span class='badge badge-success' d-block>" + data.estado +
+                            return "<span class='badge badge-success' d-block>" + data.estado_pago+
                                 "</span>";
                             break;
                         case "DEVUELTO":
-                            return "<span class='badge badge-warning' d-block>" + data.estado +
+                            return "<span class='badge badge-warning' d-block>" + data.estado_pago+
                                 "</span>";
                             break;
                         default:
-                            return "<span class='badge badge-success' d-block>" + data.estado +
+                            return "<span class='badge badge-success' d-block>" + data.estado_pago+
                                 "</span>";
                     }
                 },
             },
-
             {
                 data: null,
                 className: "text-center letrapequeña",
@@ -301,9 +291,11 @@ $(document).ready(function() {
                     var url_edit = '{{ route("ventas.documento.edit", ":id")}}';
                     url_edit = url_edit.replace(':id', data.id);
 
+                    var dias = data.dias > 4 ? 0 : 4 - data.dias;
+
                     let cadena = "";
 
-                    if(data.sunat == '0' && data.tipo_venta_id != 129 && data.dias > 0) //&& data.dias > 0
+                    if(data.sunat == '0' && data.tipo_venta_id != 129 && dias > 0) //&& data.dias > 0
                     {
                         cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }
@@ -320,25 +312,25 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>";
                     }
 
-                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado == 'PAGADA')
+                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado_pago == 'PAGADA')
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_devolucion +"'  title='Devoluciones'><i class='fa fa-file-o'></i> Devoluciones</a>" ;
                     }
 
-                    if(data.tipo_venta_id == 129 && data.estado == 'PENDIENTE')
+                    if(data.tipo_venta_id == 129 && data.estado_pago == 'PENDIENTE')
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_edit +"'  title='Editar'><i class='fa fa-pencil'></i> Editar</a>" ;
                     }
 
-                    if((data.sunat == '2' && data.tipo_venta_id == 129) || (data.tipo_venta_id == 129 && data.estado == 'PENDIENTE'))
+                    if((data.sunat == '2' && data.tipo_venta_id == 129) || (data.tipo_venta_id == 129 && data.estado_pago == 'PENDIENTE'))
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
                     }
 
-                    if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')
+                    if(data.condicion == 'CONTADO' && data.estado_pago == 'PENDIENTE')
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
