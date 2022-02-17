@@ -9,6 +9,7 @@ use App\Exports\GuiaExport;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Empresa;
+use App\Mantenimiento\Persona\Persona;
 use App\Ventas\Cliente;
 use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
@@ -20,18 +21,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use stdClass;
 
 class DocumentoController extends Controller
 {
     public function index()
     {
-        return view('consultas.documentos.index');
+        $auxs = Persona::where('estado','ACTIVO')->get();
+        $users = [];
+        foreach($auxs as $user)
+        {
+            if($user->user_persona && $user->colaborador)
+            {
+                $user_aux = new stdClass();
+                $user_aux->id = $user->user_persona->user->id;
+                $user_aux->name = $user->getApellidosYNombres();
+
+                array_push($users,$user_aux);
+            }
+        }
+        return view('consultas.documentos.index',compact('users'));
     }
 
     public function getTable(Request $request){
 
         try{
             $tipo = $request->tipo;
+            $user = $request->user;
             $fecha_desde = $request->fecha_desde;
             $fecha_hasta = $request->fecha_hasta;
 
@@ -43,6 +59,11 @@ class DocumentoController extends Controller
                 if($fecha_desde && $fecha_hasta)
                 {
                     $consulta = $consulta->whereBetween('fecha_documento', [$fecha_desde, $fecha_hasta]);
+                }
+
+                if($user)
+                {
+                    $consulta = $consulta->where('user_id',$user);
                 }
 
                 $consulta = $consulta->orderBy('id', 'desc')->get();
@@ -74,6 +95,11 @@ class DocumentoController extends Controller
                 if($fecha_desde && $fecha_hasta)
                 {
                     $consulta = $consulta->whereBetween('fecha_documento', [$fecha_desde, $fecha_hasta]);
+                }
+
+                if($user)
+                {
+                    $consulta = $consulta->where('user_id',$user);
                 }
 
                 $consulta = $consulta->orderBy('id', 'asc')->get();
@@ -130,6 +156,11 @@ class DocumentoController extends Controller
                 if($fecha_desde && $fecha_hasta)
                 {
                     $ventas = $ventas->whereBetween('fecha_documento', [$fecha_desde, $fecha_hasta]);
+                }
+
+                if($user)
+                {
+                    $ventas = $ventas->where('user_id',$user);
                 }
 
                 $ventas = $ventas->orderBy('id', 'asc')->get();
@@ -280,12 +311,13 @@ class DocumentoController extends Controller
         $tipo = $request->tipo;
         $fecha_desde = $request->fecha_desde;
         $fecha_hasta = $request->fecha_hasta;
+        $user = $request->user;
         if($tipo == 132)
         {
             return  Excel::download(new GuiaExport($fecha_desde,$fecha_hasta), 'GUIAS_'.$fecha_desde.'-'.$fecha_hasta.'.xlsx');
         }
         else {
-            return  Excel::download(new DocumentosExport($tipo,$fecha_desde,$fecha_hasta), 'INFORME_'.$fecha_desde.'-'.$fecha_hasta.'.xlsx');
+            return  Excel::download(new DocumentosExport($tipo,$fecha_desde,$fecha_hasta,$user), 'INFORME_'.$fecha_desde.'-'.$fecha_hasta.'.xlsx');
         }
     }
 }

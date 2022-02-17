@@ -54,6 +54,26 @@ class DocumentoController extends Controller
 
     public function getDocument(){
 
+        /*$documentos = DB::table('cotizacion_documento')
+        ->join('tabladetalles','tabladetalles.id','=','cotizacion_documento.tipo_venta')
+        ->join('condicions','condicions.id','=')
+        ->select(
+            'cotizacion_documento.id',
+            'tabladetalles.nombre as tipo_venta',
+            'cotizacion_documento.tipo_venta as tipo_venta_id',
+            DB::raw('(CONCAT(cotizacion_documento.serie, "-" ,cotizacion_documento.correlativo)) as numero_doc'),
+            'cotizacion_documento.cliente',
+            'cotizacion_documento.empresa',
+            'cotizacion_documento.cliente_id',
+            'cotizacion_documento.empresa_id',
+
+        )
+        ->where('cotizacion_documento.estado','!=','ANULADO');
+
+        return datatables()->query(
+            $documentos
+        )->toJson();*/
+
         $documentos = [];
         if(FullAccess())
         {

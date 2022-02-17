@@ -21,7 +21,7 @@
     <div class="row">
         <div class="col-12">
             <div class="row align-items-end">
-                <div class="col-12 col-md-4">
+                <div class="col-12 col-md-3">
                     <div class="form-group">
                         <label for="tipo_id">Documento</label>
                         <select name="tipo_id" id="tipo_id" class="select2_form form-control">
@@ -36,11 +36,22 @@
                 </div>
                 <div class="col-12 col-md-3">
                     <div class="form-group">
+                        <label for="user_id">Usuario</label>
+                        <select name="user_id" id="user_id" class="select2_form form-control">
+                            <option value=""></option>
+                            @foreach($users as $user)
+                                <option value="{{$user->id}}">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 col-md-2">
+                    <div class="form-group">
                         <label for="fecha_desde">Fecha desde</label>
                         <input type="date" id="fecha_desde" class="form-control">
                     </div>
                 </div>
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-2">
                     <div class="form-group">
                         <label for="fecha_desde">Fecha hasta</label>
                         <input type="date" id="fecha_hasta" class="form-control">
@@ -126,6 +137,7 @@
         var fecha_desde = $('#fecha_desde').val();
         var fecha_hasta = $('#fecha_hasta').val();
         var tipo = $('#tipo_id').val();
+        var user = $('#user_id').val();
 
         if (tipo == '') {
             verificar = false;
@@ -146,7 +158,6 @@
             verificar = false;
             toastr.error('Fecha desde debe ser menor que fecha hasta');
         }
-        console.log(tipo)
 
         if(verificar)
         {
@@ -166,7 +177,7 @@
                         dataType : 'json',
                         type : 'post',
                         url : '{{ route('consultas.documento.getTable') }}',
-                        data : {'_token' : $('input[name=_token]').val(), 'fecha_desde' : fecha_desde, 'fecha_hasta' : fecha_hasta, 'tipo' : tipo},
+                        data : {'_token' : $('input[name=_token]').val(), 'fecha_desde' : fecha_desde, 'fecha_hasta' : fecha_hasta, 'tipo' : tipo,'user': user},
                         success: function(response) {
                             if (response.success) {
                                 documentos = [];
@@ -308,6 +319,7 @@
         var fecha_desde = $('#fecha_desde').val();
         var fecha_hasta = $('#fecha_hasta').val();
         var tipo = $('#tipo_id').val();
+        var user = $('#user_id').val();
 
         if (tipo == '') {
             verificar = false;
@@ -331,7 +343,7 @@
 
         if(verificar)
         {
-            window.location = '/consultas/documentos/getDownload?fecha_desde='+fecha_desde+'&fecha_hasta='+fecha_hasta+'&tipo='+tipo;
+            window.location = '/consultas/documentos/getDownload?fecha_desde='+fecha_desde+'&fecha_hasta='+fecha_hasta+'&tipo='+tipo+'&user='+user;
         }
         return false;
     }

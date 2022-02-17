@@ -16,7 +16,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
 {
 
     use Exportable;
-    public $tipo,$fecha_desde,$fecha_hasta;
+    public $tipo,$user,$fecha_desde,$fecha_hasta;
 
     public function headings(): array
     {
@@ -48,11 +48,12 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
         return "Documentos";
     }
 
-    public function __construct($tipo,$fecha_desde,$fecha_hasta)
+    public function __construct($tipo,$fecha_desde,$fecha_hasta,$user)
     {
         $this->tipo = $tipo;
         $this->fecha_desde = $fecha_desde;
         $this->fecha_hasta = $fecha_hasta;
+        $this->user = $user;
     }
     /**
     * @return \Illuminate\Support\Collection
@@ -65,6 +66,11 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $consulta = $consulta->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
+            }
+
+            if($this->user)
+            {
+                $consulta = $consulta->where('user_id',$this->user);
             }
 
             $consulta = $consulta->orderBy('id', 'asc')->get();
@@ -123,6 +129,11 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                 $ventas = $ventas->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
             }
 
+            if($this->user)
+            {
+                $ventas = $ventas->where('user_id',$this->user);
+            }
+
             $ventas = $ventas->orderBy('id', 'asc')->get();
 
             $coleccion = collect();
@@ -176,6 +187,11 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $ventas = $ventas->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
+            }
+
+            if($this->user)
+            {
+                $ventas = $ventas->where('user_id',$this->user);
             }
 
             $ventas = $ventas->orderBy('id', 'asc')->get();
