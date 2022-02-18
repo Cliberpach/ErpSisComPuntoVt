@@ -593,6 +593,7 @@ class NoEnviadosController extends Controller
                 'compra_documento_detalles.precio_soles',
                 'compra_documento_detalles.precio as precio_compra',
                 'detalle_nota_ingreso.costo as precio_ingreso',
+                'detalle_nota_ingreso.costo_soles as precio_ingreso_soles',
                 'nota_ingreso.dolar as dolar_ingreso',
                 'compra_documento_detalles.precio_mas_igv_soles',
                 'lote_productos.*','productos.nombre',

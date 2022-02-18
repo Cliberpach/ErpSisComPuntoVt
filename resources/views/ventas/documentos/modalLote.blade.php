@@ -162,7 +162,6 @@
                 {
                     data: null,
                     className: "text-center",
-                    name:"compra_documento_detalles.precio_mas_igv_soles",
                     sWidth: '10%',
                     render: function(data) {
                         if (data.precio_compra == null) {
@@ -170,9 +169,9 @@
                             let precio = 0;
                             var precio_ = data.precio_ingreso;
                             let porcentaje = 0;
-                            let porcentaje_ = data.porcentaje_normal;
+                            let porcentaje_ = convertFloat(data.porcentaje_normal);
                             let precio_nuevo = 0;
-                            if(data.moneda_compra == 'DOLARES')
+                            if(data.moneda_ingreso == 'DOLARES')
                             {
                                 precio = precio_ * cambio;
                                 precio_nuevo = precio * (1 + (porcentaje_ / 100))
@@ -223,7 +222,6 @@
                 {
                     data: null,
                     className: "text-center",
-                    name:"compra_documento_detalles.precio_mas_igv_soles",
                     sWidth: '10%',
                     render: function(data) {
                         if (data.precio_compra == null) {
@@ -232,7 +230,7 @@
                             var precio_ = data.precio_ingreso;
                             let porcentaje_ = data.porcentaje_distribuidor;
                             let precio_nuevo = 0;
-                            if(data.moneda_compra == 'DOLARES')
+                            if(data.moneda_ingreso == 'DOLARES')
                             {
                                 precio = precio_ * cambio;
                                 precio_nuevo = precio * (1 + (porcentaje_ / 100))
@@ -288,7 +286,7 @@
                     sWidth: '5%',
                     render: function(data) {
                         if (data.precio_mas_igv_soles == null) {
-                            return data.precio_ingreso;
+                            return data.precio_ingreso_soles;
                         }else{
                             return convertFloat(data.precio_mas_igv_soles).toFixed(2);
                         }
@@ -366,7 +364,7 @@
             var precio_ = producto.precio_ingreso;
             let porcentaje_ = producto.porcentaje;
             let precio_nuevo = 0;
-            if(producto.moneda_compra == 'DOLARES')
+            if(producto.moneda_ingreso == 'DOLARES')
             {
                 precio = precio_ * cambio;
                 precio_nuevo = precio * (1 + (porcentaje_ / 100))

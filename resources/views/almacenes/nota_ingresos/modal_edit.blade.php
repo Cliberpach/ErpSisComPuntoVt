@@ -29,7 +29,7 @@
                         <div class="col-lg-6 col-xs-12">
                             <div class="form-group">
                                 <label class="required">Cantidad</label>
-                                <input type="text" id="cantidad" name="cantidad" class="form-control" onkeypress="return isNumber(event)"  required>
+                                <input type="text" id="cantidad" name="cantidad" class="form-control" onkeypress="return isNumber(event)" disabled  required>
                             </div>
                         </div>
                         <div class="col-lg-6 col-xs-12">
@@ -43,7 +43,7 @@
                         <div class="col-lg-6 col-xs-12">
                             <label class="">Lote</label>
                             <input type="text" name="lote" id="lote" class="form-control">
-                            <input type="hidden" name="detalle_id" id="detalle_id" class="form-control">
+                            <input type="text" name="detalle_id" id="detalle_id" class="form-control">
                         </div>
                     </div>
                     <input type="hidden" name="pro_id" id="prod_id">
@@ -177,7 +177,7 @@ function actualizarTabla(i) {
         fechavencimiento: $('#modal_editar_detalle #fechavencimiento').val(),
         producto_id:$( "#modal_editar_detalle #producto" ).val(),
         costo:convertFloat($( "#modal_editar_detalle #costo" ).val()).toFixed(4),
-        id:$( "#modal_editar_detalle #detalle_id" ).val()
+        id:$( "#modal_editar_detalle #detalle_id").val()
     }
     agregarTabla(detalle);
     $('#modal_editar_detalle').modal('hide');

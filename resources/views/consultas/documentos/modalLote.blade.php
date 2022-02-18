@@ -170,7 +170,7 @@ function obtenerLotesproductos(tipo_cliente) {
                         let porcentaje = 0;
                         let porcentaje_ = data.porcentaje_normal;
                         let precio_nuevo = 0;
-                        if(data.moneda_compra == 'DOLARES')
+                        if(data.moneda_ingreso == 'DOLARES')
                         {
                             precio = precio_ * cambio;
                             precio_nuevo = precio * (1 + (porcentaje_ / 100))
@@ -230,7 +230,7 @@ function obtenerLotesproductos(tipo_cliente) {
                         var precio_ = data.precio_ingreso;
                         let porcentaje_ = data.porcentaje_distribuidor;
                         let precio_nuevo = 0;
-                        if(data.moneda_compra == 'DOLARES')
+                        if(data.moneda_ingreso == 'DOLARES')
                         {
                             precio = precio_ * cambio;
                             precio_nuevo = precio * (1 + (porcentaje_ / 100))
@@ -285,7 +285,7 @@ function obtenerLotesproductos(tipo_cliente) {
                 sWidth: '5%',
                 render: function(data) {
                     if (data.precio_soles == null) {
-                        return '0.00';
+                        return data.precio_ingreso_soles;
                     }else{
                         return convertFloat(data.precio_soles).toFixed(2);
                     }
@@ -362,7 +362,7 @@ function evaluarPrecioigv(producto) {
         var precio_ = producto.precio_ingreso;
         let porcentaje_ = producto.porcentaje;
         let precio_nuevo = 0;
-        if(producto.moneda_compra == 'DOLARES')
+        if(producto.moneda_ingreso == 'DOLARES')
         {
             precio = precio_ * cambio;
             precio_nuevo = precio * (1 + (porcentaje_ / 100))
