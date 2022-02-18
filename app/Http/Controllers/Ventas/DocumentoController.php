@@ -801,6 +801,7 @@ class DocumentoController extends Controller
         $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->with(['lote','lote.producto'])->get();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
         $fullaccess = false;
+        $fecha_hoy = Carbon::now()->toDateString();
 
         if(count(Auth::user()->roles)>0)
         {
@@ -823,6 +824,7 @@ class DocumentoController extends Controller
             'productos' => $productos,
             'condiciones' => $condiciones,
             'fullaccess' => $fullaccess,
+            'fecha_hoy' => $fecha_hoy,
         ]);
     }
 
