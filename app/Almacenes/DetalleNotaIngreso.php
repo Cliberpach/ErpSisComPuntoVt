@@ -54,6 +54,10 @@ class DetalleNotaIngreso extends Model
             $lote->estado = '1';
             $lote->save();
 
+            $producto = Producto::findOrFail($detalle->producto_id);
+            $producto->precio_compra = $detalle->costo_soles;
+            $producto->update();
+
             $detalle->lote_id = $lote->id;
             $detalle->update();
 

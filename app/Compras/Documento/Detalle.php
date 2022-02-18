@@ -85,6 +85,8 @@ class Detalle extends Model
 
             //MOVIMIENTO
             $producto = Producto::findOrFail($detalle->producto_id);
+            $producto->precio_compra = $detalle->precio_soles;
+            $producto->update();
 
             $movimiento = new MovimientoAlmacen();
             $movimiento->almacen_final_id = $detalle->producto->almacen->id;

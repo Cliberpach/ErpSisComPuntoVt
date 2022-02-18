@@ -189,7 +189,7 @@ function loadTable()
                 extend: 'excelHtml5',
                 text: '<i class="fa fa-file-excel-o"></i> Excel',
                 titleAttr: 'Excel',
-                title: 'CONSULTA DOCUMENTO VENTA'
+                title: 'KARDEX-PRODUCTO'
             },
             {
                 titleAttr: 'Imprimir',

@@ -198,9 +198,9 @@ $(document).ready(function() {
             },
 
             {
-                data: 'tipo_venta_id',
+                data: 'tipo_venta',
                 className: "text-center letrapequeña",
-                name: 'cotizacion_documento.condicion_id',
+                name: 'tabladetalles.nombre',
                 visible: false
             },
 

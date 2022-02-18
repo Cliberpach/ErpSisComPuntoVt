@@ -4,6 +4,7 @@ namespace App\Ventas\Documento;
 
 use App\Almacenes\Kardex;
 use App\Almacenes\LoteProducto;
+use App\Almacenes\Producto;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
@@ -59,6 +60,10 @@ class Detalle extends Model
             $kardex->importe = $detalle->precio_nuevo * $detalle->cantidad;
             $kardex->stock = $detalle->lote->producto->stock;
             $kardex->save();
+
+            $producto = Producto::find($detalle->lote->producto_id);
+            $producto->precio_venta_minimo = $detalle->precio_unitario;
+            $producto->update();
 
         });
 

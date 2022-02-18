@@ -1043,7 +1043,7 @@ $(".enviar_producto").click(function() {
     }
     if ($('#precio').val() == '') {
 
-        toastr.error('Ingrese el Producto del Producto.', 'Error');
+        toastr.error('Ingrese el precio del Producto.', 'Error');
         enviar = false;
 
         $("#precio").addClass("is-invalid");

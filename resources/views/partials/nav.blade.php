@@ -226,7 +226,7 @@
         <li class="@yield('cuentas_x_pagar_reporte-active')"><a href="{{ route('reporte.cuentas.proveedor') }}">Cuentas por Pagar</a></li>
         @endcan
         @can('haveaccess','reporte_stock_valorizado.index')
-        <li class="@yield('stock_valorizado_reporte-active')"><a href="#">Stock Valorizado</a></li>
+        <li class="@yield('stock_valorizado_reporte-active')"><a href="{{ route('reporte.producto.stockvalorizado.index') }}">Stock Valorizado</a></li>
         @endcan
     </ul>
 </li>

@@ -644,6 +644,14 @@ function(){
 
     });
 
+    // Reportes - Producto - stock valorizado
+    Route::prefix('reportes/producto/stock-valorizado')->group(function(){
+
+        Route::get('index', 'Reportes\StockValorizadoController@index')->name('reporte.producto.stockvalorizado.index');
+        Route::get('getTable', 'Reportes\StockValorizadoController@getTable')->name('reporte.producto.stockvalorizado.getTable');
+
+    });
+
     // Reportes - Pos - CajaDiaria
     Route::prefix('reportes/pos')->group(function(){
 
