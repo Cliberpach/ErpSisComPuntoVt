@@ -595,6 +595,7 @@
     });
 
     $(document).ready(function() {
+        changeFormaPago();
         $(".select2_form").select2({
             placeholder: "SELECCIONAR",
             allowClear: true,
