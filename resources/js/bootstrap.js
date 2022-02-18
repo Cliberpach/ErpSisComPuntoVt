@@ -33,7 +33,7 @@ import Echo from 'laravel-echo';
 
 window.Pusher = require('pusher-js');
 
-/*En el servidor
+/*En el servidor*/
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: 'ASDASF2121',
@@ -43,9 +43,9 @@ window.Echo = new Echo({
     disableStats:true,
     enabledTransports: ['ws', 'wss'],
     //forceTLS:false,
-});*/
+});
 
-/*En el local*/
+/*En el local
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
@@ -54,6 +54,6 @@ window.Echo = new Echo({
     wsPort: 6001,
     forceTLS:false,
     disableStats: true,
-});
+});*/
 
 
