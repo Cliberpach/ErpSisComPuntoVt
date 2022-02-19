@@ -163,6 +163,7 @@
                     data: null,
                     className: "text-center",
                     sWidth: '10%',
+                    searchable: false,
                     render: function(data) {
                         if (data.precio_compra == null) {
                             let cambio = convertFloat(data.dolar_ingreso);
@@ -223,6 +224,7 @@
                     data: null,
                     className: "text-center",
                     sWidth: '10%',
+                    searchable: false,
                     render: function(data) {
                         if (data.precio_compra == null) {
                             let cambio = convertFloat(data.dolar_ingreso);
@@ -282,7 +284,7 @@
                 {
                     data: null,
                     className: "text-center",
-                    name:"compra_documento_detalles.precio_mas_igv_soles",
+                    searchable: false,
                     sWidth: '5%',
                     render: function(data) {
                         if (data.precio_mas_igv_soles == null) {

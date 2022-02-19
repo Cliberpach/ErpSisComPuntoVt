@@ -160,7 +160,7 @@ function obtenerLotesproductos(tipo_cliente) {
             {
                 data: null,
                 className: "text-center",
-                name:"compra_documento_detalles.precio_mas_igv_soles",
+                searchable: false,
                 sWidth: '10%',
                 render: function(data) {
                     if (data.precio_compra == null) {
@@ -221,7 +221,7 @@ function obtenerLotesproductos(tipo_cliente) {
             {
                 data: null,
                 className: "text-center",
-                name:"compra_documento_detalles.precio_mas_igv_soles",
+                searchable: false,
                 sWidth: '10%',
                 render: function(data) {
                     if (data.precio_compra == null) {
@@ -281,7 +281,7 @@ function obtenerLotesproductos(tipo_cliente) {
             {
                 data: null,
                 className: "text-center letrapequeña",
-                name:"compra_documento_detalles.precio_soles",
+                searchable: false,
                 sWidth: '5%',
                 render: function(data) {
                     if (data.precio_soles == null) {
