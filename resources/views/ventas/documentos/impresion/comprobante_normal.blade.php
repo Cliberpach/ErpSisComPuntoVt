@@ -211,7 +211,7 @@
                 </tr>
                 @endif
                 <tr>
-                    <td>USUARIO</td>
+                    <td>ATENDIDO POR</td>
                     <td>:</td>
                     <td class="text-uppercase">{{ $documento->user->user->persona ? $documento->user->user->persona->getApellidosYNombres() : $documento->user->usuario }}</td>
                 </tr>
