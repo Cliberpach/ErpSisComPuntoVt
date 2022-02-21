@@ -49,7 +49,8 @@
                         style="text-transform:uppercase">
                             <thead>
                                 <tr>
-                                    <th class="text-center" style="width: 30%;">PRODUCTO</th>
+                                    <th class="text-center" style="width: 20%;">PRODUCTO</th>
+                                    <th class="text-center" style="width: 10%;">CATEGORIA</th>
                                     <th class="text-center" style="width: 10%;">STOCK INI.</th>
                                     <th class="text-center" style="width: 10%;">COMPRAS</th>
                                     <th class="text-center" style="width: 10%;">INGRESOS</th>
@@ -215,6 +216,7 @@ function loadTable()
             //{ data: 'id',className: "text-center"},
 
             { data: 'nombre',className: "text-center"},
+            { data: 'categoria',className: "text-center"},
             { data: 'STOCKINI',className: "text-center"},
             { data: 'COMPRAS',className: "text-center"},
             { data: 'INGRESOS',className: "text-center"},
