@@ -35,6 +35,8 @@ class AlertaController extends Controller
         ->select(
             DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
             'cotizacion_documento.id',
+            'cotizacion_documento.serie',
+            'cotizacion_documento.correlativo',
             'cotizacion_documento.fecha_documento',
             'cotizacion_documento.estado',
             'tabladetalles.descripcion as tipo',
@@ -76,6 +78,8 @@ class AlertaController extends Controller
         ->select(
             DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
             'cotizacion_documento.id',
+            'cotizacion_documento.serie',
+            'cotizacion_documento.correlativo',
             'cotizacion_documento.fecha_documento',
             'cotizacion_documento.estado',
             'tabladetalles.descripcion as tipo',
