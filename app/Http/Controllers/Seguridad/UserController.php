@@ -54,6 +54,7 @@ class UserController extends Controller
 
         $rules = [
             'usuario' => 'required',
+            'colaborador_id' => 'required',
             'email' => ['required', Rule::unique('users','email')->where(function ($query) {
                 $query->whereIn('estado',["ACTIVO","ANULADO"]);
             })],
@@ -61,6 +62,7 @@ class UserController extends Controller
         ];
         $message = [
             'usuario.required' => 'El campo usuario es obligatorio.',
+            'colaborador_id.required' => 'El campo colaborador es obligatorio.',
             'email.required' => 'El campo email es obligatorio',
             'email.unique' => 'El campo email debe ser único',
             'password.required' => 'El campo contraseña  es obligatorio'
@@ -222,10 +224,34 @@ class UserController extends Controller
 
         $this->authorize('view',[$user,['user.edit','userown.edit']]);
 
-        $request->validate([
-            'usuario' => 'required|max:50|unique:users,usuario,'.$user->id,
-            'email' => 'required|max:50|unique:users,email,'.$user->id
-        ]);
+        // $request->validate([
+        //     'usuario' => 'required|max:50|unique:users,usuario,'.$user->id,
+        //     'colaborador_id' => 'required',
+        //     'email' => 'required|max:50|unique:users,email,'.$user->id
+        // ]);
+
+        $data = $request->all();
+
+        $rules = [
+            'usuario' => ['required', Rule::unique('users','usuario')->where(function ($query) {
+                $query->whereIn('estado',["ACTIVO","ANULADO"]);
+            })->ignore($id)],
+            'colaborador_id' => 'required',
+            'email' => ['required', Rule::unique('users','email')->where(function ($query) {
+                $query->whereIn('estado',["ACTIVO","ANULADO"]);
+            })->ignore($id)],
+            'password' => 'required'
+        ];
+        $message = [
+            'usuario.required' => 'El campo usuario es obligatorio.',
+            'colaborador_id.required' => 'El campo colaborador es obligatorio.',
+            'email.required' => 'El campo email es obligatorio',
+            'email.unique' => 'El campo email debe ser único',
+            'password.required' => 'El campo contraseña  es obligatorio'
+
+        ];
+
+        Validator::make($data, $rules, $message)->validate();
 
         if($request->password !== $request->confirm_password)
         {
