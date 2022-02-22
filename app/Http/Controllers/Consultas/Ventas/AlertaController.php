@@ -42,7 +42,9 @@ class AlertaController extends Controller
             'cotizacion_documento.total as monto',
             DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
             'cotizacion_documento.sunat',
-            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code')
+            'cotizacion_documento.getCdrResponse',
+            DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.code"))),"-") as code'),
+            DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.description"))),"-") as description')
         )
         ->orderBy('cotizacion_documento.id','DESC')
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
@@ -81,7 +83,9 @@ class AlertaController extends Controller
             'cotizacion_documento.total as monto',
             DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
             'cotizacion_documento.sunat',
-            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code')
+            'cotizacion_documento.getRegularizeResponse',
+            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code'),
+            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.description")) as description')
         )
         ->orderBy('cotizacion_documento.id','DESC')
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])

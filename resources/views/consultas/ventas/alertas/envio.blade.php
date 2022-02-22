@@ -36,6 +36,7 @@
                                     <th class="text-center">TIEMPO</th>
                                     <th class="text-center">ESTADO</th>
                                     <th class="text-center">SUNAT</th>
+                                    <th class="text-center">DESCRIPCION</th>
                                     <th class="text-center">DESCARGAS</th>
                                     <th class="text-center">ACCIONES</th>
                                 </tr>
@@ -225,6 +226,19 @@ function loadTable()
                             break;
                         default:
                             return "<span class='badge badge-success' d-block>REGISTRADO</span>";
+                    }
+                },
+            },
+            {
+                data: null,
+                className: "text-center letrapequeña",
+                render: function(data) {
+                    if(data.getCdrResponse)
+                    {
+                        return data.code + "-" + data.description;
+                    }
+                    else{
+                        return "-";
                     }
                 },
             },
