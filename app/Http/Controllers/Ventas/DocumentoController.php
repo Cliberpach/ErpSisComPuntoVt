@@ -38,6 +38,7 @@ use Exception;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 //CONVERTIR DE NUMEROS A LETRAS
 use Luecano\NumeroALetras\NumeroALetras;
 use stdClass;
@@ -66,6 +67,10 @@ class DocumentoController extends Controller
             'cotizacion_documento.correlativo',
             'cotizacion_documento.cliente',
             'cotizacion_documento.empresa',
+            'cotizacion_documento.importe',
+            'cotizacion_documento.efectivo',
+            'cotizacion_documento.tipo_pago_id',
+            'cotizacion_documento.ruta_pago',
             'cotizacion_documento.cliente_id',
             'cotizacion_documento.empresa_id',
             'cotizacion_documento.cotizacion_venta',
@@ -306,6 +311,98 @@ class DocumentoController extends Controller
             DB::rollBack();
             Session::flash('error',$e->getMessage());
             return redirect()->route('ventas.documento.index');
+        }
+    }
+
+    public function updatePago(Request $request)
+    {
+        try
+        {
+            DB::beginTransaction();
+            $data = $request->all();
+
+            $rules = [
+                'tipo_pago_id'=> 'required',
+                'efectivo'=> 'required',
+                'importe'=> 'required',
+
+            ];
+
+            $message = [
+                'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
+                'importe.required' => 'El campo importe es obligatorio.',
+                'efectivo.required' => 'El campo efectivo es obligatorio.'
+            ];
+
+            $validator =  Validator::make($data, $rules, $message);
+
+            if ($validator->fails()) {
+                $clase = $validator->getMessageBag()->toArray();
+                $cadena = "";
+                foreach($clase as $clave => $valor) {
+                    $cadena =  $cadena . "$valor[0] ";
+                }
+
+                Session::flash('error_store_pago',$cadena);
+                DB::rollBack();
+                return redirect()->route('ventas.documento.index');
+            }
+
+            $documento = Documento::find($request->venta_id);
+
+            $documento->tipo_pago_id = $request->get('tipo_pago_id');
+            $documento->importe = $request->get('importe');
+            $documento->efectivo = $request->get('efectivo');
+            $documento->estado_pago = 'PAGADA';
+            $documento->banco_empresa_id = $request->get('cuenta_id');
+            $ruta_pago = $documento->ruta_pago;
+            if($request->hasFile('imagen')){
+                //Eliminar Archivo anterior
+                if($ruta_pago)
+                {
+                    self::deleteImage($ruta_pago);
+                }
+                //Agregar nuevo archivo
+                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'pagos'))) {
+                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'pagos'));
+                }
+                $documento->ruta_pago = $request->file('imagen')->store('public/pagos');
+            }else{
+                if ($request->get('ruta_pago') == null || $request->get('ruta_pago') == "") {
+                    $documento->ruta_pago = "";
+                    if($ruta_pago)
+                    {
+                        self::deleteImage($ruta_pago);
+                    }
+                }
+            }
+            $documento->update();
+
+
+
+            DB::commit();
+            Session::flash('success','Pago editado con exito.');
+            return redirect()->route('ventas.documento.index');
+        }
+        catch(Exception $e)
+        {
+            DB::rollBack();
+            Session::flash('error',$e->getMessage());
+            return redirect()->route('ventas.documento.index');
+        }
+    }
+
+    public function deleteImage($ruta_pago)
+    {
+        try{
+            $sRutaImagenActual = str_replace('/storage', 'public', $ruta_pago);
+            $sNombreImagenActual = str_replace('public/', '', $sRutaImagenActual);
+            Storage::disk('public')->delete($sNombreImagenActual);
+            return array('success' => true,'mensaje' => 'Imagen eliminada');
+        }
+        catch(Exception $e)
+        {
+            return array('success' => false,'mensaje' => $e->getMessage());
         }
     }
 

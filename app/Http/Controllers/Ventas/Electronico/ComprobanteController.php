@@ -6,15 +6,18 @@ use App\Events\DocumentoNumeracion;
 use App\Events\NotifySunatEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Condicion;
+use App\Mantenimiento\Empresa\Empresa;
 use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Luecano\NumeroALetras\NumeroALetras;
 use stdClass;
 use Yajra\DataTables\Facades\DataTables;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class ComprobanteController extends Controller
 {
@@ -422,5 +425,51 @@ class ComprobanteController extends Controller
             return redirect()->route('ventas.documento.index');
         }
 
+    }
+
+    public function email(Request $request)
+    {
+        try
+        {
+            $id = $request->id;
+            $correo = $request->correo;
+            $documento = Documento::findOrFail($id);
+            $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->get();
+            $empresa = Empresa::first();
+            $legends = self::obtenerLeyenda($documento);
+            $legends = json_encode($legends,true);
+            $legends = json_decode($legends,true);
+
+            $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_normal',[
+                'documento' => $documento,
+                'detalles' => $detalles,
+                'moneda' => $documento->simboloMoneda(),
+                'empresa' => $empresa,
+                "legends" =>  $legends,
+                ])->setPaper('a4')->setWarnings(false);
+
+            Mail::send('ventas.documentos.mail.cliente_mail',compact("documento"), function ($mail) use ($pdf,$documento,$correo) {
+                $mail->to($correo);
+                $mail->subject($documento->nombreTipo());
+                $mail->attachdata($pdf->output(), $documento->serie.'-'.$documento->correlativo.'.pdf');
+                if($documento->tipo_venta != '129' && $documento->sunat == '1')
+                {
+                    $mail->attach(base_path().'/storage/app/public/cdr/R-'.$documento->serie.'-'.$documento->correlativo.'.zip');
+                }
+                $mail->from('facturacion@siscomfac.com','SiScOmFaC');
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'El correo se envio con exito.'
+            ]);
+        }
+        catch(Exception $e)
+        {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se puede conectar con el servidor, porfavor intentar nuevamente.'
+            ]);
+        }
     }
 }

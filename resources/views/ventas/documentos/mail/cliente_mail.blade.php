@@ -1,1 +1,1 @@
-<h4>{{ $documento->clienteEntidad->nombre}}</h4>
+<h4>COMPROBANTE ELECTRONICO</h4>

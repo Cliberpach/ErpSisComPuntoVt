@@ -5,6 +5,7 @@ use App\Almacenes\LoteProducto;
 use App\Events\NotifySunatEvent;
 use App\Events\VentasCajaEvent;
 use App\Http\Controllers\Almacenes\NotaSalidadController;
+use App\Mail\NotificacionFacturacionMail;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Pos\MovimientoCaja;
@@ -348,11 +349,12 @@ function(){
         Route::get('show/{id}','Ventas\DocumentoController@show')->name('ventas.documento.show');
         Route::get('reporte/{id}','Ventas\DocumentoController@report')->name('ventas.documento.reporte');
         Route::get('tipoPago/{id}','Ventas\DocumentoController@TypePay')->name('ventas.documento.tipo_pago.existente');
-        //Route::get('comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
-        Route::get('xml/{id}','Ventas\DocumentoController@xml')->name('ventas.documento.xml');
+        // Route::get('comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
+        // Route::get('xml/{id}','Ventas\DocumentoController@xml')->name('ventas.documento.xml');
 
         Route::post('getDocumentClient','Ventas\DocumentoController@getDocumentClient')->name('ventas.getDocumentClient');
         Route::post('/storePago', 'Ventas\DocumentoController@storePago')->name('ventas.documento.storePago');
+        Route::post('/updatePago', 'Ventas\DocumentoController@updatePago')->name('ventas.documento.updatePago');
         Route::post('/getCuentas', 'Ventas\DocumentoController@getCuentas')->name('ventas.documento.getCuentas');
 
         Route::post('cantidad', 'Ventas\DocumentoController@quantity')->name('ventas.documento.cantidad');
@@ -382,6 +384,7 @@ function(){
         Route::get('getVouchers','Ventas\Electronico\ComprobanteController@getVouchers')->name('ventas.getVouchers');
         Route::get('sunat/{id}','Ventas\Electronico\ComprobanteController@sunat')->name('ventas.documento.sunat');
         Route::get('cdr/{id}','Ventas\Electronico\ComprobanteController@cdr')->name('ventas.documento.cdr');
+        Route::post('/envio','Ventas\Electronico\ComprobanteController@email')->name('ventas.documento.envio');
     });
 
     //GUIAS DE REMISION
@@ -721,8 +724,37 @@ function(){
 });
 
 Route::get('ventas/documentos/comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
+Route::get('ventas/documentos/xml/{id}','Ventas\DocumentoController@xml')->name('ventas.documento.xml');
+Route::get('/buscar','BuscarController@index');
+Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
+
+    $documento = Documento::findOrFail(2);
+            $detalles = Detalle::where('documento_id',2)->where('estado','ACTIVO')->get();
+            $empresa = Empresa::first();
+            $legends = self::obtenerLeyenda($documento);
+            $legends = json_encode($legends,true);
+            $legends = json_decode($legends,true);
+
+            $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_normal',[
+                'documento' => $documento,
+                'detalles' => $detalles,
+                'moneda' => $documento->simboloMoneda(),
+                'empresa' => $empresa,
+                "legends" =>  $legends,
+                ])->setPaper('a4')->setWarnings(false);
+
+            Mail::send('ventas.documentos.mail.cliente_mail',compact("documento"), function ($mail) use ($pdf,$documento) {
+                $mail->to('ccubas@unitru.edu.pe');
+                $mail->subject($documento->nombreTipo());
+                $mail->attachdata($pdf->output(), $documento->serie.'-'.$documento->correlativo.'.pdf');
+                if($documento->tipo_venta != '129' && $documento->sunat == '1')
+                {
+                    $mail->attach(base_path().'/storage/app/public/cdr/R-'.$documento->serie.'-'.$documento->correlativo.'.zip');
+                }
+                $mail->from('facturacion@siscomfac.com','SiScOmFaC');
+            });
 
     return timeago('2022-02-11 08:43:04');
     $dato = 'Actualizar';

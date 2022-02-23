@@ -43,6 +43,7 @@ use App\Notifications\RegularizeNotification;
 use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use App\Ventas\Documento\Documento as DocumentoDocumento;
+use Luecano\NumeroALetras\NumeroALetras;
 
 // TABLAS-DETALLES
 
@@ -1637,6 +1638,21 @@ if (!function_exists('timeago')) {
                     $diff = round($diff);
                     return "Hace " . $diff . " " . $strTime[$i] . "(s)";
         }
+    }
+}
+
+if (!function_exists('obtenerLegend')) {
+    function obtenerLegend($documento) {
+        $formatter = new NumeroALetras();
+        $convertir = $formatter->toInvoice($documento->total, 2, 'SOLES');
+
+        //CREAR LEYENDA DEL COMPROBANTE
+        $arrayLeyenda = Array();
+        $arrayLeyenda[] = array(
+            "code" => "1000",
+            "value" => $convertir
+        );
+        return $arrayLeyenda;
     }
 }
 

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => 'smtp',
+    'default' =>  env('MAIL_MAILER', 'smtp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,11 +36,11 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
-            'host' => 'smtp.gmail.com',
-            'port' => 587,
-            'encryption' => 'tls',
-            'username' => 'developer.limpiecito@gmail.com',
-            'password' => 'hoqpexgqvrxfsocv',
+            'host' => env('MAIL_HOST','mail.siscomfac.com'),
+            'port' => env('MAIL_PORT', 587),
+            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
             'timeout' => null,
             'auth_mode' => null,
         ],
@@ -84,8 +84,8 @@ return [
     */
 
     'from' => [
-        'address' => 'developer.limpiecito@gmail.com',
-        'name' => 'CLIENTE EXAMPLE',
+        'address' => 'facturacion@siscomfac.com',
+        'name' => env('MAIL_FROM_NAME', 'SiScOmFaC'),
     ],
 
     /*

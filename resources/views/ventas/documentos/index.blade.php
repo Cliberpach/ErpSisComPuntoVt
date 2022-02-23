@@ -80,11 +80,24 @@
                             <b>Descargar A4</b>
                         </div>
                     </div>
-                    <div class="col-12 col-md-6 text-center">
+                    <div class="col-12 col-md-6 text-center mb-4">
                         <div class="form-group">
                             <button class="btn btn-info file-ticket"><i class="fa fa-file-o"></i></button><br>
                             <b>Descargar Ticket</b>
                         </div>
+                    </div>
+                    <br>
+                    <div class="col-12 mt-4">
+                        <form id="frm_envio">
+                            @csrf
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input type="hidden" id="id" name="id" placeholder="Id" class="form-control" required>
+                                    <input type="email" id="correo" name="correo" placeholder="Correo electrónico" class="form-control" required>
+                                    <span class="input-group-append"><button type="submit" class="btn btn-default"><i class="fa fa-envelope"></i> <span>Enviar</span></button></span>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -122,6 +135,7 @@
 <script src="{{asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js')}}"></script>
 <!-- Select2 -->
 <script src="{{ asset('Inspinia/js/plugins/select2/select2.full.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 $(document).ready(function() {
 
@@ -378,6 +392,8 @@ $(".dataTables-documento").on('click','.btn-pdf',function(){
     $('.descarga-title').html(data.serie + '-' + data.correlativo);
     $('.file-pdf').attr('onclick',fn_pdf);
     $('.file-ticket').attr('onclick',fn_ticket);
+    $('#correo').val('');
+    $('#id').val(data.id);
     $('#modal_descargas_pdf').modal('show');
 });
 
@@ -615,6 +631,7 @@ function enviarSunat(id , sunat) {
         confirmButtonColor: "#1ab394",
         confirmButtonText: 'Si, Confirmar',
         cancelButtonText: "No, Cancelar",
+        allowOutsideClick: false,
         // showLoaderOnConfirm: true,
     }).then((result) => {
         if (result.value) {
@@ -648,6 +665,44 @@ function enviarSunat(id , sunat) {
 
 }
 
+$('#frm_envio').on('submit', function(e){
+    e.preventDefault();
+    let timerInterval = 9999;
+    Swal.fire({
+        title: 'Enviando email...',
+        icon: 'info',
+        timer: 10,
+        customClass: {
+            container: 'my-swal'
+        },
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+            Swal.stopTimer();
+
+            let frm_envio = document.getElementById('frm_envio');
+            let formData = new FormData(frm_envio);
+
+            axios.post("{{ route('ventas.documento.envio') }}", formData).then((value) => {
+                let response = value.data;
+                if (response.success) {
+                    toastr.success(response.message);
+                    timerInterval = 0;
+                    $('#correo').val('');
+                    Swal.resumeTimer();
+                } else {
+                    toastr.success(response.message);
+                    timerInterval = 0;
+                    Swal.resumeTimer();
+                }
+            });
+        },
+        willClose: () => {
+            clearInterval(timerInterval)
+        }
+    });
+})
+
 $(".dataTables-documento").on('click','.pagar',function(){
     var data = $(".dataTables-documento").dataTable().fnGetData($(this).closest('tr'));
     $('.ventas-title').html(data.cliente);
@@ -662,6 +717,8 @@ $(".dataTables-documento").on('click','.verPago',function(){
     $('#modal_pago_show #monto_venta').val(data.total);
     $('#modal_pago_show #venta_id').val(data.id);
     $('#modal_pago_show #div_cuentas').addClass('d-none');
+
+    $('#modal_pago_show #ruta_pago').val(data.ruta_pago);
     if(data.ruta_pago)
     {
         let ruta = data.ruta_pago;
@@ -669,12 +726,16 @@ $(".dataTables-documento").on('click','.verPago',function(){
         ruta = 'storage'+ruta;
         let ruta_final = "{{asset(':ruta')}}";
         ruta_final = ruta_final.replace(':ruta', ruta);
-        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+        $inputPrevisualizacion = document.querySelector("#modal_pago_show #imagen_update");
+        $inputPrevisualizacion.src = ruta;
+        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
         $imagenPrevisualizacion.src = ruta_final;
+        $('#modal_pago_show .custom-file-label').addClass("selected").html(data.serie+'-'+data.correlativo+'.jpg');
     }
     else
     {
-        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+        $('#modal_pago_show #imagen_update').val('');
+        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
         $imagenPrevisualizacion.src = "{{asset('img/default.png')}}";
     }
 
@@ -683,8 +744,8 @@ $(".dataTables-documento").on('click','.verPago',function(){
         $('#modal_pago_show #div_cuentas').removeClass('d-none');
         initCuentasShow(data.empresa_id,data.cuenta_id);
     }
-    $('#modal_pago_show #modo_pago').val(data.tipo_pago).trigger('change.select2');
-    if(data.tipo_pago != 1)
+    $('#modal_pago_show #modo_pago').val(data.tipo_pago_id).trigger('change.select2');
+    if(data.tipo_pago_id != 1)
     {
         $('#modal_pago_show #efectivo').val(data.efectivo);
         $('#modal_pago_show #importe').val(data.importe);

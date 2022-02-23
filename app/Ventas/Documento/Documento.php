@@ -49,6 +49,7 @@ class Documento extends Model
 
         'estado',
         'estado_pago',
+        'ruta_pago',
 
         'convertir'
     ];
