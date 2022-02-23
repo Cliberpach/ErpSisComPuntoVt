@@ -733,7 +733,7 @@ Route::get('ruta', function () {
     $documento = Documento::findOrFail(2);
             $detalles = Detalle::where('documento_id',2)->where('estado','ACTIVO')->get();
             $empresa = Empresa::first();
-            $legends = self::obtenerLeyenda($documento);
+            $legends = obtenerLegend($documento);
             $legends = json_encode($legends,true);
             $legends = json_decode($legends,true);
 
