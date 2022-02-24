@@ -15,6 +15,12 @@
         border-radius: 10%;
     }
 
+    .imagen_update {
+        width: 200px;
+        height: 200px;
+        border-radius: 10%;
+    }
+
 </style>
 @stop
 @section('vue-js')

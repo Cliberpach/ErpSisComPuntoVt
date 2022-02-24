@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Reportes;
 
 use App\Almacenes\DetalleNotaIngreso;
 use App\Almacenes\DetalleNotaSalidad;
+use App\Almacenes\NotaIngreso;
 use App\Almacenes\Producto;
 use App\Compras\Documento\Detalle;
 use App\Http\Controllers\Controller;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductoController extends Controller
@@ -95,12 +98,91 @@ class ProductoController extends Controller
         foreach($ingresos as $ingreso) {
             $coleccion->push([
                 'origen' => $ingreso->nota_ingreso->origen,
+                'numero' => $ingreso->nota_ingreso->numero,
                 'destino' => $ingreso->nota_ingreso->destino,
                 'cantidad' => $ingreso->cantidad,
                 'costo' => $ingreso->costo_soles,
+                'nombre' => $ingreso->producto->nombre,
                 'total' => $ingreso->valor_ingreso,
+                'nota_ingreso_id' => $ingreso->nota_ingreso->id,
+                'id' => $ingreso->id,
+                'moneda' => $ingreso->nota_ingreso->moneda,
             ]);
         }
         return DataTables::of($coleccion)->make(true);
+    }
+
+    public function updateIngreso(Request $request)
+    {
+        DB::beginTransaction();
+        $data = $request->all();
+
+        $rules = [
+            'id'=> 'required',
+            'nota_ingreso_id'=> 'required',
+            'costo'=> 'required',
+
+        ];
+
+        $message = [
+            'id.required' => 'El id del detalle es obligatorio.',
+            'nota_ingreso_id.required' => 'El id de la nota de ingreso es obligatorio.',
+            'costo.required' => 'El campo costo es obligatorio.'
+        ];
+
+        $validator =  Validator::make($data, $rules, $message);
+
+        if ($validator->fails()) {
+            $clase = $validator->getMessageBag()->toArray();
+            $cadena = "";
+            foreach($clase as $clave => $valor) {
+                $cadena =  $cadena . "$valor[0] ";
+            }
+
+            Session::flash('error',$cadena);
+            DB::rollBack();
+            return redirect()->route('reporte.producto.informe');
+        }
+
+        $notaingreso = NotaIngreso::find($request->nota_ingreso_id);
+        $dolar = $notaingreso->dolar;
+        if($notaingreso->moneda == 'DOLARES')
+        {
+            $costo_soles = (float) $request->costo * (float) $dolar;
+
+            $costo_dolares = (float) $request->costo;
+        }
+        else
+        {
+            $costo_soles = (float) $request->costo;
+
+            $costo_dolares = (float) $request->costo / (float) $dolar;
+        }
+        $detalle = DetalleNotaIngreso::findOrFail($request->id);
+        $detalle->costo = $request->costo;
+        $detalle->costo_soles = $costo_soles;
+        $detalle->costo_dolares = $costo_dolares;
+        $detalle->valor_ingreso = $request->costo * $detalle->cantidad;
+        $detalle->update();
+
+        $notaingreso->total = $notaingreso->detalles->sum('valor_ingreso');
+        if($notaingreso->moneda == 'DOLARES')
+        {
+            $notaingreso->total_soles = (float) $notaingreso->detalles->sum('valor_ingreso') * (float) $dolar;
+
+            $notaingreso->total_dolares = (float) $notaingreso->detalles->sum('valor_ingreso');
+        }
+        else
+        {
+            $notaingreso->total_soles = (float) $notaingreso->detalles->sum('valor_ingreso');
+
+            $notaingreso->total_dolares = (float) $notaingreso->detalles->sum('valor_ingreso') / $dolar;
+        }
+
+        $notaingreso->update();
+
+        Session::flash('success', 'Se actualizo correctamente el costo de ingreso.');
+        DB::commit();
+        return redirect()->route('reporte.producto.informe');
     }
 }

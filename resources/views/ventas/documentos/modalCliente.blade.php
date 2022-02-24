@@ -382,8 +382,22 @@
                 var apellido_materno = objeto.value.data.apellido_materno;
                 var codigo_verificacion = objeto.value.data.codigo_verificacion;
 
+                var direccion = objeto.value.data.direccion_completa;
+                var departamento = objeto.value.data.ubigeo[0];
+                var provincia = objeto.value.data.ubigeo[1];
+                var distrito = objeto.value.data.ubigeo[2];
+
+                if (direccion != '-' && direccion != "NULL") {
+                    $('#direccion').val(direccion);
+                }
+
+                if(departamento && provincia && distrito)
+                {
+                    camposUbigeoApi(departamento, provincia, distrito);
+                }
+
                 var nombre = "";
-                if (nombres !== '-' && nombres !== "NULL") {
+                if (nombres != '-' && nombres != "NULL") {
                     nombre += nombres;
                 }
                 if (apellido_paterno !== '-' && apellido_paterno !== "NULL") {
@@ -392,6 +406,7 @@
                 if (apellido_materno !== '-' && apellido_materno !== "NULL") {
                     nombre += (nombre.length === 0) ? apellido_materno : ' ' + apellido_materno
                 }
+
                 $("#nombre").val(nombre);
                 $("#activo").val("ACTIVO");
                 if (codigo_verificacion !== '-' && codigo_verificacion !== "NULL") {

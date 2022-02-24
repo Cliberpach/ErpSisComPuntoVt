@@ -376,6 +376,7 @@ function(){
         Route::post('getDocumentClient','Ventas\CajaController@getDocumentClient')->name('ventas.caja.getDocumentClient');
 
         Route::post('/storePago', 'Ventas\CajaController@storePago')->name('ventas.caja.storePago');
+        Route::post('/updatePago', 'Ventas\CajaController@updatePago')->name('ventas.caja.updatePago');
     });
 
     //COMPROBANTES ELECTRONICOS
@@ -643,6 +644,7 @@ function(){
         Route::get('llenarVentas/{id}', 'Reportes\ProductoController@llenarVentas')->name('reporte.producto.llenarVentas');
         Route::get('llenarSalidas/{id}', 'Reportes\ProductoController@llenarSalidas')->name('reporte.producto.llenarSalidas');
         Route::get('llenarIngresos/{id}', 'Reportes\ProductoController@llenarIngresos')->name('reporte.producto.llenarIngresos');
+        Route::post('updateIngreso', 'Reportes\ProductoController@updateIngreso')->name('reporte.producto.updateIngreso');
         Route::get('getTable', 'Reportes\ProductoController@getTable')->name('reporte.producto.getTable');
 
     });
@@ -731,30 +733,30 @@ Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDoc
 Route::get('ruta', function () {
 
     $documento = Documento::findOrFail(2);
-            $detalles = Detalle::where('documento_id',2)->where('estado','ACTIVO')->get();
-            $empresa = Empresa::first();
-            $legends = obtenerLegend($documento);
-            $legends = json_encode($legends,true);
-            $legends = json_decode($legends,true);
+    $detalles = Detalle::where('documento_id',2)->where('estado','ACTIVO')->get();
+    $empresa = Empresa::first();
+    $legends = obtenerLegend($documento);
+    $legends = json_encode($legends,true);
+    $legends = json_decode($legends,true);
 
-            $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_normal',[
-                'documento' => $documento,
-                'detalles' => $detalles,
-                'moneda' => $documento->simboloMoneda(),
-                'empresa' => $empresa,
-                "legends" =>  $legends,
-                ])->setPaper('a4')->setWarnings(false);
+    $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_normal',[
+        'documento' => $documento,
+        'detalles' => $detalles,
+        'moneda' => $documento->simboloMoneda(),
+        'empresa' => $empresa,
+        "legends" =>  $legends,
+        ])->setPaper('a4')->setWarnings(false);
 
-            Mail::send('ventas.documentos.mail.cliente_mail',compact("documento"), function ($mail) use ($pdf,$documento) {
-                $mail->to('ccubas@unitru.edu.pe');
-                $mail->subject($documento->nombreTipo());
-                $mail->attachdata($pdf->output(), $documento->serie.'-'.$documento->correlativo.'.pdf');
-                if($documento->tipo_venta != '129' && $documento->sunat == '1')
-                {
-                    $mail->attach(base_path().'/storage/app/public/cdr/R-'.$documento->serie.'-'.$documento->correlativo.'.zip');
-                }
-                $mail->from('facturacion@siscomfac.com','SiScOmFaC');
-            });
+    Mail::send('ventas.documentos.mail.cliente_mail',compact("documento"), function ($mail) use ($pdf,$documento) {
+        $mail->to('ccubas@unitru.edu.pe');
+        $mail->subject($documento->nombreTipo());
+        $mail->attachdata($pdf->output(), $documento->serie.'-'.$documento->correlativo.'.pdf');
+        if($documento->tipo_venta != '129' && $documento->sunat == '1')
+        {
+            $mail->attach(base_path().'/storage/app/public/cdr/R-'.$documento->serie.'-'.$documento->correlativo.'.zip');
+        }
+        $mail->from('facturacion@siscomfac.com','SiScOmFaC');
+    });
 
     return timeago('2022-02-11 08:43:04');
     $dato = 'Actualizar';

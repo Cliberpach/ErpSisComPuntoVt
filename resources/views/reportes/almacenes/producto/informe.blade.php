@@ -153,6 +153,7 @@
                                     <th class="text-center">CANTIDAD</th>
                                     <th class="text-center">COSTO U.</th>
                                     <th class="text-center">TOTAL</th>
+                                    <th class="text-center">OPCIONES</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -199,7 +200,7 @@
         </div>
     </div>
 </div>
-
+@include('reportes.almacenes.producto.modalEditCosto')
 @stop
 @push('styles')
 <!-- DataTable -->
@@ -554,6 +555,13 @@
                 {data: 'cantidad',name:'cantidad', className: "letrapequeña"},
                 {data: 'costo',name:'costo', className: "letrapequeña"},
                 {data: 'total',name:'total', className: "letrapequeña"},
+                {
+                    data: null,
+                    className: "text-center letrapequeña",
+                    render: function(data){
+                        return "<button type='button' class='btn btn-sm btn-info editCosto'><i class='fa fa-pencil'></i></button>"
+                    }
+                },
             ],
             "language": {
                         "url": "{{asset('Spanish.json')}}"
@@ -627,5 +635,18 @@
         });
         return false;
     }
+
+    $(".dataTables-ingresos").on('click','.editCosto',function(){
+        var data = $(".dataTables-ingresos").dataTable().fnGetData($(this).closest('tr'));
+        $('#modal_costo_update .pago-title').html(data.nombre)
+        $('#modal_costo_update .pago-subtitle').html(data.numero);
+        $('#modal_costo_update #producto').val(data.nombre);
+        $('#modal_costo_update #detalle_id').val(data.id);
+        $('#modal_costo_update #nota_ingreso_id').val(data.nota_ingreso_id);
+        $('#modal_costo_update #moneda').val(data.moneda);
+        $('#modal_costo_update #costo').val(data.costo);
+        $('#modal_costo_update #total').val(data.total);
+        $('#modal_costo_update').modal('show');
+}   );
 </script>
 @endpush

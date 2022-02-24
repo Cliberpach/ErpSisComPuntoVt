@@ -280,7 +280,7 @@ class DocumentoController extends Controller
                     $cadena =  $cadena . "$valor[0] ";
                 }
 
-                Session::flash('error_store_pago',$cadena);
+                Session::flash('error',$cadena);
                 DB::rollBack();
                 return redirect()->route('ventas.documento.index');
             }
@@ -343,7 +343,7 @@ class DocumentoController extends Controller
                     $cadena =  $cadena . "$valor[0] ";
                 }
 
-                Session::flash('error_store_pago',$cadena);
+                Session::flash('error',$cadena);
                 DB::rollBack();
                 return redirect()->route('ventas.documento.index');
             }
@@ -408,7 +408,7 @@ class DocumentoController extends Controller
 
     public function getCuentas(Request $request)
     {
-        $cuentas = Banco::where('empresa_id',$request->empresa_id)->get();
+        $cuentas = Banco::where('empresa_id',$request->empresa_id)->where('estado','ACTIVO')->get();
         return response()->json([
             'success' => true,
             'cuentas' => $cuentas

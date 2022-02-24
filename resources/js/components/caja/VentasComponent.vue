@@ -291,55 +291,87 @@
                         <small class="font-bold pago-subtitle"></small>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-12 col-md-6 br">
-                                <div class="form-group d-none">
-                                    <label class="col-form-label required">Venta</label>
-                                    <input type="text" class="form-control" id="venta_id" name="venta_id" disabled>
-                                </div>
-                                <div class="form-group d-none">
-                                    <label class="col-form-label required">Tipo Pago</label>
-                                    <input type="text" class="form-control" id="tipo_pago_id" name="tipo_pago_id" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-form-label required">Monto</label>
-                                    <input type="text" class="form-control" id="monto_venta" name="monto_venta" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-form-label required">Efectivo</label>
-                                    <input type="text" value="0.00" class="form-control" id="efectivo" name="efectivo" disabled>
-                                </div>
-                                <div class="form-group">
+                        <form v-on:submit.prevent="updateFormularioPago()" id="update_pago_venta" method="POST" enctype="multipart/form-data">
+                            <div class="row">
+                                <div class="col-12 col-md-6 br">
+                                    <div class="form-group d-none">
+                                        <label class="col-form-label required">Venta</label>
+                                        <input type="text" class="form-control" v-model="form_show.venta_id" id="venta_id" name="venta_id" readonly>
+                                    </div>
+                                    <div class="form-group d-none">
+                                        <label class="col-form-label required">Tipo Pago</label>
+                                        <input type="text" class="form-control" v-model="form_show.tipo_pago_id" id="tipo_pago_id" name="tipo_pago_id" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-form-label required">Monto</label>
+                                        <input type="text" class="form-control" v-model="form_show.monto_venta" id="monto_venta" name="monto_venta" onkeypress="return filterFloat(event, this);" readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-form-label required">Efectivo</label>
+                                        <input type="text" class="form-control" v-model="form_show.efectivo" id="efectivo" name="efectivo" onkeypress="return filterFloat(event, this);" @keyup="changeEfectivoShow()">
+                                    </div>
+                                    <div class="form-group">
                                         <label class="col-form-label required">Modo de pago</label>
-                                        <input type="text" class="form-control" v-model="form_show.tipo_pago" disabled>
+                                        <v-select
+                                            :options="desc_pagos_show"
+                                            placeholder="SELECCIONAR"
+                                            v-model="tipo_pago_show"
+                                            @input="setSelectedPagoShow"
+                                        ></v-select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label  class="col-form-label required">Importe</label>
+                                        <input type="text" class="form-control" id="importe" v-model="form_show.importe" name="importe" onkeypress="return filterFloat(event, this);" @keyup="changeImporteShow()">
+                                    </div>
+                                     <div class="form-group d-none" id="div_cuentas">
+                                        <label class="col-form-label">Cuentas</label>
+                                        <v-select
+                                            :options="cuentas_show"
+                                            placeholder="SELECCIONAR"
+                                            v-model="cuenta_show"
+                                            @input="setSelectedCuentaShow"
+                                        ></v-select>
+                                    </div>
+                                    <div class="form-group d-none">
+                                        <label class="col-form-label required">Cuenta</label>
+                                        <input type="text" class="form-control" id="cuenta_id" name="cuenta_id" v-model="form_show.cuenta_id" readonly>
+                                    </div>
                                 </div>
-                                <div class="form-group">
-                                    <label  class="col-form-label required">Importe</label>
-                                    <input type="text" class="form-control" id="importe" name="importe" disabled>
-                                </div>
-                                <div class="form-group d-none" id="div_cuentas">
-                                    <label class="col-form-label">Cuentas</label>
-                                    <input type="text" class="form-control" v-model="form_show.cuenta" disabled>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <div class="form-group">
-                                    <label id="imagen_label">Imagen:</label>
-                                </div>
-                                <div class="form-group row justify-content-center">
-                                    <div class="col-6 align-content-center">
-                                        <div class="row justify-content-center">
-                                            <p>
-                                                <img class="imagen" src="/img/default.png" alt="IMG">
-                                            </p>
+                                <div class="col-12 col-md-6">
+                                    <div class="form-group">
+                                        <label id="imagen_label">Imagen:</label>
+                                        <div class="custom-file">
+                                            <input id="imagen_update" type="file" name="imagen" class="custom-file-input" accept="image/*" @change="changeImageShow()">
+
+                                            <label for="imagen" id="imagen_txt"
+                                                class="custom-file-label selected">Seleccionar</label>
+
+                                            <div class="invalid-feedback"><b><span id="error-imagen"></span></b></div>
+                                            <input type="hidden" name="ruta_pago" id="ruta_pago">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row justify-content-center">
+                                        <div class="col-6 align-content-center">
+                                            <div class="row justify-content-end">
+                                                <a href="javascript:void(0);" id="limpiar_imagen"  @click="limpiarImagenShow()">
+                                                    <span class="badge badge-danger">x</span>
+                                                </a>
+                                            </div>
+                                            <div class="row justify-content-center">
+                                                <p>
+                                                    <img class="imagen_update" alt="IMG">
+                                                    <input id="url_imagen" name="url_imagen" type="hidden" value="">
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="modal-footer">
                         <div class="col-md-6 text-right">
+                            <button type="submit" class="btn btn-primary btn-sm" form="update_pago_venta" :disabled="iEditando == 1"><i class="fa fa-pencil"></i> Editar</button>
                             <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
                         </div>
                     </div>
@@ -360,12 +392,16 @@ export default {
             tableVentas: null,
             ventas: [],
             desc_pagos: [],
+            desc_pagos_show: [],
             cuentas: [],
             cuentas_show: [],
             value_pagos: [],
+            value_pagos_show: [],
             options: [],
             tipo_pago: null,
+            tipo_pago_show: null,
             cuenta: null,
+            cuenta_show: null,
             form: {
                 venta_id: null,
                 tipo_pago_id: null,
@@ -378,15 +414,16 @@ export default {
             },
             form_show: {
                 venta_id: null,
-                tipo_pago: null,
+                tipo_pago_id: null,
                 importe: null,
-                efectivo: null,
+                efectivo: 0.00,
                 monto_venta: null,
-                cuenta: null,
+                cuenta_id: null,
                 image: null,
 
             },
-            iPagando: 0
+            iPagando: 0,
+            iEditando: 0
         };
     },
     mounted() {
@@ -395,6 +432,7 @@ export default {
         {
             let pago = {'code': $this.modospago[i].id, 'label': $this.modospago[i].descripcion}
             $this.desc_pagos.push(pago);
+            $this.desc_pagos_show.push(pago);
         }
 
         $this.loadTable();
@@ -439,42 +477,57 @@ export default {
 
         $this.table.on('click','.verPago',function(){
             let data = $this.table.row($(this).closest("tr")).data();
-            $('#modal_pago_show .pago-title').html(data.numero_doc);
-            $('#modal_pago_show #monto_venta').val(data.total);
-            $('#modal_pago_show #venta_id').val(data.id);
+           $('#modal_pago_show .pago-title').html(data.numero_doc);
             $('#modal_pago_show #div_cuentas').addClass('d-none');
-            let $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
-            console.log(data);
+
+            $('#modal_pago_show #ruta_pago').val(data.ruta_pago)
+
+            let pago = {
+                code: data.tipo_pago_id,
+                label: data.tipo_pago
+            }
+
+            let cuenta = {
+                code: data.banco_empresa_id,
+                label: data.banco_empresa
+            }
+
+            $this.setSelectedPagoShow(pago)
+            $this.setSelectedCuentaShow(cuenta)
+            $this.form_show.monto_venta = data.total
+            $this.form_show.venta_id = data.id
+            let $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
             if(data.ruta_pago)
             {
                 let ruta = data.ruta_pago;
                 ruta = ruta.replace('public','');
-                ruta = 'storage'+ruta;
-                let ruta_final = "/"+ruta;
-                ruta_final = ruta_final.replace(':ruta', ruta);
-                $imagenPrevisualizacion.src = ruta_final;
+                ruta = '/storage'+ruta;
+                let $inputPrevisualizacion = document.querySelector("#modal_pago_show #imagen_update");
+                $inputPrevisualizacion.src = ruta;
+                $imagenPrevisualizacion.src = ruta;
+                $('#modal_pago_show .custom-file-label').addClass("selected").html(data.serie+'-'+data.correlativo+'.jpg');
             }
             else
             {
-                $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+                $('#modal_pago_show #imagen_update').val('');
+                $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
                 $imagenPrevisualizacion.src = "/img/default.png";
             }
 
             if(data.cuenta_id)
             {
                 $('#modal_pago_show #div_cuentas').removeClass('d-none');
-                $this.form_show.cuenta = data.cuenta_desc;
+                $this.initCuentasShow(data.empresa_id,data.cuenta_id);
             }
-            $this.form_show.tipo_pago = data.tipo_pago_desc;
-            if(data.tipo_pago != 1)
+            if(data.tipo_pago_id != 1)
             {
-                $('#modal_pago_show #efectivo').val(data.efectivo);
-                $('#modal_pago_show #importe').val(data.importe);
+                $this.form_show.efectivo = data.efectivo;
+                $this.form_show.importe = data.importe;
             }
             else
             {
-                $('#modal_pago_show #efectivo').val('0.00');
-                $('#modal_pago_show #importe').val(data.importe);
+                $this.form_show.efectivo = 0.00;
+                $this.form_show.importe = data.importe;
             }
 
             $('#modal_pago_show .pago-subtitle').html(data.cliente);
@@ -865,12 +918,58 @@ export default {
                 }
             });
         },
+        initCuentasShow:function(empresa_id)
+        {
+            let $this = this;
+            $this.cuentas_show = [];
+            let timerInterval;
+            Swal.fire({
+                title: 'Cargando...',
+                icon: 'info',
+                customClass: {
+                    container: 'my-swal'
+                },
+                timer: 10,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    Swal.stopTimer();
+                    $.ajax({
+                        dataType : 'json',
+                        type : 'post',
+                        url : route('ventas.documento.getCuentas'),
+                        data : {'_token': $('input[name=_token]').val(), 'empresa_id': empresa_id},
+                        success: function(response) {
+                            if (response.success) {
+                                if (response.cuentas.length > 0) {
+                                    for(var i = 0;i < response.cuentas.length; i++)
+                                    {
+                                        let newOption = {'code': response.cuentas[i].id, 'label': response.cuentas[i].descripcion + ': ' + response.cuentas[i].num_cuenta};
+                                        $this.cuentas_show.push(newOption);
+                                    }
+
+                                } else {
+                                }
+                                timerInterval = 0;
+                                Swal.resumeTimer();
+                            } else {
+                                timerInterval = 0;
+                                Swal.resumeTimer();
+                            }
+                        }
+                    });
+                },
+                willClose: () => {
+                    clearInterval(timerInterval)
+                }
+            });
+        },
         setSelectedPago: function(value)
         {
             let $this = this;
             let monto = $this.form.monto_venta;
             let importe = $this.form.importe;
-            let efectivo = $this.efectivo;
+            let efectivo = $this.form.efectivo;
             let suma = convertFloat(importe) + convertFloat(efectivo);
             $this.cuenta = '';
             $this.form.cuenta_id = null;
@@ -898,6 +997,42 @@ export default {
             else
             {
                 $this.form.tipo_pago_id = null;
+            }
+
+        },
+        setSelectedPagoShow: function(value)
+        {
+            let $this = this;
+            let monto = $this.form_show.monto_venta;
+            let importe = $this.form_show.importe;
+            let efectivo = $this.form_show.efectivo;
+            let suma = convertFloat(importe) + convertFloat(efectivo);
+            $this.cuenta_show = '';
+            $this.form_show.cuenta_id = null;
+            $('#modal_pago_show #efectivo').attr('readonly', false);
+            $('#modal_pago_show #importe').attr('readonly', false);
+            if(value != null)
+            {
+                $this.form_show.tipo_pago_id = value.code;
+                $this.tipo_pago_show = value.label;
+                if(value.label == 'EFECTIVO')
+                {
+                    $('#modal_pago_show #efectivo').attr('readonly', true);
+                    $('#modal_pago_show #importe').attr('readonly', true);
+                    $this.form_show.efectivo = '0.00';
+                    $this.form_show.importe = monto;
+                }
+
+                if(value.label == 'TRANSFERENCIA')
+                {
+                    $('#modal_pago_show #div_cuentas').removeClass('d-none');
+                }else{
+                    $('#modal_pago_show #div_cuentas').addClass('d-none');
+                }
+            }
+            else
+            {
+                $this.form_show.tipo_pago_id = null;
             }
 
         },
@@ -992,16 +1127,98 @@ export default {
                 toastr.error(sHtmlMensaje);
             }).then(() => $this.iPagando = 0);
         },
-        comprobanteElectronico: function(id) {
-            var url = '{{ route("ventas.documento.comprobante", ":id")}}';
-            url = url.replace(':id',id+'-100');
-            window.open(url, "Comprobante SISCOM", "width=900, height=600")
+        changeEfectivoShow: function()
+        {
+            let $this = this;
+            let modo = $this.tipo_pago_show;
+            let monto = convertFloat($this.form_show.monto_venta);
+            let efectivo = convertFloat($this.form_show.efectivo);
+            let importe = $this.form_show.importe;
+            if(modo != 'EFECTIVO')
+            {
+                let diferencia = monto - efectivo;
+                $this.form_show.importe = diferencia.toFixed(2);
+            }
         },
-        comprobanteElectronicoTicket: function(id) {
-            var url = '{{ route("ventas.documento.comprobante", ":id")}}';
-            url = url.replace(':id',id+'-80');
-            window.open(url, "Comprobante SISCOM", "width=900, height=600");
-        }
+        changeImporteShow: function()
+        {
+            let $this = this;
+            let modo = $this.tipo_pago_show;
+            let monto = convertFloat($this.form_show.monto_venta);
+            let importe = convertFloat($this.form_show.importe);
+            let efectivo = $this.form_show.efectivo;
+            if(modo != 'EFECTIVO')
+            {
+                let diferencia = monto - importe;
+                $this.form_show.efectivo = diferencia.toFixed(2);
+            }
+        },
+        limpiarImagenShow: function()
+        {
+            $('.imagen_update').attr("src", "/img/default.png")
+            var fileName = "Seleccionar"
+            $('#modal_pago_show .custom-file-label').addClass("selected").html(fileName);
+            $('#imagen_update').val('')
+            $('#modal_pago_show #ruta_pago').val('')
+            this.form_show.image = null
+        },
+        changeImageShow: function()
+        {
+            var fileInput = document.getElementById('imagen_update');
+            var filePath = fileInput.value;
+            var allowedExtensions = /(.jpg|.jpeg|.png)$/i;
+            let $imagenPrevisualizacion = document.querySelector(".imagen_update");
+            if (allowedExtensions.exec(filePath)) {
+                var userFile = document.getElementById('imagen_update');
+                userFile.src = URL.createObjectURL(event.target.files[0]);
+                this.form_show.image = event.target.files[0]
+                console.log(this.form_show.image)
+                var data = userFile.src;
+                $imagenPrevisualizacion.src = data;
+                let fileName = $('#imagen_update').val().split('\\').pop();
+                $('#imagen_update').next('#modal_pago_show .custom-file-label').addClass("selected").html(fileName);
+            } else {
+                this.form_show.image = null
+                toastr.error('Extensión inválida, formatos admitidos (.jpg . jpeg . png)', 'Error');
+                $('.imagen_update').attr("src", "/img/default.png")
+            }
+        },
+        setSelectedCuentaShow: function(value)
+        {
+            let $this = this;
+            if(value != null)
+            {
+                $this.form_show.cuenta_id = value.code;
+                $this.cuenta_show = value.label;
+            }
+        },
+        updateFormularioPago: function()
+        {
+            let $this = this;
+            let frm = document.getElementById('update_pago_venta');
+            let formData = new FormData(frm);
+            formData.forEach(function(value, key){
+                console.log(key)
+                console.log(value);
+            });
+            $this.iEditando = 1;
+            axios.post(route('ventas.caja.updatePago'), formData)
+            .then(response => {
+                let respuesta = response.data;
+                if (respuesta.result == 'success') {
+                    toastr.success(respuesta.mensaje)
+                    location.reload()
+                } else {
+                    let sHtmlMensaje = sHtmlErrores(respuesta.data.errors);
+                    toastr.error(sHtmlMensaje);
+                    $this.iEditando = 0;
+                }
+            })
+            .catch(error => {
+                let sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
+                toastr.error(sHtmlMensaje);
+            }).then(() => $this.iEditando = 0);
+        },
     },
     updated() {
         this.$nextTick(function () {

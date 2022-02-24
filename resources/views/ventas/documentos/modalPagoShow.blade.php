@@ -84,7 +84,9 @@
             </div>
             <div class="modal-footer">
                 <div class="col-md-6 text-right">
+                    @if(PuntoVenta())
                     <button type="submit" class="btn btn-primary btn-sm" form="update_pago_venta"><i class="fa fa-pencil"></i> Editar</button>
+                    @endif
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
                 </div>
             </div>

@@ -238,6 +238,9 @@ class NotaIngresoController extends Controller
             'moneda' => 'SOLES',
             'tipo_cambio' => $dolar,
             'dolar' => $dolar,
+            'total' => $request->costo * $request->cantidad,
+            'total_soles' => $request->costo * $request->cantidad,
+            'total_dolares' => ($request->costo * $request->cantidad) / $dolar,
             'origen' => 'INGRESO RAPIDO',
             'usuario' => Auth()->user()->usuario
         ]);
@@ -375,10 +378,7 @@ class NotaIngresoController extends Controller
              $notaingreso->destino = $destino->descripcion;
         }
 
-        $dolar_aux = json_encode(precio_dolar(), true);
-        $dolar_aux = json_decode($dolar_aux, true);
-
-        $dolar = (float)$dolar_aux['original']['venta'];
+        $dolar = (float)$notaingreso->dolar;
 
         $origen = DB::table('tabladetalles')->where('id', $request->origen)->first();
         $notaingreso->origen = $origen->descripcion;

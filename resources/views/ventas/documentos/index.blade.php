@@ -691,7 +691,7 @@ $('#frm_envio').on('submit', function(e){
                     $('#correo').val('');
                     Swal.resumeTimer();
                 } else {
-                    toastr.success(response.message);
+                    toastr.error(response.message);
                     timerInterval = 0;
                     Swal.resumeTimer();
                 }

@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -65,7 +66,11 @@ class CajaController extends Controller
                 'tipo_venta' => $documento->nombreTipo(),
                 'tipo_venta_id' => $documento->tipo_venta,
                 'empresa' => $documento->empresaEntidad->razon_social,
-                'tipo_pago' => $documento->tipo_pago_id,
+                'tipo_pago_id' => $documento->tipo_pago_id,
+                'tipo_pago' => $documento->tipo_pago ? $documento->tipo_pago->descripcion : null,
+                'ruta_pago' => $documento->ruta_pago,
+                'banco_empresa_id' => $documento->banco_empresa_id,
+                'banco_empresa' => $documento->bancoPagado ? $documento->bancoPagado->descripcion : null,
                 'tipo_pago_desc' => $documento->tipo_pago_id ? $documento->tipo_pago->descripcion : '-',
                 'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
                 'serie' => $documento->serie,
@@ -87,10 +92,10 @@ class CajaController extends Controller
                 'sunat' => $documento->sunat,
                 'regularize' => $documento->regularize,
                 'code' => $code,
-                'otros' => 'S/. '.number_format($otros, 2, '.', ''),
-                'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
-                'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
-                'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
+                'otros' => $otros,
+                'efectivo' => $efectivo,
+                'transferencia' => $transferencia,
+                'total' => $documento->total,
                 'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
                 'notas' => $cantidad_notas
             ]);
@@ -234,6 +239,97 @@ class CajaController extends Controller
                 'mensaje' => 'Pago realizado exitosamente.',
                 'data' => array('errors' => array('error' => [$e->getMessage()])),
             ]);
+        }
+    }
+    public function updatePago(Request $request)
+    {
+        try
+        {
+            DB::beginTransaction();
+            $data = $request->all();
+
+            $rules = [
+                'tipo_pago_id'=> 'required',
+                'efectivo'=> 'required',
+                'importe'=> 'required',
+
+            ];
+
+            $message = [
+                'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
+                'importe.required' => 'El campo importe es obligatorio.',
+                'efectivo.required' => 'El campo efectivo es obligatorio.'
+            ];
+
+            $validator =  Validator::make($data, $rules, $message);
+
+            if ($validator->fails()) {
+                DB::rollBack();
+                return response()->json([
+                    'result' => 'warning',
+                    'mensaje' => 'Ocurrió un error de validación.',
+                    'data' => array('errors' => $validator->getMessageBag()->toArray()),
+                ]);
+            }
+
+            $documento = Documento::find($request->venta_id);
+
+            $documento->tipo_pago_id = $request->get('tipo_pago_id');
+            $documento->importe = $request->get('importe');
+            $documento->efectivo = $request->get('efectivo');
+            $documento->estado_pago = 'PAGADA';
+            $documento->banco_empresa_id = $request->get('cuenta_id');
+            $ruta_pago = $documento->ruta_pago;
+            if($request->hasFile('imagen')){
+                //Eliminar Archivo anterior
+                if($ruta_pago)
+                {
+                    self::deleteImage($ruta_pago);
+                }
+                //Agregar nuevo archivo
+                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'pagos'))) {
+                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'pagos'));
+                }
+                $documento->ruta_pago = $request->file('imagen')->store('public/pagos');
+            }else{
+                if ($request->get('ruta_pago') == null || $request->get('ruta_pago') == "") {
+                    $documento->ruta_pago = "";
+                    if($ruta_pago)
+                    {
+                        self::deleteImage($ruta_pago);
+                    }
+                }
+            }
+            $documento->update();
+
+            DB::commit();
+            return response()->json([
+                'result' => 'success',
+                'mensaje' => 'Pago actualizado exitosamente.',
+            ]);
+        }
+        catch(Exception $e)
+        {
+            DB::rollBack();
+            return response()->json([
+                'result' => 'error',
+                'mensaje' => 'Error al intentar actualizar pago',
+                'data' => array('errors' => array('error' => [$e->getMessage()])),
+            ]);
+        }
+    }
+
+    public function deleteImage($ruta_pago)
+    {
+        try{
+            $sRutaImagenActual = str_replace('/storage', 'public', $ruta_pago);
+            $sNombreImagenActual = str_replace('public/', '', $sRutaImagenActual);
+            Storage::disk('public')->delete($sNombreImagenActual);
+            return array('success' => true,'mensaje' => 'Imagen eliminada');
+        }
+        catch(Exception $e)
+        {
+            return array('success' => false,'mensaje' => $e->getMessage());
         }
     }
 }

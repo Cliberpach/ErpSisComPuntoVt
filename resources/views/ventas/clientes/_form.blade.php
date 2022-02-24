@@ -924,6 +924,20 @@
                 var apellido_materno = objeto.value.data.apellido_materno;
                 var codigo_verificacion = objeto.value.data.codigo_verificacion;
 
+                var direccion = objeto.value.data.direccion_completa;
+                var departamento = objeto.value.data.ubigeo[0];
+                var provincia = objeto.value.data.ubigeo[1];
+                var distrito = objeto.value.data.ubigeo[2];
+
+                if (direccion != '-' && direccion != "NULL") {
+                    $('#direccion').val(direccion);
+                }
+
+                if(departamento && provincia && distrito)
+                {
+                    camposUbigeoApi(departamento, provincia, distrito);
+                }
+
                 var nombre = "";
                 if (nombres !== '-' && nombres !== "NULL") {
                     nombre += nombres;

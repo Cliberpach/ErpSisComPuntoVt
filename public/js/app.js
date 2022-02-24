@@ -1947,6 +1947,42 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var datatables_net_bs4__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(datatables_net_bs4__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! datatables.net-buttons-bs4 */ "./node_modules/datatables.net-buttons-bs4/js/buttons.bootstrap4.js");
 /* harmony import */ var datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(datatables_net_buttons_bs4__WEBPACK_IMPORTED_MODULE_2__);
+var _methods;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2308,12 +2344,16 @@ __webpack_require__.r(__webpack_exports__);
       tableVentas: null,
       ventas: [],
       desc_pagos: [],
+      desc_pagos_show: [],
       cuentas: [],
       cuentas_show: [],
       value_pagos: [],
+      value_pagos_show: [],
       options: [],
       tipo_pago: null,
+      tipo_pago_show: null,
       cuenta: null,
+      cuenta_show: null,
       form: {
         venta_id: null,
         tipo_pago_id: null,
@@ -2325,14 +2365,15 @@ __webpack_require__.r(__webpack_exports__);
       },
       form_show: {
         venta_id: null,
-        tipo_pago: null,
+        tipo_pago_id: null,
         importe: null,
-        efectivo: null,
+        efectivo: 0.00,
         monto_venta: null,
-        cuenta: null,
+        cuenta_id: null,
         image: null
       },
-      iPagando: 0
+      iPagando: 0,
+      iEditando: 0
     };
   },
   mounted: function mounted() {
@@ -2344,6 +2385,7 @@ __webpack_require__.r(__webpack_exports__);
         'label': $this.modospago[i].descripcion
       };
       $this.desc_pagos.push(pago);
+      $this.desc_pagos_show.push(pago);
     }
 
     $this.loadTable();
@@ -2384,44 +2426,54 @@ __webpack_require__.r(__webpack_exports__);
     $this.table.on('click', '.verPago', function () {
       var data = $this.table.row($(this).closest("tr")).data();
       $('#modal_pago_show .pago-title').html(data.numero_doc);
-      $('#modal_pago_show #monto_venta').val(data.total);
-      $('#modal_pago_show #venta_id').val(data.id);
       $('#modal_pago_show #div_cuentas').addClass('d-none');
-      var $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
-      console.log(data);
+      $('#modal_pago_show #ruta_pago').val(data.ruta_pago);
+      var pago = {
+        code: data.tipo_pago_id,
+        label: data.tipo_pago
+      };
+      var cuenta = {
+        code: data.banco_empresa_id,
+        label: data.banco_empresa
+      };
+      $this.setSelectedPagoShow(pago);
+      $this.setSelectedCuentaShow(cuenta);
+      $this.form_show.monto_venta = data.total;
+      $this.form_show.venta_id = data.id;
+      var $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
 
       if (data.ruta_pago) {
         var ruta = data.ruta_pago;
         ruta = ruta.replace('public', '');
-        ruta = 'storage' + ruta;
-        var ruta_final = "/" + ruta;
-        ruta_final = ruta_final.replace(':ruta', ruta);
-        $imagenPrevisualizacion.src = ruta_final;
+        ruta = '/storage' + ruta;
+        var $inputPrevisualizacion = document.querySelector("#modal_pago_show #imagen_update");
+        $inputPrevisualizacion.src = ruta;
+        $imagenPrevisualizacion.src = ruta;
+        $('#modal_pago_show .custom-file-label').addClass("selected").html(data.serie + '-' + data.correlativo + '.jpg');
       } else {
-        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen");
+        $('#modal_pago_show #imagen_update').val('');
+        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
         $imagenPrevisualizacion.src = "/img/default.png";
       }
 
       if (data.cuenta_id) {
         $('#modal_pago_show #div_cuentas').removeClass('d-none');
-        $this.form_show.cuenta = data.cuenta_desc;
+        $this.initCuentasShow(data.empresa_id, data.cuenta_id);
       }
 
-      $this.form_show.tipo_pago = data.tipo_pago_desc;
-
-      if (data.tipo_pago != 1) {
-        $('#modal_pago_show #efectivo').val(data.efectivo);
-        $('#modal_pago_show #importe').val(data.importe);
+      if (data.tipo_pago_id != 1) {
+        $this.form_show.efectivo = data.efectivo;
+        $this.form_show.importe = data.importe;
       } else {
-        $('#modal_pago_show #efectivo').val('0.00');
-        $('#modal_pago_show #importe').val(data.importe);
+        $this.form_show.efectivo = 0.00;
+        $this.form_show.importe = data.importe;
       }
 
       $('#modal_pago_show .pago-subtitle').html(data.cliente);
       $('#modal_pago_show').modal('show');
     });
   },
-  methods: {
+  methods: (_methods = {
     irHome: function irHome() {
       window.location = route("home");
     },
@@ -2744,136 +2796,279 @@ __webpack_require__.r(__webpack_exports__);
           clearInterval(timerInterval);
         }
       });
-    },
-    setSelectedPago: function setSelectedPago(value) {
-      var $this = this;
-      var monto = $this.form.monto_venta;
-      var importe = $this.form.importe;
-      var efectivo = $this.efectivo;
-      var suma = convertFloat(importe) + convertFloat(efectivo);
-      $this.cuenta = '';
-      $this.form.cuenta_id = null;
-      $('#efectivo').attr('readonly', false);
-      $('#importe').attr('readonly', false);
-
-      if (value != null) {
-        $this.form.tipo_pago_id = value.code;
-        $this.tipo_pago = value.label;
-
-        if (value.label == 'EFECTIVO') {
-          $('#efectivo').attr('readonly', true);
-          $('#importe').attr('readonly', true);
-          $this.form.efectivo = '0.00';
-          $this.form.importe = monto;
-        }
-
-        if (value.label == 'TRANSFERENCIA') {
-          $('#div_cuentas').removeClass('d-none');
-        } else {
-          $('#div_cuentas').addClass('d-none');
-        }
-      } else {
-        $this.form.tipo_pago_id = null;
-      }
-    },
-    changeEfectivo: function changeEfectivo() {
-      var $this = this;
-      var modo = $this.tipo_pago;
-      var monto = convertFloat($this.form.monto_venta);
-      var efectivo = convertFloat($this.form.efectivo);
-      var importe = $this.form.importe;
-
-      if (modo != 'EFECTIVO') {
-        var diferencia = monto - efectivo;
-        $this.form.importe = diferencia.toFixed(2);
-      }
-    },
-    changeImporte: function changeImporte() {
-      var $this = this;
-      var modo = $this.tipo_pago;
-      var monto = convertFloat($this.form.monto_venta);
-      var importe = convertFloat($this.form.importe);
-      var efectivo = $this.form.efectivo;
-
-      if (modo != 'EFECTIVO') {
-        var diferencia = monto - importe;
-        $this.form.efectivo = diferencia.toFixed(2);
-      }
-    },
-    changeImage: function changeImage() {
-      var fileInput = document.getElementById('imagen');
-      var filePath = fileInput.value;
-      var allowedExtensions = /(.jpg|.jpeg|.png)$/i;
-      var $imagenPrevisualizacion = document.querySelector(".imagen");
-
-      if (allowedExtensions.exec(filePath)) {
-        var userFile = document.getElementById('imagen');
-        userFile.src = URL.createObjectURL(event.target.files[0]);
-        this.form.image = event.target.files[0];
-        console.log(this.form.image);
-        var data = userFile.src;
-        $imagenPrevisualizacion.src = data;
-        var fileName = $('#imagen').val().split('\\').pop();
-        $('#imagen').next('.custom-file-label').addClass("selected").html(fileName);
-      } else {
-        this.form.image = null;
-        toastr.error('Extensión inválida, formatos admitidos (.jpg . jpeg . png)', 'Error');
-        $('.imagen').attr("src", "/img/default.png");
-      }
-    },
-    limpiarImagen: function limpiarImagen() {
-      $('.imagen').attr("src", "/img/default.png");
-      var fileName = "Seleccionar";
-      $('.custom-file-label').addClass("selected").html(fileName);
-      $('#imagen').val('');
-      this.form.image = null;
-    },
-    setSelectedCuenta: function setSelectedCuenta(value) {
-      var $this = this;
-
-      if (value != null) {
-        $this.form.cuenta_id = value.code;
-        $this.cuenta = value.label;
-      }
-    },
-    submitFormularioPago: function submitFormularioPago() {
-      var $this = this;
-      var frm = document.getElementById('pago_venta');
-      var formData = new FormData(frm); // formData.forEach(function(value, key){
-      //     console.log(key)
-      //     console.log(value);
-      // });
-
-      $this.iPagando = 1;
-      axios.post(route('ventas.caja.storePago'), formData).then(function (response) {
-        var respuesta = response.data;
-
-        if (respuesta.result == 'success') {
-          toastr.success(respuesta.mensaje);
-          location.reload();
-        } else {
-          var sHtmlMensaje = sHtmlErrores(respuesta.data.errors);
-          toastr.error(sHtmlMensaje);
-          $this.iPagando = 0;
-        }
-      })["catch"](function (error) {
-        var sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
-        toastr.error(sHtmlMensaje);
-      }).then(function () {
-        return $this.iPagando = 0;
-      });
-    },
-    comprobanteElectronico: function comprobanteElectronico(id) {
-      var url = '{{ route("ventas.documento.comprobante", ":id")}}';
-      url = url.replace(':id', id + '-100');
-      window.open(url, "Comprobante SISCOM", "width=900, height=600");
-    },
-    comprobanteElectronicoTicket: function comprobanteElectronicoTicket(id) {
-      var url = '{{ route("ventas.documento.comprobante", ":id")}}';
-      url = url.replace(':id', id + '-80');
-      window.open(url, "Comprobante SISCOM", "width=900, height=600");
     }
-  },
+  }, _defineProperty(_methods, "initCuentasShow", function initCuentasShow(empresa_id) {
+    var $this = this;
+    $this.cuentas_show = [];
+    var timerInterval;
+    Swal.fire({
+      title: 'Cargando...',
+      icon: 'info',
+      customClass: {
+        container: 'my-swal'
+      },
+      timer: 10,
+      allowOutsideClick: false,
+      didOpen: function didOpen() {
+        Swal.showLoading();
+        Swal.stopTimer();
+        $.ajax({
+          dataType: 'json',
+          type: 'post',
+          url: route('ventas.documento.getCuentas'),
+          data: {
+            '_token': $('input[name=_token]').val(),
+            'empresa_id': empresa_id
+          },
+          success: function success(response) {
+            if (response.success) {
+              if (response.cuentas.length > 0) {
+                for (var i = 0; i < response.cuentas.length; i++) {
+                  var newOption = {
+                    'code': response.cuentas[i].id,
+                    'label': response.cuentas[i].descripcion + ': ' + response.cuentas[i].num_cuenta
+                  };
+                  $this.cuentas_show.push(newOption);
+                }
+              } else {}
+
+              timerInterval = 0;
+              Swal.resumeTimer();
+            } else {
+              timerInterval = 0;
+              Swal.resumeTimer();
+            }
+          }
+        });
+      },
+      willClose: function willClose() {
+        clearInterval(timerInterval);
+      }
+    });
+  }), _defineProperty(_methods, "setSelectedPago", function setSelectedPago(value) {
+    var $this = this;
+    var monto = $this.form.monto_venta;
+    var importe = $this.form.importe;
+    var efectivo = $this.form.efectivo;
+    var suma = convertFloat(importe) + convertFloat(efectivo);
+    $this.cuenta = '';
+    $this.form.cuenta_id = null;
+    $('#efectivo').attr('readonly', false);
+    $('#importe').attr('readonly', false);
+
+    if (value != null) {
+      $this.form.tipo_pago_id = value.code;
+      $this.tipo_pago = value.label;
+
+      if (value.label == 'EFECTIVO') {
+        $('#efectivo').attr('readonly', true);
+        $('#importe').attr('readonly', true);
+        $this.form.efectivo = '0.00';
+        $this.form.importe = monto;
+      }
+
+      if (value.label == 'TRANSFERENCIA') {
+        $('#div_cuentas').removeClass('d-none');
+      } else {
+        $('#div_cuentas').addClass('d-none');
+      }
+    } else {
+      $this.form.tipo_pago_id = null;
+    }
+  }), _defineProperty(_methods, "setSelectedPagoShow", function setSelectedPagoShow(value) {
+    var $this = this;
+    var monto = $this.form_show.monto_venta;
+    var importe = $this.form_show.importe;
+    var efectivo = $this.form_show.efectivo;
+    var suma = convertFloat(importe) + convertFloat(efectivo);
+    $this.cuenta_show = '';
+    $this.form_show.cuenta_id = null;
+    $('#modal_pago_show #efectivo').attr('readonly', false);
+    $('#modal_pago_show #importe').attr('readonly', false);
+
+    if (value != null) {
+      $this.form_show.tipo_pago_id = value.code;
+      $this.tipo_pago_show = value.label;
+
+      if (value.label == 'EFECTIVO') {
+        $('#modal_pago_show #efectivo').attr('readonly', true);
+        $('#modal_pago_show #importe').attr('readonly', true);
+        $this.form_show.efectivo = '0.00';
+        $this.form_show.importe = monto;
+      }
+
+      if (value.label == 'TRANSFERENCIA') {
+        $('#modal_pago_show #div_cuentas').removeClass('d-none');
+      } else {
+        $('#modal_pago_show #div_cuentas').addClass('d-none');
+      }
+    } else {
+      $this.form_show.tipo_pago_id = null;
+    }
+  }), _defineProperty(_methods, "changeEfectivo", function changeEfectivo() {
+    var $this = this;
+    var modo = $this.tipo_pago;
+    var monto = convertFloat($this.form.monto_venta);
+    var efectivo = convertFloat($this.form.efectivo);
+    var importe = $this.form.importe;
+
+    if (modo != 'EFECTIVO') {
+      var diferencia = monto - efectivo;
+      $this.form.importe = diferencia.toFixed(2);
+    }
+  }), _defineProperty(_methods, "changeImporte", function changeImporte() {
+    var $this = this;
+    var modo = $this.tipo_pago;
+    var monto = convertFloat($this.form.monto_venta);
+    var importe = convertFloat($this.form.importe);
+    var efectivo = $this.form.efectivo;
+
+    if (modo != 'EFECTIVO') {
+      var diferencia = monto - importe;
+      $this.form.efectivo = diferencia.toFixed(2);
+    }
+  }), _defineProperty(_methods, "changeImage", function changeImage() {
+    var fileInput = document.getElementById('imagen');
+    var filePath = fileInput.value;
+    var allowedExtensions = /(.jpg|.jpeg|.png)$/i;
+    var $imagenPrevisualizacion = document.querySelector(".imagen");
+
+    if (allowedExtensions.exec(filePath)) {
+      var userFile = document.getElementById('imagen');
+      userFile.src = URL.createObjectURL(event.target.files[0]);
+      this.form.image = event.target.files[0];
+      console.log(this.form.image);
+      var data = userFile.src;
+      $imagenPrevisualizacion.src = data;
+      var fileName = $('#imagen').val().split('\\').pop();
+      $('#imagen').next('.custom-file-label').addClass("selected").html(fileName);
+    } else {
+      this.form.image = null;
+      toastr.error('Extensión inválida, formatos admitidos (.jpg . jpeg . png)', 'Error');
+      $('.imagen').attr("src", "/img/default.png");
+    }
+  }), _defineProperty(_methods, "limpiarImagen", function limpiarImagen() {
+    $('.imagen').attr("src", "/img/default.png");
+    var fileName = "Seleccionar";
+    $('.custom-file-label').addClass("selected").html(fileName);
+    $('#imagen').val('');
+    this.form.image = null;
+  }), _defineProperty(_methods, "setSelectedCuenta", function setSelectedCuenta(value) {
+    var $this = this;
+
+    if (value != null) {
+      $this.form.cuenta_id = value.code;
+      $this.cuenta = value.label;
+    }
+  }), _defineProperty(_methods, "submitFormularioPago", function submitFormularioPago() {
+    var $this = this;
+    var frm = document.getElementById('pago_venta');
+    var formData = new FormData(frm); // formData.forEach(function(value, key){
+    //     console.log(key)
+    //     console.log(value);
+    // });
+
+    $this.iPagando = 1;
+    axios.post(route('ventas.caja.storePago'), formData).then(function (response) {
+      var respuesta = response.data;
+
+      if (respuesta.result == 'success') {
+        toastr.success(respuesta.mensaje);
+        location.reload();
+      } else {
+        var sHtmlMensaje = sHtmlErrores(respuesta.data.errors);
+        toastr.error(sHtmlMensaje);
+        $this.iPagando = 0;
+      }
+    })["catch"](function (error) {
+      var sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
+      toastr.error(sHtmlMensaje);
+    }).then(function () {
+      return $this.iPagando = 0;
+    });
+  }), _defineProperty(_methods, "changeEfectivoShow", function changeEfectivoShow() {
+    var $this = this;
+    var modo = $this.tipo_pago_show;
+    var monto = convertFloat($this.form_show.monto_venta);
+    var efectivo = convertFloat($this.form_show.efectivo);
+    var importe = $this.form_show.importe;
+
+    if (modo != 'EFECTIVO') {
+      var diferencia = monto - efectivo;
+      $this.form_show.importe = diferencia.toFixed(2);
+    }
+  }), _defineProperty(_methods, "changeImporteShow", function changeImporteShow() {
+    var $this = this;
+    var modo = $this.tipo_pago_show;
+    var monto = convertFloat($this.form_show.monto_venta);
+    var importe = convertFloat($this.form_show.importe);
+    var efectivo = $this.form_show.efectivo;
+
+    if (modo != 'EFECTIVO') {
+      var diferencia = monto - importe;
+      $this.form_show.efectivo = diferencia.toFixed(2);
+    }
+  }), _defineProperty(_methods, "limpiarImagenShow", function limpiarImagenShow() {
+    $('.imagen_update').attr("src", "/img/default.png");
+    var fileName = "Seleccionar";
+    $('#modal_pago_show .custom-file-label').addClass("selected").html(fileName);
+    $('#imagen_update').val('');
+    $('#modal_pago_show #ruta_pago').val('');
+    this.form_show.image = null;
+  }), _defineProperty(_methods, "changeImageShow", function changeImageShow() {
+    var fileInput = document.getElementById('imagen_update');
+    var filePath = fileInput.value;
+    var allowedExtensions = /(.jpg|.jpeg|.png)$/i;
+    var $imagenPrevisualizacion = document.querySelector(".imagen_update");
+
+    if (allowedExtensions.exec(filePath)) {
+      var userFile = document.getElementById('imagen_update');
+      userFile.src = URL.createObjectURL(event.target.files[0]);
+      this.form_show.image = event.target.files[0];
+      console.log(this.form_show.image);
+      var data = userFile.src;
+      $imagenPrevisualizacion.src = data;
+      var fileName = $('#imagen_update').val().split('\\').pop();
+      $('#imagen_update').next('#modal_pago_show .custom-file-label').addClass("selected").html(fileName);
+    } else {
+      this.form_show.image = null;
+      toastr.error('Extensión inválida, formatos admitidos (.jpg . jpeg . png)', 'Error');
+      $('.imagen_update').attr("src", "/img/default.png");
+    }
+  }), _defineProperty(_methods, "setSelectedCuentaShow", function setSelectedCuentaShow(value) {
+    var $this = this;
+
+    if (value != null) {
+      $this.form_show.cuenta_id = value.code;
+      $this.cuenta_show = value.label;
+    }
+  }), _defineProperty(_methods, "updateFormularioPago", function updateFormularioPago() {
+    var $this = this;
+    var frm = document.getElementById('update_pago_venta');
+    var formData = new FormData(frm);
+    formData.forEach(function (value, key) {
+      console.log(key);
+      console.log(value);
+    });
+    $this.iEditando = 1;
+    axios.post(route('ventas.caja.updatePago'), formData).then(function (response) {
+      var respuesta = response.data;
+
+      if (respuesta.result == 'success') {
+        toastr.success(respuesta.mensaje);
+        location.reload();
+      } else {
+        var sHtmlMensaje = sHtmlErrores(respuesta.data.errors);
+        toastr.error(sHtmlMensaje);
+        $this.iEditando = 0;
+      }
+    })["catch"](function (error) {
+      var sHtmlMensaje = sHtmlErrores(error.responseJSON.errors);
+      toastr.error(sHtmlMensaje);
+    }).then(function () {
+      return $this.iEditando = 0;
+    });
+  }), _methods),
   updated: function updated() {
     this.$nextTick(function () {});
   }
@@ -58775,95 +58970,433 @@ var render = function() {
             _vm._m(10),
             _vm._v(" "),
             _c("div", { staticClass: "modal-body" }, [
-              _c("div", { staticClass: "row" }, [
-                _c("div", { staticClass: "col-12 col-md-6 br" }, [
-                  _vm._m(11),
-                  _vm._v(" "),
-                  _vm._m(12),
-                  _vm._v(" "),
-                  _vm._m(13),
-                  _vm._v(" "),
-                  _vm._m(14),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "form-group" }, [
-                    _c("label", { staticClass: "col-form-label required" }, [
-                      _vm._v("Modo de pago")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.form_show.tipo_pago,
-                          expression: "form_show.tipo_pago"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: { type: "text", disabled: "" },
-                      domProps: { value: _vm.form_show.tipo_pago },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
+              _c(
+                "form",
+                {
+                  attrs: {
+                    id: "update_pago_venta",
+                    method: "POST",
+                    enctype: "multipart/form-data"
+                  },
+                  on: {
+                    submit: function($event) {
+                      $event.preventDefault()
+                      return _vm.updateFormularioPago()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-12 col-md-6 br" }, [
+                      _c("div", { staticClass: "form-group d-none" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Venta")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form_show.venta_id,
+                              expression: "form_show.venta_id"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "venta_id",
+                            name: "venta_id",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form_show.venta_id },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form_show,
+                                "venta_id",
+                                $event.target.value
+                              )
+                            }
                           }
-                          _vm.$set(
-                            _vm.form_show,
-                            "tipo_pago",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _vm._m(15),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    {
-                      staticClass: "form-group d-none",
-                      attrs: { id: "div_cuentas" }
-                    },
-                    [
-                      _c("label", { staticClass: "col-form-label" }, [
-                        _vm._v("Cuentas")
+                        })
                       ]),
                       _vm._v(" "),
-                      _c("input", {
-                        directives: [
-                          {
-                            name: "model",
-                            rawName: "v-model",
-                            value: _vm.form_show.cuenta,
-                            expression: "form_show.cuenta"
-                          }
-                        ],
-                        staticClass: "form-control",
-                        attrs: { type: "text", disabled: "" },
-                        domProps: { value: _vm.form_show.cuenta },
-                        on: {
-                          input: function($event) {
-                            if ($event.target.composing) {
-                              return
+                      _c("div", { staticClass: "form-group d-none" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Tipo Pago")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form_show.tipo_pago_id,
+                              expression: "form_show.tipo_pago_id"
                             }
-                            _vm.$set(
-                              _vm.form_show,
-                              "cuenta",
-                              $event.target.value
-                            )
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "tipo_pago_id",
+                            name: "tipo_pago_id",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form_show.tipo_pago_id },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form_show,
+                                "tipo_pago_id",
+                                $event.target.value
+                              )
+                            }
                           }
-                        }
-                      })
-                    ]
-                  )
-                ]),
-                _vm._v(" "),
-                _vm._m(16)
-              ])
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Monto")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form_show.monto_venta,
+                              expression: "form_show.monto_venta"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "monto_venta",
+                            name: "monto_venta",
+                            onkeypress: "return filterFloat(event, this);",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form_show.monto_venta },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form_show,
+                                "monto_venta",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Efectivo")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form_show.efectivo,
+                              expression: "form_show.efectivo"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "efectivo",
+                            name: "efectivo",
+                            onkeypress: "return filterFloat(event, this);"
+                          },
+                          domProps: { value: _vm.form_show.efectivo },
+                          on: {
+                            keyup: function($event) {
+                              return _vm.changeEfectivoShow()
+                            },
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form_show,
+                                "efectivo",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "form-group" },
+                        [
+                          _c(
+                            "label",
+                            { staticClass: "col-form-label required" },
+                            [_vm._v("Modo de pago")]
+                          ),
+                          _vm._v(" "),
+                          _c("v-select", {
+                            attrs: {
+                              options: _vm.desc_pagos_show,
+                              placeholder: "SELECCIONAR"
+                            },
+                            on: { input: _vm.setSelectedPagoShow },
+                            model: {
+                              value: _vm.tipo_pago_show,
+                              callback: function($$v) {
+                                _vm.tipo_pago_show = $$v
+                              },
+                              expression: "tipo_pago_show"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Importe")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form_show.importe,
+                              expression: "form_show.importe"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "importe",
+                            name: "importe",
+                            onkeypress: "return filterFloat(event, this);"
+                          },
+                          domProps: { value: _vm.form_show.importe },
+                          on: {
+                            keyup: function($event) {
+                              return _vm.changeImporteShow()
+                            },
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form_show,
+                                "importe",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass: "form-group d-none",
+                          attrs: { id: "div_cuentas" }
+                        },
+                        [
+                          _c("label", { staticClass: "col-form-label" }, [
+                            _vm._v("Cuentas")
+                          ]),
+                          _vm._v(" "),
+                          _c("v-select", {
+                            attrs: {
+                              options: _vm.cuentas_show,
+                              placeholder: "SELECCIONAR"
+                            },
+                            on: { input: _vm.setSelectedCuentaShow },
+                            model: {
+                              value: _vm.cuenta_show,
+                              callback: function($$v) {
+                                _vm.cuenta_show = $$v
+                              },
+                              expression: "cuenta_show"
+                            }
+                          })
+                        ],
+                        1
+                      ),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group d-none" }, [
+                        _c(
+                          "label",
+                          { staticClass: "col-form-label required" },
+                          [_vm._v("Cuenta")]
+                        ),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.form_show.cuenta_id,
+                              expression: "form_show.cuenta_id"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "cuenta_id",
+                            name: "cuenta_id",
+                            readonly: ""
+                          },
+                          domProps: { value: _vm.form_show.cuenta_id },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.form_show,
+                                "cuenta_id",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-12 col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { id: "imagen_label" } }, [
+                          _vm._v("Imagen:")
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "custom-file" }, [
+                          _c("input", {
+                            staticClass: "custom-file-input",
+                            attrs: {
+                              id: "imagen_update",
+                              type: "file",
+                              name: "imagen",
+                              accept: "image/*"
+                            },
+                            on: {
+                              change: function($event) {
+                                return _vm.changeImageShow()
+                              }
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c(
+                            "label",
+                            {
+                              staticClass: "custom-file-label selected",
+                              attrs: { for: "imagen", id: "imagen_txt" }
+                            },
+                            [_vm._v("Seleccionar")]
+                          ),
+                          _vm._v(" "),
+                          _vm._m(11),
+                          _vm._v(" "),
+                          _c("input", {
+                            attrs: {
+                              type: "hidden",
+                              name: "ruta_pago",
+                              id: "ruta_pago"
+                            }
+                          })
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass: "form-group row justify-content-center"
+                        },
+                        [
+                          _c(
+                            "div",
+                            { staticClass: "col-6 align-content-center" },
+                            [
+                              _c(
+                                "div",
+                                { staticClass: "row justify-content-end" },
+                                [
+                                  _c(
+                                    "a",
+                                    {
+                                      attrs: {
+                                        href: "javascript:void(0);",
+                                        id: "limpiar_imagen"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.limpiarImagenShow()
+                                        }
+                                      }
+                                    },
+                                    [
+                                      _c(
+                                        "span",
+                                        { staticClass: "badge badge-danger" },
+                                        [_vm._v("x")]
+                                      )
+                                    ]
+                                  )
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _vm._m(12)
+                            ]
+                          )
+                        ]
+                      )
+                    ])
+                  ])
+                ]
+              )
             ]),
             _vm._v(" "),
-            _vm._m(17)
+            _c("div", { staticClass: "modal-footer" }, [
+              _c("div", { staticClass: "col-md-6 text-right" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary btn-sm",
+                    attrs: {
+                      type: "submit",
+                      form: "update_pago_venta",
+                      disabled: _vm.iEditando == 1
+                    }
+                  },
+                  [_c("i", { staticClass: "fa fa-pencil" }), _vm._v(" Editar")]
+                ),
+                _vm._v(" "),
+                _vm._m(13)
+              ])
+            ])
           ])
         ])
       ]
@@ -59308,113 +59841,26 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group d-none" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Venta")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { type: "text", id: "venta_id", name: "venta_id", disabled: "" }
-      })
+    return _c("div", { staticClass: "invalid-feedback" }, [
+      _c("b", [_c("span", { attrs: { id: "error-imagen" } })])
     ])
   },
   function() {
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group d-none" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Tipo Pago")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          type: "text",
-          id: "tipo_pago_id",
-          name: "tipo_pago_id",
-          disabled: ""
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Monto")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          type: "text",
-          id: "monto_venta",
-          name: "monto_venta",
-          disabled: ""
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Efectivo")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: {
-          type: "text",
-          value: "0.00",
-          id: "efectivo",
-          name: "efectivo",
-          disabled: ""
-        }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form-group" }, [
-      _c("label", { staticClass: "col-form-label required" }, [
-        _vm._v("Importe")
-      ]),
-      _vm._v(" "),
-      _c("input", {
-        staticClass: "form-control",
-        attrs: { type: "text", id: "importe", name: "importe", disabled: "" }
-      })
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-12 col-md-6" }, [
-      _c("div", { staticClass: "form-group" }, [
-        _c("label", { attrs: { id: "imagen_label" } }, [_vm._v("Imagen:")])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "form-group row justify-content-center" }, [
-        _c("div", { staticClass: "col-6 align-content-center" }, [
-          _c("div", { staticClass: "row justify-content-center" }, [
-            _c("p", [
-              _c("img", {
-                staticClass: "imagen",
-                attrs: { src: "/img/default.png", alt: "IMG" }
-              })
-            ])
-          ])
-        ])
+    return _c("div", { staticClass: "row justify-content-center" }, [
+      _c("p", [
+        _c("img", { staticClass: "imagen_update", attrs: { alt: "IMG" } }),
+        _vm._v(" "),
+        _c("input", {
+          attrs: {
+            id: "url_imagen",
+            name: "url_imagen",
+            type: "hidden",
+            value: ""
+          }
+        })
       ])
     ])
   },
@@ -59422,18 +59868,14 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-footer" }, [
-      _c("div", { staticClass: "col-md-6 text-right" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn btn-danger btn-sm",
-            attrs: { type: "button", "data-dismiss": "modal" }
-          },
-          [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cerrar")]
-        )
-      ])
-    ])
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-danger btn-sm",
+        attrs: { type: "button", "data-dismiss": "modal" }
+      },
+      [_c("i", { staticClass: "fa fa-times" }), _vm._v(" Cerrar")]
+    )
   }
 ]
 render._withStripped = true

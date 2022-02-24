@@ -617,7 +617,21 @@
             var nombres = objeto.value.data.nombres;
             var apellido_paterno = objeto.value.data.apellido_paterno;
             var apellido_materno = objeto.value.data.apellido_materno;
-           // var codigo_verificacion = objeto.value.data.codVerifica;
+            // var codigo_verificacion = objeto.value.data.codVerifica;
+
+            var direccion = objeto.value.data.direccion_completa;
+            var departamento = objeto.value.data.ubigeo[0];
+            var provincia = objeto.value.data.ubigeo[1];
+            var distrito = objeto.value.data.ubigeo[2];
+
+            if (direccion != '-' && direccion != "NULL") {
+                $('#direccion').val(direccion);
+            }
+
+            if(departamento && provincia && distrito)
+            {
+                camposUbigeoApi(departamento, provincia, distrito);
+            }
 
             if (nombres !== '-' && nombres !== "NULL" ) {
                 $('#nombres').val(nombres);
@@ -633,6 +647,50 @@
             // }
             $('#estado_documento').val('ACTIVO')
         }
+
+        function camposUbigeoApi(departamento, provincia, distrito) {
+            departamento_api = '';
+            provincia_api = '';
+            distrito_api = '';
+
+            if (departamento !== '-' && departamento !== null && provincia !== '-' && provincia !== null &&
+                distrito !== '-' && distrito !== null) {
+                $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        _token: $('input[name=_token]').val(),
+                        departamento: departamento,
+                        provincia: provincia,
+                        distrito: distrito
+                    },
+                    url: "{{ route('mantenimiento.ubigeo.api_ruc') }}",
+                    success: function(data) {
+                        // Limpiamos data
+                        $("#provincia").empty();
+                        $("#distrito").empty();
+
+                        if (!data.error) {
+                            // Mostramos la información
+                            if (data.ubigeo != null) {
+
+                                departamento_api = data.ubigeo.departamento_id;
+                                provincia_api = parseInt(data.ubigeo.provincia_id);
+                                distrito_api = data.ubigeo.id;
+
+                                $("#departamento").val(parseInt(departamento_api)).trigger('change');
+                            }
+                        } else {
+                            toastr.error(data.message, 'Mensaje de Error', {
+                                "closeButton": true,
+                                positionClass: 'toast-bottom-right'
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
 
         function clearDatosPersona() {
             $('#documento').val("");
