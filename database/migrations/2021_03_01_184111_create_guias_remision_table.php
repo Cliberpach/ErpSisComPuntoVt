@@ -15,23 +15,22 @@ class CreateGuiasRemisionTable extends Migration
     {
         Schema::create('guias_remision', function (Blueprint $table) {
             $table->Increments('id');
-            $table->unsignedInteger('documento_id');
+            $table->unsignedInteger('documento_id')->nullable();
             $table->foreign('documento_id')->references('id')->on('cotizacion_documento')->onDelete('cascade');
             $table->unsignedDecimal('cantidad_productos', 15, 2);
             $table->unsignedDecimal('peso_productos', 15, 2);
             $table->text('tienda')->nullable();
-            
+
             $table->string('ruc_transporte_oficina')->nullable();
             $table->string('nombre_transporte_oficina')->nullable();
 
             $table->string('ruc_transporte_domicilio')->nullable();
             $table->string('nombre_transporte_domicilio')->nullable();
-            // $table->foreign('tienda_id')->references('id')->on('cliente_tiendas')->onDelete('cascade');
             $table->string('direccion_llegada')->nullable();
 
             $table->mediumText('observacion')->nullable();
             $table->enum('estado',['REGISTRADO','ACEPTADO','NULO'])->default('REGISTRADO');
-            
+
             $table->enum('sunat',['0','1','2'])->default('0');
             $table->BigInteger('correlativo')->nullable();
             $table->string('serie')->nullable();
@@ -45,6 +44,16 @@ class CreateGuiasRemisionTable extends Migration
             $table->string('ubigeo_partida')->nullable();
             $table->string('ubigeo_llegada')->nullable();
 
+            $table->date('fecha_emision')->nullable();
+            $table->string('ruc_empresa')->nullable();
+            $table->string('empresa')->nullable();
+            $table->text('direccion_empresa')->nullable();
+            $table->unsignedInteger('empresa_id');
+            $table->text('tipo_documento_cliente')->nullable();
+            $table->text('documento_cliente')->nullable();
+            $table->text('cliente')->nullable();
+            $table->text('direccion_cliente')->nullable();
+            $table->unsignedInteger('cliente_id');
             $table->timestamps();
         });
     }

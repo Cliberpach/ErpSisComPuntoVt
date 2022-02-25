@@ -8,6 +8,7 @@ use App\Events\NumeracionGuiaRemision;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Ventas\Cliente;
+use App\Ventas\DetalleGuia;
 use App\Ventas\Documento\Detalle;
 use App\Ventas\Documento\Documento;
 use App\Ventas\ErrorGuia;
@@ -107,7 +108,7 @@ class GuiaController extends Controller
             DB::beginTransaction();
             $data = $request->all();
             $rules = [
-                'documento_id'=> 'required',
+                'documento_id'=> 'nullable',
                 'cantidad_productos'=> 'required',
                 'peso_productos'=> 'required',
                 'tienda'=> 'nullable',
@@ -119,7 +120,6 @@ class GuiaController extends Controller
 
             ];
             $message = [
-                'documento_id.required' => 'El campo Documento es obligatorio.',
                 'direccion_empresa.required' => 'El campo direccion de llegada es obligatorio.',
                 'cantidad_productos.required' => 'El campo Cantidad de Productos es obligatorio.',
                 'peso_productos.required' => 'El campo Peso de Productos es obligatorio.',
@@ -130,11 +130,84 @@ class GuiaController extends Controller
             ];
             Validator::make($data, $rules, $message)->validate();
 
-            $guia = Guia::where('documento_id',$request->get('documento_id'))->get();
+            if($request->documento_id)
+            {
+                $guia = Guia::where('documento_id',$request->get('documento_id'))->get();
+                $documento = Documento::find($request->get('documento_id'));
+                if (count($guia) == 0) {
+                    $guia = new Guia();
+                    $guia->documento_id = $request->get('documento_id');
 
-            if (count($guia) == 0) {
+                    $guia->tienda = $request->get('tienda');
+
+                    $guia->ruc_transporte_oficina = '-';
+                    $guia->nombre_transporte_oficina = '-';
+
+                    $guia->ruc_transporte_domicilio = '-';
+                    $guia->nombre_transporte_domicilio = '-';
+                    $guia->direccion_llegada = $request->get('direccion_tienda');
+
+                    $guia->cantidad_productos = $request->get('cantidad_productos');
+                    $guia->peso_productos = $request->get('peso_productos');
+                    $guia->observacion = $request->get('observacion');
+                    $guia->ubigeo_llegada = str_pad($request->get('ubigeo_llegada'), 6, "0", STR_PAD_LEFT);
+                    $guia->ubigeo_partida = str_pad($request->get('ubigeo_partida'), 6, "0", STR_PAD_LEFT);
+                    $guia->dni_conductor = $request->get('dni_conductor');
+                    $guia->placa_vehiculo = $request->get('placa_vehiculo');
+                    $guia->placa_vehiculo = $request->get('placa_vehiculo');
+
+                    $guia->fecha_emision = $documento->fecha_documento;
+                    $guia->ruc_empresa = $documento->ruc_empresa;
+                    $guia->empresa_id = $documento->empresa_id;
+                    $guia->empresa = $documento->empresa;
+                    $guia->direccion_empresa = $documento->direccion_fiscal_empresa;
+
+                    $guia->tipo_documento_cliente = $documento->tipo_documento_cliente;
+                    $guia->documento_cliente = $documento->documento_cliente;
+                    $guia->direccion_cliente = $documento->direccion_cliente;
+                    $guia->cliente = $documento->cliente;
+                    $guia->cliente_id = $documento->cliente_id;
+                    $guia->save();
+
+                    $detalles = Detalle::where('documento_id',$request->documento_id)->get();
+
+                    foreach($detalles as $detalle)
+                    {
+                        DetalleGuia::create([
+                            'guia_id' => $guia->id,
+                            'producto_id' => $detalle->lote->producto_id,
+                            'codigo_producto' => $detalle->codigo_producto,
+                            'nombre_producto' => $detalle->nombre_producto,
+                            'unidad' => $detalle->unidad,
+                            'cantidad' => $detalle->cantidad,
+                        ]);
+                    }
+
+                    $envio_prev = self::sunat_prev($guia->id);
+
+                    if(!$envio_prev['success'])
+                    {
+                        DB::rollBack();
+                        Session::flash('error',$envio_prev['mensaje']);
+                        return back()->with('sunat_error', 'error');
+                    }
+
+
+                    DB::commit();
+                    $envio_post = self::sunat_post($guia->id);
+                    $guia_pdf = self::guia_pdf($guia->id);
+                    Session::flash('success','Guia de Remision creada.');
+                    return redirect()->route('ventas.guiasremision.index')->with('guardar', 'success');
+                }else{
+                    Session::flash('error','Guia de Remision ya ha sido creado.');
+                    return redirect()->route('ventas.guiasremision.index');
+                }
+            }
+            else{
+
+                $empresa = Empresa::first();
+                $cliente = Cliente::findOrFail($request->cliente_id);
                 $guia = new Guia();
-                $guia->documento_id = $request->get('documento_id');
 
                 $guia->tienda = $request->get('tienda');
 
@@ -152,7 +225,34 @@ class GuiaController extends Controller
                 $guia->ubigeo_partida = str_pad($request->get('ubigeo_partida'), 6, "0", STR_PAD_LEFT);
                 $guia->dni_conductor = $request->get('dni_conductor');
                 $guia->placa_vehiculo = $request->get('placa_vehiculo');
+
+                $guia->fecha_emision = $request->get('fecha_documento');
+                $guia->ruc_empresa = $empresa->ruc;
+                $guia->empresa = $empresa->razon_social;
+                $guia->empresa_id = $empresa->id;
+                $guia->direccion_empresa = $empresa->direccion_fiscal;
+
+                $guia->tipo_documento_cliente = $cliente->tipo_documento;
+                $guia->documento_cliente = $cliente->documento;
+                $guia->direccion_cliente = $cliente->direccion;
+                $guia->cliente = $cliente->nombre;
+                $guia->cliente_id = $cliente->id;
                 $guia->save();
+
+                $productosJSON = $request->get('productos_tabla');
+                $detalles = json_decode($productosJSON[0]);
+                foreach($detalles as $detalle)
+                {
+                    $producto = Producto::find($detalle->producto_id);
+                    DetalleGuia::create([
+                        'guia_id' => $guia->id,
+                        'producto_id' => $detalle->producto_id,
+                        'codigo_producto' => $producto->codigo,
+                        'unidad' => $producto->getMedida(),
+                        'nombre_producto' => $producto->nombre,
+                        'cantidad' => $detalle->cantidad,
+                    ]);
+                }
 
                 $envio_prev = self::sunat_prev($guia->id);
 
@@ -165,13 +265,6 @@ class GuiaController extends Controller
 
 
                 DB::commit();
-                $envio_post = self::sunat_post($guia->id);
-                $guia_pdf = self::guia_pdf($guia->id);
-                Session::flash('success','Guia de Remision creada.');
-                return redirect()->route('ventas.guiasremision.index')->with('guardar', 'success');
-            }else{
-                Session::flash('error','Guia de Remision ya ha sido creado.');
-                return redirect()->route('ventas.guiasremision.index');
             }
         }
         catch(Exception $e)
@@ -193,7 +286,7 @@ class GuiaController extends Controller
 
     public function obtenerProductos($guia)
     {
-        $detalles = Detalle::where('documento_id',$guia->documento_id)->get();
+        $detalles = DetalleGuia::where('guia_id',$guia->id)->get();
 
         $arrayProductos = Array();
         for($i = 0; $i < count($detalles); $i++){
@@ -201,7 +294,7 @@ class GuiaController extends Controller
             $arrayProductos[] = array(
                 "codigo" => $detalles[$i]->codigo_producto,
                 "unidad" => $detalles[$i]->unidad,
-                "descripcion"=> $detalles[$i]->nombre_producto.' - '.$detalles[$i]->codigo_lote,
+                "descripcion"=> $detalles[$i]->nombre_producto,
                 "cantidad" => $detalles[$i]->cantidad,
                 "codProdSunat" => '10',
             );
@@ -346,19 +439,19 @@ class GuiaController extends Controller
                             "fechaEmision" => self::obtenerFecha($guia),
 
                             "company" => array(
-                                "ruc" => $guia->documento->ruc_empresa,
-                                "razonSocial" => $guia->documento->empresa,
+                                "ruc" => $guia->ruc_empresa,
+                                "razonSocial" => $guia->empresa,
                                 "address" => array(
-                                    "direccion" => $guia->documento->direccion_fiscal_empresa,
+                                    "direccion" => $guia->direccion_empresa,
                                 )),
 
 
                             "destinatario" => array(
-                                "tipoDoc" =>  $guia->documento->tipoDocumentoCliente(),
-                                "numDoc" => $guia->documento->documento_cliente,
-                                "rznSocial" => $guia->documento->cliente,
+                                "tipoDoc" =>  $guia->tipoDocumentoCliente(),
+                                "numDoc" => $guia->documento_cliente,
+                                "rznSocial" => $guia->cliente,
                                 "address" => array(
-                                    "direccion" => $guia->documento->direccion_cliente,
+                                    "direccion" => $guia->ddireccion_cliente,
                                 )
                             ),
 
@@ -380,7 +473,7 @@ class GuiaController extends Controller
                                 ),
                                 "partida" => array(
                                     "ubigueo" => $guia->ubigeo_partida,
-                                    "direccion" => self::limitarDireccion($guia->documento->direccion_fiscal_empresa,50,"..."),
+                                    "direccion" => self::limitarDireccion($guia->direccion_empresa,50,"..."),
                                 ),
                                 "transportista"=> self::condicionReparto($guia)
                             ),

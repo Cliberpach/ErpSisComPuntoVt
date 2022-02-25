@@ -1937,9 +1937,9 @@ class DocumentoController extends Controller
             ->join('marcas','marcas.id','=','productos.marca_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('detalle_nota_ingreso','detalle_nota_ingreso.lote_id','=','lote_productos.id')
-            ->leftJoin('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
+            ->join('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
+            ->join('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
             ->select(
                 'nota_ingreso.moneda as moneda_ingreso',
                 'compra_documentos.moneda as moneda_compra',

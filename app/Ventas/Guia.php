@@ -13,7 +13,7 @@ class Guia extends Model
         'peso_productos',
 
         'tienda_id',
-        
+
         'direccion_llegada',
         // 'direccion_partida', //EMPRESA DOCUMENTO DE VENTA PLANO
 
@@ -34,7 +34,18 @@ class Guia extends Model
         'ruta_comprobante_archivo',
         'nombre_comprobante_archivo',
         'dni_conductor',
-        'placa_vehiculo'
+        'placa_vehiculo',
+
+        'fecha_emision',
+        'ruc_empresa',
+        'empresa',
+        'empresa_id',
+        'direccion_empresa',
+
+        'tipo_documento_cliente',
+        'documento_cliente',
+        'cliente',
+        'cliente_id',
     ];
 
     public function documento()
@@ -45,5 +56,14 @@ class Guia extends Model
     public function tienda()
     {
         return $this->belongsTo('App\Ventas\Tienda','tienda_id');
+    }
+
+    public function tipoDocumentoCliente(): string
+    {
+        $documento = tipos_documento()->where('simbolo', $this->tipo_documento_cliente)->first();
+        if (is_null($documento))
+            return "-";
+        else
+            return $documento->parametro;
     }
 }
