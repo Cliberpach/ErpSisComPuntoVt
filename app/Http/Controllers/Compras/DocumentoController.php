@@ -173,14 +173,24 @@ class DocumentoController extends Controller
 
     public function getProduct()
     {
-        $productos = Producto::where('estado', 'ACTIVO')->get();
-        foreach($productos as $item)
-        {
-            $item['medida_desc'] = $item->medidaCompleta();
-        }
-        return response()->json([
-            'productos' => $productos
-        ]);
+        // $productos = Producto::where('estado', 'ACTIVO')->get();
+        // foreach($productos as $item)
+        // {
+        //     $item['medida_desc'] = $item->medidaCompleta();
+        // }
+        // return response()->json([
+        //     'productos' => $productos
+        // ]);
+        $consulta = DB::table('productos')
+        ->join('tabladetalles','tabladetalles.id','=','productos.medida')
+        ->select(
+            'productos.*',
+            'tabladetalles.descripcion as medida_desc'
+        )
+        ->where('productos.estado','ACTIVO');
+        return datatables()->query(
+            $consulta
+        )->toJson();
     }
 
     public function store(Request $request){

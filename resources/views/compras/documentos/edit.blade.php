@@ -540,6 +540,7 @@
 <script src="{{asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js')}}"></script>
 <!-- Chosen -->
 <script src="{{asset('Inspinia/js/plugins/chosen/chosen.jquery.js')}}"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
 //IGV
 $(document).ready(function() {
@@ -1418,36 +1419,27 @@ function sumaTotal() {
 
     function obtenerProducts()
     {
-
-        $("#producto_id").removeAttr('onchange','cargarPresentacion(this)');
         $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         $("#producto_id").empty().trigger('change');
-        $.ajax({
-            dataType: 'json',
-            url: '{{ route('compras.documento.getProduct') }}',
-            type: 'get',
-            data: {
-                '_token': $('input[name=_token]').val(),
-            },
-            success: function(data) {
-                if (data.productos.length > 0) {
-                    $('#producto_id').append('<option></option>').trigger('change');
-                    for(var i = 0;i < data.productos.length; i++)
-                    {
-                        let codigo = data.productos[i].codigo_barra ? (' - ' + data.productos[i].codigo_barra) : '';
-                        var newOption = '<option value="'+data.productos[i].id+'">'+data.productos[i].nombre + codigo + '</option>';
-                        $('#producto_id').append(newOption).trigger('change');
-                        //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
-                    }
-                    $("#producto_id").attr('onchange','cargarPresentacion(this)');
-                    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-
-                } else {
-                    $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-                    $("#producto_id").attr('onchange','cargarPresentacion(this)');
-                    toastr.error('Productos no encontrados.', 'Error');
+        axios.get('{{ route('compras.documento.getProduct') }}').then(response => {
+            let data = response.data.data
+            console.log(data)
+            if (data.length > 0) {
+                $('#producto_id').append('<option></option>').trigger('change');
+                for(var i = 0;i < data.length; i++)
+                {
+                    let codigo = data[i].codigo_barra ? (' - ' + data[i].codigo_barra) : '';
+                    var newOption = '<option value="'+data[i].id+'" peso="'+data[i].peso_producto+'" unidad="'+data[i].medida_desc+'" descripcion="'+data[i].nombre+'">'+data[i].nombre + codigo + '</option>';
+                    $('#producto_id').append(newOption).trigger('change');
+                    //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
                 }
-            },
+
+                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+
+            } else {
+                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+                toastr.error('Productos no encontrados.', 'Error');
+            }
         })
     }
 
