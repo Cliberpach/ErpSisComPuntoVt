@@ -20,7 +20,7 @@ class CreateGuiaDetallesTable extends Migration
             $table->unsignedBigInteger('producto_id');
             $table->text('codigo_producto');
             $table->text('nombre_producto');
-            $table->text('cantidad');
+            $table->unsignedDecimal('cantidad', 15, 2);
             $table->text('unidad');
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();

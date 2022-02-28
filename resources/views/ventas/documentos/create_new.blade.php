@@ -1548,6 +1548,9 @@
         if (cliente_id) {
             $('#buscarLotes').prop("disabled", false)
         }
+        else{
+            $('#buscarLotes').prop("disabled", true)
+        }
     }
 
     function enviarVenta()
