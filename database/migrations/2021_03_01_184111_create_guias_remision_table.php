@@ -45,8 +45,8 @@ class CreateGuiasRemisionTable extends Migration
             $table->string('ubigeo_llegada')->nullable();
 
             $table->date('fecha_emision')->nullable();
-            $table->string('ruc_empresa')->nullable();
-            $table->string('empresa')->nullable();
+            $table->text('ruc_empresa')->nullable();
+            $table->text('empresa')->nullable();
             $table->text('direccion_empresa')->nullable();
             $table->unsignedInteger('empresa_id');
 

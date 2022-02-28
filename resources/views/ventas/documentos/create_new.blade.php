@@ -332,112 +332,118 @@
                     <div class="row">
 
                         <div class="col-lg-12">
-                            <div class="panel panel-primary">
+                            <div class="panel panel-primary" id="panel_detalle">
                                 <div class="panel-heading">
                                     <h4 class=""><b>Detalle del Documento de Venta</b></h4>
                                 </div>
-                                <div class="panel-body">
+                                <div class="panel-body ibox-content">
+                                    <div class="sk-spinner sk-spinner-wave">
+                                        <div class="sk-rect1"></div>
+                                        <div class="sk-rect2"></div>
+                                        <div class="sk-rect3"></div>
+                                        <div class="sk-rect4"></div>
+                                        <div class="sk-rect5"></div>
+                                    </div>
+                                    @if (empty($cotizacion))
+                                        <div class="row">
+                                            <div class="col-lg-6 col-xs-12">
+                                                <label class="col-form-label required">Producto:</label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="producto_lote" readonly>
+                                                    <span class="input-group-append">
+                                                        <button type="button" class="btn btn-primary" disabled id="buscarLotes"
+                                                            data-toggle="modal" data-target="#modal_lote"><i
+                                                                class='fa fa-search'></i> Buscar
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                                <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                                </div>
+                                            </div>
 
-                                        @if (empty($cotizacion))
-                                            <div class="row">
-                                                <div class="col-lg-6 col-xs-12">
-                                                    <label class="col-form-label required">Producto:</label>
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" id="producto_lote" readonly>
-                                                        <span class="input-group-append">
-                                                            <button type="button" class="btn btn-primary" disabled id="buscarLotes"
-                                                                data-toggle="modal" data-target="#modal_lote"><i
-                                                                    class='fa fa-search'></i> Buscar
-                                                            </button>
-                                                        </span>
-                                                    </div>
-                                                    <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                            <input type="hidden" name="producto_id" id="producto_id">
+                                            <input type="hidden" name="producto_unidad" id="producto_unidad">
+
+                                            <div class="col-lg-2 col-xs-12">
+
+                                                <label class="col-form-label required">Cantidad:</label>
+                                                <input type="text" name="cantidad"  id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'precio')" disabled>
+                                                <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-2 col-xs-12">
+                                                <div class="form-group">
+                                                    <label class="col-form-label required" for="amount">Precio:</label>
+                                                    <input type="number" id="precio" name="precio" class="form-control" onkeydown="nextFocus(event,'btn_agregar_detalle')" disabled>
+                                                    <div class="invalid-feedback"><b><span id="error-precio"></span></b>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                <input type="hidden" name="producto_id" id="producto_id">
-                                                <input type="hidden" name="producto_unidad" id="producto_unidad">
 
-                                                <div class="col-lg-2 col-xs-12">
 
-                                                    <label class="col-form-label required">Cantidad:</label>
-                                                    <input type="text" name="cantidad"  id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'precio')" disabled>
-                                                    <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
-                                                    </div>
+                                            <div class="col-lg-2 col-xs-12">
+
+                                                <div class="form-group">
+                                                    <label class="col-form-label" for="amount">&nbsp;</label>
+                                                    <button type=button class="btn btn-block btn-warning" style='color:white;'
+                                                        id="btn_agregar_detalle" disabled> <i class="fa fa-plus"></i>
+                                                        AGREGAR</button>
                                                 </div>
-
-                                                <div class="col-lg-2 col-xs-12">
-                                                    <div class="form-group">
-                                                        <label class="col-form-label required" for="amount">Precio:</label>
-                                                        <input type="number" id="precio" name="precio" class="form-control" onkeydown="nextFocus(event,'btn_agregar_detalle')" disabled>
-                                                        <div class="invalid-feedback"><b><span id="error-precio"></span></b>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-
-
-                                                <div class="col-lg-2 col-xs-12">
-
-                                                    <div class="form-group">
-                                                        <label class="col-form-label" for="amount">&nbsp;</label>
-                                                        <button type=button class="btn btn-block btn-warning" style='color:white;'
-                                                            id="btn_agregar_detalle" disabled> <i class="fa fa-plus"></i>
-                                                            AGREGAR</button>
-                                                    </div>
-
-                                                </div>
-
-
 
                                             </div>
-                                            <hr>
-                                        @endif
 
 
-                                        <div class="table-responsive">
-                                            <table
-                                                class="table dataTables-detalle-documento table-striped table-bordered table-hover"
-                                                style="text-transform:uppercase">
-                                                <thead>
-                                                    <tr>
-                                                        <th></th>
-                                                        <th class="text-center"><i class="fa fa-dashboard"></i></th>
-                                                        <th class="text-center">CANT</th>
-                                                        <th class="text-center">UM</th>
-                                                        <th class="text-center">PRODUCTO</th>
-                                                        <th class="text-center">V. UNITARIO</th>
-                                                        <th class="text-center">P. UNITARIO</th>
-                                                        <th class="text-center">DESCUENTO</th>
-                                                        <th class="text-center">P. NUEVO</th>
-                                                        <th class="text-center">TOTAL</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
 
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <th class="text-right" colspan="10"></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-right" colspan="9">Sub Total:</th>
-                                                        <th class="text-center"><span
-                                                                id="subtotal">@if (!empty($cotizacion)) {{ $cotizacion->sub_total }} @else 0.0 @endif</span></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-right" colspan="9">IGV <span id="igv_int"></span>:</th>
-                                                        <th class="text-center"><span
-                                                                id="igv_monto">@if (!empty($cotizacion)) {{ $cotizacion->total_igv }} @else 0.0 @endif</span></th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-right" colspan="9">TOTAL:</th>
-                                                        <th class="text-center"><span id="total">@if (!empty($cotizacion)) {{ $cotizacion->total }} @else 0.0 @endif</span>
-                                                        </th>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
                                         </div>
+                                        <hr>
+                                    @endif
+
+
+                                    <div class="table-responsive">
+                                        <table
+                                            class="table dataTables-detalle-documento table-striped table-bordered table-hover"
+                                            style="text-transform:uppercase">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th class="text-center"><i class="fa fa-dashboard"></i></th>
+                                                    <th class="text-center">CANT</th>
+                                                    <th class="text-center">UM</th>
+                                                    <th class="text-center">PRODUCTO</th>
+                                                    <th class="text-center">V. UNITARIO</th>
+                                                    <th class="text-center">P. UNITARIO</th>
+                                                    <th class="text-center">DESCUENTO</th>
+                                                    <th class="text-center">P. NUEVO</th>
+                                                    <th class="text-center">TOTAL</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th class="text-right" colspan="10"></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-right" colspan="9">Sub Total:</th>
+                                                    <th class="text-center"><span
+                                                            id="subtotal">@if (!empty($cotizacion)) {{ $cotizacion->sub_total }} @else 0.0 @endif</span></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-right" colspan="9">IGV <span id="igv_int"></span>:</th>
+                                                    <th class="text-center"><span
+                                                            id="igv_monto">@if (!empty($cotizacion)) {{ $cotizacion->total_igv }} @else 0.0 @endif</span></th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="text-right" colspan="9">TOTAL:</th>
+                                                    <th class="text-center"><span id="total">@if (!empty($cotizacion)) {{ $cotizacion->total }} @else 0.0 @endif</span>
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1506,6 +1512,7 @@
         clientes_global = [];
         $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         $("#cliente_id").empty().trigger('change');
+        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         axios.post('{{ route('ventas.customers_all') }}',{'_token': $('input[name=_token]').val(), 'tipo_id': $('#tipo_venta').val()}).then(response => {
 
             let data = response.data;
@@ -1532,7 +1539,9 @@
 
             $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
             $('#tipo_cliente_documento').val(data.tipo);
-        }).then(obtenerTipocliente(1))
+            obtenerTipocliente(1);
+            $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+        })
     }
 
     function obtenerTipocliente(cliente_id) {
