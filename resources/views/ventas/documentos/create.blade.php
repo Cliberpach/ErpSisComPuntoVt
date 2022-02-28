@@ -897,7 +897,6 @@
         }
 
         if ($('#cantidad').val() == 0) {
-            toastr.error('El stock del producto es 0.', 'Error');
             enviar = true;
             $("#cantidad").addClass("is-invalid");
             $('#error-cantidad').text('El campo cantidad debe ser mayor a 0.')
