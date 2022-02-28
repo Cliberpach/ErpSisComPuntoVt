@@ -254,7 +254,7 @@
                                                     disabled>
                                                     <option></option>
                                                     @foreach ($clientes as $cliente)
-                                                        <option value="{{ $cliente->id }}" @if (old('cliente_id', $cotizacion->cliente_id) == $cliente->id){{ 'selected' }}@endif >{{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
+                                                        <option value="{{ $cliente->id }}" @if (old('cliente_id', $cotizacion->cliente_id) == $cliente->id){{ 'selected' }}@endif tabladetalle="{{$cliente->tabladetalles_id}}">{{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -1487,8 +1487,8 @@
 
     function obtenerClientes() {
         clientes_global = [];
-        $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         $("#cliente_id").empty().trigger('change');
+        $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         axios.post('{{ route('ventas.customers_all') }}',{'_token': $('input[name=_token]').val(), 'tipo_id': $('#tipo_venta').val()}).then(response => {
 
             let data = response.data;
@@ -1500,11 +1500,11 @@
                     var newOption = '';
                     if(data.clientes[i].id == 1)
                     {
-                        newOption = '<option value="'+data.clientes[i].id+'" selected>'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                        newOption = '<option value="'+data.clientes[i].id+'" selected tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
                     }
                     else
                     {
-                        newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                        newOption = '<option value="'+data.clientes[i].id+'" tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
                     }
                     $('#cliente_id').append(newOption).trigger('change');
                 }
@@ -1512,19 +1512,14 @@
             } else {
                 toastr.error('Clientes no encontrados.', 'Error');
             }
-
-            $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
             $('#tipo_cliente_documento').val(data.tipo);
+            $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
         }).then(obtenerTipocliente(1))
     }
 
     function obtenerTipocliente(cliente_id) {
         if (cliente_id != '') {
-            axios.post('{{ route('ventas.cliente.getcustomer') }}',{'_token': $('input[name=_token]').val(), 'cliente_id': cliente_id}).then(response => {
-                let cliente = response.data;
-                $('#buscarLotes').prop("disabled", false)
-                $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
-            })
+            $('#buscarLotes').prop("disabled", false)
         }
     }
 

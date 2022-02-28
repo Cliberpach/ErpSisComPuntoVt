@@ -135,6 +135,7 @@
 <script>
 
     function obtenerLotesproductos(tipo_cliente) {
+        console.log(tipo_cliente)
         //RUTA LOTES PRODUCTOS
         var url = '{{ route("ventas.getLot", ":id")}}';
         url = url.replace(':id', tipo_cliente);
@@ -416,7 +417,7 @@
 
     function limpiarModallote() {
         //ACTUALIZAR DATATABLE
-        let cliente_id = $("#cliente_id option:selected").attr('tabladetalle_id')
+        let cliente_id = $("#cliente_id option:selected").attr('tabladetalle')
         obtenerLotesproductos(cliente_id)
         setTimeout(function() {
             $('#modal_lote div.dataTables_filter input').focus();
@@ -428,7 +429,7 @@
     //AL ABRIR EL MODAL SE DEBE DE ACTUALIZAR EL DATATABLE
     $('#modal_lote').on('show.bs.modal', function(e) {
         //ACTUALIZAR DATATABLE
-        let cliente_id = $("#cliente_id option:selected").attr('tabladetalle_id')
+        let cliente_id = $("#cliente_id option:selected").attr('tabladetalle')
         obtenerLotesproductos(cliente_id)
         setTimeout(function() {
             $('#modal_lote div.dataTables_filter input').focus();
