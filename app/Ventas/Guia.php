@@ -46,6 +46,7 @@ class Guia extends Model
         'documento_cliente',
         'cliente',
         'cliente_id',
+        'user_id',
     ];
 
     public function documento()
@@ -53,9 +54,25 @@ class Guia extends Model
         return $this->belongsTo('App\Ventas\Documento\Documento','documento_id');
     }
 
+    public function detalles()
+    {
+        return $this->hasMany(DetalleGuia::class,'guia_id');
+    }
+
     public function tienda()
     {
         return $this->belongsTo('App\Ventas\Tienda','tienda_id');
+    }
+
+    public function clienteEntidad()
+    {
+        return $this->belongsTo('App\Ventas\Cliente', 'cliente_id');
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
     }
 
     public function tipoDocumentoCliente(): string

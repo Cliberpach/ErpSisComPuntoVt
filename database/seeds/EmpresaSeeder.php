@@ -28,6 +28,7 @@ class EmpresaSeeder extends Seeder
         $empresa->dni_representante = '70004110';
         $empresa->nombre_representante = 'NOMBRE APELLIDOPAT APELLIDOMAT';
         $empresa->num_asiento = 'A00001';
+        $empresa->ubigeo = '130102';
         $empresa->num_partida = '11036086';
         $empresa->estado_ruc = 'ACTIVO';
         $empresa->estado_fe= '1';

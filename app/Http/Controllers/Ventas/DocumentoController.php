@@ -1854,8 +1854,8 @@ class DocumentoController extends Controller
         {
             $arrayCuotas[] = array(
                 "moneda" => "PEN",
-                "monto" => (float)1,
-                "fechaPago" => self::obtenerFechaEmision($documento)
+                "monto" => (float)$documento->total,
+                "fechaPago" => self::obtenerFechaVencimiento($documento)
 
             );
         }
@@ -1937,9 +1937,9 @@ class DocumentoController extends Controller
             ->join('marcas','marcas.id','=','productos.marca_id')
             ->join('tabladetalles','tabladetalles.id','=','productos.medida')
             ->leftJoin('detalle_nota_ingreso','detalle_nota_ingreso.lote_id','=','lote_productos.id')
-            ->join('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
+            ->leftJoin('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
             ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->join('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
+            ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
             ->select(
                 'nota_ingreso.moneda as moneda_ingreso',
                 'compra_documentos.moneda as moneda_compra',
@@ -1954,7 +1954,6 @@ class DocumentoController extends Controller
                 'lote_productos.*','productos.nombre',
                 'productos.igv',
                 'productos.codigo_barra',
-               //'productos.porcentaje_normal',
                 DB::raw('ifnull((select porcentaje
                     from productos_clientes pc
                     where pc.producto_id = lote_productos.producto_id
@@ -1962,7 +1961,6 @@ class DocumentoController extends Controller
                     and pc.estado = "ACTIVO"
                 order by id desc
                 limit 1),20) as porcentaje_normal'),
-                //'productos.porcentaje_distribuidor',
                 DB::raw('ifnull((select porcentaje
                     from productos_clientes pc
                     where pc.producto_id = lote_productos.producto_id

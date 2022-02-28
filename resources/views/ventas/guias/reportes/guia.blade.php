@@ -204,10 +204,10 @@
                 <tbody>
                     <tr>
                         <td>
-                            <p class="m-0 p-0">{{ $guia->documento->tipo_documento_cliente == 'RUC' ? 'Razón Social' : 'Nombre' }}: {{ $guia->documento->clienteEntidad->nombre }}</p>
-                            <p class="m-0 p-0">{{ $guia->documento->tipo_documento_cliente }}: {{ $guia->documento->clienteEntidad->documento }}</p>
+                            <p class="m-0 p-0">{{ $guia->tipo_documento_cliente == 'RUC' ? 'Razón Social' : 'Nombre' }}: {{ $guia->clienteEntidad->nombre }}</p>
+                            <p class="m-0 p-0">{{ $guia->tipo_documento_cliente }}: {{ $guia->clienteEntidad->documento }}</p>
                             <p class="m-0 p-0">Dirección: {{ $guia->direccion_llegada }}</p>
-                            <p class="m-0 p-0">Vendedor: {{ $guia->documento->user->usuario }}</p>
+                            <p class="m-0 p-0">Vendedor: {{ $guia->user->usuario }}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -257,7 +257,7 @@
                         </td>
                         <td style="border-left: 0px !important;">
                             <p class="m-0 p-0">DNI: {{ $guia->dni_conductor }}</p>
-                            <p class="m-0 p-0">Conductor: {{ $guia->dni_conductor }}</p>
+                            <p class="m-0 p-0">Conductor: {{ '-' }}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -275,13 +275,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for($i = 0; $i < count($guia->documento->detalles); $i++)
+                    @for($i = 0; $i < count($guia->detalles); $i++)
                     <tr>
                         <td style="text-align: center"><p class="m-0 p-0">{{ $i + 1 }}</p></td>
-                        <td style="text-align: center">{{ $guia->documento->detalles[$i]->lote->producto->codigo }}</td>
-                        <td>{{ $guia->documento->detalles[$i]->lote->producto->nombre }}</td>
-                        <td style="text-align: center">{{ $guia->documento->detalles[$i]->lote->producto->getMedida() }}</td>
-                        <td style="text-align: center">{{ $guia->documento->detalles[$i]->cantidad }}</td>
+                        <td style="text-align: center">{{ $guia->detalles[$i]->codigo_producto }}</td>
+                        <td>{{ $guia->detalles[$i]->nombre_producto }}</td>
+                        <td style="text-align: center">{{ $guia->detalles[$i]->unidad }}</td>
+                        <td style="text-align: center">{{ $guia->detalles[$i]->cantidad }}</td>
                     </tr>
                     @endfor
                 </tbody>
@@ -291,12 +291,12 @@
             <table class="tbl-detalles" cellpadding="2" cellspacing="0">
                 <thead>
                     <tr>
-                        <th style="text-align: left">{{ $guia->documento->nombreDocumento() }}</th>
+                        <th style="text-align: left">{{ $guia->documento ? $guia->documento->nombreDocumento() : '-' }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ $guia->documento->serie.'-'.$guia->documento->correlativo }}</td>
+                        <td>{{ $guia->documento ? $guia->documento->serie.'-'.$guia->documento->correlativo : '-' }}</td>
                     </tr>
                 </tbody>
             </table>

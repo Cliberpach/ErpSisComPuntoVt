@@ -157,8 +157,8 @@ class AlertaController extends Controller
         {
             $arrayCuotas[] = array(
                 "moneda" => "PEN",
-                "monto" => (float)1,
-                "fechaPago" => self::obtenerFechaEmision($documento)
+                "monto" => (float)$documento->total,
+                "fechaPago" => self::obtenerFechaVencimiento($documento)
 
             );
         }

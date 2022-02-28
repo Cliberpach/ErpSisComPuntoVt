@@ -174,6 +174,10 @@ class DocumentoController extends Controller
     public function getProduct()
     {
         $productos = Producto::where('estado', 'ACTIVO')->get();
+        foreach($productos as $item)
+        {
+            $item['medida_desc'] = $item->medidaCompleta();
+        }
         return response()->json([
             'productos' => $productos
         ]);

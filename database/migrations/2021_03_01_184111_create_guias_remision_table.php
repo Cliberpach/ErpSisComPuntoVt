@@ -49,11 +49,15 @@ class CreateGuiasRemisionTable extends Migration
             $table->string('empresa')->nullable();
             $table->text('direccion_empresa')->nullable();
             $table->unsignedInteger('empresa_id');
+
             $table->text('tipo_documento_cliente')->nullable();
             $table->text('documento_cliente')->nullable();
             $table->text('cliente')->nullable();
             $table->text('direccion_cliente')->nullable();
             $table->unsignedInteger('cliente_id');
+
+            $table->unsignedInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
