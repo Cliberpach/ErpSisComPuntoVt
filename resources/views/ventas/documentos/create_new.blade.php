@@ -648,58 +648,6 @@
                 },
             })
         @endif
-    });
-
-    function changeFormaPago()
-    {
-        let condicion_id = $('#condicion_id').val();
-        if(condicion_id)
-        {
-            let cadena = condicion_id.split('-');
-            let dias = parseInt($('#condicion_id option:selected').data('dias')) + 1
-            let fecha = new Date('{{ $fecha_hoy }}')
-
-            fecha.setDate(fecha.getDate() + dias)
-
-            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
-            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
-            let resultado = fecha.getFullYear() + '-' + month + '-' + day
-            $("#fecha_vencimiento_campo").val(resultado);
-            if(cadena[1] == 'CONTADO')
-            {
-                $('#fecha_vencimiento').addClass('d-none');
-            }
-            else
-            {
-                $('#fecha_vencimiento').removeClass('d-none');
-            }
-        }
-        else
-        {
-            $('#fecha_vencimiento').addClass('d-none');
-            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
-        }
-    }
-
-    function obtenerProducto(id) {
-        // Consultamos nuestra BBDD
-        var url = '{{ route('almacenes.producto.productoDescripcion', ':id') }}';
-        url = url.replace(':id', id);
-        $.ajax({
-            dataType: 'json',
-            type: 'get',
-            url: url,
-        }).done(function(result) {
-
-            $('#presentacion_producto').val(result.medida)
-            $('#codigo_nombre_producto').val(result.codigo + ' - ' + result.nombre)
-            llegarDatos()
-            sumaTotal()
-            limpiarDetalle()
-        });
-    }
-
-    $(document).ready(function() {
 
         //DATATABLE - COTIZACION
         table = $('.dataTables-detalle-documento').DataTable({
@@ -848,6 +796,55 @@
         //Controlar Error
         $.fn.DataTable.ext.errMode = 'throw';
     });
+
+    function changeFormaPago()
+    {
+        let condicion_id = $('#condicion_id').val();
+        if(condicion_id)
+        {
+            let cadena = condicion_id.split('-');
+            let dias = parseInt($('#condicion_id option:selected').data('dias')) + 1
+            let fecha = new Date('{{ $fecha_hoy }}')
+
+            fecha.setDate(fecha.getDate() + dias)
+
+            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
+            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
+            let resultado = fecha.getFullYear() + '-' + month + '-' + day
+            $("#fecha_vencimiento_campo").val(resultado);
+            if(cadena[1] == 'CONTADO')
+            {
+                $('#fecha_vencimiento').addClass('d-none');
+            }
+            else
+            {
+                $('#fecha_vencimiento').removeClass('d-none');
+            }
+        }
+        else
+        {
+            $('#fecha_vencimiento').addClass('d-none');
+            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
+        }
+    }
+
+    function obtenerProducto(id) {
+        // Consultamos nuestra BBDD
+        var url = '{{ route('almacenes.producto.productoDescripcion', ':id') }}';
+        url = url.replace(':id', id);
+        $.ajax({
+            dataType: 'json',
+            type: 'get',
+            url: url,
+        }).done(function(result) {
+
+            $('#presentacion_producto').val(result.medida)
+            $('#codigo_nombre_producto').val(result.codigo + ' - ' + result.nombre)
+            llegarDatos()
+            sumaTotal()
+            limpiarDetalle()
+        });
+    }
 
     function limpiarErrores() {
         $('#cantidad').removeClass("is-invalid")
@@ -1503,72 +1500,48 @@
     function consultarSeguntipo() {
         $('#empresa_id').prop("disabled", false);
         obtenerTiposComprobantes()
-        //obtenerClientes()
     }
 
     function obtenerClientes() {
         clientes_global = [];
+        $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         $("#cliente_id").empty().trigger('change');
-        $.ajax({
-            dataType: 'json',
-            url: '{{ route('ventas.customers_all') }}',
-            type: 'post',
-            data: {
-                '_token': $('input[name=_token]').val(),
-                'tipo_id': $('#tipo_venta').val()
-            },
-            success: function(data) {
-                clientes_global = data.clientes;
-                if (data.clientes.length > 0) {
-                    $('#cliente_id').append('<option></option>').trigger('change');
-                    for(var i = 0;i < data.clientes.length; i++)
-                    {
-                        var newOption = '';
-                        if(data.clientes[i].id == 1)
-                        {
-                            newOption = '<option value="'+data.clientes[i].id+'" selected>'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
-                        }
-                        else
-                        {
-                            newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
-                        }
-                        $('#cliente_id').append(newOption).trigger('change');
-                        //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
-                    }
-                    // $('#cliente_id').val($('#cliente_id option:first-child').val()).trigger('change');
-                    // //$('#cliente_id').prop("disabled", false);
-                    // var clientes = '<option value="" selected disabled >SELECCIONAR</option>'
-                    // for (var i = 0; i < data.clientes.length; i++)
-                    //     clientes += '<option value="' + data.clientes[i].id + '">' + data.clientes[i]
-                    //     .tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i]
-                    //     .nombre + '</option>';
+        axios.post('{{ route('ventas.customers_all') }}',{'_token': $('input[name=_token]').val(), 'tipo_id': $('#tipo_venta').val()}).then(response => {
 
-                } else {
-                    //$('#cliente_id').val($('#cliente_id option:first-child').val()).trigger('change');
-                    //$('#cliente_id').prop("disabled", true);
-                    toastr.error('Clientes no encontrados.', 'Error');
+            let data = response.data;
+            clientes_global = data.clientes;
+            if (data.clientes.length > 0) {
+                $('#cliente_id').append('<option></option>').trigger('change');
+                for(var i = 0;i < data.clientes.length; i++)
+                {
+                    var newOption = '';
+                    if(data.clientes[i].id == 1)
+                    {
+                        newOption = '<option value="'+data.clientes[i].id+'" selected>'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                    }
+                    else
+                    {
+                        newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                    }
+                    $('#cliente_id').append(newOption).trigger('change');
                 }
 
-                //$("#cliente_id").html(clientes);
-                $('#tipo_cliente_documento').val(data.tipo);
-            },
-        })
+            } else {
+                toastr.error('Clientes no encontrados.', 'Error');
+            }
+
+            $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
+            $('#tipo_cliente_documento').val(data.tipo);
+        }).then(obtenerTipocliente(1))
     }
 
     function obtenerTipocliente(cliente_id) {
         if (cliente_id) {
-            $.ajax({
-                dataType: 'json',
-                url: '{{ route('ventas.cliente.getcustomer') }}',
-                type: 'post',
-                data: {
-                    '_token': $('input[name=_token]').val(),
-                    'cliente_id': cliente_id
-                },
-                success: function(cliente) {
-                    $('#buscarLotes').prop("disabled", false)
-                    $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
-                },
+            axios.post('{{ route('ventas.cliente.getcustomer') }}',{'_token': $('input[name=_token]').val(), 'cliente_id': cliente_id}).then(response => {
+                let cliente = response.data;
+                console.log(cliente);
+                $('#buscarLotes').prop("disabled", false)
+                $("#cliente_id option[value='"+cliente_id+"']").attr('tabladetalle_id', cliente.tabladetalles_id)
             })
         }
     }
