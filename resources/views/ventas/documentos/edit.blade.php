@@ -1343,7 +1343,7 @@
                 for(var i = 0;i < data.clientes.length; i++)
                 {
                     var newOption = '';
-                    if(data.clientes[i].id == 1)
+                    if(data.clientes[i].id == '{{$documento->cliente_id}}')
                     {
                         newOption = '<option value="'+data.clientes[i].id+'" selected tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
                     }
