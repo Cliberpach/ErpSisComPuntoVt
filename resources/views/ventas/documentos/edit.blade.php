@@ -247,11 +247,18 @@
                     <div class="row">
 
                         <div class="col-lg-12">
-                            <div class="panel panel-primary">
+                            <div class="panel panel-primary" id="panel_detalle">
                                 <div class="panel-heading">
                                     <h4 class=""><b>Detalle del Documento de Venta</b></h4>
                                 </div>
-                                <div class="panel-body">
+                                <div class="panel-body ibox-content">
+                                    <div class="sk-spinner sk-spinner-wave">
+                                        <div class="sk-rect1"></div>
+                                        <div class="sk-rect2"></div>
+                                        <div class="sk-rect3"></div>
+                                        <div class="sk-rect4"></div>
+                                        <div class="sk-rect5"></div>
+                                    </div>
 
                                     <div class="row">
                                         <div class="col-lg-6 col-xs-12">
@@ -1325,55 +1332,44 @@
     function obtenerClientes() {
         clientes_global = [];
         $("#cliente_id").empty().trigger('change');
-        $.ajax({
-            dataType: 'json',
-            url: '{{ route('ventas.customers_all') }}',
-            type: 'post',
-            data: {
-                '_token': $('input[name=_token]').val(),
-                'tipo_id': $('#tipo_venta').val()
-            },
-            success: function(data) {
-                clientes_global = data.clientes;
-                if (data.clientes.length > 0) {
-                    $('#cliente_id').append('<option></option>').trigger('change');
-                    for(var i = 0;i < data.clientes.length; i++)
-                    {
-                        let = newOption = '';
-                        if('{{$documento->cliente_id}}' == data.clientes[i].id)
-                        {
-                            newOption = '<option value="'+data.clientes[i].id+'" selected>'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>';
-                        }
-                        else
-                        {
-                            newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>';
-                        }
-                        $('#cliente_id').append(newOption).trigger('change');
-                    }
+        $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
+        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
+        axios.post('{{ route('ventas.customers_all') }}',{'_token': $('input[name=_token]').val(), 'tipo_id': $('#tipo_venta').val()}).then(response => {
 
-                } else {
-                    toastr.error('Clientes no encontrados.', 'Error');
+            let data = response.data;
+            clientes_global = data.clientes;
+            if (data.clientes.length > 0) {
+                $('#cliente_id').append('<option></option>').trigger('change');
+                for(var i = 0;i < data.clientes.length; i++)
+                {
+                    var newOption = '';
+                    if(data.clientes[i].id == 1)
+                    {
+                        newOption = '<option value="'+data.clientes[i].id+'" selected tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                    }
+                    else
+                    {
+                        newOption = '<option value="'+data.clientes[i].id+'" tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                    }
+                    $('#cliente_id').append(newOption).trigger('change');
                 }
-                $('#tipo_cliente_documento').val(data.tipo);
-            },
+
+            } else {
+                toastr.error('Clientes no encontrados.', 'Error');
+            }
+            $('#tipo_cliente_documento').val(data.tipo);
+            $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
+            obtenerTipocliente(1)
+            $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         })
     }
 
     function obtenerTipocliente(cliente_id) {
-        if (cliente_id) {
-            $.ajax({
-                dataType: 'json',
-                url: '{{ route('ventas.cliente.getcustomer') }}',
-                type: 'post',
-                data: {
-                    '_token': $('input[name=_token]').val(),
-                    'cliente_id': cliente_id
-                },
-                success: function(cliente) {
-                    $('#buscarLotes').prop("disabled", false)
-                    obtenerLotesproductos(cliente.tabladetalles_id)
-                },
-            })
+        if (cliente_id != '') {
+            $('#buscarLotes').prop("disabled", false)
+        }
+        else{
+            $('#buscarLotes').prop("disabled", true)
         }
     }
 

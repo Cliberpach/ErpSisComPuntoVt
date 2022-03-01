@@ -13,6 +13,7 @@ use App\Compras\Orden;
 use App\Compras\Pago as ComprasPago;
 use App\Compras\Proveedor;
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Movimientos\MovimientoAlmacen;
 use App\Ventas\Documento\Pago\Pago;
@@ -142,6 +143,7 @@ class DocumentoController extends Controller
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
         $productos = Producto::where('estado','ACTIVO')->get();
         $modos =  modo_compra();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
 
         $monedas =  tipos_moneda();
         if (empty($orden)) {
@@ -153,6 +155,7 @@ class DocumentoController extends Controller
                 'monedas' => $monedas,
                 'fecha_hoy' => $fecha_hoy,
                 'fecha_actual' => $fecha_actual,
+                'condiciones' => $condiciones,
                 'fecha_5' => $fecha_5,
             ]);
         }else{
@@ -165,6 +168,7 @@ class DocumentoController extends Controller
                 'monedas' => $monedas,
                 'fecha_hoy' => $fecha_hoy,
                 'fecha_actual' => $fecha_actual,
+                'condiciones' => $condiciones,
                 'detalles' => $detalles,
                 'fecha_5' => $fecha_5,
             ]);
@@ -209,7 +213,7 @@ class DocumentoController extends Controller
                 'numero_tipo'=> 'required',
                 'serie_tipo'=> 'required',
                 'proveedor_id'=> 'required',
-                'modo_compra'=> 'required',
+                'condicion_id'=> 'required',
                 'observacion' => 'nullable',
                 'moneda' => 'nullable',
                 'tipo_cambio' => 'nullable|numeric',
@@ -223,7 +227,7 @@ class DocumentoController extends Controller
                 'numero_tipo.required' => 'El campo Número es obligatorio.',
                 'serie_tipo.required' => 'El campo Serie es obligatorio.',
                 'proveedor_id.required' => 'El campo Proveedor es obligatorio.',
-                'modo_compra.required' => 'El campo Modo de Compra es obligatorio.',
+                'condicion_id.required' => 'El campo condicion es obligatorio.',
                 'moneda.required' => 'El campo Moneda es obligatorio.',
                 'igv.required_if' => 'El campo Igv es obligatorio.',
                 'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
@@ -270,11 +274,13 @@ class DocumentoController extends Controller
                 $documento->total_dolares = (float) $request->get('monto_total') / $dolar;
             }
             //-------------------------------
+            $condicion = Condicion::find($request->get('condicion_id'));
             $documento->empresa_id = 1;
             $documento->numero_tipo = $request->get('numero_tipo');
             $documento->serie_tipo = $request->get('serie_tipo');
             $documento->proveedor_id = $request->get('proveedor_id');
-            $documento->modo_compra = $request->get('modo_compra');
+            $documento->condicion_id = $request->get('condicion_id');
+            $documento->modo_compra = $condicion->descripcion;
             $documento->observacion = $request->get('observacion');
             $documento->moneda = $request->get('moneda');
             $documento->tipo_cambio = $request->get('tipo_cambio');
@@ -386,6 +392,7 @@ class DocumentoController extends Controller
         $fecha_actual = Carbon::now();
         $fecha_actual = date("d/m/Y",strtotime($fecha_actual));
         $fecha_5 = date("d/m/Y",strtotime($fecha_hoy."+ 5 years"));
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
         return view('compras.documentos.edit',[
             'empresas' => $empresas,
             'proveedores' => $proveedores,
@@ -394,6 +401,7 @@ class DocumentoController extends Controller
             'presentaciones' => $presentaciones,
             'fecha_hoy' => $fecha_hoy,
             'fecha_actual' => $fecha_actual,
+            'condiciones' => $condiciones,
             'fecha_5' => $fecha_5,
             'detalles' => $detalles,
         ]);
@@ -410,7 +418,7 @@ class DocumentoController extends Controller
             'numero_tipo'=> 'required',
             'serie_tipo'=> 'required',
             'proveedor_id'=> 'required',
-            'modo_compra'=> 'required',
+            'condicion_id'=> 'required',
             'observacion' => 'nullable',
             'moneda' => 'nullable',
             'tipo_cambio' => 'nullable|numeric',
@@ -423,7 +431,7 @@ class DocumentoController extends Controller
             'numero_tipo.required' => 'El campo Número es obligatorio.',
             'serie_tipo.required' => 'El campo Serie es obligatorio.',
             'proveedor_id.required' => 'El campo Proveedor es obligatorio.',
-            'modo_compra.required' => 'El campo Modo de Compra es obligatorio.',
+            'condicion_id.required' => 'El campo Condicion es obligatorio.',
             'moneda.required' => 'El campo Moneda es obligatorio.',
             'igv.required_if' => 'El campo Igv es obligatorio.',
             'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
@@ -470,9 +478,11 @@ class DocumentoController extends Controller
             $documento->total_dolares = (float) $request->get('monto_total') / $dolar;
         }
             //-------------------------------
+        $condicion = Condicion::find($request->get('condicion_id'));
         $documento->empresa_id = '1';
         $documento->proveedor_id = $request->get('proveedor_id');
-        $documento->modo_compra = $request->get('modo_compra');
+        $documento->condicion_id = $request->get('condicion_id');
+        $documento->modo_compra = $condicion->descripcion;
         $documento->observacion = $request->get('observacion');
         $documento->moneda = $request->get('moneda');
         $documento->tipo_cambio = $request->get('tipo_cambio');

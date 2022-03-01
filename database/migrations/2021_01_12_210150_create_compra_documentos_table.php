@@ -16,6 +16,7 @@ class CreateCompraDocumentosTable extends Migration
         Schema::create('compra_documentos', function (Blueprint $table) {
             $table->increments('id');
             $table->date('fecha_emision');
+            $table->date('fecha_vencimiento')->nullable();
             $table->date('fecha_entrega');
             $table->unsignedInteger('empresa_id');
             $table->foreign('empresa_id')->references('id')->on('empresas')->onDelete('cascade');
@@ -24,8 +25,8 @@ class CreateCompraDocumentosTable extends Migration
             $table->foreign('proveedor_id')->references('id')->on('proveedores')->onDelete('cascade');
 
             $table->BigInteger('orden_compra')->nullable();
-
-            $table->string('modo_compra');
+            $table->foreignId('condicion_id')->nullable()->constrained()->onDelete('SET NULL');
+            $table->string('modo_compra')->nullable();
             $table->string('numero_tipo');
             $table->string('serie_tipo');
             $table->string('numero_doc')->nullable();

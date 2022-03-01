@@ -160,28 +160,23 @@
                             </div>
 
                             <div class="col-sm-6">
-
-
                                 <div class="form-group">
-                                    <label class="required">Modo de Compra: </label>
-                                    <select
-                                        class="select2_form form-control {{ $errors->has('modo_compra') ? ' is-invalid' : '' }}"
-                                        style="text-transform: uppercase; width:100%"
-                                        value="{{old('modo_compra',$orden->modo_compra)}}" name="modo_compra"
-                                        id="modo_compra" required>
+                                    <label class="required">Condición</label>
+                                    <select id="condicion_id" name="condicion_id"
+                                        class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                        required>
                                         <option></option>
-                                        @foreach ($modos as $modo)
-                                        <option value="{{$modo->descripcion}}" @if(old('modo_compra',$orden->
-                                            modo_compra)==$modo->
-                                            descripcion ) {{'selected'}} @endif
-                                            >{{$modo->simbolo.' - '.$modo->descripcion}}</option>
+                                        @foreach ($condiciones as $condicion)
+                                            <option value="{{ $condicion->id }}" @if(old('condicion_id',$orden->condicion_id) == $condicion->id ) {{'selected'}} @endif>
+                                                {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                            </option>
                                         @endforeach
-                                        @if ($errors->has('modo_compra'))
-                                        <span class="invalid-feedback" role="alert">
-                                            <strong>{{ $errors->first('modo_compra') }}</strong>
-                                        </span>
-                                        @endif
                                     </select>
+                                    @if ($errors->has('condicion_id'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('condicion_id') }}</strong>
+                                    </span>
+                                    @endif
                                 </div>
 
                                 <div class="form-group row">

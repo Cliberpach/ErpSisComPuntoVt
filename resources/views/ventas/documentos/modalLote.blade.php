@@ -19,7 +19,7 @@
                         <table class="table dataTables-lotes table-bordered" style="width:100%; text-transform:uppercase;" id="table_lotes">
                             <thead>
                             <tr>
-                                <th class="text-center"></th>
+                                <th class="text-center" hidden></th>
                                 <th class="text-center">PRODUCTO</th>
                                 <th class="text-center">UM</th>
                                 <th class="text-center">CATEGORIA</th>
@@ -153,16 +153,16 @@
             "processing":true,
             "ajax": url,
             "columns": [
-                {data: 'id', className: "text-center", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
-                {data: 'nombre', className: "text-left", name:"productos.nombre", sWidth: '35%' },
-                {data: 'unidad_producto', className: "text-center", name:"tabladetalles.simbolo", sWidth: '5%' },
-                {data: 'categoria', className: "text-center", name:"categorias.descripcion", sWidth: '15%' },
-                {data: 'marca', className: "text-center", name:"marcas.marca", sWidth: '5%' },
-                {data: 'cantidad_logica', className: "text-center", name:"lote_productos.cantidad_logica", sWidth: '10%' },
-                {data: 'codigo_barra', className: "text-center", name:"productos.codigo_barra", sWidth: '15%' },
+                {data: 'id', className: "text-center letrapequeña", name:"lote_productos.id" ,visible: false, sWidth: '0%'},
+                {data: 'nombre', className: "text-left letrapequeña", name:"productos.nombre", sWidth: '35%' },
+                {data: 'unidad_producto', className: "text-center letrapequeña", name:"tabladetalles.simbolo", sWidth: '5%' },
+                {data: 'categoria', className: "text-center letrapequeña", name:"categorias.descripcion", sWidth: '15%' },
+                {data: 'marca', className: "text-center letrapequeña", name:"marcas.marca", sWidth: '5%' },
+                {data: 'cantidad_logica', className: "text-center letrapequeña", name:"lote_productos.cantidad_logica", sWidth: '10%' },
+                {data: 'codigo_barra', className: "text-center letrapequeña", name:"productos.codigo_barra", sWidth: '15%' },
                 {
                     data: null,
-                    className: "text-center",
+                    className: "text-center letrapequeña",
                     sWidth: '10%',
                     searchable: false,
                     render: function(data) {
@@ -223,7 +223,7 @@
                 },
                 {
                     data: null,
-                    className: "text-center",
+                    className: "text-center letrapequeña",
                     sWidth: '10%',
                     searchable: false,
                     render: function(data) {
@@ -284,7 +284,7 @@
                 @if ($fullaccess)
                 {
                     data: null,
-                    className: "text-center",
+                    className: "text-center letrapequeña",
                     searchable: false,
                     sWidth: '5%',
                     render: function(data) {

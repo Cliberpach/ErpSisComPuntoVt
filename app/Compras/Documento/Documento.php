@@ -4,6 +4,7 @@ namespace App\Compras\Documento;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Compras\CuentaProveedor;
+use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 
 class Documento extends Model
@@ -17,6 +18,7 @@ class Documento extends Model
             'empresa_id',
             'proveedor_id',
             'modo_compra',
+            'condicion_id',
             'numero_doc',
             'moneda',
             'observacion',
@@ -86,8 +88,8 @@ class Documento extends Model
     protected static function booted()
     {
         static::created(function(Documento $documento){
-            $modo = TablaDetalle::where('descripcion',$documento->modo_compra)->first();
-            if($modo->simbolo === 'CREDITO' || $modo->simbolo === 'credito' || $modo->simbolo === 'CRÉDITO' || $modo->simbolo === 'crédito')
+            $condicion = Condicion::find($documento->condicion_id);
+            if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
             {
                 $cuenta_proveedor = new CuentaProveedor();
                 $cuenta_proveedor->compra_documento_id = $documento->id;
@@ -110,8 +112,8 @@ class Documento extends Model
             }
             else
             {
-                $modo = TablaDetalle::where('descripcion',$documento->modo_compra)->first();
-                if($modo->simbolo === 'CREDITO' || $modo->simbolo === 'credito' || $modo->simbolo === 'CRÉDITO' || $modo->simbolo === 'crédito')
+                $condicion = Condicion::find($documento->condicion_id);
+                if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
                 {
                     $cuenta_proveedor = new CuentaProveedor();
                     $cuenta_proveedor->compra_documento_id = $documento->id;

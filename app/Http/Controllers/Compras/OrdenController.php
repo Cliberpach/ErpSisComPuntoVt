@@ -11,6 +11,7 @@ use App\Compras\Enviado;
 use App\Compras\Orden;
 use App\Compras\Proveedor;
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Condicion;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Movimientos\MovimientoAlmacen;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -124,12 +125,14 @@ class OrdenController extends Controller
         $modos =  modo_compra();
         $fecha_hoy = Carbon::now()->toDateString();
         $monedas =  tipos_moneda();
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
 
         return view('compras.ordenes.create',[
             'empresas' => $empresas,
             'proveedores' => $proveedores,
             'productos' => $productos,
             'presentaciones' => $presentaciones,
+            'condiciones' => $condiciones,
             'fecha_hoy' => $fecha_hoy,
             'modos' => $modos,
             'monedas' => $monedas,
@@ -144,6 +147,7 @@ class OrdenController extends Controller
         $detalles = Detalle::where('orden_id',$id)->get();
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
         $orden = Orden::findOrFail($id);
+        $condiciones = Condicion::where('estado','ACTIVO')->get();
 
         $documento = Documento::where('orden_compra',$id)->where('estado','!=','ANULADO')->first();
 
@@ -164,6 +168,7 @@ class OrdenController extends Controller
                 'orden' => $orden,
                 'productos' => $productos,
                 'presentaciones' => $presentaciones,
+                'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
                 'detalles' => $detalles,
                 'modos' => $modos,
@@ -177,6 +182,7 @@ class OrdenController extends Controller
                 'orden' => $orden,
                 'productos' => $productos,
                 'presentaciones' => $presentaciones,
+                'condiciones' => $condiciones,
                 'fecha_hoy' => $fecha_hoy,
                 'detalles' => $detalles,
                 'modos' => $modos,
@@ -194,7 +200,7 @@ class OrdenController extends Controller
             'fecha_emision'=> 'required',
             'fecha_entrega'=> 'required',
             'proveedor_id'=> 'required',
-            'modo_compra'=> 'required',
+            'condicion_id'=> 'required',
             'observacion' => 'nullable',
             'moneda' => 'nullable',
             'tipo_cambio' => 'nullable|numeric',
@@ -205,7 +211,7 @@ class OrdenController extends Controller
             'fecha_emision.required' => 'El campo Fecha de Emisión es obligatorio.',
             'fecha_entrega.required' => 'El campo Fecha de Entrega es obligatorio.',
             'proveedor_id.required' => 'El campo Proveedor es obligatorio.',
-            'modo_compra.required' => 'El campo Modo de Compra es obligatorio.',
+            'condicion_id.required' => 'El campo Condicion es obligatorio.',
             'moneda.required' => 'El campo Moneda es obligatorio.',
             'igv.required_if' => 'El campo Igv es obligatorio.',
             'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
@@ -224,9 +230,12 @@ class OrdenController extends Controller
         $orden->total_igv = (float) $request->get('monto_total_igv');
         $orden->total = (float) $request->get('monto_total');
 
+        $condicion = Condicion::find($request->get('condicion_id'));
+
         $orden->empresa_id = '1';
         $orden->proveedor_id = $request->get('proveedor_id');
-        $orden->modo_compra = $request->get('modo_compra');
+        $orden->condicion_id = $request->get('condicion_id');
+        $orden->modo_compra = $condicion->descripcion;
         $orden->observacion = $request->get('observacion');
         $orden->moneda = $request->get('moneda');
         $orden->tipo_cambio = $request->get('tipo_cambio');
@@ -266,7 +275,7 @@ class OrdenController extends Controller
             'fecha_emision'=> 'required',
             'fecha_entrega'=> 'required',
             'proveedor_id'=> 'required',
-            'modo_compra'=> 'required',
+            'condicion_id'=> 'required',
             'observacion' => 'nullable',
             'moneda' => 'nullable',
             'igv' => 'required_if:igv_check,==,on|digits_between:1,3',
@@ -276,7 +285,7 @@ class OrdenController extends Controller
             'fecha_emision.required' => 'El campo Fecha de Emisión es obligatorio.',
             'fecha_entrega.required' => 'El campo Fecha de Entrega es obligatorio.',
             'proveedor_id.required' => 'El campo Proveedor es obligatorio.',
-            'modo_compra.required' => 'El campo Modo de Compra es obligatorio.',
+            'condicion_id.required' => 'El campo Condicion es obligatorio.',
             'moneda.required' => 'El campo Moneda es obligatorio.',
             'igv.required_if' => 'El campo Igv es obligatorio.',
             'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
@@ -293,10 +302,12 @@ class OrdenController extends Controller
         $orden->total_igv = (float) $request->get('monto_total_igv');
         $orden->total = (float) $request->get('monto_total');
 
+        $condicion = Condicion::find($request->get('condicion_id'));
 
         $orden->empresa_id = '1';
         $orden->proveedor_id = $request->get('proveedor_id');
-        $orden->modo_compra = $request->get('modo_compra');
+        $orden->condicion_id = $request->get('condicion_id');
+        $orden->modo_compra = $condicion->descripcion;
         $orden->moneda = $request->get('moneda');
         $orden->observacion = $request->get('observacion');
         $orden->usuario_id = auth()->user()->id;

@@ -169,25 +169,23 @@
 
                                         <div class="form-group row">
                                             <div class="col-md-6">
-                                                <label class="required">Modo de Compra: </label>
-                                                <select
-                                                    class="select2_form form-control {{ $errors->has('modo_compra') ? ' is-invalid' : '' }}"
-                                                    style="text-transform: uppercase; width:100%"
-                                                    value="{{old('modo_compra',$documento->modo_compra)}}" name="modo_compra"
-                                                    id="modo_compra" required @if (!empty($documento->orden_id)) disabled @endif>
-                                                    <option></option>
-                                                    @foreach (modo_compra() as $modo)
-                                                    <option value="{{$modo->descripcion}}" @if(old('modo_compra',$documento->
-                                                        modo_compra)==$modo->
-                                                        descripcion ) {{'selected'}} @endif
-                                                        >{{$modo->simbolo.' - '.$modo->descripcion}}</option>
-                                                    @endforeach
-                                                    @if ($errors->has('modo_compra'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('modo_compra') }}</strong>
-                                                    </span>
-                                                    @endif
+                                                <label class="required">Condición: </label>
+                                                <select id="condicion_id" name="condicion_id"
+                                                        class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                                        required>
+                                                        <option></option>
+                                                        @foreach ($condiciones as $condicion)
+                                                            <option value="{{ $condicion->id }}"
+                                                            @if(old('condicion_id',$documento->condicion_id) == $condicion->id ) {{'selected'}} @endif>
+                                                                {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                            </option>
+                                                        @endforeach
                                                 </select>
+                                                @if ($errors->has('condicion_id'))
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('condicion_id') }}</strong>
+                                                </span>
+                                                @endif
 
                                             </div>
                                             <div class="col-md-6">
@@ -786,7 +784,7 @@ $('#enviar_orden').submit(function(e) {
                 $('#monto_percepcion').val($('#percepcion').val())
                 @if (!empty($documento->orden_id))
                 cargarproductos()
-                    document.getElementById("modo_compra").disabled = false;
+                    document.getElementById("condicion_id").disabled = false;
                     document.getElementById("igv_check").disabled = false;
                     document.getElementById("moneda").disabled = false;
                     document.getElementById("observacion").disabled = false;

@@ -14,18 +14,19 @@ class Orden extends Model
             'empresa_id',
             'proveedor_id',
             'modo_compra',
+            'condicion_id',
             'moneda',
             'observacion',
             'igv',
             'igv_check',
             'tipo_cambio',
-            
+
             'sub_total',
             'total_igv',
             'total',
 
             'estado',
-            
+
             'enviado',
             'usuario_id'
         ];

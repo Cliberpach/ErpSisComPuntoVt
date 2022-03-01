@@ -29,6 +29,7 @@ class CreateOrdenesTable extends Migration
             $table->date('fecha_entrega');
 
             $table->string('modo_compra');
+            $table->foreignId('condicion_id')->nullable()->constrained()->onDelete('SET NULL');
             $table->string('moneda');
             $table->string('igv_check',2)->nullable();
             $table->char('igv',3)->nullable();
