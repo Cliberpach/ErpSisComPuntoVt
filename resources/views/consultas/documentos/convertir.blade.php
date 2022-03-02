@@ -248,7 +248,6 @@
                                         <div class="sk-rect4"></div>
                                         <div class="sk-rect5"></div>
                                     </div>
-
                                     <div class="row d-none">
                                         <div class="col-lg-6 col-xs-12">
                                             <label class="col-form-label required">Producto:</label>
@@ -1391,7 +1390,7 @@
                     document.getElementById("fecha_documento_campo").disabled = false;
                     document.getElementById("fecha_atencion_campo").disabled = false;
                     document.getElementById("empresa_id").disabled = false;
-                    document.getElementById("cliente_id").disabled = false;
+                    document.getElementById("condicion_id").disabled = false;
                     //HABILITAR EL CARGAR PAGINA
                 }
                 else
@@ -1467,10 +1466,11 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                             }
                             else if(result.value.success)
                             {
-                                toastr.success('¡Documento de venta creado!','Exito')
+                                toastr.success('¡Documento de venta convertido!','Exito')
 
                                 let id = result.value.documento_id;
                                 var url_open_pdf = '{{ route("ventas.documento.comprobante", ":id")}}';
@@ -1499,6 +1499,7 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                             }
                         }
                     });

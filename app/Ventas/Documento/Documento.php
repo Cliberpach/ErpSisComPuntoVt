@@ -203,9 +203,6 @@ class Documento extends Model
                     $cuenta_cliente->save();
                 }
             }
-
-            $dato = "Message";
-            broadcast(new NotifySunatEvent($dato));
         });
 
         static::updated(function(Documento $documento){

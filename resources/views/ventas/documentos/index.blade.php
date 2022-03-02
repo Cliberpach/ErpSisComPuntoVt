@@ -713,51 +713,56 @@ $(".dataTables-documento").on('click','.pagar',function(){
 
 $(".dataTables-documento").on('click','.verPago',function(){
     var data = $(".dataTables-documento").dataTable().fnGetData($(this).closest('tr'));
-    $('#modal_pago_show .pago-title').html(data.numero_doc);
-    $('#modal_pago_show #monto_venta').val(data.total);
-    $('#modal_pago_show #venta_id').val(data.id);
-    $('#modal_pago_show #div_cuentas').addClass('d-none');
+    if(data.condicion_id != 1)
+    {
+        toastr.warning("Este documento ha sido pagado en cuotas")
+    }else{
+        $('#modal_pago_show .pago-title').html(data.numero_doc);
+        $('#modal_pago_show #monto_venta').val(data.total);
+        $('#modal_pago_show #venta_id').val(data.id);
+        $('#modal_pago_show #div_cuentas').addClass('d-none');
 
-    $('#modal_pago_show #ruta_pago').val(data.ruta_pago);
-    if(data.ruta_pago)
-    {
-        let ruta = data.ruta_pago;
-        ruta = ruta.replace('public','');
-        ruta = 'storage'+ruta;
-        let ruta_final = "{{asset(':ruta')}}";
-        ruta_final = ruta_final.replace(':ruta', ruta);
-        $inputPrevisualizacion = document.querySelector("#modal_pago_show #imagen_update");
-        $inputPrevisualizacion.src = ruta;
-        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
-        $imagenPrevisualizacion.src = ruta_final;
-        $('#modal_pago_show .custom-file-label').addClass("selected").html(data.serie+'-'+data.correlativo+'.jpg');
-    }
-    else
-    {
-        $('#modal_pago_show #imagen_update').val('');
-        $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
-        $imagenPrevisualizacion.src = "{{asset('img/default.png')}}";
-    }
+        $('#modal_pago_show #ruta_pago').val(data.ruta_pago);
+        if(data.ruta_pago)
+        {
+            let ruta = data.ruta_pago;
+            ruta = ruta.replace('public','');
+            ruta = 'storage'+ruta;
+            let ruta_final = "{{asset(':ruta')}}";
+            ruta_final = ruta_final.replace(':ruta', ruta);
+            $inputPrevisualizacion = document.querySelector("#modal_pago_show #imagen_update");
+            $inputPrevisualizacion.src = ruta;
+            $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
+            $imagenPrevisualizacion.src = ruta_final;
+            $('#modal_pago_show .custom-file-label').addClass("selected").html(data.serie+'-'+data.correlativo+'.jpg');
+        }
+        else
+        {
+            $('#modal_pago_show #imagen_update').val('');
+            $imagenPrevisualizacion = document.querySelector("#modal_pago_show .imagen_update");
+            $imagenPrevisualizacion.src = "{{asset('img/default.png')}}";
+        }
 
-    if(data.cuenta_id)
-    {
-        $('#modal_pago_show #div_cuentas').removeClass('d-none');
-        initCuentasShow(data.empresa_id,data.cuenta_id);
-    }
-    $('#modal_pago_show #modo_pago').val(data.tipo_pago_id).trigger('change.select2');
-    if(data.tipo_pago_id != 1)
-    {
-        $('#modal_pago_show #efectivo').val(data.efectivo);
-        $('#modal_pago_show #importe').val(data.importe);
-    }
-    else
-    {
-        $('#modal_pago_show #efectivo').val('0.00');
-        $('#modal_pago_show #importe').val(data.importe);
-    }
+        if(data.cuenta_id)
+        {
+            $('#modal_pago_show #div_cuentas').removeClass('d-none');
+            initCuentasShow(data.empresa_id,data.cuenta_id);
+        }
+        $('#modal_pago_show #modo_pago').val(data.tipo_pago_id).trigger('change.select2');
+        if(data.tipo_pago_id != 1)
+        {
+            $('#modal_pago_show #efectivo').val(data.efectivo);
+            $('#modal_pago_show #importe').val(data.importe);
+        }
+        else
+        {
+            $('#modal_pago_show #efectivo').val('0.00');
+            $('#modal_pago_show #importe').val(data.importe);
+        }
 
-    $('#modal_pago_show .pago-subtitle').html(data.cliente);
-    $('#modal_pago_show').modal('show');
+        $('#modal_pago_show .pago-subtitle').html(data.cliente);
+        $('#modal_pago_show').modal('show');
+    }
 });
 
 function initCuentasShow(empresa_id,cuenta_id)
