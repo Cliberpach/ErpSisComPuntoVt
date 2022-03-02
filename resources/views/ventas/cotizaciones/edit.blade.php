@@ -31,12 +31,12 @@
                                 id="form_modificar_cotizacion">
                                 @csrf @method('PUT')
                                 <div class="row">
-                                    <div class="col-lg-12 col-xs-12">
+                                    <div class="col-12">
                                         <h4><b>Datos Generales</b></h4>
                                     </div>
-                                    <div class="col-lg-12 col-xs-12 d-none">
+                                    <div class="col-12 d-none">
                                         <div class="form-group row">
-                                            <div class="col-lg-12 col-xs-12">
+                                            <div class="col-12">
                                                 <label class="required">Fecha de Documento</label>
                                                 <div class="input-group date">
                                                     <span class="input-group-addon">
@@ -81,53 +81,59 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-12 col-xs-12">
+                                    <div class="col-12">
                                         <div class="row">
-                                            <div class="col-lg-4 col-xs-12">
-                                                <label class="required">Fecha de Atención</label>
-                                                <div class="input-group date">
-                                                    <span class="input-group-addon">
-                                                        <i class="fa fa-calendar"></i>
-                                                    </span>
-                                                    <input type="date" id="fecha_atencion" name="fecha_atencion"
-                                                        class="form-control input-required {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_atencion', $cotizacion->fecha_atencion) }}"
-                                                        autocomplete="off" required readonly>
-                                                    @if ($errors->has('fecha_atencion'))
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $errors->first('fecha_atencion') }}</strong>
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-4 col-xs-12">
-                                                <label id="igv_requerido">IGV (%):</label>
-                                                <div class="input-group">
-                                                    <div class="input-group-prepend">
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="required">Fecha de Atención</label>
+                                                    <div class="input-group date">
                                                         <span class="input-group-addon">
-                                                            <input type="checkbox" id="igv_check" name="igv_check">
+                                                            <i class="fa fa-calendar"></i>
                                                         </span>
+                                                        <input type="date" id="fecha_atencion" name="fecha_atencion"
+                                                            class="form-control input-required {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
+                                                            value="{{ old('fecha_atencion', $cotizacion->fecha_atencion) }}"
+                                                            autocomplete="off" required readonly>
+                                                        @if ($errors->has('fecha_atencion'))
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $errors->first('fecha_atencion') }}</strong>
+                                                            </span>
+                                                        @endif
                                                     </div>
-                                                    <input type="text" value="{{ old('igv', $cotizacion->igv) }}" maxlength="3"
-                                                        class="form-control input-required {{ $errors->has('igv') ? ' is-invalid' : '' }}"
-                                                        name="igv" id="igv" onkeyup="return mayus(this)" required>
-                                                    @if ($errors->has('igv'))
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $errors->first('igv') }}</strong>
-                                                        </span>
-                                                    @endif
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-xs-12">
-                                                <label class="___class_+?40___">Vendedor</label>
-                                                <select id="vendedor" name="vendedor" class="select2_form form-control">
-                                                    <option value=""></option>
-                                                    @foreach (vendedores() as $vendedor)
-                                                        <option value="{{ $vendedor->id }}" {{$cotizacion->vendedor_id==null? '' :($cotizacion->vendedor_id==$vendedor->id ? 'selected' : '')}}>
-                                                            {{ $vendedor->persona->apellido_paterno . ' ' . $vendedor->persona->apellido_materno . ' ' . $vendedor->persona->nombres }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <label id="igv_requerido">IGV (%):</label>
+                                                    <div class="input-group">
+                                                        <div class="input-group-prepend">
+                                                            <span class="input-group-addon">
+                                                                <input type="checkbox" id="igv_check" name="igv_check">
+                                                            </span>
+                                                        </div>
+                                                        <input type="text" value="{{ old('igv', $cotizacion->igv) }}" maxlength="3"
+                                                            class="form-control input-required {{ $errors->has('igv') ? ' is-invalid' : '' }}"
+                                                            name="igv" id="igv" onkeyup="return mayus(this)" required>
+                                                        @if ($errors->has('igv'))
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $errors->first('igv') }}</strong>
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="___class_+?40___">Vendedor</label>
+                                                    <select id="vendedor" name="vendedor" class="select2_form form-control">
+                                                        <option value=""></option>
+                                                        @foreach (vendedores() as $vendedor)
+                                                            <option value="{{ $vendedor->id }}" {{$cotizacion->vendedor_id==null? '' :($cotizacion->vendedor_id==$vendedor->id ? 'selected' : '')}}>
+                                                                {{ $vendedor->persona->apellido_paterno . ' ' . $vendedor->persona->apellido_materno . ' ' . $vendedor->persona->nombres }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="row">

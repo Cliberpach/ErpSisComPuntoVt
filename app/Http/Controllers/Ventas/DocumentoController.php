@@ -474,6 +474,7 @@ class DocumentoController extends Controller
                     'empresas' => $empresas,
                     'clientes' => $clientes,
                     'productos' => $productos,
+                    'condiciones' => $condiciones,
                     'lotes' => $nuevoDetalle,
                     'errores' => $errores,
                     'fecha_hoy' => $fecha_hoy,
@@ -669,11 +670,11 @@ class DocumentoController extends Controller
                 'fecha_documento_campo'=> 'required',
                 'fecha_atencion_campo'=> 'required',
                 'tipo_venta'=> 'required',
-                'condicion_id'=> 'required',
                 'tipo_pago_id'=> 'nullable',
                 'efectivo'=> 'required',
                 'importe'=> 'required',
                 'empresa_id'=> 'required',
+                'condicion_id' => 'required',
                 'cliente_id'=> 'required',
                 'observacion' => 'nullable',
                 'igv' => 'required_if:igv_check,==,on|numeric|digits_between:1,3',
@@ -684,7 +685,6 @@ class DocumentoController extends Controller
                 'fecha_documento_campo.required' => 'El campo Fecha de Emisión es obligatorio.',
                 'tipo_venta.required' => 'El campo tipo de venta es obligatorio.',
                 'condicion_id.required' => 'El campo condición de pago es obligatorio.',
-                //'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
                 'importe.required' => 'El campo importe es obligatorio.',
                 'efectivo.required' => 'El campo efectivo es obligatorio.',
                 'fecha_atencion_campo.required' => 'El campo Fecha de Entrega es obligatorio.',
@@ -718,12 +718,6 @@ class DocumentoController extends Controller
             $documento->empresa_id = $request->get('empresa_id'); //OBTENER NUMERACION DE LA EMPRESA
             //CLIENTE
             $cliente = Cliente::findOrFail($request->get('cliente_id'));
-
-            //CONDICION
-            $cadena = explode('-',$request->get('condicion_id'));
-            $condicion = Condicion::findOrFail($cadena[0]);
-            $documento->condicion_id = $condicion->id;
-
             $documento->tipo_documento_cliente =  $cliente->tipo_documento;
             $documento->documento_cliente =  $cliente->documento;
             $documento->direccion_cliente =  $cliente->direccion;
@@ -731,6 +725,12 @@ class DocumentoController extends Controller
             $documento->cliente_id = $request->get('cliente_id'); //OBTENER TIENDA DEL CLIENTE
 
             $documento->tipo_venta = $request->get('tipo_venta');
+
+            //CONDICION
+            $cadena = explode('-',$request->get('condicion_id'));
+            $condicion = Condicion::findOrFail($cadena[0]);
+            $documento->condicion_id = $condicion->id;
+
             $documento->observacion = $request->get('observacion');
             $documento->user_id = auth()->user()->id;
             $documento->sub_total = $request->get('monto_sub_total');
@@ -1032,6 +1032,11 @@ class DocumentoController extends Controller
             //ANULAMOS EL DETALLE
             $detalle->estado = "ANULADO";
             $detalle->update();
+            $lote = LoteProducto::find($detalle->lote_id);
+            $cantidad = $detalle->cantidad - $detalle->detalles->sum('cantidad');
+            $lote->cantidad = $lote->cantidad + $cantidad;
+            $lote->cantidad_logica = $lote->cantidad_logica + $cantidad;
+            $lote->update();
         }
 
         //Registro de actividad
@@ -1850,7 +1855,7 @@ class DocumentoController extends Controller
         $documento = Documento::find($id);
         $arrayCuotas = Array();
         $condicion = Condicion::find($documento->condicion_id);
-        if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
+        if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
         {
             $arrayCuotas[] = array(
                 "moneda" => "PEN",

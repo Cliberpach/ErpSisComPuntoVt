@@ -40,7 +40,7 @@ class DocumentoController extends Controller
         $documentos = Documento::where('estado','!=','ANULADO')->get();
         $coleccion = collect([]);
         foreach($documentos as $doc){
-            $detalles = DocumentoDetalle::where('documento_id',$doc->id)->get();
+            $detalles = DocumentoDetalle::where('documento_id',$doc->id)->where('estado','ACTIVO')->get();
             $documento = Documento::findOrFail($doc->id);
             $subtotal = 0;
             $igv = '';
@@ -96,7 +96,6 @@ class DocumentoController extends Controller
                 $documento->estado = "PENDIENTE";
                 $documento->update();
             }
-            $modo = TablaDetalle::where('descripcion',$documento->modo_compra)->first();
 
             $coleccion->push([
                 'id' => $documento->id,
@@ -115,7 +114,7 @@ class DocumentoController extends Controller
                 'saldo' => $tipo_moneda.' '.number_format($saldo, 2, '.', ''),
                 'acuenta' => $tipo_moneda.' '.number_format($acuenta, 2, '.', ''),
                 'total' => $tipo_moneda.' '.number_format($decimal_total, 2, '.', ''),
-                'modo' => $modo->simbolo,
+                'modo' => $documento->modo_compra,
             ]);
         }
         return DataTables::of($coleccion)->toJson();

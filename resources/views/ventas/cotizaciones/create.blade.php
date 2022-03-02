@@ -31,10 +31,10 @@
                                 id="form_registrar_cotizacion">
                                 @csrf
                                 <div class="row">
-                                    <div class="col-lg-12 col-xs-12">
+                                    <div class="col-12">
                                         <h4><b>Datos Generales</b></h4>
                                     </div>
-                                    <div class="col-lg-12 col-xs-12 d-none">
+                                    <div class="col-12 d-none">
                                         <div class="form-group row">
                                             <div class="col-lg-6 col-xs-12">
                                                 <label class="required">Fecha de Documento</label>
@@ -84,26 +84,28 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-lg-12 col-xs-12">
+                                    <div class="col-12">
                                         <div class="row">
-                                            <div class="col-lg-4 col-xs-12">
-                                                <label class="required">Fecha de Atención</label>
-                                                <div class="input-group date">
-                                                    <span class="input-group-addon">
-                                                        <i class="fa fa-calendar"></i>
-                                                    </span>
-                                                    <input type="date" id="fecha_atencion" name="fecha_atencion"
-                                                        class="form-control {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_atencion', $fecha_hoy) }}"
-                                                        autocomplete="off" required readonly>
-                                                    @if ($errors->has('fecha_atencion'))
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $errors->first('fecha_atencion') }}</strong>
+                                            <div class="col-12 col-md-4">
+                                                <div class="form-group">
+                                                    <label class="required">Fecha de Atención</label>
+                                                    <div class="input-group date">
+                                                        <span class="input-group-addon">
+                                                            <i class="fa fa-calendar"></i>
                                                         </span>
-                                                    @endif
+                                                        <input type="date" id="fecha_atencion" name="fecha_atencion"
+                                                            class="form-control {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
+                                                            value="{{ old('fecha_atencion', $fecha_hoy) }}"
+                                                            autocomplete="off" required readonly>
+                                                        @if ($errors->has('fecha_atencion'))
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $errors->first('fecha_atencion') }}</strong>
+                                                            </span>
+                                                        @endif
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-xs-12">
+                                            <div class="col-12 col-md-4">
                                                 <div class="form-group">
                                                     <label id="igv_requerido">IGV (%):</label>
                                                     <div class="input-group">
@@ -124,7 +126,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-xs-12">
+                                            <div class="col-12 col-md-4">
                                                 <div class="form-group">
                                                     <label class="">Vendedor</label>
                                                     <select id="vendedor" name="vendedor" class="select2_form form-control">
@@ -139,43 +141,47 @@
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-lg-6 col-xs-12 select-required">
-                                                <label class="required">Cliente</label>
-                                                <select id="cliente" name="cliente"
-                                                    class="select2_form form-control {{ $errors->has('cliente') ? ' is-invalid' : '' }}"
-                                                    onchange="obtenerTipo(this)" required>
-                                                    <option></option>
-                                                    @foreach ($clientes as $cliente)
-                                                        <option value="{{ $cliente->id }}"
-                                                            {{ old('cliente') == $cliente->id ? 'selected' : '' }}>
-                                                            {{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                @if ($errors->has('cliente'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('cliente') }}</strong>
-                                                    </span>
-                                                @endif
+                                            <div class="col-12 col-md-6 select-required">
+                                                <div class="form-group">
+                                                    <label class="required">Cliente</label>
+                                                    <select id="cliente" name="cliente"
+                                                        class="select2_form form-control {{ $errors->has('cliente') ? ' is-invalid' : '' }}"
+                                                        onchange="obtenerTipo(this)" required>
+                                                        <option></option>
+                                                        @foreach ($clientes as $cliente)
+                                                            <option value="{{ $cliente->id }}"
+                                                                {{ old('cliente') == $cliente->id ? 'selected' : '' }}>
+                                                                {{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @if ($errors->has('cliente'))
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $errors->first('cliente') }}</strong>
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <div class="col-lg-6 col-xs-12 select-required">
-                                                <label class="required">Condición</label>
-                                                <select id="condicion_id" name="condicion_id"
-                                                    class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                                    required>
-                                                    <option></option>
-                                                    @foreach ($condiciones as $condicion)
-                                                        <option value="{{ $condicion->id }}"
-                                                            {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
-                                                            {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                @if ($errors->has('condicion_id'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('condicion_id') }}</strong>
-                                                    </span>
-                                                @endif
+                                            <div class="col-12 col-md-6 select-required">
+                                                <div class="form-group">
+                                                    <label class="required">Condición</label>
+                                                    <select id="condicion_id" name="condicion_id"
+                                                        class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
+                                                        required>
+                                                        <option></option>
+                                                        @foreach ($condiciones as $condicion)
+                                                            <option value="{{ $condicion->id }}"
+                                                                {{ old('condicion_id') == $condicion->id ? 'selected' : '' }}>
+                                                                {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                    @if ($errors->has('condicion_id'))
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $errors->first('condicion_id') }}</strong>
+                                                        </span>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
                                         <!-- OBTENER TIPO DE CLIENTE -->

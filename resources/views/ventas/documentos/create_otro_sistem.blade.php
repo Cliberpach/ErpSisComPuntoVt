@@ -205,11 +205,12 @@
                                             <label class="required">Condición</label>
                                             <select id="condicion_id" name="condicion_id"
                                                 class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                                required disabled onchange="changeFormaPago()>
+                                                required onchange="changeFormaPago()" disabled>
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
+                                                        {{ old('condicion_id') == $condicion->id.'-'.$condicion->descripcion || $condicion->id == $cotizacion->condicion_id ? 'selected' : '' }}
+                                                        data-dias="{{$condicion->dias}}">
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
                                                 @endforeach

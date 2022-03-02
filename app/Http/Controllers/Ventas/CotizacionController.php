@@ -52,7 +52,6 @@ class CotizacionController extends Controller
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $fecha_hoy = Carbon::now()->toDateString();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
-        //$lotes = LoteProducto::where('estado', '1')->distinct()->get(['producto_id']);
         $lotes = Producto::where('estado','ACTIVO')->get();
         return view('ventas.cotizaciones.create', compact('empresas', 'clientes', 'fecha_hoy', 'lotes', 'condiciones'));
     }
@@ -270,7 +269,6 @@ class CotizacionController extends Controller
         $detalles = CotizacionDetalle::where('cotizacion_id',$id)->where('estado','ACTIVO')->get();
         $condiciones = Condicion::where('estado','ACTIVO')->get();
 
-
         return view('ventas.cotizaciones.show', [
             'cotizacion' => $cotizacion,
             'detalles' => $detalles,
@@ -368,11 +366,16 @@ class CotizacionController extends Controller
 
     public function newDocument($id){
         $documento_old =  Documento::where('cotizacion_venta',$id)->where('estado','!=','ANULADO')->first();
+        if($documento_old->sunat == '1' && $documento_old->tipo_venta != '129')
+        {
+            Session::flash('success','Este documento ya fue informado a sunat, si desea reemplazarlo debe hacerle una nota de credito y crear un nuevo documento.');
+            return redirect()->route('ventas.cotizacion.show');
+        }
         foreach ($documento_old->detalles as $detalle) {
             $lote = LoteProducto::find($detalle->lote_id);
-            $cantidad = $lote->cantidad + $detalle->cantidad;
-            $lote->cantidad = $cantidad;
-            $lote->cantidad_logica = $cantidad;
+            $cantidad = $detalle->cantidad - $detalle->detalles->sum('cantidad');
+            $lote->cantidad = $lote->cantidad + $cantidad;
+            $lote->cantidad_logica = $lote->cantidad_logica + $cantidad;
             $lote->update();
             //ANULAMOS EL DETALLE
             $detalle->estado = "ANULADO";

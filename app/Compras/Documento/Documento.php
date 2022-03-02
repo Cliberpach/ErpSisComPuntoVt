@@ -85,6 +85,11 @@ class Documento extends Model
         return $this->hasMany('App\Compras\Documento\Detalle','documento_id');
     }
 
+    public function condicion()
+    {
+        return $this->belongsTo('App\Mantenimiento\Condicion', 'condicion_id');
+    }
+
     protected static function booted()
     {
         static::created(function(Documento $documento){
@@ -104,11 +109,20 @@ class Documento extends Model
             if($documento->cuenta)
             {
                 $cuenta_proveedor = CuentaProveedor::find($documento->cuenta->id);
-                $cuenta_proveedor->compra_documento_id = $documento->id;
-                $cuenta_proveedor->fecha_doc = $documento->fecha_emision;
-                $cuenta_proveedor->saldo = $documento->total;
-                $cuenta_proveedor->acta = 'DOCUMENTO COMPRA';
-                $cuenta_proveedor->update();
+                $condicion = Condicion::find($documento->condicion_id);
+                if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
+                {
+                    $cuenta_proveedor->compra_documento_id = $documento->id;
+                    $cuenta_proveedor->fecha_doc = $documento->fecha_emision;
+                    $cuenta_proveedor->saldo = $documento->total;
+                    $cuenta_proveedor->acta = 'DOCUMENTO COMPRA';
+                    $cuenta_proveedor->update();
+                }
+                else
+                {
+                    $cuenta_proveedor->estado = 'ANULADO';
+                    $cuenta_proveedor->update();
+                }
             }
             else
             {

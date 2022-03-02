@@ -443,10 +443,7 @@ class NoEnviadosController extends Controller
             $documento->cliente =  $cliente->nombre;
             $documento->cliente_id = $request->get('cliente_id');
 
-            //$documento->tipo_venta = $request->get('tipo_venta');
-            //$documento->forma_pago = $request->get('forma_pago');
             $documento->observacion = $request->get('observacion');
-            //$documento->user_id = auth()->user()->id;
             $documento->sub_total = $request->get('monto_sub_total');
             $documento->total_igv = $request->get('monto_total_igv');
             $documento->total = $request->get('monto_total');
@@ -475,9 +472,11 @@ class NoEnviadosController extends Controller
             $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id',$id)->get();
             foreach($detalles as $item)
             {
-                // $lote = LoteProducto::findOrFail($item->lote_id);
-                // $lote->cantidad =  $lote->cantidad + $item->cantidad;
-                // $lote->update();
+                $lote = LoteProducto::findOrFail($item->lote_id);
+                $lote->cantidad =  $lote->cantidad + $item->cantidad;
+                $lote->cantidad_logica =  $lote->cantidad_logica + $item->cantidad;
+                $lote->estado = '1';
+                $lote->update();
                 $item->estado = 'ANULADO';
                 $item->update();
             }
@@ -503,14 +502,22 @@ class NoEnviadosController extends Controller
                     $detalle->estado = 'ACTIVO';
                     $detalle->update();
 
-                    $lote->cantidad =  $lote->cantidad - $producto->cantidad;
-                    if($producto->cantidad - $cantidad >= 0)
+                    $lote->cantidad = $lote->cantidad - $cantidad;
+                    $lote->cantidad_logica = $lote->cantidad_logica - $cantidad;
+                    if($cantidad >= $producto->cantidad)
                     {
-                        $lote->cantidad_logica =  $lote->cantidad_logica - $cantidad;
+                        $cant_aux = $cantidad - $producto->cantidad;
+                        $lote->cantidad =  $lote->cantidad + $cant_aux;
                     }
-                    else
+                    else{
+                        $cant_aux = $producto->cantidad - $cantidad;
+                        $lote->cantidad =  $lote->cantidad - $cant_aux;
+                    }
+
+                    if($cantidad >= $producto->cantidad)
                     {
-                        $lote->cantidad_logica =  $lote->cantidad_logica + (($cantidad - $producto->cantidad) - $cantidad);
+                        $cant_aux = $cantidad - $producto->cantidad;
+                        $lote->cantidad_logica =  $lote->cantidad_logica + $cant_aux;
                     }
                     $lote->update();
                 }

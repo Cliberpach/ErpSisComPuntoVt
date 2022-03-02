@@ -65,21 +65,21 @@
 
     $('#tabladetalle_id_guardar').on('change', function(e){
         e.preventDefault();
-
         $('#dias_guardar').attr('readonly', false);
         $('#dias_guardar').val('');
-        let descripcion = $('#descripcion_guardar option:selected').attr('descripcion');
-        if(descripcion == 'CONTADO')
+        if($('#tabladetalle_id_guardar').val())
         {
-            $('#dias_guardar').val(0);
-            $('#dias_guardar').attr('readonly', true);
+            let descripcion = $('#tabladetalle_id_guardar option:selected').attr('descripcion');
+            if(descripcion.toUpperCase() == 'CONTADO')
+            {
+                $('#dias_guardar').val(0);
+                $('#dias_guardar').attr('readonly', true);
+            }
         }
     })
 
     $('#crear_condicion').on('submit',function(e){
         e.preventDefault();
-        console.log($('#tabladetalle_id_guardar').val());
-        console.log($('#dias_guardar').val());
         $.ajax({
             dataType : 'json',
             type : 'post',

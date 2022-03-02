@@ -189,7 +189,7 @@ class Documento extends Model
         static::created(function(Documento $documento){
             //CREAR CUENTA CLIENTE
             $condicion = Condicion::find($documento->condicion_id);
-            if($condicion->descripcion == 'CREDITO' || $condicion->descripcion == 'credito' || $condicion->descripcion == 'CRÉDITO' || $condicion->descripcion == 'crédito' || $condicion->descripcion == 'Crédito' || $condicion->descripcion == 'Credito')
+            if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
             {
                 if($documento->convertir == null || $documento->convertir == '')
                 {
@@ -240,9 +240,9 @@ class Documento extends Model
            }
            else
            {
-               $condicion = Condicion::find($documento->condicion_id);
-               if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
-               {
+                $condicion = Condicion::find($documento->condicion_id);
+                if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
+                {
                    if($documento->convertir == null || $documento->convertir == '')
                    {
                         $cuenta_cliente = new CuentaCliente();
@@ -262,8 +262,8 @@ class Documento extends Model
                 $doc_convertido = Documento::find($documento->convertir);
 
                 $condicion = Condicion::find($documento->condicion_id);
-               if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
-               {
+                if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
+                {
                     if($documento->cuenta)
                     {
                         $cuenta_a_convertir = CuentaCliente::find($documento->cuenta->id);

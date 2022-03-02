@@ -153,7 +153,7 @@ class AlertaController extends Controller
         $documento = Documento::find($id);
         $arrayCuotas = Array();
         $condicion = Condicion::find($documento->condicion_id);
-        if($condicion->descripcion === 'CREDITO' || $condicion->descripcion === 'credito' || $condicion->descripcion === 'CRÉDITO' || $condicion->descripcion === 'crédito')
+        if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
         {
             $arrayCuotas[] = array(
                 "moneda" => "PEN",

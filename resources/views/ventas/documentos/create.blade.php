@@ -781,7 +781,6 @@
                 $('#igv').prop('required', true)
                 var igv = ($('#igv').val()) + ' %'
                 $('#igv_int').text(igv)
-                // sumaTotal()
             @else
                 if ($("#igv_check").prop('checked')) {
                     $('#igv').attr('disabled', false)
@@ -1001,9 +1000,6 @@
             $detalle.precio_inicial,
             $detalle.descuento,
         ]).draw(false);
-        //cargarProductos()
-        //INGRESADO EL PRODUCTO SUMA TOTAL DEL DETALLE
-        //sumaTotal()
         //LIMPIAR LOS CAMPOS DESPUES DE LA BUSQUEDA
         $('#precio').val('')
         $('#cantidad').val('')
@@ -1637,6 +1633,7 @@
                                 document.getElementById("empresa_id").disabled = true;
                                 @if (!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                                 @endif
                             }
                             else if(result.value.success)
@@ -1672,6 +1669,7 @@
                                 document.getElementById("empresa_id").disabled = true;
                                 @if (!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                                 @endif
                             }
                         }
