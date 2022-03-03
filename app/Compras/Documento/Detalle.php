@@ -55,18 +55,18 @@ class Detalle extends Model
 
     public function fechaFormateada()
     {
-        $fecha = Carbon::createFromFormat('Y-m-d',$this->fecha_vencimiento)->format('d/m/Y');
+        $fecha = Carbon::createFromFormat('Y-m-d', $this->fecha_vencimiento)->format('d/m/Y');
         return $fecha;
     }
 
-    public function lote()
+    public function loteProducto()
     {
-        return $this->belongsTo('App\Almacenes\LoteProducto','lote_id');
+        return $this->belongsTo('App\Almacenes\LoteProducto', 'lote_id');
     }
 
     protected static function booted()
     {
-        static::created(function(Detalle $detalle){
+        static::created(function (Detalle $detalle) {
             $lote = new LoteProducto();
             $lote->compra_documento_id = $detalle->documento->id;
             $lote->codigo_lote = $detalle->lote;
@@ -92,7 +92,7 @@ class Detalle extends Model
             $movimiento->almacen_final_id = $detalle->producto->almacen->id;
             $movimiento->cantidad = $detalle->cantidad;
             $movimiento->nota = 'COMPRA';
-            $movimiento->observacion = $producto->codigo.' - '.$producto->descripcion;
+            $movimiento->observacion = $producto->codigo . ' - ' . $producto->descripcion;
             $movimiento->usuario_id = auth()->user()->id;
             $movimiento->movimiento = 'INGRESO';
             $movimiento->producto_id = $detalle->producto_id;
@@ -107,26 +107,22 @@ class Detalle extends Model
             $kardex->fecha = $detalle->documento->fecha_emision;
             $kardex->cantidad = $detalle->cantidad;
             $kardex->producto_id = $detalle->producto_id;
-            $kardex->descripcion = 'PROVEEDOR: '.$detalle->documento->proveedor->descripcion;
+            $kardex->descripcion = 'PROVEEDOR: ' . $detalle->documento->proveedor->descripcion;
             $kardex->precio = $detalle->precio;
             $kardex->importe = $detalle->precio * $detalle->cantidad;
             $kardex->stock = $producto->stock;
             $kardex->save();
         });
 
-        static::updated(function(Detalle $detalle){
+        static::updated(function (Detalle $detalle) {
             //ANULAR LOTE producto
-            if($detalle->estado == 'ANULADO')
-            {
+            if ($detalle->estado == 'ANULADO') {
                 $lote = LoteProducto::find($detalle->lote_id);
-                if($lote)
-                {
+                if ($lote) {
                     $lote->estado = '0';
                     $lote->update();
                 }
             }
         });
-
-
     }
 }

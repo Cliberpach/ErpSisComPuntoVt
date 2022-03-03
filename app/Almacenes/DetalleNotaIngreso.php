@@ -23,8 +23,9 @@ class DetalleNotaIngreso extends Model
     ];
     public $timestamps = true;
 
-    public function nota_ingreso(){
-        return $this->belongsTo(NotaIngreso::class,'nota_ingreso_id','id');
+    public function nota_ingreso()
+    {
+        return $this->belongsTo(NotaIngreso::class, 'nota_ingreso_id', 'id');
     }
 
     public function producto()
@@ -32,14 +33,14 @@ class DetalleNotaIngreso extends Model
         return $this->belongsTo('App\Almacenes\Producto');
     }
 
-    public function lote()
+    public function loteProducto()
     {
-        return $this->belongsTo('App\Almacenes\LoteProducto','lote_id');
+        return $this->belongsTo('App\Almacenes\LoteProducto', 'lote_id');
     }
 
     protected static function booted()
     {
-        static::created(function(DetalleNotaIngreso $detalle){
+        static::created(function (DetalleNotaIngreso $detalle) {
 
             $lote = new LoteProducto();
             $lote->nota_ingreso_id = $detalle->nota_ingreso->id;
@@ -47,7 +48,7 @@ class DetalleNotaIngreso extends Model
             $lote->producto_id = $detalle->producto_id;
             $lote->cantidad = $detalle->cantidad;
             $lote->cantidad_logica = $detalle->cantidad;
-            $lote->cantidad_inicial= $detalle->cantidad;
+            $lote->cantidad_inicial = $detalle->cantidad;
             $lote->fecha_vencimiento = $detalle->fecha_vencimiento;
             $lote->fecha_entrega = $detalle->nota_ingreso->fecha;
             $lote->observacion = 'NOTA DE INGRESO';
@@ -84,7 +85,6 @@ class DetalleNotaIngreso extends Model
             $kardex->importe = $detalle->costo_soles * $detalle->cantidad;
             $kardex->stock = $detalle->producto->stock;
             $kardex->save();
-
         });
     }
 }

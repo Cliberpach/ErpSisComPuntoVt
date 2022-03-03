@@ -26,29 +26,30 @@ class ProductoController extends Controller
     {
         return datatables()->query(
             DB::table('productos')
-            ->join('marcas','productos.marca_id','=','marcas.id')
-            ->join('almacenes','almacenes.id','=','productos.almacen_id')
-            ->join('categorias','categorias.id','=','productos.categoria_id')
-            ->select('categorias.descripcion as categoria','almacenes.descripcion as almacen','marcas.marca','productos.*')
-            ->orderBy('productos.id','ASC')
-            ->where('productos.estado', 'ACTIVO')
+                ->join('marcas', 'productos.marca_id', '=', 'marcas.id')
+                ->join('almacenes', 'almacenes.id', '=', 'productos.almacen_id')
+                ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+                ->select('categorias.descripcion as categoria', 'almacenes.descripcion as almacen', 'marcas.marca', 'productos.*')
+                ->orderBy('productos.id', 'ASC')
+                ->where('productos.estado', 'ACTIVO')
         )->toJson();
     }
 
     public function llenarCompras($id)
     {
-        $compras = Detalle::where('producto_id', $id)->where('estado','ACTIVO')->orderBy('id', 'desc')->get();
+        $compras = Detalle::where('producto_id', $id)->where('estado', 'ACTIVO')->orderBy('id', 'desc')->get();
         $coleccion = collect([]);
-        foreach($compras as $producto) {
+        foreach ($compras as $producto) {
             $coleccion->push([
                 'proveedor' => $producto->documento->proveedor->descripcion,
                 'documento' => $producto->documento->tipo_compra,
-                'numero' => $producto->documento->serie_tipo.'-'.$producto->documento->numero_tipo,
+                'numero' => $producto->documento->serie_tipo . '-' . $producto->documento->numero_tipo,
                 'fecha_emision' => $producto->documento->fecha_emision,
                 'cantidad' => $producto->cantidad,
                 'precio' => $producto->precio_soles,
                 'lote' => $producto->lote,
                 'fecha_vencimiento' => $producto->fecha_vencimiento,
+                'medida' => $producto->loteProducto->producto->medidaCompleta(),
             ]);
         }
         return DataTables::of($coleccion)->make(true);
@@ -56,20 +57,20 @@ class ProductoController extends Controller
 
     public function llenarVentas($id)
     {
-        $ventas = DocumentoDetalle::orderBy('id', 'desc')->where('estado','ACTIVO')->get();
+        $ventas = DocumentoDetalle::orderBy('id', 'desc')->where('estado', 'ACTIVO')->get();
         $coleccion = collect([]);
-        foreach($ventas as $producto) {
-            if($producto->lote->producto_id == $id)
-            {
+        foreach ($ventas as $producto) {
+            if ($producto->lote->producto_id == $id) {
                 $coleccion->push([
                     'cliente' => $producto->documento->clienteEntidad->nombre,
                     'documento' => $producto->documento->nombreTipo(),
-                    'numero' => $producto->documento->serie.'-'.$producto->documento->correlativo,
+                    'numero' => $producto->documento->serie . '-' . $producto->documento->correlativo,
                     'fecha_emision' => $producto->documento->fecha_atencion,
                     'cantidad' => $producto->cantidad,
                     'precio' => $producto->precio_nuevo,
                     'lote' => $producto->lote->codigo_lote,
                     'fecha_vencimiento' => $producto->documento->fecha_vencimiento,
+                    'medida' => $producto->lote->producto->medidaCompleta(),
                 ]);
             }
         }
@@ -80,12 +81,13 @@ class ProductoController extends Controller
     {
         $salidas = DetalleNotaSalidad::orderBy('id', 'desc')->where('producto_id', $id)->get();
         $coleccion = collect([]);
-        foreach($salidas as $salida) {
+        foreach ($salidas as $salida) {
             $coleccion->push([
                 'origen' => $salida->nota_salidad->origen,
                 'destino' => $salida->nota_salidad->destino,
                 'cantidad' => $salida->cantidad,
                 'lote' => $salida->lote->codigo_lote,
+                'medida' => $salida->lote->producto->medidaCompleta(),
             ]);
         }
         return DataTables::of($coleccion)->make(true);
@@ -95,7 +97,7 @@ class ProductoController extends Controller
     {
         $ingresos = DetalleNotaIngreso::orderBy('id', 'desc')->where('producto_id', $id)->get();
         $coleccion = collect([]);
-        foreach($ingresos as $ingreso) {
+        foreach ($ingresos as $ingreso) {
             $coleccion->push([
                 'origen' => $ingreso->nota_ingreso->origen,
                 'numero' => $ingreso->nota_ingreso->numero,
@@ -107,6 +109,7 @@ class ProductoController extends Controller
                 'nota_ingreso_id' => $ingreso->nota_ingreso->id,
                 'id' => $ingreso->id,
                 'moneda' => $ingreso->nota_ingreso->moneda,
+                'medida' => $ingreso->loteProducto->producto->medidaCompleta(),
             ]);
         }
         return DataTables::of($coleccion)->make(true);
@@ -118,9 +121,9 @@ class ProductoController extends Controller
         $data = $request->all();
 
         $rules = [
-            'id'=> 'required',
-            'nota_ingreso_id'=> 'required',
-            'costo'=> 'required',
+            'id' => 'required',
+            'nota_ingreso_id' => 'required',
+            'costo' => 'required',
 
         ];
 
@@ -135,25 +138,22 @@ class ProductoController extends Controller
         if ($validator->fails()) {
             $clase = $validator->getMessageBag()->toArray();
             $cadena = "";
-            foreach($clase as $clave => $valor) {
+            foreach ($clase as $clave => $valor) {
                 $cadena =  $cadena . "$valor[0] ";
             }
 
-            Session::flash('error',$cadena);
+            Session::flash('error', $cadena);
             DB::rollBack();
             return redirect()->route('reporte.producto.informe');
         }
 
         $notaingreso = NotaIngreso::find($request->nota_ingreso_id);
         $dolar = $notaingreso->dolar;
-        if($notaingreso->moneda == 'DOLARES')
-        {
+        if ($notaingreso->moneda == 'DOLARES') {
             $costo_soles = (float) $request->costo * (float) $dolar;
 
             $costo_dolares = (float) $request->costo;
-        }
-        else
-        {
+        } else {
             $costo_soles = (float) $request->costo;
 
             $costo_dolares = (float) $request->costo / (float) $dolar;
@@ -166,14 +166,11 @@ class ProductoController extends Controller
         $detalle->update();
 
         $notaingreso->total = $notaingreso->detalles->sum('valor_ingreso');
-        if($notaingreso->moneda == 'DOLARES')
-        {
+        if ($notaingreso->moneda == 'DOLARES') {
             $notaingreso->total_soles = (float) $notaingreso->detalles->sum('valor_ingreso') * (float) $dolar;
 
             $notaingreso->total_dolares = (float) $notaingreso->detalles->sum('valor_ingreso');
-        }
-        else
-        {
+        } else {
             $notaingreso->total_soles = (float) $notaingreso->detalles->sum('valor_ingreso');
 
             $notaingreso->total_dolares = (float) $notaingreso->detalles->sum('valor_ingreso') / $dolar;

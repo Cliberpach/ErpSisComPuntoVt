@@ -29,21 +29,19 @@ class NoEnviadosController extends Controller
         return view('consultas.ventas.documentos_no.index');
     }
 
-    public function getTable(Request $request){
+    public function getTable(Request $request)
+    {
 
-        if($request->fecha_desde && $request->fecha_hasta)
-        {
-            $documentos = Documento::where('estado','!=','ANULADO')->wherein('sunat',['0'])->where('tipo_venta','!=',129)->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
-        }
-        else
-        {
-            $documentos = Documento::where('estado','!=','ANULADO')->wherein('sunat',['0'])->where('tipo_venta','!=',129)->orderBy('id', 'desc')->get();
+        if ($request->fecha_desde && $request->fecha_hasta) {
+            $documentos = Documento::where('estado', '!=', 'ANULADO')->wherein('sunat', ['0'])->where('tipo_venta', '!=', 129)->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
+        } else {
+            $documentos = Documento::where('estado', '!=', 'ANULADO')->wherein('sunat', ['0'])->where('tipo_venta', '!=', 129)->orderBy('id', 'desc')->get();
         }
 
         $hoy = Carbon::now();
 
         $coleccion = collect();
-        foreach($documentos as $documento){
+        foreach ($documentos as $documento) {
 
             $transferencia = 0.00;
             $otros = 0.00;
@@ -51,12 +49,10 @@ class NoEnviadosController extends Controller
 
             if ($documento->tipo_pago_id == 1) {
                 $efectivo = $documento->importe;
-            }
-            else if ($documento->tipo_pago_id == 2){
-                $transferencia = $documento->importe ;
+            } else if ($documento->tipo_pago_id == 2) {
+                $transferencia = $documento->importe;
                 $efectivo = $documento->efectivo;
-            }
-            else {
+            } else {
                 $otros = $documento->importe;
                 $efectivo = $documento->efectivo;
             }
@@ -71,19 +67,19 @@ class NoEnviadosController extends Controller
                 'tipo_venta' => $documento->nombreTipo(),
                 'tipo_venta_id' => $documento->tipo_venta,
                 'tipo_pago' => $documento->tipo_pago,
-                'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
+                'numero_doc' =>  $documento->serie . '-' . $documento->correlativo,
                 'serie' => $documento->serie,
                 'correlativo' => $documento->correlativo,
-                'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
+                'cliente' => $documento->tipo_documento_cliente . ': ' . $documento->documento_cliente . ' - ' . $documento->cliente,
                 'empresa' => $documento->empresa,
                 'cotizacion_venta' =>  $documento->cotizacion_venta,
-                'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
+                'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format('d/m/Y'),
                 'estado' => $documento->estado_pago,
                 'sunat' => $documento->sunat,
-                'otros' => 'S/. '.number_format($otros, 2, '.', ''),
-                'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
-                'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
-                'total' => 'S/. '.number_format($documento->total, 2, '.', ''),
+                'otros' => 'S/. ' . number_format($otros, 2, '.', ''),
+                'efectivo' => 'S/. ' . number_format($efectivo, 2, '.', ''),
+                'transferencia' => 'S/. ' . number_format($transferencia, 2, '.', ''),
+                'total' => 'S/. ' . number_format($documento->total, 2, '.', ''),
                 'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
                 'notas' => $cantidad_notas
             ]);
@@ -102,7 +98,7 @@ class NoEnviadosController extends Controller
         $convertir = $formatter->toInvoice($documento->total, 2, 'SOLES');
 
         //CREAR LEYENDA DEL COMPROBANTE
-        $arrayLeyenda = Array();
+        $arrayLeyenda = array();
         $arrayLeyenda[] = array(
             "code" => "1000",
             "value" => $convertir
@@ -112,14 +108,14 @@ class NoEnviadosController extends Controller
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('estado','ACTIVO')->where('documento_id',$id)->get();
-        $arrayProductos = Array();
-        for($i = 0; $i < count($detalles); $i++){
+        $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $id)->get();
+        $arrayProductos = array();
+        for ($i = 0; $i < count($detalles); $i++) {
 
             $arrayProductos[] = array(
                 "codProducto" => $detalles[$i]->codigo_producto,
                 "unidad" => $detalles[$i]->unidad,
-                "descripcion"=> $detalles[$i]->nombre_producto.' - '.$detalles[$i]->codigo_lote,
+                "descripcion" => $detalles[$i]->nombre_producto . ' - ' . $detalles[$i]->codigo_lote,
                 "cantidad" => (float)$detalles[$i]->cantidad,
                 "mtoValorUnitario" => (float)($detalles[$i]->precio_nuevo / 1.18),
                 "mtoValorVenta" => (float)($detalles[$i]->valor_venta / 1.18),
@@ -141,7 +137,7 @@ class NoEnviadosController extends Controller
         $date = strtotime($documento->fecha_documento);
         $fecha_emision = date('Y-m-d', $date);
         $hora_emision = date('H:i:s', $date);
-        $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
+        $fecha = $fecha_emision . 'T' . $hora_emision . '-05:00';
 
         return $fecha;
     }
@@ -151,7 +147,7 @@ class NoEnviadosController extends Controller
         $date = strtotime($documento->fecha_vencimiento);
         $fecha_emision = date('Y-m-d', $date);
         $hora_emision = date('H:i:s', $date);
-        $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
+        $fecha = $fecha_emision . 'T' . $hora_emision . '-05:00';
 
         return $fecha;
     }
@@ -162,13 +158,13 @@ class NoEnviadosController extends Controller
         $documento = Documento::findOrFail($id);
         //OBTENER CORRELATIVO DEL COMPROBANTE ELECTRONICO
         $existe = event(new DocumentoNumeracion($documento));
-        if($existe[0]){
+        if ($existe[0]) {
             if ($existe[0]->get('existe') == true) {
                 if ($documento->sunat != '1') {
                     //ARREGLO COMPROBANTE
                     $arreglo_comprobante = array(
                         "tipoOperacion" => $documento->tipoOperacion(),
-                        "tipoDoc"=> $documento->tipoDocumento(),
+                        "tipoDoc" => $documento->tipoDocumento(),
                         "serie" => $existe[0]->get('numeracion')->serie,
                         "correlativo" => $documento->correlativo,
                         "fechaEmision" => self::obtenerFechaEmision($documento),
@@ -185,13 +181,15 @@ class NoEnviadosController extends Controller
                             "rznSocial" => $documento->cliente,
                             "address" => array(
                                 "direccion" => $documento->direccion_cliente,
-                            )),
+                            )
+                        ),
                         "company" => array(
                             "ruc" =>  $documento->ruc_empresa,
                             "razonSocial" => $documento->empresa,
                             "address" => array(
                                 "direccion" => $documento->direccion_fiscal_empresa,
-                            )),
+                            )
+                        ),
                         "mtoOperGravadas" => (float)$documento->sub_total,
                         "mtoOperExoneradas" => 0,
                         "mtoIGV" => (float)$documento->total_igv,
@@ -217,12 +215,12 @@ class NoEnviadosController extends Controller
 
                         $data_comprobante = generarComprobanteapi(json_encode($arreglo_comprobante), $documento->empresa_id);
 
-                        $name = $documento->serie."-".$documento->correlativo.'.pdf';
+                        $name = $documento->serie . "-" . $documento->correlativo . '.pdf';
 
-                        $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.$name);
+                        $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . $name);
 
-                        if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
-                            mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'));
                         }
 
                         file_put_contents($pathToFile, $data_comprobante);
@@ -242,12 +240,12 @@ class NoEnviadosController extends Controller
                         /********************************/
                         $data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
 
-                        $name_qr = $documento->serie."-".$documento->correlativo.'.svg';
+                        $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
 
-                        $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'.DIRECTORY_SEPARATOR.$name_qr);
+                        $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
 
-                        if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'))) {
-                            mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'));
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
                         }
 
                         file_put_contents($pathToFile_qr, $data_qr);
@@ -255,10 +253,10 @@ class NoEnviadosController extends Controller
                         /********************************/
 
                         $data_xml = generarXmlapi(json_encode($arreglo_comprobante), $documento->empresa_id);
-                        $name_xml = $documento->serie.'-'.$documento->correlativo.'.xml';
-                        $pathToFile_xml = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'.DIRECTORY_SEPARATOR.$name_xml);
-                        if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'))) {
-                            mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'));
+                        $name_xml = $documento->serie . '-' . $documento->correlativo . '.xml';
+                        $pathToFile_xml = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . $name_xml);
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml'));
                         }
                         file_put_contents($pathToFile_xml, $data_xml);
 
@@ -267,18 +265,18 @@ class NoEnviadosController extends Controller
                         $documento->nombre_comprobante_archivo = $name;
                         $documento->hash = $json_sunat->hash;
                         $documento->xml = $name_xml;
-                        $documento->ruta_comprobante_archivo = 'public/sunat/'.$name;
-                        $documento->ruta_qr = 'public/qrs/'.$name_qr;
+                        $documento->ruta_comprobante_archivo = 'public/sunat/' . $name;
+                        $documento->ruta_qr = 'public/qrs/' . $name_qr;
                         $documento->update();
 
 
                         //Registro de actividad
-                        $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: ". $documento->serie."-".$documento->correlativo;
+                        $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: " . $documento->serie . "-" . $documento->correlativo;
                         $gestion = "COMPROBANTES ELECTRONICOS";
-                        crearRegistro($documento , $descripcion , $gestion);
+                        crearRegistro($documento, $descripcion, $gestion);
 
-                        Session::flash('success','Documento de Venta enviada a Sunat con exito.');
-                        return view('consultas.ventas.documentos_no.index',[
+                        Session::flash('success', 'Documento de Venta enviada a Sunat con exito.');
+                        return view('consultas.ventas.documentos_no.index', [
 
                             'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
                             'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
@@ -286,8 +284,7 @@ class NoEnviadosController extends Controller
                             'sunat_exito' => true
 
                         ])->with('sunat_exito', 'success');
-
-                    }else{
+                    } else {
 
                         //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                         $documento->sunat = '0';
@@ -296,65 +293,58 @@ class NoEnviadosController extends Controller
                         if ($json_sunat->sunatResponse->error) {
                             $id_sunat = $json_sunat->sunatResponse->error->code;
                             $descripcion_sunat = $json_sunat->sunatResponse->error->message;
-
-
-                        }else {
+                        } else {
                             $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                             $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-
                         };
 
-                        Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
-                        return view('consultas.ventas.documentos_no.index',[
+                        Session::flash('error', 'Documento de Venta sin exito en el envio a sunat.');
+                        return view('consultas.ventas.documentos_no.index', [
                             'id_sunat' =>  $id_sunat,
                             'descripcion_sunat' =>  $descripcion_sunat,
                             'sunat_error' => true,
 
                         ])->with('sunat_error', 'error');
                     }
-                }else{
+                } else {
                     $documento->sunat = '1';
                     $documento->update();
-                    Session::flash('error','Documento de venta fue enviado a Sunat.');
+                    Session::flash('error', 'Documento de venta fue enviado a Sunat.');
                     return redirect()->route('consultas.ventas.documentos_no.index')->with('sunat_existe', 'error');
                 }
-            }else{
-                Session::flash('error','Tipo de Comprobante no registrado en la empresa.');
+            } else {
+                Session::flash('error', 'Tipo de Comprobante no registrado en la empresa.');
                 return redirect()->route('consultas.ventas.documentos_no.index')->with('sunat_existe', 'error');
             }
-        }else{
-            Session::flash('error','Empresa sin parametros para emitir comprobantes electronicos');
+        } else {
+            Session::flash('error', 'Empresa sin parametros para emitir comprobantes electronicos');
             return redirect()->route('consultas.ventas.documentos_no.index');
         }
-
     }
 
     public function edit($id)
     {
-        $this->authorize('haveaccess','documento_venta.index');
+        $this->authorize('haveaccess', 'documento_venta.index');
         $empresas = Empresa::where('estado', 'ACTIVO')->get();
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $productos = Producto::where('estado', 'ACTIVO')->get();
         $documento = Documento::findOrFail($id);
-        $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->with(['lote','lote.producto'])->get();
-        $condiciones = Condicion::where('estado','ACTIVO')->get();
+        $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->with(['lote', 'lote.producto'])->get();
+        $condiciones = Condicion::where('estado', 'ACTIVO')->get();
         $fullaccess = false;
         $fecha_hoy = Carbon::now()->toDateString();
 
-        if(count(Auth::user()->roles)>0)
-        {
+        if (count(Auth::user()->roles) > 0) {
             $cont = 0;
-            while($cont < count(Auth::user()->roles))
-            {
-                if(Auth::user()->roles[$cont]['full-access'] == 'SI')
-                {
+            while ($cont < count(Auth::user()->roles)) {
+                if (Auth::user()->roles[$cont]['full-access'] == 'SI') {
                     $fullaccess = true;
                     $cont = count(Auth::user()->roles);
                 }
                 $cont = $cont + 1;
             }
         }
-        return view('consultas.ventas.documentos_no.edit',[
+        return view('consultas.ventas.documentos_no.edit', [
             'documento' => $documento,
             'detalles' => $detalles,
             'empresas' => $empresas,
@@ -368,23 +358,23 @@ class NoEnviadosController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->authorize('haveaccess','documento_venta.index');
+        $this->authorize('haveaccess', 'documento_venta.index');
         ini_set("max_execution_time", 60000);
-        try{
+        try {
 
             DB::beginTransaction();
             $data = $request->all();
 
             $rules = [
-                'fecha_documento_campo'=> 'required',
-                'fecha_atencion_campo'=> 'required',
+                'fecha_documento_campo' => 'required',
+                'fecha_atencion_campo' => 'required',
                 //'tipo_venta'=> 'required',
-                'condicion_id'=> 'required',
-                'tipo_pago_id'=> 'nullable',
-                'efectivo'=> 'required',
-                'importe'=> 'required',
-                'empresa_id'=> 'required',
-                'cliente_id'=> 'required',
+                'condicion_id' => 'required',
+                'tipo_pago_id' => 'nullable',
+                'efectivo' => 'required',
+                'importe' => 'required',
+                'empresa_id' => 'required',
+                'cliente_id' => 'required',
                 'observacion' => 'nullable',
                 'igv' => 'required_if:igv_check,==,on|numeric|digits_between:1,3',
 
@@ -415,7 +405,6 @@ class NoEnviadosController extends Controller
                     'errors' => true,
                     'data' => array('mensajes' => $validator->getMessageBag()->toArray())
                 ]);
-
             }
 
             $documento = Documento::find($id);
@@ -433,7 +422,7 @@ class NoEnviadosController extends Controller
             $cliente = Cliente::findOrFail($request->get('cliente_id'));
 
             //CONDICION
-            $cadena = explode('-',$request->get('condicion_id'));
+            $cadena = explode('-', $request->get('condicion_id'));
             $condicion = Condicion::findOrFail($cadena[0]);
             $documento->condicion_id = $condicion->id;
 
@@ -450,8 +439,7 @@ class NoEnviadosController extends Controller
             $documento->igv = $request->get('igv') ? $request->get('igv') : 18;
             $documento->moneda = 1;
 
-            if($monto != $request->get('monto_total'))
-            {
+            if ($monto != $request->get('monto_total')) {
                 $documento->tipo_pago_id = $request->get('tipo_pago_id');
                 $documento->importe = $request->get('importe');
                 $documento->efectivo = $request->get('efectivo');
@@ -463,27 +451,26 @@ class NoEnviadosController extends Controller
             }
 
             $numero_doc = $documento->id;
-            $documento->numero_doc = 'VENTA-'.$numero_doc;
+            $documento->numero_doc = 'VENTA-' . $numero_doc;
             $documento->update();
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
 
-            $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id',$id)->get();
-            foreach($detalles as $item)
-            {
+            $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $id)->get();
+            foreach ($detalles as $item) {
                 $lote = LoteProducto::findOrFail($item->lote_id);
                 $lote->cantidad =  $lote->cantidad + $item->cantidad;
                 $lote->cantidad_logica =  $lote->cantidad_logica + $item->cantidad;
                 $lote->estado = '1';
                 $lote->update();
                 $item->estado = 'ANULADO';
+                $item->eliminado = '1';
                 $item->update();
             }
 
             foreach ($productotabla as $producto) {
-                if($producto->detalle_id != 0)
-                {
+                if ($producto->detalle_id != 0) {
                     $lote = LoteProducto::findOrFail($producto->lote_id);
                     $detalle = Detalle::find($producto->detalle_id);
                     $cantidad = $detalle->cantidad;
@@ -500,29 +487,25 @@ class NoEnviadosController extends Controller
                     $detalle->valor_unitario = $producto->valor_unitario;
                     $detalle->valor_venta = $producto->valor_venta;
                     $detalle->estado = 'ACTIVO';
+                    $detalle->eliminado = '0';
                     $detalle->update();
 
                     $lote->cantidad = $lote->cantidad - $cantidad;
                     $lote->cantidad_logica = $lote->cantidad_logica - $cantidad;
-                    if($cantidad >= $producto->cantidad)
-                    {
+                    if ($cantidad >= $producto->cantidad) {
                         $cant_aux = $cantidad - $producto->cantidad;
                         $lote->cantidad =  $lote->cantidad + $cant_aux;
-                    }
-                    else{
+                    } else {
                         $cant_aux = $producto->cantidad - $cantidad;
                         $lote->cantidad =  $lote->cantidad - $cant_aux;
                     }
 
-                    if($cantidad >= $producto->cantidad)
-                    {
+                    if ($cantidad >= $producto->cantidad) {
                         $cant_aux = $cantidad - $producto->cantidad;
                         $lote->cantidad_logica =  $lote->cantidad_logica + $cant_aux;
                     }
                     $lote->update();
-                }
-                else
-                {
+                } else {
                     $lote = LoteProducto::findOrFail($producto->lote_id);
                     Detalle::create([
                         'documento_id' => $documento->id,
@@ -541,8 +524,7 @@ class NoEnviadosController extends Controller
                         'valor_venta' => $producto->valor_venta,
                     ]);
 
-                    if($lote->cantidad - $producto->cantidad == 0)
-                    {
+                    if ($lote->cantidad - $producto->cantidad == 0) {
                         $lote->cantidad_logica =  0;
                     }
 
@@ -553,27 +535,25 @@ class NoEnviadosController extends Controller
 
 
             $documento = Documento::find($documento->id);
-            $documento->nombre_comprobante_archivo = $documento->serie.'-'.$documento->correlativo.'.pdf';
+            $documento->nombre_comprobante_archivo = $documento->serie . '-' . $documento->correlativo . '.pdf';
             $documento->update();
 
             //Registro de actividad
-            $descripcion = "SE AGREGÓ EL DOCUMENTO DE VENTA CON LA FECHA: ". Carbon::parse($documento->fecha_documento)->format('d/m/y');
+            $descripcion = "SE AGREGÓ EL DOCUMENTO DE VENTA CON LA FECHA: " . Carbon::parse($documento->fecha_documento)->format('d/m/y');
             $gestion = "DOCUMENTO DE VENTA";
-            crearRegistro($documento , $descripcion , $gestion);
+            crearRegistro($documento, $descripcion, $gestion);
 
             DB::commit();
-            Session::flash('success','Documento de venta modificado.');
+            Session::flash('success', 'Documento de venta modificado.');
             return response()->json([
                 'success' => true,
-                'documento_id'=> $documento->id
+                'documento_id' => $documento->id
             ]);
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'mensaje'=> 'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.',
+                'mensaje' => 'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.',
                 'excepcion' => $e->getMessage()
             ]);
         }
@@ -583,75 +563,72 @@ class NoEnviadosController extends Controller
     {
         return datatables()->query(
             DB::table('lote_productos')
-            ->join('productos','productos.id','=','lote_productos.producto_id')
-            ->join('productos_clientes','productos_clientes.producto_id','=','productos.id')
-            ->join('categorias','categorias.id','=','productos.categoria_id')
-            ->join('marcas','marcas.id','=','productos.marca_id')
-            ->join('tabladetalles','tabladetalles.id','=','productos.medida')
-            ->leftJoin('detalle_nota_ingreso','detalle_nota_ingreso.lote_id','=','lote_productos.id')
-            ->leftJoin('nota_ingreso','nota_ingreso.id','=','detalle_nota_ingreso.nota_ingreso_id')
-            ->leftJoin('compra_documento_detalles','compra_documento_detalles.lote_id','=','lote_productos.id')
-            ->leftJoin('compra_documentos','compra_documentos.id','=','compra_documento_detalles.documento_id')
-            ->select(
-                'nota_ingreso.moneda as moneda_ingreso',
-                'compra_documentos.moneda as moneda_compra',
-                'compra_documentos.dolar as dolar_compra',
-                'compra_documentos.igv_check as igv_compra',
-                'compra_documento_detalles.precio_soles',
-                'compra_documento_detalles.precio as precio_compra',
-                'detalle_nota_ingreso.costo as precio_ingreso',
-                'detalle_nota_ingreso.costo_soles as precio_ingreso_soles',
-                'nota_ingreso.dolar as dolar_ingreso',
-                'compra_documento_detalles.precio_mas_igv_soles',
-                'lote_productos.*','productos.nombre',
-                'productos.igv',
-                'productos.codigo_barra',
-               //'productos.porcentaje_normal',
-                DB::raw('ifnull((select porcentaje
+                ->join('productos', 'productos.id', '=', 'lote_productos.producto_id')
+                ->join('productos_clientes', 'productos_clientes.producto_id', '=', 'productos.id')
+                ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+                ->join('marcas', 'marcas.id', '=', 'productos.marca_id')
+                ->join('tabladetalles', 'tabladetalles.id', '=', 'productos.medida')
+                ->leftJoin('detalle_nota_ingreso', 'detalle_nota_ingreso.lote_id', '=', 'lote_productos.id')
+                ->leftJoin('nota_ingreso', 'nota_ingreso.id', '=', 'detalle_nota_ingreso.nota_ingreso_id')
+                ->leftJoin('compra_documento_detalles', 'compra_documento_detalles.lote_id', '=', 'lote_productos.id')
+                ->leftJoin('compra_documentos', 'compra_documentos.id', '=', 'compra_documento_detalles.documento_id')
+                ->select(
+                    'nota_ingreso.moneda as moneda_ingreso',
+                    'compra_documentos.moneda as moneda_compra',
+                    'compra_documentos.dolar as dolar_compra',
+                    'compra_documentos.igv_check as igv_compra',
+                    'compra_documento_detalles.precio_soles',
+                    'compra_documento_detalles.precio as precio_compra',
+                    'detalle_nota_ingreso.costo as precio_ingreso',
+                    'detalle_nota_ingreso.costo_soles as precio_ingreso_soles',
+                    'nota_ingreso.dolar as dolar_ingreso',
+                    'compra_documento_detalles.precio_mas_igv_soles',
+                    'lote_productos.*',
+                    'productos.nombre',
+                    'productos.igv',
+                    'productos.codigo_barra',
+                    //'productos.porcentaje_normal',
+                    DB::raw('ifnull((select porcentaje
                     from productos_clientes pc
                     where pc.producto_id = lote_productos.producto_id
                     and pc.cliente = 121
                     and pc.estado = "ACTIVO"
                 order by id desc
                 limit 1),20) as porcentaje_normal'),
-                //'productos.porcentaje_distribuidor',
-                DB::raw('ifnull((select porcentaje
+                    //'productos.porcentaje_distribuidor',
+                    DB::raw('ifnull((select porcentaje
                     from productos_clientes pc
                     where pc.producto_id = lote_productos.producto_id
                     and pc.cliente = 122
                     and pc.estado = "ACTIVO"
                 order by id desc
                 limit 1),20) as porcentaje_distribuidor'),
-                'productos_clientes.cliente',
-                'productos_clientes.moneda',
-                'productos_clientes.porcentaje',
-                'tabladetalles.simbolo as unidad_producto',
-                'categorias.descripcion as categoria',
-                'marcas.marca',
-                DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
-            )
-            ->where('lote_productos.cantidad_logica','>',0)
-            ->where('lote_productos.estado','1')
-            ->where('productos_clientes.cliente',$id)
-            ->where('productos_clientes.moneda','1')
-            ->orderBy('lote_productos.id','ASC')
-            ->where('productos_clientes.estado','ACTIVO')
+                    'productos_clientes.cliente',
+                    'productos_clientes.moneda',
+                    'productos_clientes.porcentaje',
+                    'tabladetalles.simbolo as unidad_producto',
+                    'categorias.descripcion as categoria',
+                    'marcas.marca',
+                    DB::raw('DATE_FORMAT(lote_productos.fecha_vencimiento, "%d/%m/%Y") as fecha_venci')
+                )
+                ->where('lote_productos.cantidad_logica', '>', 0)
+                ->where('lote_productos.estado', '1')
+                ->where('productos_clientes.cliente', $id)
+                ->where('productos_clientes.moneda', '1')
+                ->orderBy('lote_productos.id', 'ASC')
+                ->where('productos_clientes.estado', 'ACTIVO')
         )->toJson();
     }
 
     public function getLotRecientes($id)
     {
-        $detalles = Detalle::where('estado','ACTIVO')->where('documento_id', $id)->get();
+        $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $id)->get();
         $colecction = collect([]);
-        foreach($detalles as $detalle)
-        {
+        foreach ($detalles as $detalle) {
             $precio_soles = 0;
-            if(!empty($detalle->lote->detalle_compra))
-            {
+            if (!empty($detalle->lote->detalle_compra)) {
                 $precio_soles = $detalle->lote->detalle_compra->precio_soles;
-            }
-            else
-            {
+            } else {
                 $precio_soles = $detalle->lote->detalle_nota->costo_soles;
             }
 
@@ -678,8 +655,6 @@ class NoEnviadosController extends Controller
                 'cantidad' => $detalle->lote->cantidad,
                 'cantidad_logica' => $detalle->cantidad,
             ]);
-
-
         }
         return DataTables::of($colecction)->make(true);
     }
@@ -694,14 +669,14 @@ class NoEnviadosController extends Controller
         $mensaje = '';
         $lote = LoteProducto::findOrFail($producto_id);
         //DISMINUIR
-        if ($lote->cantidad_logica >= $cantidad && $condicion == '1' ) {
+        if ($lote->cantidad_logica >= $cantidad && $condicion == '1') {
             $nuevaCantidad = $lote->cantidad_logica - $cantidad;
             $lote->cantidad_logica = $nuevaCantidad;
             $lote->update();
             $mensaje = 'Cantidad aceptada';
         }
         //AUMENTAR
-        if ($condicion == '0' ) {
+        if ($condicion == '0') {
             $nuevaCantidad = $lote->cantidad_logica + $cantidad;
             $lote->cantidad_logica = $nuevaCantidad;
             $lote->update();
@@ -728,10 +703,8 @@ class NoEnviadosController extends Controller
             $cont = 0;
             $existe = false;
             $indice =  -1;
-            while($cont < count($detalles))
-            {
-                if($detalles[$cont]->id == $detalle->detalle_id)
-                {
+            while ($cont < count($detalles)) {
+                if ($detalles[$cont]->id == $detalle->detalle_id) {
                     $existe = true;
                     $indice = $cont;
                     $cont = count($detalles);
@@ -739,23 +712,18 @@ class NoEnviadosController extends Controller
                 $cont = $cont + 1;
             }
 
-            if($existe)
-            {
-                if($indice >= 0)
-                {
+            if ($existe) {
+                if ($indice >= 0) {
                     $lot = $detalles[$indice];
 
-                    if($detalle->cantidad - $lot->cantidad > 0)
-                    {
+                    if ($detalle->cantidad - $lot->cantidad > 0) {
                         $lote = LoteProducto::findOrFail($lot->lote_id);
                         $lote->cantidad_logica = $lote->cantidad_logica + ($detalle->cantidad - $lot->cantidad);
                         $lote->estado = '1';
                         $lote->update();
                     }
                 }
-            }
-            else
-            {
+            } else {
                 //DEVOLVEMOS CANTIDAD AL LOTE Y AL LOTE LOGICO
                 $lote = LoteProducto::findOrFail($detalle->lote_id);
                 $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
@@ -775,14 +743,12 @@ class NoEnviadosController extends Controller
         $lote_id = $data['lote_id'];
         $lote = LoteProducto::find($lote_id);
 
-        if($lote)
-        {
+        if ($lote) {
             return response()->json([
                 'success' => true,
                 'lote' => $lote,
             ]);
-        }
-        else{
+        } else {
             return response()->json([
                 'success' => false,
             ]);
@@ -791,7 +757,7 @@ class NoEnviadosController extends Controller
 
     public function updateLote(Request $request)
     {
-        try{
+        try {
             DB::beginTransaction();
             $data = $request->all();
             $lote_id = $data['lote_id'];
@@ -799,8 +765,7 @@ class NoEnviadosController extends Controller
             $cantidad_res = $data['cantidad_res'];
             $lote = LoteProducto::find($lote_id);
 
-            if($lote)
-            {
+            if ($lote) {
                 $lote->cantidad_logica = $lote->cantidad_logica + ($cantidad_sum - $cantidad_res);
                 $lote->update();
                 DB::commit();
@@ -808,16 +773,13 @@ class NoEnviadosController extends Controller
                     'success' => true,
                     'lote' => $lote,
                 ]);
-            }
-            else{
+            } else {
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
                 ]);
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,

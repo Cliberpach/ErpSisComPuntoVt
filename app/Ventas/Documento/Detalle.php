@@ -26,12 +26,13 @@ class Detalle extends Model
         'dinero',
         'valor_unitario',
         'valor_venta',
-        'estado'
+        'estado',
+        'eliminado',
     ];
 
     public function detalles()
     {
-        return $this->hasMany('App\Ventas\NotaDetalle','detalle_id','id');
+        return $this->hasMany('App\Ventas\NotaDetalle', 'detalle_id', 'id');
     }
 
     public function documento()
@@ -41,12 +42,12 @@ class Detalle extends Model
 
     public function lote()
     {
-        return $this->belongsTo('App\Almacenes\LoteProducto','lote_id');
+        return $this->belongsTo('App\Almacenes\LoteProducto', 'lote_id');
     }
 
     protected static function booted()
     {
-        static::created(function(Detalle $detalle){
+        static::created(function (Detalle $detalle) {
 
             //KARDEX
             $kardex = new Kardex();
@@ -64,10 +65,9 @@ class Detalle extends Model
             $producto = Producto::find($detalle->lote->producto_id);
             $producto->precio_venta_minimo = $detalle->precio_unitario;
             $producto->update();
-
         });
 
-        static::updated(function(Detalle $detalle){
+        static::updated(function (Detalle $detalle) {
 
             // if($detalle->estado == 'ANULADO')
             // {

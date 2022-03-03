@@ -58,12 +58,12 @@ class Documento extends Model
 
     public function detalles()
     {
-        return $this->hasMany('App\Ventas\Documento\Detalle','documento_id');
+        return $this->hasMany('App\Ventas\Documento\Detalle', 'documento_id');
     }
 
     public function notas()
     {
-        return $this->hasMany('App\Ventas\Nota','documento_id');
+        return $this->hasMany('App\Ventas\Nota', 'documento_id');
     }
 
     public function condicion()
@@ -94,7 +94,7 @@ class Documento extends Model
 
     public function tipo_pago()
     {
-        return $this->belongsTo('App\Ventas\TipoPago','tipo_pago_id');
+        return $this->belongsTo('App\Ventas\TipoPago', 'tipo_pago_id');
     }
 
     public function nombreTipo(): string
@@ -148,7 +148,7 @@ class Documento extends Model
         if (is_null($condicion))
             return "-";
         else
-            return strval($condicion->descripcion.' '.($condicion->dias > 0 ? $condicion->dias.' dias' : ''));
+            return strval($condicion->descripcion . ' ' . ($condicion->dias > 0 ? $condicion->dias . ' dias' : ''));
     }
 
     public function forma_pago(): string
@@ -181,21 +181,19 @@ class Documento extends Model
 
     public function cuenta()
     {
-        return $this->hasOne('App\Ventas\CuentaCliente','cotizacion_documento_id');
+        return $this->hasOne('App\Ventas\CuentaCliente', 'cotizacion_documento_id');
     }
 
     protected static function booted()
     {
-        static::created(function(Documento $documento){
+        static::created(function (Documento $documento) {
             //CREAR CUENTA CLIENTE
             $condicion = Condicion::find($documento->condicion_id);
-            if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
-            {
-                if($documento->convertir == null || $documento->convertir == '')
-                {
+            if (strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO') {
+                if ($documento->convertir == null || $documento->convertir == '') {
                     $cuenta_cliente = new CuentaCliente();
                     $cuenta_cliente->cotizacion_documento_id = $documento->id;
-                    $cuenta_cliente->numero_doc = $documento->serie.' - '.$documento->correlativo;
+                    $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
                     $cuenta_cliente->fecha_doc = $documento->fecha_documento;
                     $cuenta_cliente->monto = $documento->total;
                     $cuenta_cliente->acta = 'DOCUMENTO VENTA';
@@ -205,87 +203,80 @@ class Documento extends Model
             }
         });
 
-        static::updated(function(Documento $documento){
-            if($documento->cuenta)
-           {
-               $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
-               $cuenta_cliente->cotizacion_documento_id = $documento->id;
-               $cuenta_cliente->numero_doc = $documento->serie.' - '.$documento->correlativo;
-               $cuenta_cliente->fecha_doc = $documento->fecha_documento;
-               $cuenta_cliente->monto = $documento->total;
-               $cuenta_cliente->acta = 'DOCUMENTO VENTA';
-               $cuenta_cliente->saldo = $documento->total;
-               $cuenta_cliente->update();
+        static::updated(function (Documento $documento) {
+            if ($documento->cuenta) {
+                $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+                $cuenta_cliente->cotizacion_documento_id = $documento->id;
+                $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
+                $cuenta_cliente->fecha_doc = $documento->fecha_documento;
+                $cuenta_cliente->monto = $documento->total;
+                $cuenta_cliente->acta = 'DOCUMENTO VENTA';
+                $cuenta_cliente->saldo = $documento->total;
+                $cuenta_cliente->update();
 
-               if($cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto') > 0)
-               {
-                   $cuenta_cliente->saldo =  $cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto');
-               }
-               else
-               {
-                   $cuenta_cliente->saldo = 0;
-                   $cuenta_cliente->estado = 'PAGADO';
-               }
-               $cuenta_cliente->update();
+                if ($cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto') > 0) {
+                    $cuenta_cliente->saldo =  $cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto');
+                } else {
+                    $cuenta_cliente->saldo = 0;
+                    $cuenta_cliente->estado = 'PAGADO';
+                }
+                $cuenta_cliente->update();
 
-               if($documento->estado == 'ANULADO')
-               {
-                   $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
-                   $cuenta_cliente->estado = 'ANULADO';
-                   $cuenta_cliente->update();
-               }
-           }
-           else
-           {
+                if ($documento->estado == 'ANULADO') {
+                    $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+                    $cuenta_cliente->estado = 'ANULADO';
+                    $cuenta_cliente->update();
+                }
+            } else {
                 $condicion = Condicion::find($documento->condicion_id);
-                if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
-                {
-                   if($documento->convertir == null || $documento->convertir == '')
-                   {
+                if (strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO') {
+                    if ($documento->convertir == null || $documento->convertir == '') {
                         $cuenta_cliente = new CuentaCliente();
                         $cuenta_cliente->cotizacion_documento_id = $documento->id;
-                        $cuenta_cliente->numero_doc = $documento->serie.' - '.$documento->correlativo;
+                        $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
                         $cuenta_cliente->fecha_doc = $documento->fecha_documento;
                         $cuenta_cliente->monto = $documento->total;
                         $cuenta_cliente->acta = 'DOCUMENTO VENTA';
                         $cuenta_cliente->saldo = $documento->total;
                         $cuenta_cliente->save();
-                   }
-               }
-           }
+                    }
+                }
+            }
 
-           if($documento->convertir && $documento->tipo_venta == 129)
-            {
+            if ($documento->convertir && $documento->tipo_venta == 129) {
                 $doc_convertido = Documento::find($documento->convertir);
 
                 $condicion = Condicion::find($documento->condicion_id);
-                if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
-                {
-                    if($documento->cuenta)
-                    {
+                if (strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO') {
+                    if ($documento->cuenta) {
                         $cuenta_a_convertir = CuentaCliente::find($documento->cuenta->id);
-                        $cuenta_a_convertir->cotizacion_documento_id = $doc_convertido->id;
-                        $cuenta_a_convertir->numero_doc = $doc_convertido->serie.' - '.$doc_convertido->correlativo;
-                        $cuenta_a_convertir->fecha_doc = $doc_convertido->fecha_documento;
+                        //$cuenta_a_convertir->cotizacion_documento_id = $doc_convertido->id;
+                        //$cuenta_a_convertir->numero_doc = $doc_convertido->serie . ' - ' . $doc_convertido->correlativo;
+                        //$cuenta_a_convertir->fecha_doc = $doc_convertido->fecha_documento;
                         $cuenta_a_convertir->monto = $doc_convertido->total;
                         $cuenta_a_convertir->acta = 'DOCUMENTO VENTA';
                         $cuenta_a_convertir->update();
+                    } else {
+                        $cuenta_cliente = new CuentaCliente();
+                        $cuenta_cliente->cotizacion_documento_id = $documento->id;
+                        $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
+                        $cuenta_cliente->fecha_doc = $documento->fecha_documento;
+                        $cuenta_cliente->monto = $documento->total;
+                        $cuenta_cliente->acta = 'DOCUMENTO VENTA';
+                        $cuenta_cliente->saldo = $documento->total;
+                        $cuenta_cliente->save();
                     }
-               }
-               else{
-                    if($documento->cuenta)
-                    {
+                } else {
+                    if ($documento->cuenta) {
                         $cuenta_a_convertir = CuentaCliente::find($documento->cuenta->id);
                         $cuenta_a_convertir->estado = 'ANULADO';
                         $cuenta_a_convertir->update();
                     }
-               }
+                }
             }
 
-            if($documento->sunat == '2' || $documento->estado == 'ANULADO')
-            {
-                if($documento->cuenta)
-                {
+            if ($documento->sunat == '2' || $documento->estado == 'ANULADO') {
+                if ($documento->cuenta) {
                     $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
                     $cuenta_cliente->estado = 'ANULADO';
                     $cuenta_cliente->update();
@@ -293,16 +284,13 @@ class Documento extends Model
             }
         });
 
-        static::deleted(function(Documento $documento){
-           //ANULAR CUENTA
-           if($documento->cuenta)
-           {
-               $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
-               $cuenta_cliente->estado = 'ANULADO';
-               $cuenta_cliente->update();
-           }
-
+        static::deleted(function (Documento $documento) {
+            //ANULAR CUENTA
+            if ($documento->cuenta) {
+                $cuenta_cliente = CuentaCliente::find($documento->cuenta->id);
+                $cuenta_cliente->estado = 'ANULADO';
+                $cuenta_cliente->update();
+            }
         });
-
     }
 }
