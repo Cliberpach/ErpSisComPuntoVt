@@ -1728,6 +1728,14 @@ if (!function_exists('ifComprobanteSeleccionado')) {
     }
 }
 
+if (!function_exists('codigoPrecioMenor')) {
+    function codigoPrecioMenor()
+    {
+        $empresa = Empresa::first();
+        return $empresa;
+    }
+}
+
 
 
 

@@ -148,7 +148,17 @@
                                     </div>
 
                                 </div>
-
+                                @if (codigoPrecioMenor()->estado_precio_menor == '1')
+                                <div class="row">
+                                    <div class="col-12 col-md-6">
+                                        <div class="form-group">
+                                            <label for="">Codigo para vender a menor precio</label>
+                                            <input type="text" class="form-control" id="codigo_precio_menor" placeholder="Código" autocomplete="off">
+                                            <input type="hidden" class="form-control" id="codigo_precio_menor_json" value="{{codigoPrecioMenor()}}">
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -359,6 +369,7 @@
 
                                             <input type="hidden" name="producto_id" id="producto_id">
                                             <input type="hidden" name="producto_unidad" id="producto_unidad">
+                                            <input type="hidden" name="producto_json" id="producto_json">
 
                                             <div class="col-lg-2 col-xs-12">
 
@@ -490,6 +501,7 @@
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <!-- DataTable -->
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ asset('Inspinia/css/plugins/iCheck/custom.css' )}}" rel="stylesheet">
 
 <style>
     .my-swal {
@@ -515,7 +527,7 @@
 <script src="{{ asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+<script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
 
 <script>
 
@@ -557,6 +569,7 @@
                 $('#producto_lote_editar').val(data[4]);
                 $('#producto_editar').val(data[0]);
                 $('#precio_editar').val(data[10]);
+                $('#precio_minimo').val(data[12]);
                 $('#codigo_nombre_producto_editar').val(data[4]);
                 $('#cantidad_editar').val(data[2]);
                 $('#cantidad_editar_actual').val(data[2]);
@@ -634,6 +647,11 @@
             width: '100%',
         });
 
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+        
         @if(empty($cotizacion))
             obtenerClientes();
         @else
@@ -713,6 +731,10 @@
                 {
                     "targets": [11],
                     'visible': false
+                },
+                {
+                    "targets": [12],
+                    'visible': false
                 }
             ],
             'bAutoWidth': false,
@@ -749,6 +771,9 @@
                 },
                 {
                     sWidth: '10%',
+                },
+                {
+                    sWidth: '0%',
                 },
                 {
                     sWidth: '0%',
@@ -862,48 +887,66 @@
     //Validacion al ingresar tablas
     $("#btn_agregar_detalle").click(function() {
         limpiarErrores()
-        var enviar = false;
+        var enviar = true;
+        var producto_json = JSON.parse($('#producto_json').val());
+        var codigo = JSON.parse($('#codigo_precio_menor_json').val());
         if ($('#producto_id').val() == '') {
             toastr.error('Seleccione Producto.', 'Error');
-            enviar = true;
+            enviar = false;
             $('#producto_id').addClass("is-invalid")
             $('#error-producto').text('El campo Producto es obligatorio.')
         } else {
             var existe = buscarProducto($('#producto_id').val())
-            if (existe == true) {
+            if (existe) {
                 toastr.error('Producto ya se encuentra ingresado.', 'Error');
-                enviar = true;
+                enviar = false;
             }
         }
 
         if ($('#precio').val() == '') {
             toastr.error('Ingrese el precio del producto.', 'Error');
-            enviar = true;
+            enviar = false;
             $("#precio").addClass("is-invalid");
             $('#error-precio').text('El campo Precio es obligatorio.')
         } else {
             if ($('#precio').val() == 0) {
                 toastr.error('Ingrese el precio del producto superior a 0.0.', 'Error');
-                enviar = true;
+                enviar = false;
                 $("#precio").addClass("is-invalid");
                 $('#error-precio').text('El campo precio debe ser mayor a 0.')
+            }
+
+            if(convertFloat($('#precio').val()) < convertFloat(evaluarPrecioigv(producto_json)))
+            {
+                if(codigo.estado_precio_menor == '1')
+                {
+                    if($('#codigo_precio_menor').val() != codigo.codigo_precio_menor)
+                    {
+                        toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
+                        enviar = false;
+                    }
+                }
+                else{
+                    toastr.error('No puedes vender a un precio menor a lo establecido.', 'Error');
+                    enviar = false;
+                }
             }
         }
 
         if ($('#cantidad').val() == '') {
             toastr.error('Ingrese cantidad del artículo.', 'Error');
-            enviar = true;
+            enviar = false;
             $("#cantidad").addClass("is-invalid");
             $('#error-cantidad').text('El campo Cantidad es obligatorio.')
         }
 
         if ($('#cantidad').val() == 0) {
-            enviar = true;
+            enviar = false;
             $("#cantidad").addClass("is-invalid");
             $('#error-cantidad').text('El campo cantidad debe ser mayor a 0.')
         }
 
-        if (enviar != true) {
+        if (enviar) {
             llegarDatos();
             sumaTotal();
             $('#asegurarCierre').val(1);
@@ -940,6 +983,8 @@
         precio_nuevo = precio_unitario - dinero;
         valor_venta = precio_nuevo * cantidad;
 
+        var producto_json = JSON.parse($('#producto_json').val());
+
         let detalle = {
             producto_id: $('#producto_id').val(),
             unidad: $('#producto_unidad').val(),
@@ -952,6 +997,7 @@
             dinero: dinero,
             descuento: pdescuento,
             precio_nuevo: precio_nuevo,
+            precio_minimo: convertFloat(evaluarPrecioigv(producto_json)),
         }
         agregarTabla(detalle);
         cambiarCantidad(detalle, '1');
@@ -1001,6 +1047,7 @@
             Number($detalle.valor_venta).toFixed(2),
             $detalle.precio_inicial,
             $detalle.descuento,
+            $detalle.precio_minimo,
         ]).draw(false);
         //cargarProductos()
         //INGRESADO EL PRODUCTO SUMA TOTAL DEL DETALLE
@@ -1097,6 +1144,7 @@
                 dinero: dinero,
                 descuento: pdescuento,
                 precio_nuevo: precio_nuevo,
+                precio_minimo: el[12],
                 }
                 detalles.push(detalle);
                 });
@@ -1138,6 +1186,7 @@
                         dinero: dinero,
                         descuento: pdescuento,
                         precio_nuevo: precio_nuevo,
+                        precio_minimo: el[12],
                     }
 
                     detalles.push(detalle);
@@ -1180,6 +1229,7 @@
                     dinero: dinero,
                     descuento: pdescuento,
                     precio_nuevo: precio_nuevo,
+                    precio_minimo: el[12],
                 }
                 detalles.push(detalle);
             });
@@ -1455,6 +1505,7 @@
                 "{{ $lote->valor_venta }}",
                 "{{ $lote->precio_inicial }}",
                 "{{ $lote->descuento }}",
+                "{{ $lote->precio_nuevo }}",
                 ])
             @endforeach
             //SUMATORIA TOTAL

@@ -723,6 +723,7 @@ function(){
     Route::prefix('configuracion')->group(function(){
         Route::get('index', 'Configuracion\ConfiguracionController@index')->name('configuracion.index');
         Route::put('update/{id}', 'Configuracion\ConfiguracionController@update')->name('configuracion.update');
+        Route::put('/empresa/update', 'Configuracion\ConfiguracionController@codigo')->name('configuracion.empresa.update');
     });
 });
 

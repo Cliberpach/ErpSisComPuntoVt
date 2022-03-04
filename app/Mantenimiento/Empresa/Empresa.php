@@ -22,6 +22,9 @@ class Empresa extends Model
         'correo',
         'direccion_planta',
 
+        'codigo_precio_menor',
+        'estado_precio_menor',
+
         'dni_representante',
         'nombre_representante',
 

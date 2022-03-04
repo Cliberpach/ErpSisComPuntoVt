@@ -135,7 +135,6 @@
 <script>
 
     function obtenerLotesproductos(tipo_cliente) {
-        console.log(tipo_cliente)
         //RUTA LOTES PRODUCTOS
         var url = '{{ route("ventas.getLot", ":id")}}';
         url = url.replace(':id', tipo_cliente);
@@ -328,7 +327,6 @@
         $ ('.dataTables-lotes'). on ('dblclick', 'tbody td', function () {
             var lote =  $('.dataTables-lotes').DataTable();
             var data = lote.row(this).data();
-            console.log(data)
             ingresarProducto(data)
         });
 
@@ -345,6 +343,7 @@
         $('#precio').val(evaluarPrecioigv(producto))
         //$('#cantidad').val(producto.cantidad_logica)
         $('#producto_unidad').val(producto.unidad_producto)
+        $('#producto_json').val(JSON.stringify(producto))
         $('#producto_id').val(producto.id)
         $('#producto_lote').val(producto.nombre+' - '+ producto.codigo_lote)
         //AGREGAR LIMITE A LA CANTIDAD SEGUN EL LOTE SELECCIONADO
@@ -379,7 +378,6 @@
             }
             return convertFloat(precio_nuevo).toFixed(2);
         }else{
-            console.log(producto.dolar_compra)
             let cambio = convertFloat(producto.dolar_compra);
             let precio = 0;
             let precio_ = producto.precio_compra;

@@ -27,7 +27,6 @@
                         <input type="text" id="medida_editar" name="medida_editar" class="form-control" disabled>
                     </div>
                     <div class="form-group row">
-
                         <div class="col-lg-6 col-xs-12">
                             <label class="required">Cantidad</label>
                             <input type="text" id="cantidad_editar" name="cantidad_editar" class="form-control" min="0" onkeypress="return filterFloat(event, this, false);" required>
@@ -36,6 +35,7 @@
                         <div class="col-lg-6 col-xs-12">
                             <label class="required">Precio</label>
                             <input type="text" id="precio_editar" name="precio_editar" class="form-control" maxlength="15" onkeypress="return filterFloat(event, this, true);" required>
+                            <input type="hidden" id="precio_minimo" name="precio_minimo" class="form-control" maxlength="15" onkeypress="return filterFloat(event, this, true);" required>
                         </div>
                     </div>
                 </form>
@@ -70,20 +70,50 @@ $('#cantidad_editar').on('input', function() {
 //Validacion al ingresar tablas
 $('#edit_detalle_venta').submit(function(e) {
     e.preventDefault();
-    var enviar = false;
+    var enviar = true;
 
+    // if ($('#precio_editar').val() == '') {
+
+    //     toastr.error('Ingrese el precio del Producto.', 'Error');
+    //     enviar = true;
+
+    //     $("#precio_editar").addClass("is-invalid");
+    //     $('#error-precio_editar').text('El campo Precio es obligatorio.')
+    // }
+    var codigo = JSON.parse($('#codigo_precio_menor_json').val());
     if ($('#precio_editar').val() == '') {
+            toastr.error('Ingrese el precio del producto.', 'Error');
+            enviar = false;
+            $("#precio_editar").addClass("is-invalid");
+            $('#error-precio_editar').text('El campo Precio es obligatorio.')
+    } else {
+        if ($('#precio_editar').val() == 0) {
+            toastr.error('Ingrese el precio del producto superior a 0.0.', 'Error');
+            enviar = false;
+            $("#precio_editar").addClass("is-invalid");
+            $('#error-precio_editar').text('El campo precio debe ser mayor a 0.')
+        }
 
-        toastr.error('Ingrese el precio del Producto.', 'Error');
-        enviar = true;
-
-        $("#precio_editar").addClass("is-invalid");
-        $('#error-precio_editar').text('El campo Precio es obligatorio.')
+        if(convertFloat($('#precio_editar').val()) < convertFloat($('#precio_minimo').val()))
+        {
+            if(codigo.estado_precio_menor == '1')
+            {
+                if($('#codigo_precio_menor').val() != codigo.codigo_precio_menor)
+                {
+                    toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
+                    enviar = false;
+                }
+            }
+            else{
+                toastr.error('No puedes vender a un precio menor a lo establecido.', 'Error');
+                enviar = false;
+            }
+        }
     }
 
     if ($('#cantidad_editar').val() == '') {
         toastr.error('Ingrese cantidad del Producto.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#cantidad_editar").addClass("is-invalid");
         $('#error-cantidad_editar').text('El campo Cantidad es obligatorio.')
@@ -91,7 +121,7 @@ $('#edit_detalle_venta').submit(function(e) {
 
     if ($('#cantidad_editar').val() == 0) {
         toastr.error('Ingrese cantidad del Producto mayor a 0.', 'Error');
-        enviar = true;
+        enviar = false;
 
         $("#cantidad_editar").addClass("is-invalid");
         $('#error-cantidad_editar').text('Cantidad mayor a 0.')
@@ -115,16 +145,16 @@ $('#edit_detalle_venta').submit(function(e) {
         }).done(function (response){
             if(!response.success)
             {
-                enviar = true;
+                enviar = false;
                 toastr.warning('Ocurrió un error porfavor recargar la pagina.')
             }
         });
     }else{
         toastr.error('Cerrar ventana y volver a editar producto.', 'Error');
-        enviar = true;
+        enviar = false;
     }
 
-    if (enviar != true) {
+    if (enviar) {
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {
                 confirmButton: 'btn btn-success',
@@ -200,6 +230,7 @@ function actualizarTabla(i) {
                 dinero: dinero,
                 descuento: pdescuento,
                 precio_nuevo: precio_nuevo,
+                precio_minimo: $('#precio_minimo').val()
             }
     agregarTabla(detalle);
     sumaTotal()
