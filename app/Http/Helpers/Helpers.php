@@ -1317,7 +1317,10 @@ if (!function_exists('cuadreMovimientoCajaEgresosEgresoResum')) {
         {
             $totalEgresos = 0;
             foreach ($movimiento->detalleMoviemientoEgresos as $key => $item) {
-                $totalEgresos = $totalEgresos + $item->egreso->efectivo;
+                if($item->egreso->estado == 'ACTIVO')
+                {
+                    $totalEgresos = $totalEgresos + $item->egreso->efectivo;
+                }
             }
             return $totalEgresos;
         }

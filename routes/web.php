@@ -733,33 +733,8 @@ Route::get('/buscar','BuscarController@index');
 Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
-
-    $documento = Documento::findOrFail(2);
-    $detalles = Detalle::where('documento_id',2)->where('estado','ACTIVO')->get();
-    $empresa = Empresa::first();
-    $legends = obtenerLegend($documento);
-    $legends = json_encode($legends,true);
-    $legends = json_decode($legends,true);
-
-    $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_normal',[
-        'documento' => $documento,
-        'detalles' => $detalles,
-        'moneda' => $documento->simboloMoneda(),
-        'empresa' => $empresa,
-        "legends" =>  $legends,
-        ])->setPaper('a4')->setWarnings(false);
-
-    Mail::send('ventas.documentos.mail.cliente_mail',compact("documento"), function ($mail) use ($pdf,$documento) {
-        $mail->to('ccubas@unitru.edu.pe');
-        $mail->subject($documento->nombreTipo());
-        $mail->attachdata($pdf->output(), $documento->serie.'-'.$documento->correlativo.'.pdf');
-        if($documento->tipo_venta != '129' && $documento->sunat == '1')
-        {
-            $mail->attach(base_path().'/storage/app/public/cdr/R-'.$documento->serie.'-'.$documento->correlativo.'.zip');
-        }
-        $mail->from('facturacion@siscomfac.com','SiScOmFaC');
-    });
-
+    $user = Auth::user();
+    return $user->havePermission('condicion.index');
     return timeago('2022-02-11 08:43:04');
     $dato = 'Actualizar';
     broadcast(new NotifySunatEvent($dato));

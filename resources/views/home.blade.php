@@ -1,4 +1,5 @@
-@extends('layout') @section('content')
+@extends('layout') 
+@section('content')
 <div class="wrapper wrapper-content">
     <div class="row">
         <div class="col-lg-3">
@@ -173,11 +174,7 @@
 
         </div>
     </div>
-
-
-
 </div>
-
 
 @stop
 @push('styles')
