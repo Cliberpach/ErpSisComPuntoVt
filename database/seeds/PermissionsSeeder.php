@@ -38,7 +38,7 @@ class PermissionsSeeder extends Seeder
         Permission::create([
             'name'  => 'Ver graficos de información',
             'slug' => 'dashboard',
-            'description' => 'El usuario puede ver graficos de informacion.'
+            'description' => 'El usuario podrá ver graficos de informacion (compras, ventas, etc)'
         ]);
 
         //User permission
