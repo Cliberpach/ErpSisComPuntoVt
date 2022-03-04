@@ -33,6 +33,14 @@ class PermissionsSeeder extends Seeder
 
         $useradmin->roles()->sync([$roleadmin->id]);
 
+        //Dahsboard permission
+
+        Permission::create([
+            'name'  => 'Ver graficos de información',
+            'slug' => 'dashboard',
+            'description' => 'El usuario puede ver graficos de informacion.'
+        ]);
+
         //User permission
 
         Permission::create([

@@ -9,6 +9,7 @@ use App\Ventas\Documento\Documento;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use stdClass;
 
 class HomeController extends Controller
@@ -30,8 +31,16 @@ class HomeController extends Controller
      */
     public function index()
     {
-
-        return view('home');
+        $user = Auth::user();
+        if($user->havePermission('dashboard'))
+        {
+            return view('home');
+        }
+        else
+        {
+            return view('home_aux');
+        }
+        
     }
 
     public function dashboard()
