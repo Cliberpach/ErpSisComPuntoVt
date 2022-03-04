@@ -22,6 +22,11 @@ class Cotizacion extends Model
         'igv_check'
     ];
 
+    public function documento()
+    {
+        return $this->hasOne('App\Ventas\Documento\Documento', 'cotizacion_id');
+    }
+
     public function empresa()
     {
         return $this->belongsTo('App\Mantenimiento\Empresa\Empresa', 'empresa_id');

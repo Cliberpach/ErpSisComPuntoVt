@@ -35,6 +35,9 @@ class CreateEmpresasTable extends Migration
 
             $table->mediumText('direccion_llegada');
 
+            $table->mediumText('codigo_precio_menor')->nullable();
+            $table->enum('estado_precio_menor',['0','1'])->nullable();
+
             $table->string('dni_representante');
             $table->string('nombre_representante');
             $table->string('num_asiento');

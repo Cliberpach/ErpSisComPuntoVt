@@ -73,6 +73,7 @@ class DocumentoController extends Controller
                 'cotizacion_documento.tipo_pago_id',
                 'cotizacion_documento.ruta_pago',
                 'cotizacion_documento.cliente_id',
+                'cotizacion_documento.convertir',
                 'cotizacion_documento.empresa_id',
                 'cotizacion_documento.cotizacion_venta',
                 'cotizacion_documento.fecha_documento',
@@ -228,6 +229,7 @@ class DocumentoController extends Controller
                 'cliente' => $documento->tipo_documento_cliente . ': ' . $documento->documento_cliente . ' - ' . $documento->cliente,
                 'empresa' => $documento->empresa,
                 'empresa_id' => $documento->empresa_id,
+                'convertir' => $documento->convertir,
                 'cotizacion_venta' =>  $documento->cotizacion_venta,
                 'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format('d/m/Y'),
                 'estado' => $documento->estado_pago,
@@ -237,7 +239,7 @@ class DocumentoController extends Controller
                 'efectivo' => 'S/. ' . number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. ' . number_format($transferencia, 2, '.', ''),
                 'total' => number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
+                'dias' => (int)(4 - $diff < 0 ? 0  : 4 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }

@@ -66,7 +66,7 @@
                                         </div>
                                         <div class="form-group col-lg-2 col-xs-12">
                                             <label><strong>ESTADO</strong></label>
-                                            <p>{{ ($cliente->activo == 1) ? 'ACTIVO' : 'INACTIVO' }}</p>
+                                            <p>{{ $cliente->activo }}</p>
                                         </div>
                                     </div>
                                     <div class="row">

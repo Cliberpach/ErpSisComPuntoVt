@@ -88,6 +88,7 @@ class CajaController extends Controller
                 'cuenta_id' => $documento->banco_empresa_id,
                 'cuenta_desc' => $documento->banco_empresa_id ? $documento->bancoPagado->descripcion.':'.$documento->bancoPagado->num_cuenta : '-',
                 'importe' => $documento->importe,
+                'convertir' => $documento->convertir,
                 'efectivo' => $documento->efectivo,
                 'sunat' => $documento->sunat,
                 'regularize' => $documento->regularize,
@@ -96,7 +97,7 @@ class CajaController extends Controller
                 'efectivo' => $efectivo,
                 'transferencia' => $transferencia,
                 'total' => $documento->total,
-                'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
+                'dias' => (int)(4 - $diff < 0 ? 0  : 4 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -149,6 +150,7 @@ class CajaController extends Controller
                 'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
                 'empresa' => $documento->empresa,
                 'empresa_id' => $documento->empresa_id,
+                'convertir' => $documento->convertir,
                 'cotizacion_venta' =>  $documento->cotizacion_venta,
                 'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
                 'estado' => $documento->estado_pago,

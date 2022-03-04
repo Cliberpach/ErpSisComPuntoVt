@@ -16,7 +16,6 @@ class UtilidadController extends Controller
     }
 
     public function getTable(Request $request){
-
         try
         {
             if($request->fecha_desde && $request->fecha_hasta)

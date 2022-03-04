@@ -118,7 +118,7 @@
                                                 <option></option>
 
                                                 @foreach (tipos_venta() as $tipo)
-                                                    @if ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS')
+                                                    @if (ifComprobanteSeleccionado($tipo->id) && ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS'))
                                                         <option value="{{ $tipo->id }}" @if (old('tipo_venta') == $tipo->id || $tipo->id == 129) {{ 'selected' }} @endif>
                                                             {{ $tipo->nombre }}</option>
                                                     @endif
@@ -269,12 +269,7 @@
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <div class="checkbox pt-2">
-                                                <input type="checkbox" name="envio_sunat" id="envio_sunat" value="1">
-                                                <label for="envio_sunat" title="Enviar ahora" class="text-danger font-weight-bold">
-                                                    Enviar a sunat
-                                                </label>
-                                            </div>
+                                            <label> <input type="checkbox" class="i-checks" name="envio_sunat" id="envio_sunat" value="1"> <b class="text-danger">Enviar a Sunat</b> </label>
                                         </div>
                                     </div>
                                 </div>
@@ -493,7 +488,7 @@
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <!-- DataTable -->
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
-
+<link href="{{ asset('Inspinia/css/plugins/iCheck/custom.css' )}}" rel="stylesheet">
 <style>
     .my-swal {
         z-index: 3000 !important;
@@ -519,7 +514,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-
+<script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
 <script>
 
     //PRUEBA
@@ -635,6 +630,11 @@
             placeholder: "SELECCIONAR",
             allowClear: true,
             width: '100%',
+        });
+
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
         });
 
         @if(empty($cotizacion))

@@ -40,7 +40,8 @@ class CotizacionController extends Controller
                 'cliente' => $cotizacion->cliente->nombre,
                 'fecha_documento' => Carbon::parse($cotizacion->fecha_documento)->format( 'd/m/Y'),
                 'total' => $cotizacion->total,
-                'estado' => $cotizacion->estado
+                'estado' => $cotizacion->estado,
+                'documento' => $cotizacion->documento ? '1' : '0'
             ]);
         }
         return DataTables::of($coleccion)->toJson();

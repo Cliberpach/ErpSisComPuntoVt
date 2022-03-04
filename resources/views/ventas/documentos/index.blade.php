@@ -344,7 +344,13 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
                     }
 
-                    if(data.condicion == 'CONTADO' && data.estado_pago == 'PENDIENTE')
+                    if(data.condicion == 'CONTADO' && data.estado_pago == 'PENDIENTE' && data.tipo_venta_id == '129')
+                    {
+                        cadena = cadena +
+                        "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
+                    }
+
+                    if(data.condicion == 'CONTADO' && data.estado_pago == 'PENDIENTE' && data.tipo_venta_id != 129 && (data.convertir == '' || data.convertir == null))
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";

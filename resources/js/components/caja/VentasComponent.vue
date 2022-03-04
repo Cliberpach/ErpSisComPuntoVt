@@ -687,14 +687,22 @@ export default {
                         className: "text-center letrapequeña",
                         render: function(data) {
                             let cadena = "";
+                            if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE' && data.tipo_venta_id == '129')
+                            {
+                                cadena = cadena +
+                                "<button type='button' class='btn btn-sm btn-primary m-1 pagar' @click='fnPagar("+data+")' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
+                            }
+
+                            if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE' && data.tipo_venta_id != 129 && (data.convertir == '' || data.convertir == null))
+                            {
+                                cadena = cadena +
+                                "<button type='button' class='btn btn-sm btn-primary m-1 pagar' @click='fnPagar("+data+")' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
+                            }
+                            
                             if (
                                 data.condicion == "CONTADO" &&
-                                data.estado == "PENDIENTE"
+                                data.estado == "PAGADA"
                             ) {
-                                cadena =
-                                    cadena +
-                                    "<button type='button' class='btn btn-sm btn-primary m-1 pagar' @click='fnPagar("+data+")' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
-                            } else {
                                 cadena =
                                     cadena +
                                     "<button type='button' class='btn btn-sm btn-success m-1 verPago' title='Ver'><i class='fa fa-eye'></i> Ver Pago</button>";
@@ -759,7 +767,13 @@ export default {
 
                             let cadena = '';
 
-                            if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE')
+                            if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE' && data.tipo_venta_id == '129')
+                            {
+                                cadena = cadena +
+                                "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
+                            }
+
+                            if(data.condicion == 'CONTADO' && data.estado == 'PENDIENTE' && data.tipo_venta_id != 129 && (data.convertir == '' || data.convertir == null))
                             {
                                 cadena = cadena +
                                 "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";

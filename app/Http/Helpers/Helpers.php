@@ -197,7 +197,7 @@ if (!function_exists('modos_pago')) {
 if (!function_exists('vendedores')) {
     function vendedores()
     {
-        return Vendedor::cursor()->filter(function ($vendedor) {
+        return Colaborador::cursor()->filter(function ($vendedor) {
             return $vendedor->persona->estado == "ACTIVO" ? true : false;
         });
     }
@@ -1710,6 +1710,21 @@ if (!function_exists('refreshNotifications')) {
         {
             Auth::user()->notify(new RegularizeNotification($doc));
         }
+    }
+}
+
+if (!function_exists('ifComprobanteSeleccionado')) {
+    function ifComprobanteSeleccionado($id)
+    {
+        $facturaciones = Numeracion::where('estado', 'ACTIVO')->get();
+        $existe = false;
+        foreach ($facturaciones as $fac) {
+            if ($fac->tipo_comprobante == $id) {
+                $existe = true;
+            }
+        }
+
+        return $existe;
     }
 }
 

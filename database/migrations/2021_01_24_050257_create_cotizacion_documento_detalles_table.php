@@ -32,7 +32,7 @@ class CreateCotizacionDocumentoDetallesTable extends Migration
             $table->unsignedDecimal('valor_unitario', 15, 2);
             $table->unsignedDecimal('valor_venta', 15, 2);
             $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');
-            $table->enum('elminado', ['0', '1'])->default('0');
+            $table->enum('eliminado', ['0', '1'])->default('0');
             $table->timestamps();
         });
     }

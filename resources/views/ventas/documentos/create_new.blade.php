@@ -118,7 +118,7 @@
                                                 <option></option>
 
                                                 @foreach (tipos_venta() as $tipo)
-                                                    @if ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS')
+                                                    @if (ifComprobanteSeleccionado($tipo->id) && ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS'))
                                                         <option value="{{ $tipo->id }}" @if (old('tipo_venta') == $tipo->id || $tipo->id == 129) {{ 'selected' }} @endif>
                                                             {{ $tipo->nombre }}</option>
                                                     @endif
@@ -270,12 +270,7 @@
                                     </div>
                                     <div class="col-12 col-md-6">
                                         <div class="form-group">
-                                            <div class="checkbox pt-2">
-                                                <input type="checkbox" name="envio_sunat" id="envio_sunat" value="1">
-                                                <label for="envio_sunat" title="Enviar ahora" class="text-danger font-weight-bold">
-                                                    Enviar a sunat
-                                                </label>
-                                            </div>
+                                            <label> <input type="checkbox" class="i-checks" name="envio_sunat" id="envio_sunat" value="1"> <b class="text-danger">Enviar a Sunat</b> </label>
                                         </div>
                                     </div>
                                 </div>
