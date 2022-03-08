@@ -1185,7 +1185,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
        {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
-                if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id && $item->documento->estado_pago == 'PAGADA')) { // && $item->documento->sunat != '2'
+                if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
                     if ($item->documento->tipo_pago_id == $id) {
                         $totalIngresos = $totalIngresos + $item->documento->importe;
                     }

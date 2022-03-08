@@ -293,7 +293,6 @@ class Documento extends Model
             {
                 $doc_convertido = Documento::find($documento->convertir);
                 $doc_convertido->estado_pago = $documento->estado_pago;
-                $doc_convertido->convertir = $documento->id;
                 $doc_convertido->importe = $documento->importe;
                 $doc_convertido->efectivo = $documento->efectivo;
                 $doc_convertido->tipo_pago_id = $documento->tipo_pago_id;
