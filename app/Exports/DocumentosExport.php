@@ -100,7 +100,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'DOC.' => $doc->nombreDocumento(),
                     'CODIGO.DOC' => $doc->tipoDocumento(),
                     'FECHA' => $doc->fecha_documento,
-                    'TICKET' => $doc->serie.' - '.$doc->correlativo,
+                    'TICKET' => $doc->serie.'-'.$doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA '.$doc->serie_contingencia.'-'.$doc->correlativo.')'),
                     'TIENDA' => $doc->empresa,
                     'RUC/DNI' => $doc->documento_cliente,
                     'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
@@ -113,7 +113,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => $efectivo,
                     'TRANSFERENCIA' => $transferencia,
                     'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->sunat == '1' ? 'SI' : 'NO',
+                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
                     'HASH' => $doc->hash
                 ]);
             }
@@ -161,7 +161,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'DOC.' => $doc->nombreDocumento(),
                     'CODIGO.DOC' => $doc->tipoDocumento(),
                     'FECHA' => $doc->fecha_documento,
-                    'TICKET' => $doc->serie.' - '.$doc->correlativo,
+                    'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
                     'TIENDA' => $doc->empresa,
                     'RUC/DNI' => $doc->documento_cliente,
                     'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
@@ -174,7 +174,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => $efectivo,
                     'TRANSFERENCIA' => $transferencia,
                     'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->sunat == '1' ? 'SI' : 'NO',
+                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
                     'HASH' => $doc->hash
                 ]);
             }
@@ -222,7 +222,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'DOC.' => $doc->nombreDocumento(),
                     'CODIGO.DOC' => $doc->tipoDocumento(),
                     'FECHA' => Carbon::parse($doc->fecha_documento)->format( 'Y-m-d'),
-                    'TICKET' => $doc->serie.' - '.$doc->correlativo,
+                    'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
                     'TIENDA' => $doc->empresa,
                     'RUC/DNI' => $doc->documento_cliente,
                     'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
@@ -235,7 +235,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => $efectivo,
                     'TRANSFERENCIA' => $transferencia,
                     'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->sunat == '1' ? 'SI' : 'NO',
+                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
                     'HASH' => $doc->hash
                 ]);
             }

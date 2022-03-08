@@ -265,7 +265,7 @@
 @endcan
 
 
-@can('restore', [Auth::user(),['colaborador.index','vendedor.index','empresa.index','condicion.index','tabla.index']])
+@can('restore', [Auth::user(),['colaborador.index','vendedor.index','empresa.index','condicion.index','tabla.index','configuracion.index']])
 <li class="@yield('mantenimiento-active')">
     <a href="#"><i class="fa fa-cogs"></i> <span class="nav-label">Mantenimento</span><span
             class="fa arrow"></span></a>
@@ -285,7 +285,9 @@
         @can('haveaccess', 'tabla.index')
         <li class="@yield('tablas-active')"><a href="{{ route('mantenimiento.tabla.general.index') }}">Tablas Generales</a></li>
         @endcan
+        @can('haveaccess', 'configuracion.index')
         <li class="@yield('configuracion-active')"><a href="{{ route('configuracion.index') }}">Configuración</a></li>
+        @endcan
     </ul>
 </li>
 @endcan

@@ -51,7 +51,13 @@ class Documento extends Model
         'estado_pago',
         'ruta_pago',
 
-        'convertir'
+        'convertir',
+
+        'contingencia',
+        'correlativo_contingencia',
+        'serie_contingencia',
+        'getCdrResponse_contingencia',
+        'getRegularizeResponse_contingencia'
     ];
 
 
@@ -281,6 +287,17 @@ class Documento extends Model
                     $cuenta_cliente->estado = 'ANULADO';
                     $cuenta_cliente->update();
                 }
+            }
+
+            if($documento->convertir)
+            {
+                $doc_convertido = Documento::find($documento->convertir);
+                $doc_convertido->estado_pago = $documento->estado_pago;
+                $doc_convertido->convertir = $documento->id;
+                $doc_convertido->importe = $documento->importe;
+                $doc_convertido->efectivo = $documento->efectivo;
+                $doc_convertido->tipo_pago_id = $documento->tipo_pago_id;
+                $doc_convertido->update();
             }
         });
 

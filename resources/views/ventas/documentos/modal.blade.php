@@ -68,8 +68,13 @@ $('#cantidad_editar').on('input', function() {
 });
 
 //Validacion al ingresar tablas
-$('#edit_detalle_venta').submit(function(e) {
+$('#edit_detalle_venta').submit(function(e) {    
     e.preventDefault();
+    agregarDetalleEditar('VISTA');
+})
+
+function agregarDetalleEditar(condicion)
+{
     var enviar = true;
 
     // if ($('#precio_editar').val() == '') {
@@ -98,10 +103,19 @@ $('#edit_detalle_venta').submit(function(e) {
         {
             if(codigo.estado_precio_menor == '1')
             {
-                if($('#codigo_precio_menor').val() != codigo.codigo_precio_menor)
+                if($('#codigo_precio_menor_editar').val() != codigo.codigo_precio_menor)
                 {
-                    toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
+                    if(condicion == 'MODAL')
+                    {
+                        toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
+                    }
+                    else {
+                        $('#codigo_precio_menor_editar').val('');
+                        $('#modal-codigo-precio-editar').modal('show')
+                    }
                     enviar = false;
+                } else {
+                    $('#modal-codigo-precio-editar').modal('hide');
                 }
             }
             else{
@@ -177,6 +191,7 @@ $('#edit_detalle_venta').submit(function(e) {
             cancelButtonText: "No, Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
+                $('#codigo_precio_menor_editar').val('');
                 actualizarTabla($('#indice').val())
                 sumaTotal()
                 limpiar()
@@ -194,7 +209,7 @@ $('#edit_detalle_venta').submit(function(e) {
         })
 
     }
-})
+}
 
 function actualizarTabla(i) {
     var table = $('.dataTables-detalle-documento').DataTable();

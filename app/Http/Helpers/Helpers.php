@@ -187,6 +187,13 @@ if (!function_exists('forma_pago')) {
     }
 }
 
+if (!function_exists('motivo_traslado')) {
+    function motivo_traslado()
+    {
+        return General::find(34)->detalles;
+    }
+}
+
 if (!function_exists('modos_pago')) {
     function modos_pago()
     {
@@ -1178,7 +1185,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
        {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
-                if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
+                if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id && $item->documento->estado_pago == 'PAGADA')) { // && $item->documento->sunat != '2'
                     if ($item->documento->tipo_pago_id == $id) {
                         $totalIngresos = $totalIngresos + $item->documento->importe;
                     }
@@ -1193,7 +1200,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
        {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
-                if ($item->documento->condicion_id == 1  && ifNoConvertido($item->documento->id)) { // && $item->documento->sunat != '2'
+                if ($item->documento->condicion_id == 1  && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
                     if ($item->documento->tipo_pago_id == $id) {
                         $totalIngresos = $totalIngresos + $item->documento->importe;
                     }
@@ -1565,7 +1572,7 @@ if (!function_exists('ifNoConvertido')) {
     function ifNoConvertido($id)
     {
         $doc = DocumentoDocumento::find($id);
-        if($doc->tipo_venta != 129)
+        if($doc->tipo_venta != '129')
         {
             return true;
         }
@@ -1676,7 +1683,8 @@ if (!function_exists('refreshNotifications')) {
         )
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
         ->where('cotizacion_documento.estado', '!=','ANULADO')
-        ->where('cotizacion_documento.sunat', '=','0')
+        ->where('cotizacion_documento.sunat','0')
+        ->where('cotizacion_documento.contingencia','0')
         ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
         if(!PuntoVenta() && !FullAccess())
@@ -1698,6 +1706,7 @@ if (!function_exists('refreshNotifications')) {
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
         ->where('cotizacion_documento.estado', '!=','ANULADO')
         ->where('cotizacion_documento.sunat', '!=','2')
+        ->where('cotizacion_documento.contingencia', '0')
         ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'),'1033')
         ->where('cotizacion_documento.regularize','1');
 

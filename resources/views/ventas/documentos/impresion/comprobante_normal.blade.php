@@ -177,7 +177,7 @@
                 <div class="comprobante-info">
                     <div class="numero-documento">
                         <p class="m-0 p-0 text-uppercase">{{ $documento->nombreDocumento() }}</p>
-                        <p class="m-0 p-0 text-uppercase">{{$documento->serie.'-'.$documento->correlativo}}</p>
+                        <p class="m-0 p-0 text-uppercase">{{ ($documento->contingencia == '0' ? $documento->serie : $documento->serie_contingencia).'-'.$documento->correlativo }}</p>
                     </div>
                 </div>
             </div>

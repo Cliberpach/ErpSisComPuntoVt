@@ -18,6 +18,7 @@ class CreateGuiaDetallesTable extends Migration
             $table->unsignedInteger('guia_id');
             $table->foreign('guia_id')->references('id')->on('guias_remision')->onDelete('cascade');
             $table->unsignedBigInteger('producto_id');
+            $table->unsignedBigInteger('lote_id')->nullable();
             $table->text('codigo_producto');
             $table->text('nombre_producto');
             $table->unsignedDecimal('cantidad', 15, 2);

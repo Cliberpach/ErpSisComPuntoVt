@@ -31,11 +31,11 @@ class NoEnviadosController extends Controller
 
     public function getTable(Request $request)
     {
-
+        $documento = [];
         if ($request->fecha_desde && $request->fecha_hasta) {
-            $documentos = Documento::where('estado', '!=', 'ANULADO')->wherein('sunat', ['0'])->where('tipo_venta', '!=', 129)->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
+            $documentos = Documento::where('estado', '!=', 'ANULADO')->where('sunat', '0')->where('contingencia','0')->where('tipo_venta', '!=', 129)->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
         } else {
-            $documentos = Documento::where('estado', '!=', 'ANULADO')->wherein('sunat', ['0'])->where('tipo_venta', '!=', 129)->orderBy('id', 'desc')->get();
+            $documentos = Documento::where('estado', '!=', 'ANULADO')->where('sunat', '0')->where('contingencia','0')->where('tipo_venta', '!=', 129)->orderBy('id', 'desc')->get();
         }
 
         $hoy = Carbon::now();
@@ -80,7 +80,7 @@ class NoEnviadosController extends Controller
                 'efectivo' => 'S/. ' . number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. ' . number_format($transferencia, 2, '.', ''),
                 'total' => 'S/. ' . number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(2 - $diff < 0 ? 0  : 2 - $diff),
+                'dias' => (int)(4 - $diff < 0 ? 0  : 4 - $diff),
                 'notas' => $cantidad_notas
             ]);
         }
@@ -154,7 +154,6 @@ class NoEnviadosController extends Controller
 
     public function sunat($id)
     {
-
         $documento = Documento::findOrFail($id);
         //OBTENER CORRELATIVO DEL COMPROBANTE ELECTRONICO
         $existe = event(new DocumentoNumeracion($documento));

@@ -224,12 +224,12 @@
                     <tr>
                         <td style="border-right: 0px !important; border-bottom: 0px !important;">
                             <p class="m-0 p-0">Fecha Emisión: {{ getFechaFormato($guia->created_at,'d/m/Y') }}</p>
-                            <p class="m-0 p-0">Motivo Translado: Venta</p>
+                            <p class="m-0 p-0">Motivo Translado: {{ $guia->desTraslado() }}</p>
                             <p class="m-0 p-0">Peso Bruto Total(KGM): {{ $guia->peso_productos }}</p>
                         </td>
                         <td style="border-left: 0px !important; border-bottom: 0px !important;">
                             <p class="m-0 p-0">Fecha Inicio de Translado: {{ getFechaFormato($guia->created_at,'d/m/Y') }}</p>
-                            <p class="m-0 p-0">Modalidad de Transporte: Transporte privado</p>
+                            <p class="m-0 p-0">Modalidad de Transporte: Transporte publico</p>
                             <p class="m-0 p-0">Numero de Bultos: {{ $guia->cantidad_productos }}</p>
                         </td>
                     </tr>

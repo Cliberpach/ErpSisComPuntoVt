@@ -217,5 +217,12 @@ class TablaSeeder extends Seeder
        $tabla->editable = '1';
        $tabla->save();
 
+        //34
+        $tabla = new General();
+        $tabla->descripcion = 'MOTIVOS DE TRASLADO';
+        $tabla->sigla = 'MTRASLADO';
+        $tabla->editable = '1';
+        $tabla->save();
+
     }
 }

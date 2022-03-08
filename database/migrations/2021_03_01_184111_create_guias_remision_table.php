@@ -17,6 +17,8 @@ class CreateGuiasRemisionTable extends Migration
             $table->Increments('id');
             $table->unsignedInteger('documento_id')->nullable();
             $table->foreign('documento_id')->references('id')->on('cotizacion_documento')->onDelete('cascade');
+            $table->unsignedInteger('nota_salida_id')->nullable();
+            $table->foreign('nota_salida_id')->references('id')->on('nota_salidad')->onDelete('cascade');
             $table->unsignedDecimal('cantidad_productos', 15, 2);
             $table->unsignedDecimal('peso_productos', 15, 2);
             $table->text('tienda')->nullable();
@@ -55,6 +57,8 @@ class CreateGuiasRemisionTable extends Migration
             $table->text('cliente')->nullable();
             $table->text('direccion_cliente')->nullable();
             $table->unsignedInteger('cliente_id');
+
+            $table->unsignedInteger('motivo_traslado');
 
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

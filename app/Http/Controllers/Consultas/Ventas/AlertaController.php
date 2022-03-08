@@ -52,6 +52,7 @@ class AlertaController extends Controller
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
         ->where('cotizacion_documento.estado', '!=','ANULADO')
         ->where('cotizacion_documento.sunat','0')
+        ->where('cotizacion_documento.contingencia','0')
         ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
         if(!PuntoVenta() && !FullAccess())
@@ -95,6 +96,7 @@ class AlertaController extends Controller
         ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
         ->where('cotizacion_documento.estado', '!=','ANULADO')
         ->where('cotizacion_documento.sunat', '!=','2')
+        ->where('cotizacion_documento.contingencia', '0')
         ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'),'1033')
         ->where('cotizacion_documento.regularize','1');
 

@@ -70,7 +70,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <label class="required">Destino</label>
-                                        <select name="destino" id="destino" class="form-control" required>
+                                        <select name="destino" id="destino" class="form-control select2_form" required>
                                             <option value="">Seleccionar Destino</option>
                                             @foreach ($destinos as $tabla)
                                                 <option {{ $notasalidad->destino == $tabla->descripcion ? 'selected' : '' }} value="{{$tabla->id}}">{{$tabla->descripcion}}</option>

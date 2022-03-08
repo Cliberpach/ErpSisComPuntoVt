@@ -1358,6 +1358,89 @@ class TablaDetalleSeeder extends Seeder
         $detalle->editable = 1;
         $detalle->save();
 
+        // GUIA DE REMISION
+        // MOTIVOS DE TRASLADO
+        $detalle = new Detalle();
+        $detalle->descripcion = "VENTA";
+        $detalle->nombre = "VENTA";
+        $detalle->simbolo = '01';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "VENTA SUJETA A CONFIRMACION DEL COMPRADOR";
+        $detalle->nombre = "VENTA SUJETA A CONFIRMACION DEL COMPRADOR";
+        $detalle->simbolo = '14';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "COMPRA";
+        $detalle->nombre = "COMPRA";
+        $detalle->simbolo = '02';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "TRASLADO ENTRE ESTABLECIMIENTOS DE LA MISMA EMPRESA";
+        $detalle->nombre = "TRASLADO ENTRE ESTABLECIMIENTOS DE LA MISMA EMPRESA";
+        $detalle->simbolo = '04';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "TRASLADO EMISOR ITINERANTE CP";
+        $detalle->nombre = "TRASLADO EMISOR ITINERANTE CP";
+        $detalle->simbolo = '18';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "IMPORTACION";
+        $detalle->nombre = "IMPORTACION";
+        $detalle->simbolo = '08';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "EXPORTACION";
+        $detalle->nombre = "EXPORTACION";
+        $detalle->simbolo = '09';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "TRASLADO A ZONA PRIMARIA";
+        $detalle->nombre = "TRASLADO A ZONA PRIMARIA";
+        $detalle->simbolo = '19';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
+        $detalle = new Detalle();
+        $detalle->descripcion = "OTROS";
+        $detalle->nombre = "OTROS";
+        $detalle->simbolo = '13';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 34;
+        $detalle->editable = 1;
+        $detalle->save();
+
         //---------TIPO PAGO-----------
 
         $tipo = new TipoPago();

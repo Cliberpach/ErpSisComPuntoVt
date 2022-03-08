@@ -9,6 +9,7 @@ class Guia extends Model
     protected $table = 'guias_remision';
     protected $fillable = [
         'documento_id',
+        'nota_salida_id',
         'cantidad_productos',
         'peso_productos',
 
@@ -42,6 +43,8 @@ class Guia extends Model
         'empresa_id',
         'direccion_empresa',
 
+        'motivo_traslado',
+
         'tipo_documento_cliente',
         'documento_cliente',
         'cliente',
@@ -69,6 +72,23 @@ class Guia extends Model
         return $this->belongsTo('App\Ventas\Cliente', 'cliente_id');
     }
 
+    public function codTraslado(): string
+    {
+        $motivo = motivo_traslado()->where('id', $this->motivo_traslado)->first();
+        if (is_null($motivo))
+            return "01";
+        else
+            return strval($motivo->simbolo);
+    }
+
+    public function desTraslado(): string
+    {
+        $motivo = motivo_traslado()->where('id', $this->motivo_traslado)->first();
+        if (is_null($motivo))
+            return "VENTA";
+        else
+            return strval($motivo->descripcion);
+    }
 
     public function user()
     {

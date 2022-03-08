@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Ventas;
 
+use App\Almacenes\DetalleNotaSalidad;
+use App\Almacenes\LoteProducto;
+use App\Almacenes\NotaSalidad;
 use App\Almacenes\Producto;
 use App\Events\GuiaRegistrado;
 use App\Events\NumeracionGuiaRemision;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
+use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Ventas\Cliente;
 use App\Ventas\DetalleGuia;
 use App\Ventas\Documento\Detalle;
@@ -22,6 +26,8 @@ use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade as PDF;
 use Exception;
+use Illuminate\Support\Facades\Auth;
+
 
 class GuiaController extends Controller
 {
@@ -83,11 +89,25 @@ class GuiaController extends Controller
         $empresa = Empresa::first();
         $hoy = Carbon::now()->toDateString();
 
+        $fullaccess = false;
+
+        if (count(Auth::user()->roles) > 0) {
+            $cont = 0;
+            while ($cont < count(Auth::user()->roles)) {
+                if (Auth::user()->roles[$cont]['full-access'] == 'SI') {
+                    $fullaccess = true;
+                    $cont = count(Auth::user()->roles);
+                }
+                $cont = $cont + 1;
+            }
+        }
+
         return view('ventas.guias.create_new',[
             'empresas' => $empresas,
             'empresa' => $empresa,
             'clientes' => $clientes,
             'hoy' => $hoy,
+            'fullaccess' => $fullaccess,
         ]);
 
 
@@ -135,8 +155,7 @@ class GuiaController extends Controller
                 'direccion_empresa' => 'required',
                 'ubigeo_llegada'=> 'required',
                 'ubigeo_partida'=> 'required',
-
-
+                'motivo_traslado'=> 'required',
             ];
             $message = [
                 'direccion_empresa.required' => 'El campo direccion de llegada es obligatorio.',
@@ -144,8 +163,7 @@ class GuiaController extends Controller
                 'peso_productos.required' => 'El campo Peso de Productos es obligatorio.',
                 'ubigeo_llegada.required' => 'El campo Ubigeo es obligatorio.',
                 'ubigeo_partida.required' => 'El campo Ubigeo es obligatorio.',
-
-
+                'motivo_traslado.required' => 'El campo Motivo de traslado es obligatorio.',
             ];
             Validator::make($data, $rules, $message)->validate();
 
@@ -175,6 +193,8 @@ class GuiaController extends Controller
                     $guia->placa_vehiculo = $request->get('placa_vehiculo');
                     $guia->placa_vehiculo = $request->get('placa_vehiculo');
 
+                    $guia->motivo_traslado = $request->motivo_traslado;
+
                     $guia->fecha_emision = $documento->fecha_documento;
                     $guia->ruc_empresa = $documento->ruc_empresa;
                     $guia->empresa_id = $documento->empresa_id;
@@ -196,6 +216,7 @@ class GuiaController extends Controller
                         DetalleGuia::create([
                             'guia_id' => $guia->id,
                             'producto_id' => $detalle->lote->producto_id,
+                            'lote_id' => $detalle->lote_id,
                             'codigo_producto' => $detalle->codigo_producto,
                             'nombre_producto' => $detalle->nombre_producto,
                             'unidad' => $detalle->unidad,
@@ -224,12 +245,56 @@ class GuiaController extends Controller
                 }
             }
             else{
+                $productosJSON = $request->get('productos_tabla');
+                $detalles = json_decode($productosJSON[0]);
+
+                $fecha_hoy = Carbon::now()->toDateString();
+                $fecha = Carbon::createFromFormat('Y-m-d', $fecha_hoy);
+                $fecha = str_replace("-", "", $fecha);
+                $fecha = str_replace(" ", "", $fecha);
+                $fecha = str_replace(":", "", $fecha);
+                $ngenerado = $fecha . (DB::table('nota_salidad')->count() + 1);
+
+                $motivo = TablaDetalle::find($request->motivo_traslado);
+                $tabladetalle = TablaDetalle::where('descripcion', $motivo->descripcion)->where('tabla_id', 29)->first();
+
+                if(empty($tabladetalle))
+                {
+                    $destino = new TablaDetalle();
+                    $destino->descripcion = $motivo->descripcion;
+                    $destino->simbolo = $motivo->simbolo;
+                    $destino->estado = 'ACTIVO';
+                    $destino->editable = 1;
+                    $destino->tabla_id = 29;
+                    $destino->save();
+                }
+                else {
+                    $destino = $tabladetalle;
+                }
+
+                $notasalidad = new NotaSalidad();
+                $notasalidad->numero = $ngenerado;
+                $notasalidad->fecha = Carbon::now()->toDateString();
+                $notasalidad->destino = $destino->descripcion;
+                $notasalidad->origen = $request->origen;
+                $notasalidad->usuario = Auth()->user()->usuario;
+                $notasalidad->save();
+
+                foreach ($detalles as $fila) {
+                    DetalleNotaSalidad::create([
+                        'nota_salidad_id' => $notasalidad->id,
+                        'lote_id' => $fila->lote_id,
+                        'cantidad' => $fila->cantidad,
+                        'producto_id' => $fila->producto_id,
+                    ]);
+                }
 
                 $empresa = Empresa::first();
                 $cliente = Cliente::findOrFail($request->cliente_id);
                 $guia = new Guia();
 
                 $guia->tienda = $request->get('tienda');
+                $guia->nota_salida_id = $notasalidad->id;
 
                 $guia->ruc_transporte_oficina = '-';
                 $guia->nombre_transporte_oficina = '-';
@@ -245,6 +310,8 @@ class GuiaController extends Controller
                 $guia->ubigeo_partida = str_pad($request->get('ubigeo_partida'), 6, "0", STR_PAD_LEFT);
                 $guia->dni_conductor = $request->get('dni_conductor');
                 $guia->placa_vehiculo = $request->get('placa_vehiculo');
+                
+                $guia->motivo_traslado = $request->motivo_traslado;
 
                 $guia->fecha_emision = $request->get('fecha_documento');
                 $guia->ruc_empresa = $empresa->ruc;
@@ -260,15 +327,13 @@ class GuiaController extends Controller
                 $guia->user_id = auth()->user()->id;
                 $guia->save();
 
-                $productosJSON = $request->get('productos_tabla');
-                $detalles = json_decode($productosJSON[0]);
-
                 foreach($detalles as $detalle)
                 {
                     $producto = Producto::find($detalle->producto_id);
                     DetalleGuia::create([
                         'guia_id' => $guia->id,
                         'producto_id' => $detalle->producto_id,
+                        'lote_id' => $detalle->lote_id,
                         'codigo_producto' => $producto->codigo,
                         'unidad' => $producto->getMedida(),
                         'nombre_producto' => $producto->nombre,
@@ -281,6 +346,13 @@ class GuiaController extends Controller
                 if(!$envio_prev['success'])
                 {
                     DB::rollBack();
+                    $productosJSON = $request->get('productos_tabla');
+                    $detalles = json_decode($productosJSON[0]);
+                    foreach ($detalles as $detalle) {
+                        $lote = LoteProducto::find($detalle->lote_id);
+                        $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
+                        $lote->update();
+                    }
                     Session::flash('error',$envio_prev['mensaje']);
                     return back()->with('sunat_error', 'error');
                 }
@@ -294,6 +366,13 @@ class GuiaController extends Controller
         catch(Exception $e)
         {
             DB::rollBack();
+            $productosJSON = $request->get('productos_tabla');
+            $detalles = json_decode($productosJSON[0]);
+            foreach ($detalles as $detalle) {
+                $lote = LoteProducto::find($detalle->lote_id);
+                $lote->cantidad_logica = $lote->cantidad_logica + $detalle->cantidad;
+                $lote->update();                
+            }
             return back()->with('error' , $e->getMessage());
         }
     }
@@ -483,8 +562,8 @@ class GuiaController extends Controller
 
                             "envio" => array(
                                 "modTraslado" =>  "01",
-                                "codTraslado" =>  "01",
-                                "desTraslado" =>  "VENTA",
+                                "codTraslado" =>  $guia->codTraslado(),
+                                "desTraslado" =>  $guia->desTraslado(),
                                 "fecTraslado" =>  self::obtenerFecha($guia),//FECHA DEL TRANSLADO
                                 "codPuerto" => "123",
                                 "indTransbordo"=> false,

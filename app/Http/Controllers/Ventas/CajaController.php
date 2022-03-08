@@ -156,6 +156,7 @@ class CajaController extends Controller
                 'estado' => $documento->estado_pago,
                 'condicion' => $documento->condicion->descripcion,
                 'sunat' => $documento->sunat,
+                'contingencia' => $documento->contingencia,
                 'otros' => 'S/. '.number_format($otros, 2, '.', ''),
                 'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),

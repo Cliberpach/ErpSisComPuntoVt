@@ -353,10 +353,11 @@ class CotizacionController extends Controller
 
         $documento = Documento::where('cotizacion_venta',$id)->where('estado','!=','ANULADO')->first();
         if ($documento) {
-
-            return view('ventas.cotizaciones.index',[
-                'id' => $id
-            ]);
+            Session::flash('error', 'Esta cotizacion ya tiene un documento de venta generado.');
+            return redirect()->route('ventas.cotizacion.index');
+            // return view('ventas.cotizaciones.index',[
+            //     'id' => $id
+            // ]);
         }else{
             //REDIRECCIONAR AL DOCUMENTO DE VENTA
             return redirect()->route('ventas.documento.create',['cotizacion'=>$id]);
@@ -369,8 +370,8 @@ class CotizacionController extends Controller
         $documento_old =  Documento::where('cotizacion_venta',$id)->where('estado','!=','ANULADO')->first();
         if($documento_old->sunat == '1' && $documento_old->tipo_venta != '129')
         {
-            Session::flash('success','Este documento ya fue informado a sunat, si desea reemplazarlo debe hacerle una nota de credito y crear un nuevo documento.');
-            return redirect()->route('ventas.cotizacion.show');
+            Session::flash('error','Este documento ya fue informado a sunat, si desea reemplazarlo debe hacerle una nota de credito y crear un nuevo documento.');
+            return redirect()->route('ventas.cotizacion.index');
         }
         foreach ($documento_old->detalles as $detalle) {
             $lote = LoteProducto::find($detalle->lote_id);

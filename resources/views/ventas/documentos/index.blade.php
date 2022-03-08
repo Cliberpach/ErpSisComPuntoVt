@@ -3,8 +3,8 @@
 @section('ventas-active', 'active')
 @section('documento-active', 'active')
 
-<div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10 col-md-10">
+<div class="row wrapper border-bottom white-bg page-heading align-items-end">
+    <div class="col-12 col-md-10">
        <h2  style="text-transform:uppercase"><b>Listado de Documentos de Venta</b></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -28,14 +28,16 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-12">
             <div class="ibox ">
+                <div class="ibox-title">
+                    <h5><a style="color: #FDEBD0;" href="#"><i class="fa fa-square fa-2x"></i></a> Documento con NOTAS DE CREDITO <a style="color: #EBDEF0;" href="#"><i class="fa fa-square fa-2x"></i></a> Documento de CONTINGENCIA</h5>
+                </div>
                 <div class="ibox-content">
                     <div class="table-responsive">
                         <table class="table dataTables-documento table-striped table-bordered table-hover" style="text-transform:uppercase">
                             <thead>
                                 <tr>
-
                                     <th style="display:none;"></th>
                                     <th class="text-center">C.O</th>
                                     <th class="text-center"># DOC</th>
@@ -309,18 +311,23 @@ $(document).ready(function() {
 
                     let cadena = "";
 
-                    if(data.sunat == '0' && data.tipo_venta_id != 129 && dias > 0) //&& data.dias > 0
+                    if(data.sunat == '0' && data.tipo_venta_id != 129 && dias > 0 && data.contingencia == '0') //&& data.dias > 0
                     {
-                        cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
+                        cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ "," +data.contingencia+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }
 
-                    if((data.sunat == '1' || data.notas > 0) && data.tipo_venta_id != 129)
+                    if(data.sunat_contingencia == '0' && data.tipo_venta_id != 129 && data.contingencia == '1') //&& data.dias > 0
+                    {
+                        cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ "," +data.contingencia+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
+                    }
+
+                    if((data.sunat == '1' || data.notas > 0 || data.sunat_contingencia == '1') && data.tipo_venta_id != 129)
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>" ;
                     }
 
-                    if((data.sunat == '1'))
+                    if(data.sunat == '1'  || data.sunat_contingencia == '1')
                     {
                         cadena = cadena  +
                         "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>";
@@ -338,7 +345,7 @@ $(document).ready(function() {
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_edit +"'  title='Editar'><i class='fa fa-pencil'></i> Editar</a>" ;
                     }
 
-                    if((data.sunat == '2' && data.tipo_venta_id == 129) || (data.tipo_venta_id == 129 && data.estado_pago == 'PENDIENTE'))
+                    if((data.sunat == '2' && data.tipo_venta_id == 129) || (data.tipo_venta_id == 129 && data.estado_pago == 'PENDIENTE')  && data.contingencia == '0')
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-danger m-1 d-none' onclick='eliminar(" + data.id + ")' title='Eliminar'><i class='fa fa-trash'></i> Eliminar</button>";
@@ -356,10 +363,15 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
                     }
 
-                    if(data.code == '1033' && data.regularize == '1' && data.sunat != '2')
+                    if(data.code == '1033' && data.regularize == '1' && data.sunat != '2'  && data.contingencia == '0')
                     {
                         cadena = cadena +
                         "<button type='button' class='btn btn-sm btn-primary-cdr m-1' onclick='cdr(" + data.id + ")' title='CDR'>CDR</button>";
+                    }
+
+                    if(dias <= 0 && data.contingencia == '0' && data.tipo_venta_id != '129' && data.sunat == '0')
+                    {
+                        cadena = cadena + "<button type='button' class='btn btn-sm btn-warning m-1' onclick='contingencia(" +data.id+ ")'  title='Convertir a comprobante de contingencia'><i class='fa fa-exchange'></i> Contingencia</button>";
                     }
 
                     return cadena;
@@ -380,6 +392,11 @@ $(document).ready(function() {
             if(aData.notas > 0)
             {
                 $('td', nRow).css('background-color', '#FDEBD0');
+            }
+
+            if(aData.contingencia == '1')
+            {
+                $('td', nRow).css('background-color', '#EBDEF0');
             }
         },
         "language": {
@@ -431,6 +448,36 @@ function eliminar(id) {
             var url_eliminar = '{{ route("ventas.documento.destroy", ":id")}}';
             url_eliminar = url_eliminar.replace(':id', id);
             $(location).attr('href', url_eliminar);
+
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            swalWithBootstrapButtons.fire(
+                'Cancelado',
+                'La Solicitud se ha cancelado.',
+                'error'
+            )
+        }
+    })
+}
+
+function contingencia(id) {
+
+    Swal.fire({
+        title: 'Contingencia',
+        text: "¿Seguro que desea convertir este documento a comprobante de contingencia?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: "#1ab394",
+        confirmButtonText: 'Si, Confirmar',
+        cancelButtonText: "No, Cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            //Ruta Eliminar
+            var url_contingencia = '{{ route("ventas.documento.contingencia", ":id")}}';
+            url_contingencia = url_contingencia.replace(':id', id);
+            $(location).attr('href', url_contingencia);
 
         } else if (
             /* Read more about handling dismissals below */
@@ -620,7 +667,7 @@ function  guia(id) {
     })
 }
 
-function enviarSunat(id , sunat) {
+function enviarSunat(id, contingencia) {
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',
@@ -642,8 +689,16 @@ function enviarSunat(id , sunat) {
     }).then((result) => {
         if (result.value) {
 
-            var url = '{{ route("ventas.documento.sunat", ":id")}}';
-            url = url.replace(':id',id);
+            var url = '';
+
+            if(contingencia == '1') {
+                url = '{{ route("ventas.documento.sunat.contingencia", ":id")}}';
+                url = url.replace(':id',id);
+            }
+            else {
+                url = '{{ route("ventas.documento.sunat", ":id")}}';
+                url = url.replace(':id',id);
+            }
 
             window.location.href = url
 

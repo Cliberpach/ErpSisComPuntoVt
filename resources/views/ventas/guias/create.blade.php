@@ -358,7 +358,20 @@
                                         @endif
                                     </div>
                                 </div>
-
+                                <div class="form-group">
+                                    <label class="required">Motivo de Traslado</label>
+                                    <select name="motivo_traslado" id="motivo_traslado" class="select2_form form-control" required>
+                                        <option value=""></option>
+                                        @foreach (motivo_traslado() as $motivo)
+                                            <option value="{{ $motivo->id }}" {{ $motivo->simbolo == '01' ? 'selected' : ''}}>{{ $motivo->descripcion }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if ($errors->has('motivo_traslado'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('motivo_traslado') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
                                 <div class="form-group">
                                     <label>Observación:</label>
 
@@ -373,14 +386,7 @@
                                         <strong>{{ $errors->first('observacion') }}</strong>
                                     </span>
                                     @endif
-
-
                                 </div>
-
-
-
-
-
                             </div>
 
                         </div>

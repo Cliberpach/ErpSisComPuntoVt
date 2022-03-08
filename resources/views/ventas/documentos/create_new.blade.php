@@ -146,19 +146,7 @@
                                             </select>
                                         </div>
                                     </div>
-
                                 </div>
-                                <input type="hidden" class="form-control" id="codigo_precio_menor_json" value="{{codigoPrecioMenor()}}">
-                                @if (codigoPrecioMenor()->estado_precio_menor == '1')
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
-                                        <div class="form-group">
-                                            <label for="">Codigo para vender a menor precio</label>
-                                            <input type="text" class="form-control" id="codigo_precio_menor" placeholder="Código" autocomplete="off">
-                                        </div>
-                                    </div>
-                                </div>
-                                @endif
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -491,6 +479,7 @@
 @include('ventas.documentos.modalPagoForm')
 @include('ventas.documentos.modalLote')
 @include('ventas.documentos.modalCliente')
+@include('ventas.documentos.modalCodigo')
 @stop
 
 @push('styles')
@@ -886,6 +875,11 @@
 
     //Validacion al ingresar tablas
     $("#btn_agregar_detalle").click(function() {
+        agregarDetalle('VISTA');
+    })
+
+    function agregarDetalle(condicion)
+    {
         limpiarErrores()
         var enviar = true;
         var producto_json = JSON.parse($('#producto_json').val());
@@ -922,8 +916,16 @@
                 {
                     if($('#codigo_precio_menor').val() != codigo.codigo_precio_menor)
                     {
-                        toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
+                       if(condicion == 'MODAL')
+                        {
+                            toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
+                        } else {
+                            $('#codigo_precio_menor').val('');
+                            $('#modal-codigo-precio').modal('show');
+                        }
                         enviar = false;
+                    }else{
+                        $('#modal-codigo-precio').modal('hide');
                     }
                 }
                 else{
@@ -949,9 +951,10 @@
         if (enviar) {
             llegarDatos();
             sumaTotal();
+            $('#codigo_precio_menor').val('');
             $('#asegurarCierre').val(1);
         }
-    })
+    }
 
     function buscarProducto(id) {
         var existe = false;

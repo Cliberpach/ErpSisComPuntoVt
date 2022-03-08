@@ -33,7 +33,7 @@
             <div class="ibox">
 
                 <div class="ibox-content">
-
+                    <input type="hidden" id='asegurarCierre' >
                     <div class="row">
                         <div class="col-12">
                             <form action="{{route('ventas.guiasremision.store')}}" method="POST" id="enviar_documento">
@@ -324,6 +324,21 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label class="required">Motivo de Traslado</label>
+                                            <select name="motivo_traslado" id="motivo_traslado" class="select2_form form-control" required>
+                                                <option value=""></option>
+                                                @foreach (motivo_traslado() as $motivo)
+                                                    <option value="{{ $motivo->id }}">{{ $motivo->descripcion }}</option>
+                                                @endforeach
+                                            </select>
+                                            @if ($errors->has('motivo_traslado'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('motivo_traslado') }}</strong>
+                                            </span>
+                                            @endif
+                                        </div>
+
+                                        <div class="form-group">
                                             <label>Observación:</label>
 
                                             <textarea type="text" placeholder=""
@@ -366,26 +381,23 @@
                                             <form id="agregar_producto">
                                                 <div class="row align-items-end">
                                                     <div class="col-12 col-md-6">
-                                                        <div class="form-group row align-items-end">
-                                                            <div class="col-10 col-md-10">
-                                                                <label class="required">Producto:</label>
-                                                                <select class="select2_form form-control"
-                                                                    style="text-transform: uppercase; width:100%" name="producto_id"
-                                                                    id="producto_id" required>
-
-                                                                </select>
-                                                                <div class="invalid-feedback"><b><span id="error-producto"></span></b>
-                                                                </div>
+                                                        <div class="form-group">
+                                                            <label class="col-form-label required">Producto-lote:</label>
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control" id="producto_lote_form" required readonly>
+                                                                <span class="input-group-append">
+                                                                    <button type="button" class="btn btn-primary" id="buscarLotes" data-toggle="modal" data-target="#modal_lote"><i class='fa fa-search'></i> Buscar
+                                                                    </button>
+                                                                </span>
                                                             </div>
-                                                            <div class="col-2 col-md-2">
-                                                                <button type="button" class="btn btn-secondary" onclick="obtenerProducts()"><i class="fa fa-refresh"></i></button>
-                                                            </div>
+                                                            <div class="invalid-feedback"><b><span id="error-producto_lote_form"></span></b></div>
                                                         </div>
                                                     </div>
                                                     <div class="col-12 col-md-4">
                                                         <div class="form-group">
                                                             <label for="">Cantidad</label>
-                                                            <input type="number" name="cantidad" id="cantidad" class="form-control" placeholder="Cantidad" required>
+                                                            <input type="text" name="cantidad" id="cantidad_form" class="form-control" onkeypress="return filterFloat(event, this, false);" placeholder="Cantidad" required>
+                                                            <div class="invalid-feedback"><b><span id="error-cantidad_form"></span></b></div>
                                                         </div>
                                                     </div>
                                                     <div class="col-12 col-md-2">
@@ -393,6 +405,11 @@
                                                             <button type="submit" class="btn btn-success btn-block"><i class="fa fa-plus"></i></button>
                                                         </div>
                                                     </div>
+                                                    <input type="hidden" id="producto_form">
+                                                    <input type="hidden" id="peso_form">
+                                                    <input type="hidden" id="unidad_form">
+                                                    <input type="hidden" id="lote_form">
+                                                    <input type="hidden" name="cantidad_actual_form" id="cantidad_actual_form">
                                                 </div>
                                             </form>
                                         </div>
@@ -456,6 +473,7 @@
 
 </div>
 @include('ventas.documentos.modal')
+@include('ventas.guias.modalLote')
 @stop
 
 @push('styles')
@@ -466,7 +484,6 @@
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <!-- DataTable -->
 <link href="{{asset('Inspinia/css/plugins/dataTables/datatables.min.css')}}" rel="stylesheet">
-
 @endpush
 
 @push('scripts')
@@ -484,34 +501,9 @@
 <script src="{{asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js')}}"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    function obtenerProducts()
-    {
-        $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-        $("#producto_id").empty().trigger('change');
-        axios.get('{{ route('compras.documento.getProduct') }}').then(response => {
-            let data = response.data.data
-            console.log(data)
-            if (data.length > 0) {
-                $('#producto_id').append('<option></option>').trigger('change');
-                for(var i = 0;i < data.length; i++)
-                {
-                    let codigo = data[i].codigo_barra ? (' - ' + data[i].codigo_barra) : '';
-                    var newOption = '<option value="'+data[i].id+'" peso="'+data[i].peso_producto+'" unidad="'+data[i].medida_desc+'" descripcion="'+data[i].nombre+'">'+data[i].nombre + codigo + '</option>';
-                    $('#producto_id').append(newOption).trigger('change');
-                    //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
-                }
-
-                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-
-            } else {
-                $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-                toastr.error('Productos no encontrados.', 'Error');
-            }
-        })
-    }
 
     $(document).ready(function() {
-        obtenerProducts()
+        obtenerLotesproductos();
         $(".select2_form").select2({
             placeholder: "SELECCIONAR",
             allowClear: true,
@@ -635,6 +627,10 @@
                 {
                     "targets": [5],
                 },
+                {
+                    "targets": [6],
+                    "visible": false
+                },
             ],
             'bAutoWidth': false,
             "language": {
@@ -649,33 +645,99 @@
         $.fn.DataTable.ext.errMode = 'throw';
     });
 
+    $('#cantidad_form').on('input', function() {
+        let max= convertFloat(this.max);
+        let valor = convertFloat(this.value);
+        if(valor>max){
+            toastr.error('La cantidad ingresada supera al stock del producto Max('+max+').', 'Error');
+            this.value = max;
+        }
+    });
+
     $('#agregar_producto').on('submit', function(e){
         e.preventDefault();
-        let producto_id = $('#producto_id').val();
-        let cantidad = $('#cantidad').val();
-        let correcto = true;
-        if(producto_id)
+        let enviar = false;
+        let cantidad = $('#cantidad_form').val();
+        let lote = $('#lote_form').val();
+        let producto = $('#producto_form').val();
+        let producto_lote = $('#producto_lote_form').val();
+        let unidad = $('#unidad_form').val();
+        let peso = $('#peso_form').val();
+
+
+        let cantidad_actual = convertFloat($('#cantidad_actual_form').val());
+
+
+        if(convertFloat(cantidad) > cantidad_actual)
         {
-            if(buscarProducto(producto_id))
-            {
-                correcto = false;
-                toastr.error('Producto', 'Este producto ya esta registrado');
+            toastr.warning('La cantidad debe ser menor o igual al stock actual: ' + cantidad_actual);
+
+            enviar=true;
+        }
+
+        if(convertFloat(cantidad) <= 0)
+        {
+            toastr.warning('La cantidad debe ser mayor a 0.');
+
+            enviar=true;
+        }
+
+        if(cantidad.length == 0 || lote.length == 0 || producto.length == 0 || producto_lote.length == 0 || peso.length == 0 || unidad.length == 0)
+        {
+            toastr.error('Ingrese datos', 'Error');
+            enviar=true;
+        }
+        else {
+            var existe = buscarProducto($('#lote_form').val())
+            if (existe == true) {
+                toastr.error('Producto ya se encuentra ingresado.', 'Error');
+                enviar = true;
             }
         }
-        else{
-            correcto = false;
-            toastr.error('Producto', 'El campo producto es obligatorio');
-        }
 
-        if(cantidad == '' || cantidad == null)
-        {
-            correcto = false;
-            toastr.error('Cantidad', 'El campo cantidad es obligatorio');
-        }
+        if (enviar != true) {
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-danger',
+                },
+                buttonsStyling: false
+            })
 
-        if(correcto)
-        {
-            llegarDatos();
+            Swal.fire({
+                title: 'Opción Agregar',
+                text: "¿Seguro que desea agregar Producto?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: "#1ab394",
+                confirmButtonText: 'Si, Confirmar',
+                cancelButtonText: "No, Cancelar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    var detalle = {
+                        cantidad: cantidad,
+                        lote_id: lote,
+                        producto_id: producto,
+                        unidad: unidad,
+                        peso: peso,
+                        descripcion: $('#producto_lote_form').val()
+                    }
+                    agregarTabla(detalle);
+                    cambiarCantidad(detalle,'1');
+                    $('#asegurarCierre').val(1)
+                } else if (
+                    /* Read more about handling dismissals below */
+                    result.dismiss === Swal.DismissReason.cancel
+                ) {
+                    swalWithBootstrapButtons.fire(
+                        'Cancelado',
+                        'La Solicitud se ha cancelado.',
+                        'error'
+                    )
+                }
+            })
+
         }
     })
 
@@ -690,32 +752,17 @@
         return existe
     }
 
-    function llegarDatos() {
-        let producto_id = $('#producto_id').val();
-        let unidad = $('#producto_id option:selected').attr('unidad');
-        let peso = $('#producto_id option:selected').attr('peso');
-        let descripcion = $('#producto_id option:selected').attr('descripcion');
-        let cantidad = $('#cantidad').val();
-        let detalle = {
-            id : producto_id,
-            cantidad : cantidad,
-            unidad : unidad,
-            peso : peso,
-            descripcion : descripcion
-        };
-        agregarTabla(detalle);
-    }
-
     //AGREGAR EL DETALLE A LA TABLA
     function agregarTabla($detalle) {
         var t = $('.dataTables-detalle-documento').DataTable();
         t.row.add([
-            $detalle.id,
+            $detalle.lote_id,
             '',
             $detalle.cantidad,
             $detalle.unidad,
             $detalle.peso,
-            $detalle.descripcion
+            $detalle.descripcion,
+            $detalle.producto_id,
         ]).draw(false);
         limpiarErrores();
         limpiarDetalle();
@@ -730,8 +777,9 @@
         var data = table.rows().data();
         data.each(function(value, index) {
             let fila = {
-                producto_id: value[0],
-                cantidad: value[2],
+                lote_id: value[0],
+                cantidad: value[2],                
+                producto_id: value[6],
             };
 
             notadetalle.push(fila);
@@ -740,17 +788,37 @@
         $('#productos_tabla').val(JSON.stringify(notadetalle))
     }
 
-    function limpiarErrores() {
-        $('#cantidad').removeClass("is-invalid")
-        $('#error-cantidad').text('')
+    //CAMBIAR LA CANTIDAD LOGICA DEL PRODUCTO
+    function cambiarCantidad(detalle, condicion) {
+        $.ajax({
+            type : 'POST',
+            url : '{{ route('almacenes.nota_salidad.cantidad') }}',
+            data : {
+                '_token' : $('input[name=_token]').val(),
+                'producto_id' : detalle.lote_id,
+                'cantidad' : detalle.cantidad,
+                'condicion' : condicion,
+            }
+        }).done(function (result){
+            //alert('REVISAR')
+        });
+    }
 
-        $('#producto').removeClass("is-invalid")
-        $('#error-producto').text('')
+    function limpiarErrores() {
+        $('#cantidad_form').removeClass("is-invalid")
+        $('#error-cantidad_form').text('')
+
+        $('#producto_lote_form').removeClass("is-invalid")
+        $('#error-producto_lote_form').text('')
     }
 
     function limpiarDetalle() {
-        $('#producto_id').val($('#producto option:first-child').val()).trigger('change');
-        $('#cantidad').val('');
+        $('#producto_lote_form').val('');
+        $('#producto_form').val('');
+        $('#peso_form').val('');
+        $('#unidad_form').val('');
+        $('#cantidad_actual_form').val('');
+        $('#cantidad_form').val('');
     }
 
 
@@ -821,6 +889,7 @@
                 if(registrosProductos() > 0)
                 {
                     cargarDetalle();
+                    $('#asegurarCierre').val('2');
                     this.submit();
                 }
                 else
@@ -862,6 +931,13 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 var table = $('.dataTables-detalle-documento').DataTable();
+                var data = table.row($(this).parents('tr')).data();
+                var detalle = {
+                    lote_id: data[0],
+                    cantidad: data[2],
+                }
+                //DEVOLVER LA CANTIDAD LOGICA
+                cambiarCantidad(detalle,'0')
                 table.row($(this).parents('tr')).remove().draw();
                 $('#peso_productos').val(sumaPesos().toFixed(2))
                 $('#cantidad_productos').val(registrosProductos().toFixed(2))
@@ -878,5 +954,31 @@
             }
         })
     });
+
+    //DEVOLVER CANTIDADES A LOS LOTES
+    function devolverCantidades() {
+        //CARGAR PRODUCTOS PARA DEVOLVER LOTE
+        cargarDetalle()
+        return $.ajax({
+            dataType : 'json',
+            type : 'post',
+            url : '{{ route('almacenes.nota_salidad.devolver.cantidades') }}',
+            data : {
+                '_token' : $('input[name=_token]').val(),
+                'cantidades' :  $('#productos_tabla').val(),
+            },
+            async: true
+        }).responseText()
+    }
+</script>
+<script>
+    window.onbeforeunload = () => {
+        if ($('#asegurarCierre').val() == 1) {
+            while (true) {
+                devolverCantidades()
+            }
+        }
+    }
+
 </script>
 @endpush

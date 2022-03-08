@@ -71,7 +71,7 @@
                                     </div>
                                     <div class="col-sm-4">
                                         <label class="required">Destino</label>
-                                        <select name="destino" id="destino" class="form-control {{ $errors->has('destino') ? ' is-invalid' : '' }}" required>
+                                        <select name="destino" id="destino" class="select2_form form-control {{ $errors->has('destino') ? ' is-invalid' : '' }}" required>
                                             <option value="">Seleccionar Destino</option>
                                             @foreach ($destinos as $tabla)
                                                 <option {{ old('destino') == $tabla->id ? 'selected' : '' }} value="{{$tabla->id}}">{{$tabla->descripcion}}</option>
@@ -109,13 +109,13 @@
                                                         </button>
                                                     </span>
                                                 </div>
-                                                <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                                <div class="invalid-feedback"><b><span id="error-producto_form"></span></b>
                                                 </div>
                                             </div>
                                             <div class="col-sm-2">
                                                 <label class="col-form-label">Cantidad </label>
                                                 <input type="text" id="cantidad_form" class="form-control" onkeypress="return filterFloat(event, this, false);">
-                                                <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
+                                                <div class="invalid-feedback"><b><span id="error-cantidad_form"></span></b>
                                                 </div>
                                             </div>
                                             <div class="col-sm-2">

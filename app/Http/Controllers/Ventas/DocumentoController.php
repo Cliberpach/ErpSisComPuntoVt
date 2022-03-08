@@ -82,6 +82,8 @@ class DocumentoController extends Controller
                 'cotizacion_documento.condicion_id',
                 'cotizacion_documento.sunat',
                 'cotizacion_documento.regularize',
+                'cotizacion_documento.contingencia',
+                'cotizacion_documento.sunat_contingencia',
                 DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code'),
                 'cotizacion_documento.total',
                 DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
@@ -718,6 +720,7 @@ class DocumentoController extends Controller
             $documento->tipo_pago_id = $request->get('tipo_pago_id');
             $documento->importe = $request->get('importe');
             $documento->efectivo = $request->get('efectivo');
+
             if ($request->convertir) {
                 $documento->convertir = $request->convertir;
             } else {
@@ -781,6 +784,7 @@ class DocumentoController extends Controller
 
                 $documento = Documento::find($documento->id);
                 $documento->estado = $doc_a_convertir->estado;
+                $documento->estado_pago = $doc_a_convertir->estado_pago;
                 $documento->convertir = $doc_a_convertir->id;
                 $documento->importe = $doc_a_convertir->importe;
                 $documento->efectivo = $doc_a_convertir->efectivo;
@@ -1106,7 +1110,7 @@ class DocumentoController extends Controller
             $qr = self::qr_code($id);
             $documento = Documento::findOrFail($id);
             $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->get();
-            if ((int)$documento->tipo_venta === 127 || (int)$documento->tipo_venta === 128) {
+            if ((int)$documento->tipo_venta == 127 || (int)$documento->tipo_venta == 128) {
                 if ($documento->sunat == '0' || $documento->sunat == '2') {
                     //ARREGLO COMPROBANTE
                     $arreglo_comprobante = array(
@@ -1169,7 +1173,7 @@ class DocumentoController extends Controller
                         ])->setPaper([0, 0, 226.772, 651.95]);
                         return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
                     } else {
-                        $pdf_condicion = $empresa->condicion === '1' ? 'comprobante_normal_nuevo' : 'comprobante_normal';
+                        $pdf_condicion = $empresa->condicion == '1' ? 'comprobante_normal_nuevo' : 'comprobante_normal';
                         $pdf = PDF::loadview('ventas.documentos.impresion.' . $pdf_condicion, [
                             'documento' => $documento,
                             'detalles' => $detalles,
@@ -1375,12 +1379,18 @@ class DocumentoController extends Controller
     {
         try {
             $documento = Documento::findOrFail($id);
+            $name_qr = '';
 
+            if ($documento->contingencia == '0') {
+                $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
+            } else {
+                $name_qr  = $documento->serie_contingencia . "-" . $documento->correlativo . '.svg';
+            }
             if ($documento->sunat == '1') {
                 $arreglo_qr = array(
                     "ruc" => $documento->ruc_empresa,
                     "tipo" => $documento->tipoDocumento(),
-                    "serie" => $documento->serie,
+                    "serie" => $documento->contingencia == '0' ? $documento->serie : $documento->serie_contingencia,
                     "numero" => $documento->correlativo,
                     "emision" => self::obtenerFechaEmision($documento),
                     "igv" => 18,
@@ -1391,8 +1401,6 @@ class DocumentoController extends Controller
 
                 /********************************/
                 $data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
-
-                $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
 
                 $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
 
@@ -1408,7 +1416,7 @@ class DocumentoController extends Controller
                 return array('success' => true, 'mensaje' => 'QR creado exitosamente');
             }
 
-            if ($documento->sunat == '0') {
+            if ($documento->sunat == '0' && $documento->contingencia == '0') {
                 $miQr = QrCode::format('svg')
                     ->size(130)  //defino el tamaño
                     ->backgroundColor(0, 0, 0) //defino el fondo
@@ -1416,7 +1424,26 @@ class DocumentoController extends Controller
                     ->margin(1)  //defino el margen
                     ->generate($documento->ruc_empresa . '|' . $documento->tipoDocumento() . '|' . $documento->serie . '|' . $documento->correlativo . '|' . $documento->total_igv . '|' . $documento->total . '|' . getFechaFormato($documento->fecha_emision, 'd/m/Y'));
 
-                $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
+                $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
+
+                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
+                }
+
+                file_put_contents($pathToFile_qr, $miQr);
+
+                $documento->ruta_qr = 'public/qrs/' . $name_qr;
+                $documento->update();
+                return array('success' => false, 'mensaje' => 'Ya tiene QR');
+            }
+            
+            if ($documento->sunat_contingencia == '0' && $documento->contingencia == '1') {
+                $miQr = QrCode::format('svg')
+                    ->size(130)  //defino el tamaño
+                    ->backgroundColor(0, 0, 0) //defino el fondo
+                    ->color(255, 255, 255)
+                    ->margin(1)  //defino el margen
+                    ->generate($documento->ruc_empresa . '|' . $documento->tipoDocumento() . '|' . $documento->serie . '|' . $documento->correlativo . '|' . $documento->total_igv . '|' . $documento->total . '|' . getFechaFormato($documento->fecha_emision, 'd/m/Y'));
 
                 $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
 

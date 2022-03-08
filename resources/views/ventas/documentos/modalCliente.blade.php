@@ -701,12 +701,12 @@
                                 $('#cliente_id').append('<option></option>').trigger('change');
                                 for(var i = 0;i < data.clientes.length; i++)
                                 {
-                                    var newOption = '<option value="'+data.clientes[i].id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>';
+                                    var newOption = '<option value="'+data.clientes[i].id+'" tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>';
                                     $('#cliente_id').append(newOption).trigger('change');
                                     //departamentos += '<option value="'+result.departamentos[i].id+'">'+result.departamentos[i].nombre+'</option>';
                                 }
 
-                                if(cliente.tipo_documento === 'RUC')
+                                if(cliente.tipo_documento == 'RUC')
                                 {
                                     //$('#tipo_venta').val("127").trigger("change");
                                     $('#cliente_id').val(cliente.id).trigger("change");

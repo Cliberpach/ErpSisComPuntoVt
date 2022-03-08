@@ -364,7 +364,7 @@ function loadTable()
                         cadena = cadena + "<a href='"+url_edit+"'  class='btn btn-sm btn-secondary m-1 btn-rounded'  title='Editar'><i class='fa fa-pencil'></i> Editar</a>"
                     }
 
-                    if(data.sunat === '0' && data.dias > 0 && data.tipo_venta_id != 129)
+                    if(data.sunat == '0' && data.dias > 0 && data.tipo_venta_id != 129)
                     {
                         cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1 d-none' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }

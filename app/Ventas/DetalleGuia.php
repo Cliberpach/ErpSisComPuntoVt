@@ -11,6 +11,7 @@ class DetalleGuia extends Model
     protected $fillable = [
         'guia_id',
         'producto_id',
+        'lote_id',
         'codigo_producto',
         'cantidad',
         'nombre_producto',

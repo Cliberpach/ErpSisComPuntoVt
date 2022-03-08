@@ -384,6 +384,8 @@ function(){
         Route::get('/', 'Ventas\Electronico\ComprobanteController@index')->name('ventas.comprobantes');
         Route::get('getVouchers','Ventas\Electronico\ComprobanteController@getVouchers')->name('ventas.getVouchers');
         Route::get('sunat/{id}','Ventas\Electronico\ComprobanteController@sunat')->name('ventas.documento.sunat');
+        Route::get('sunat-contingencia/{id}','Ventas\Electronico\ComprobanteController@sunatContingencia')->name('ventas.documento.sunat.contingencia');
+        Route::get('contingencia/{id}','Ventas\Electronico\ComprobanteController@convertirContingencia')->name('ventas.documento.contingencia');
         Route::get('cdr/{id}','Ventas\Electronico\ComprobanteController@cdr')->name('ventas.documento.cdr');
         Route::post('/envio','Ventas\Electronico\ComprobanteController@email')->name('ventas.documento.envio');
     });
@@ -733,10 +735,35 @@ Route::get('/buscar','BuscarController@index');
 Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
-    $user = Auth::user();
-    return $user->havePermission('condicion.index');
-    return timeago('2022-02-11 08:43:04');
-    $dato = 'Actualizar';
-    broadcast(new NotifySunatEvent($dato));
+    $curl = curl_init();
+    $data = [
+        "ruc_emisor" => "20481753091",
+        "codigo_tipo_documento" => "03",
+        "serie_documento" => "B001",
+        "numero_documento" => "7511",
+        "fecha_de_emision" => "2022-03-07",
+        "total" => "2.00"
+    ];
+
+    $post_data = http_build_query($data);
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => "https://apiperu.dev/api/cpe?api_token=c36358c49922c564f035d4dc2ff3492fbcfd31ee561866960f75b79f7d645d7d",
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST => "POST",
+        CURLOPT_POSTFIELDS => $post_data,
+        CURLOPT_SSL_VERIFYPEER => false
+    ));
+
+    $response = curl_exec($curl);
+    $err = curl_error($curl);
+
+    curl_close($curl);
+
+    if ($err) {
+        return "cURL Error #:" . $err;
+    } else {
+        return $response;
+    }
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';
 });

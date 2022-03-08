@@ -228,6 +228,14 @@ class PermissionsSeeder extends Seeder
             'description'=>'El usuario puede acceder al mantenedor de Condiciones'
         ]);
 
+        //Configuracion permission
+
+        Permission::create([
+            'name'  => 'Mantenedor de Configuracion',
+            'slug' => 'configuracion.index',
+            'description' => 'El usuario puede acceder al mantenedor de Configuracion'
+        ]);
+
         //Personas permission
 
         Permission::create([
