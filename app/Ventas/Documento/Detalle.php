@@ -22,6 +22,7 @@ class Detalle extends Model
         'precio_inicial',
         'precio_unitario',
         'precio_nuevo',
+        'precio_minimo',
         'descuento',
         'dinero',
         'valor_unitario',

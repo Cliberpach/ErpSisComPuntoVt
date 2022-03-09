@@ -1079,6 +1079,7 @@
                 descuento: value[11],
                 cantidad: value[2],
                 valor_venta: value[9],
+                precio_minimo: value[12],
             };
             productos.push(fila);
         });

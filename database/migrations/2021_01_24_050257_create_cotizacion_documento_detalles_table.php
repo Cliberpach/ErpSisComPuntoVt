@@ -29,6 +29,7 @@ class CreateCotizacionDocumentoDetallesTable extends Migration
             $table->unsignedDecimal('descuento', 15, 2)->default(0.00);
             $table->unsignedDecimal('dinero', 15, 2)->default(0.00);
             $table->unsignedDecimal('precio_nuevo', 15, 2);
+            $table->unsignedDecimal('precio_minimo', 15, 2)->nullable();
             $table->unsignedDecimal('valor_unitario', 15, 2);
             $table->unsignedDecimal('valor_venta', 15, 2);
             $table->enum('estado', ['ACTIVO', 'ANULADO'])->default('ACTIVO');

@@ -325,7 +325,7 @@
                     <hr>
                     <div class="row">
 
-                        <div class="col-lg-12">
+                        <div class="col-12">
                             <div class="panel panel-primary" id="panel_detalle">
                                 <div class="panel-heading">
                                     <h4 class=""><b>Detalle del Documento de Venta</b></h4>
@@ -1065,6 +1065,7 @@
                 descuento: value[11],
                 cantidad: value[2],
                 valor_venta: value[9],
+                precio_minimo: value[12],
             };
             productos.push(fila);
         });
