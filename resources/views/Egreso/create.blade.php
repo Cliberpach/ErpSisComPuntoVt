@@ -124,30 +124,26 @@
             var cantidad = convertFloat(efectivo_venta) + convertFloat(importe_venta);
             var modo_pago = $("#modo_pago").val();
 
-            let correcto = true;
+            let enviar = true;
             if (cantidad.length == 0 || cuenta.length == 0  || modo_pago.length == 0) {
-                correcto = false;
+                enviar = false;
                 toastr.error('Ingrese todos los datos');
             }
 
             if(cantidad == 0 || cantidad < 0)
             {
-                correcto = false;
+                enviar = false;
                 toastr.error('El monto de egreso debe ser mayor a 0.');
             }
 
-            console.log(cantidad)
-
-            if(correcto)
+            if(enviar)
             {
                 axios.get("{{route('Caja.movimiento.verificarestado')}}").then((value) => {
                     let data = value.data
                     if (!data.success) {
                             toastr.error(data.mensaje);
                     }  else {
-                        if (enviar) {
-                            this.submit();
-                        }
+                        this.submit();
                     }
                 })
             }
