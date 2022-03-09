@@ -785,6 +785,7 @@ class DocumentoController extends Controller
                 $documento = Documento::find($documento->id);
                 $documento->estado = $doc_a_convertir->estado;
                 $documento->estado_pago = $doc_a_convertir->estado_pago;
+                $documento->fecha_documento = Carbon::now()->toDateString();
                 $documento->convertir = $doc_a_convertir->id;
                 $documento->importe = $doc_a_convertir->importe;
                 $documento->efectivo = $doc_a_convertir->efectivo;
