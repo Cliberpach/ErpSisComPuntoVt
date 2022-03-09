@@ -428,7 +428,7 @@
                         <td style="text-align: center; border-right: 2px solid #52BE80">
                             {{ $cuentaCliente->cuenta_cliente->documento->clienteEntidad->nombre }}</td>
                         <td style="text-align: center; border-right: 2px solid #52BE80">
-                            {{ $cuentaCliente->cuenta_cliente->monto }}
+                            {{ $cuentaCliente->monto }}
                         </td>
                         @foreach(tipos_pago() as $tipo)
                             @if($tipo->id == 1)
