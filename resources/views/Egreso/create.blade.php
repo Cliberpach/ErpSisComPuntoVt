@@ -141,12 +141,13 @@
             if(correcto)
             {
                 axios.get("{{route('Caja.movimiento.verificarestado')}}").then((value) => {
-                    if(value.data=="")
-                    {
-                        toastr.error("No hay ninguna apertura de caja");
-                    }
-                    else{
-                        this.submit();
+                    let data = value.data
+                    if (!data.success) {
+                            toastr.error(data.mensaje);
+                    }  else {
+                        if (enviar) {
+                            this.submit();
+                        }
                     }
                 })
             }

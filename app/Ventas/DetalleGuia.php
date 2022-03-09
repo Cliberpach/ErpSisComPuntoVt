@@ -18,6 +18,11 @@ class DetalleGuia extends Model
         'unidad',
     ];
 
+    public function lote()
+    {
+        return $this->belongsTo('App\Almacenes\LoteProducto', 'lote_id');
+    }
+
     public function producto()
     {
         return $this->belongsTo(Producto::class, 'producto_id');

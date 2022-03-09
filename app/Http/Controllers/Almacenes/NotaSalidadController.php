@@ -351,6 +351,7 @@ class NotaSalidadController extends Controller
                 'compra_documento_detalles.precio_mas_igv_soles',
                 'lote_productos.*',
                 'productos.nombre',
+                'productos.id as producto_id',
                 'productos.peso_producto',
                 'productos.igv',
                 'productos.codigo_barra',

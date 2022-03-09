@@ -431,7 +431,7 @@ class GuiaController extends Controller
 
     public function show($id)
     {
-        $guia = Guia::with(['documento','documento.detalles','documento.detalles.lote','documento.detalles.lote.producto'])->findOrFail($id);
+        $guia = Guia::with(['documento','detalles','detalles.lote','detalles.lote.producto'])->findOrFail($id);
         if ($guia->sunat == '0' || $guia->sunat == '2' ) {
             //ARREGLO GUIA
             $arreglo_guia = array(
@@ -441,19 +441,19 @@ class GuiaController extends Controller
                     "fechaEmision" => self::obtenerFecha($guia),
 
                     "company" => array(
-                        "ruc" => $guia->documento->ruc_empresa,
-                        "razonSocial" => $guia->documento->empresa,
+                        "ruc" => $guia->ruc_empresa,
+                        "razonSocial" => $guia->empresa,
                         "address" => array(
-                            "direccion" => $guia->documento->direccion_fiscal_empresa,
+                            "direccion" => $guia->direccion_empresa,
                         )),
 
 
                     "destinatario" => array(
-                        "tipoDoc" =>  $guia->documento->tipoDocumentoCliente(),
-                        "numDoc" => $guia->documento->documento_cliente,
-                        "rznSocial" => $guia->documento->cliente,
+                        "tipoDoc" =>  $guia->codTraslado() == "04" ? "6" : $guia->tipoDocumentoCliente(),
+                        "numDoc" =>  $guia->codTraslado() == "04" ? $guia->ruc_empresa : $guia->documento_cliente,
+                        "rznSocial" =>  $guia->codTraslado() == "04" ? $guia->empresa : $guia->cliente,
                         "address" => array(
-                            "direccion" => $guia->documento->direccion_cliente,
+                            "direccion" =>  $guia->codTraslado() == "04" ? $guia->direccion_empresa : $guia->direccion_cliente,
                         )
                     ),
 
@@ -461,8 +461,8 @@ class GuiaController extends Controller
 
                     "envio" => array(
                         "modTraslado" =>  "01",
-                        "codTraslado" =>  "01",
-                        "desTraslado" =>  "VENTA",
+                        "codTraslado" =>  $guia->codTraslado(),
+                        "desTraslado" =>  $guia->desTraslado(),
                         "fecTraslado" =>  self::obtenerFecha($guia),//FECHA DEL TRANSLADO
                         "codPuerto" => "123",
                         "indTransbordo"=> false,
@@ -475,7 +475,7 @@ class GuiaController extends Controller
                         ),
                         "partida" => array(
                             "ubigueo" => $guia->ubigeo_partida,
-                            "direccion" => self::limitarDireccion($guia->documento->direccion_fiscal_empresa,50,"..."),
+                            "direccion" => self::limitarDireccion($guia->direccion_empresa,50,"..."),
                         ),
                         "transportista"=> self::condicionReparto($guia)
                     ),
@@ -550,11 +550,11 @@ class GuiaController extends Controller
 
 
                             "destinatario" => array(
-                                "tipoDoc" =>  $guia->tipoDocumentoCliente(),
-                                "numDoc" => $guia->documento_cliente,
-                                "rznSocial" => $guia->cliente,
+                                "tipoDoc" =>  $guia->codTraslado() == "04" ? "6" : $guia->tipoDocumentoCliente(),
+                                "numDoc" =>  $guia->codTraslado() == "04" ? $guia->ruc_empresa : $guia->documento_cliente,
+                                "rznSocial" =>  $guia->codTraslado() == "04" ? $guia->empresa : $guia->cliente,
                                 "address" => array(
-                                    "direccion" => $guia->ddireccion_cliente,
+                                    "direccion" =>  $guia->codTraslado() == "04" ? $guia->direccion_empresa : $guia->direccion_cliente,
                                 )
                             ),
 
@@ -736,11 +736,11 @@ class GuiaController extends Controller
 
 
                         "destinatario" => array(
-                            "tipoDoc" =>  $guia->tipoDocumentoCliente(),
-                            "numDoc" => $guia->documento_cliente,
-                            "rznSocial" => $guia->cliente,
+                            "tipoDoc" =>  $guia->codTraslado() == "04" ? "6" : $guia->tipoDocumentoCliente(),
+                            "numDoc" =>  $guia->codTraslado() == "04" ? $guia->ruc_empresa : $guia->documento_cliente,
+                            "rznSocial" =>  $guia->codTraslado() == "04" ? $guia->empresa : $guia->cliente,
                             "address" => array(
-                                "direccion" => $guia->direccion_cliente,
+                                "direccion" =>  $guia->codTraslado() == "04" ? $guia->direccion_empresa : $guia->direccion_cliente,
                             )
                         ),
 
@@ -748,8 +748,8 @@ class GuiaController extends Controller
 
                         "envio" => array(
                             "modTraslado" =>  "01",
-                            "codTraslado" =>  "01",
-                            "desTraslado" =>  "VENTA",
+                            "codTraslado" =>  $guia->codTraslado(),
+                            "desTraslado" =>  $guia->desTraslado(),
                             "fecTraslado" =>  self::obtenerFecha($guia),//FECHA DEL TRANSLADO
                             "codPuerto" => "123",
                             "indTransbordo"=> false,
