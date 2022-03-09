@@ -67,6 +67,14 @@ function(){
         Route::get('getTable','Mantenimiento\Tabla\GeneralController@getTable')->name('getTable');
         Route::put('update', 'Mantenimiento\Tabla\GeneralController@update')->name('mantenimiento.tabla.general.update');
     });
+
+    //Configuracion
+    Route::prefix('configuracion')->group(function () {
+        Route::get('index', 'Configuracion\ConfiguracionController@index')->name('configuracion.index');
+        Route::put('update/{id}', 'Configuracion\ConfiguracionController@update')->name('configuracion.update');
+        Route::put('/empresa/update', 'Configuracion\ConfiguracionController@codigo')->name('configuracion.empresa.update');
+    });
+
     //Users
     Route::prefix('users')->group(function() {
         Route::get('/', 'Seguridad\UserController@index')->name('user.index');
@@ -720,12 +728,6 @@ function(){
         Route::post('salida/getTable', 'Reportes\Notas\SalidaController@getTable')->name('reporte.notas.salida.getTable');
         Route::get('salida/getExcel', 'Reportes\Notas\SalidaController@getExcel')->name('reporte.notas.salida.getExcel');
 
-    });
-
-    Route::prefix('configuracion')->group(function(){
-        Route::get('index', 'Configuracion\ConfiguracionController@index')->name('configuracion.index');
-        Route::put('update/{id}', 'Configuracion\ConfiguracionController@update')->name('configuracion.update');
-        Route::put('/empresa/update', 'Configuracion\ConfiguracionController@codigo')->name('configuracion.empresa.update');
     });
 });
 
