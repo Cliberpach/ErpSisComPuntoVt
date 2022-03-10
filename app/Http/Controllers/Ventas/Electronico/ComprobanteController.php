@@ -66,7 +66,7 @@ class ComprobanteController extends Controller
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('documento_id',$id)->where('estado', 'ACTIVO')->get();
+        $detalles = Detalle::where('documento_id',$id)->where('eliminado', '0')->where('estado', 'ACTIVO')->get();
         $arrayProductos = Array();
         for($i = 0; $i < count($detalles); $i++){
 
@@ -676,7 +676,7 @@ class ComprobanteController extends Controller
             $id = $request->id;
             $correo = $request->correo;
             $documento = Documento::findOrFail($id);
-            $detalles = Detalle::where('documento_id',$id)->where('estado','ACTIVO')->get();
+            $detalles = Detalle::where('documento_id',$id)->where('eliminado','0')->get();
             $empresa = Empresa::first();
             $legends = self::obtenerLeyenda($documento);
             $legends = json_encode($legends,true);

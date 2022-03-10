@@ -62,6 +62,10 @@ class CreateGuiasRemisionTable extends Migration
 
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->json('getCdrResponse')->nullable();
+            $table->json('getRegularizeResponse')->nullable();
+            $table->enum('regularize', ['0', '1'])->default('0');
             $table->timestamps();
         });
     }

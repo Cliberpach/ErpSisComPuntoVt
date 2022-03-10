@@ -70,7 +70,7 @@ class Detalle extends Model
 
         static::updated(function (Detalle $detalle) {
 
-            // if($detalle->estado == 'ANULADO')
+            // if($detalle->eliminado == '1')
             // {
             //     $lote = LoteProducto::find($detalle->lote_id);
             //     $lote->cantidad = $lote->cantidad + $detalle->cantidad;

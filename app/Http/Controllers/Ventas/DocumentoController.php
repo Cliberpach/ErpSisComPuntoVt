@@ -982,7 +982,7 @@ class DocumentoController extends Controller
         $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->get();
         foreach ($detalles as $detalle) {
             //ANULAMOS EL DETALLE
-            $detalle->estado = "ANULADO";
+            $detalle->eliminado = "0";
             $detalle->update();
             $lote = LoteProducto::find($detalle->lote_id);
             $cantidad = $detalle->cantidad - $detalle->detalles->sum('cantidad');
@@ -1110,7 +1110,7 @@ class DocumentoController extends Controller
             $size = (int) $cadena[1];
             $qr = self::qr_code($id);
             $documento = Documento::findOrFail($id);
-            $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->get();
+            $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->get();
             if ((int)$documento->tipo_venta == 127 || (int)$documento->tipo_venta == 128) {
                 if ($documento->sunat == '0' || $documento->sunat == '2') {
                     //ARREGLO COMPROBANTE
@@ -1163,7 +1163,6 @@ class DocumentoController extends Controller
                     $legends = self::obtenerLeyenda($documento);
                     $legends = json_encode($legends, true);
                     $legends = json_decode($legends, true);
-                    $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $documento->id)->get();
                     if ($size === 80) {
                         $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_ticket', [
                             'documento' => $documento,
@@ -1203,8 +1202,6 @@ class DocumentoController extends Controller
                     $legends = self::obtenerLeyenda($documento);
                     $legends = json_encode($legends, true);
                     $legends = json_decode($legends, true);
-
-                    $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $documento->id)->get();
 
                     if ($size === 80) {
                         $pdf = PDF::loadview('ventas.documentos.impresion.comprobante_ticket', [
@@ -1479,7 +1476,7 @@ class DocumentoController extends Controller
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->get();
+        $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->where('estado','ACTIVO')->get();
         $arrayProductos = array();
         for ($i = 0; $i < count($detalles); $i++) {
 

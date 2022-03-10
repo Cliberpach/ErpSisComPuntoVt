@@ -126,7 +126,7 @@ class AlertaController extends Controller
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('documento_id',$id)->where('estado', 'ACTIVO')->get();
+        $detalles = Detalle::where('documento_id',$id)->where('eliminado', '0')->where('estado', 'ACTIVO')->get();
         $arrayProductos = Array();
         for($i = 0; $i < count($detalles); $i++){
 

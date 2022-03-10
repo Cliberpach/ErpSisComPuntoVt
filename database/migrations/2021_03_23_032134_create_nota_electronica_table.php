@@ -71,6 +71,10 @@ class CreateNotaElectronicaTable extends Migration
 
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
 
+            $table->json('getCdrResponse')->nullable();
+            $table->json('getRegularizeResponse')->nullable();
+            $table->enum('regularize', ['0', '1'])->default('0');
+
             $table->timestamps();
         });
     }

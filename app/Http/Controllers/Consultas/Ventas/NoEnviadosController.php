@@ -108,7 +108,7 @@ class NoEnviadosController extends Controller
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $id)->get();
+        $detalles = Detalle::where('eliminado', '0')->where('estado','ACTIVO')->where('documento_id', $id)->get();
         $arrayProductos = array();
         for ($i = 0; $i < count($detalles); $i++) {
 
@@ -328,7 +328,7 @@ class NoEnviadosController extends Controller
         $clientes = Cliente::where('estado', 'ACTIVO')->get();
         $productos = Producto::where('estado', 'ACTIVO')->get();
         $documento = Documento::findOrFail($id);
-        $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->with(['lote', 'lote.producto'])->get();
+        $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->where('estado', 'ACTIVO')->with(['lote', 'lote.producto'])->get();
         $condiciones = Condicion::where('estado', 'ACTIVO')->get();
         $fullaccess = false;
         $fecha_hoy = Carbon::now()->toDateString();
@@ -456,14 +456,13 @@ class NoEnviadosController extends Controller
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
 
-            $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $id)->get();
+            $detalles = Detalle::where('eliminado', '0')->where('estado','ACTIVO')->where('documento_id', $id)->get();
             foreach ($detalles as $item) {
                 $lote = LoteProducto::findOrFail($item->lote_id);
                 $lote->cantidad =  $lote->cantidad + $item->cantidad;
                 $lote->cantidad_logica =  $lote->cantidad_logica + $item->cantidad;
                 $lote->estado = '1';
                 $lote->update();
-                $item->estado = 'ANULADO';
                 $item->eliminado = '1';
                 $item->update();
             }
@@ -621,7 +620,7 @@ class NoEnviadosController extends Controller
 
     public function getLotRecientes($id)
     {
-        $detalles = Detalle::where('estado', 'ACTIVO')->where('documento_id', $id)->get();
+        $detalles = Detalle::where('eliminado', '0')->where('estado','ACTIVO')->where('documento_id', $id)->get();
         $colecction = collect([]);
         foreach ($detalles as $detalle) {
             $precio_soles = 0;
