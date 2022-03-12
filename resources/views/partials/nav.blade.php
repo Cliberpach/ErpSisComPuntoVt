@@ -165,6 +165,7 @@
                 <li class="@yield('consulta-ventas-alertas-envio-active')"><a href="{{ route('consultas.ventas.alerta.envio') }}">Documentos</a></li>
                 <li class="@yield('consulta-ventas-alertas-regularize-active')"><a href="{{ route('consultas.ventas.alerta.regularize') }}">CDR</a></li>
                 <li class="@yield('consulta-ventas-alertas-notas-active')"><a href="{{ route('consultas.ventas.alerta.notas') }}">Notas</a></li>
+                <li class="@yield('consulta-ventas-alertas-notas-active')"><a href="{{ route('consultas.ventas.alerta.guias') }}">Guias</a></li>
             </ul>
         </li>
 
