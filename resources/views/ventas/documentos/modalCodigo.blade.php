@@ -18,7 +18,7 @@
                             @if (codigoPrecioMenor()->estado_precio_menor == '1')
                             <div class="form-group">
                                 <label class="required">Código para vender a menor precio</label>
-                                <input type="text" class="form-control" id="codigo_precio_menor" placeholder="Código" autocomplete="off" required>
+                                <input type="password" class="form-control" id="codigo_precio_menor" placeholder="Código" autocomplete="off" required>
                             </div>
                             @endif
                         </div>
@@ -60,7 +60,7 @@
                             @if (codigoPrecioMenor()->estado_precio_menor == '1')
                             <div class="form-group">
                                 <label class="required">Código para vender a menor precio</label>
-                                <input type="text" class="form-control" id="codigo_precio_menor_editar" placeholder="Código" autocomplete="off" required>
+                                <input type="password" class="form-control" id="codigo_precio_menor_editar" placeholder="Código" autocomplete="off" required>
                             </div>
                             @endif
                         </div>

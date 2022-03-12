@@ -50,6 +50,10 @@ class Guia extends Model
         'cliente',
         'cliente_id',
         'user_id',
+
+        'getCdrResponse',
+        'regularize',
+        'getRegularizeResponse',
     ];
 
     public function documento()

@@ -25,7 +25,7 @@ class CreateNotaElectronicaTable extends Migration
             $table->string('desMotivo');
 
             $table->string('tipoDoc');
-            $table->dateTime('fechaEmision')->nullable();
+            $table->date('fechaEmision')->nullable();
             $table->string('tipoMoneda')->default('PEN');
            
 
@@ -70,6 +70,9 @@ class CreateNotaElectronicaTable extends Migration
             $table->mediumText('value');
 
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
+
+            $table->unsignedInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->json('getCdrResponse')->nullable();
             $table->json('getRegularizeResponse')->nullable();

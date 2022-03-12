@@ -1963,6 +1963,42 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -1971,7 +2007,9 @@ __webpack_require__.r(__webpack_exports__);
     return {
       notifyCount: 0,
       lstNotifyEnvio: [],
-      lstNotifyRegularize: []
+      lstNotifyRegularize: [],
+      lstNotifyNotas: [],
+      lstNotifyGuias: []
     };
   },
   mounted: function mounted() {
@@ -1994,6 +2032,12 @@ __webpack_require__.r(__webpack_exports__);
         _this.lstNotifyRegularize = data.notifications.filter(function (notify) {
           return notify.data.head == 'regularize';
         });
+        _this.lstNotifyNotas = data.notifications.filter(function (notify) {
+          return notify.data.head == 'nota';
+        });
+        _this.lstNotifyGuias = data.notifications.filter(function (notify) {
+          return notify.data.head == 'guia';
+        });
       });
     },
     locationEnvio: function locationEnvio() {
@@ -2001,6 +2045,12 @@ __webpack_require__.r(__webpack_exports__);
     },
     locationRegularize: function locationRegularize() {
       window.location = route('consultas.ventas.alerta.regularize');
+    },
+    locationNotas: function locationNotas() {
+      window.location = route('consultas.ventas.alerta.notas');
+    },
+    locationGuias: function locationGuias() {
+      window.location = route('consultas.ventas.alerta.guias');
     }
   },
   updated: function updated() {
@@ -57506,6 +57556,152 @@ var render = function() {
                   _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
                   _vm._v(
                     " Documento por regularizar: " +
+                      _vm._s(
+                        notify.data.body.serie +
+                          " - " +
+                          notify.data.body.correlativo
+                      ) +
+                      "\n                    "
+                  ),
+                  _c("span", { staticClass: "float-right text-muted small" }, [
+                    _vm._v(_vm._s(notify.data.time))
+                  ])
+                ])
+              ]
+            )
+          ])
+        }),
+        _vm._v(" "),
+        _vm.lstNotifyNotas.length > 0 &&
+        (_vm.lstNotifyRegularize.length > 0 || _vm.lstNotifyEnvio.length > 0)
+          ? _c("li", { staticClass: "dropdown-divider" })
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.lstNotifyNotas.length > 0
+          ? _c("li", [
+              _c(
+                "a",
+                {
+                  staticClass: "dropdown-item",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      return _vm.locationNotas()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "content-alert text-center" }, [
+                    _c("b", [
+                      _vm._v(
+                        _vm._s(_vm.lstNotifyNotas.length) +
+                          " " +
+                          _vm._s(
+                            _vm.lstNotifyNotas.length > 1
+                              ? "notificaciones"
+                              : "notificacion"
+                          ) +
+                          " de notas de credito no enviadas"
+                      )
+                    ])
+                  ])
+                ]
+              )
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._l(_vm.lstNotifyNotas, function(notify) {
+          return _c("li", { key: notify.id }, [
+            _c(
+              "a",
+              {
+                staticClass: "dropdown-item",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.locationNotas()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "content-alert" }, [
+                  _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
+                  _vm._v(
+                    " Nota de Crédito por enviar: " +
+                      _vm._s(
+                        notify.data.body.serie +
+                          " - " +
+                          notify.data.body.correlativo
+                      ) +
+                      "\n                    "
+                  ),
+                  _c("span", { staticClass: "float-right text-muted small" }, [
+                    _vm._v(_vm._s(notify.data.time))
+                  ])
+                ])
+              ]
+            )
+          ])
+        }),
+        _vm._v(" "),
+        _vm.lstNotifyGuias.length > 0 &&
+        (_vm.lstNotifyRegularize.length > 0 ||
+          _vm.lstNotifyEnvio.length > 0 ||
+          _vm.lstNotifyNotas.length > 0)
+          ? _c("li", { staticClass: "dropdown-divider" })
+          : _vm._e(),
+        _vm._v(" "),
+        _vm.lstNotifyGuias.length > 0
+          ? _c("li", [
+              _c(
+                "a",
+                {
+                  staticClass: "dropdown-item",
+                  attrs: { href: "#" },
+                  on: {
+                    click: function($event) {
+                      return _vm.locationGuias()
+                    }
+                  }
+                },
+                [
+                  _c("div", { staticClass: "content-alert text-center" }, [
+                    _c("b", [
+                      _vm._v(
+                        _vm._s(_vm.lstNotifyGuias.length) +
+                          " " +
+                          _vm._s(
+                            _vm.lstNotifyGuias.length > 1
+                              ? "notificaciones"
+                              : "notificacion"
+                          ) +
+                          " de guias no enviadas"
+                      )
+                    ])
+                  ])
+                ]
+              )
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _vm._l(_vm.lstNotifyGuias, function(notify) {
+          return _c("li", { key: notify.id }, [
+            _c(
+              "a",
+              {
+                staticClass: "dropdown-item",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.locationGuias()
+                  }
+                }
+              },
+              [
+                _c("div", { staticClass: "content-alert" }, [
+                  _c("i", { staticClass: "fa fa-envelope fa-fw text-danger" }),
+                  _vm._v(
+                    " Guia por enviar: " +
                       _vm._s(
                         notify.data.body.serie +
                           " - " +

@@ -7,6 +7,7 @@ use App\Almacenes\LoteProducto;
 use App\Almacenes\NotaSalidad;
 use App\Almacenes\Producto;
 use App\Events\GuiaRegistrado;
+use App\Events\NotifySunatEvent;
 use App\Events\NumeracionGuiaRemision;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
@@ -27,12 +28,14 @@ use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade as PDF;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-
+use stdClass;
 
 class GuiaController extends Controller
 {
     public function index()
     {
+        $dato = "Message";
+        broadcast(new NotifySunatEvent($dato));
         return view('ventas.guias.index');
     }
 
@@ -235,7 +238,7 @@ class GuiaController extends Controller
 
 
                     DB::commit();
-                    $envio_post = self::sunat_post($guia->id);
+                    //$envio_post = self::sunat_post($guia->id);
                     $guia_pdf = self::guia_pdf($guia->id);
                     Session::flash('success','Guia de Remision creada.');
                     return redirect()->route('ventas.guiasremision.index')->with('guardar', 'success');
@@ -357,7 +360,7 @@ class GuiaController extends Controller
                     return back()->with('sunat_error', 'error');
                 }
                 DB::commit();
-                $envio_post = self::sunat_post($guia->id);
+                // $envio_post = self::sunat_post($guia->id);
                 $guia_pdf = self::guia_pdf($guia->id);
                 Session::flash('success','Guia de Remision creada.');
                 return redirect()->route('ventas.guiasremision.index')->with('guardar', 'success');
@@ -569,6 +572,7 @@ class GuiaController extends Controller
                                 "indTransbordo"=> false,
                                 "pesoTotal" => $guia->peso_productos,
                                 "undPesoTotal"=> "KGM",
+                                "numContenedor" => "XD-2232",
                                 "numBultos" => $guia->cantidad_productos,
                                 "llegada" => array(
                                     "ubigueo" =>  $guia->ubigeo_llegada,
@@ -589,60 +593,89 @@ class GuiaController extends Controller
                     $json_sunat = json_decode($data);
 
                     if ($json_sunat->sunatResponse->success == true) {
+                        if($json_sunat->sunatResponse->cdrResponse->code == "0") {
+                            $guia->sunat = '1';
+                            $data = pdfGuiaapi(json_encode($arreglo_guia));
+                            $name = $existe[0]->get('numeracion')->serie . "-" . $guia->correlativo . '.pdf';
+                            $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia' . DIRECTORY_SEPARATOR . $name);
+                            if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia'))) {
+                                mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia'));
+                            }
 
-                        $guia->sunat = '1';
-                        $data = pdfGuiaapi(json_encode($arreglo_guia));
-                        $name = $existe[0]->get('numeracion')->serie."-".$guia->correlativo.'.pdf';
-                        $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'guia'.DIRECTORY_SEPARATOR.$name);
-                        if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'guia'))) {
-                            mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'guia'));
-                        }
-
-                        //file_put_contents($pathToFile, $data);
-                        $empresa = Empresa::first();
-                        PDF::loadview('ventas.guias.reportes.guia',[
-                            'guia' => $guia,
-                            'empresa' => $empresa,
+                            //file_put_contents($pathToFile, $data);
+                            $empresa = Empresa::first();
+                            PDF::loadview('ventas.guias.reportes.guia', [
+                                'guia' => $guia,
+                                'empresa' => $empresa,
                             ])->setPaper('a4')->setWarnings(false)
-                            ->save(public_path().'/storage/sunat/guia/'.$name);
+                                ->save(public_path() . '/storage/sunat/guia/' . $name);
 
-                        $guia->nombre_comprobante_archivo = $name;
-                        $guia->ruta_comprobante_archivo = 'public/sunat/guia/'.$name;
-                        $guia->update();
+                            $guia->nombre_comprobante_archivo = $name;
+                            $guia->ruta_comprobante_archivo = 'public/sunat/guia/' . $name;
+                            $guia->update();
 
-                        //Registro de actividad
-                        $descripcion = "SE AGREGÓ LA GUIA DE REMISION ELECTRONICA: ". $existe[0]->get('numeracion')->serie."-".$guia->correlativo;
-                        $gestion = "GUIA DE REMISION ELECTRONICA";
-                        crearRegistro($guia , $descripcion , $gestion);
+                            //Registro de actividad
+                            $descripcion = "SE AGREGÓ LA GUIA DE REMISION ELECTRONICA: " . $existe[0]->get('numeracion')->serie . "-" . $guia->correlativo;
+                            $gestion = "GUIA DE REMISION ELECTRONICA";
+                            crearRegistro($guia, $descripcion, $gestion);
 
-                        Session::flash('success','Guia de remision enviada a Sunat con exito.');
-                        return view('ventas.guias.index',[
+                            Session::flash('success', 'Guia de remision enviada a Sunat con exito.');
+                            return view('ventas.guias.index', [
 
-                            'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
-                            'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
-                            'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
-                            'sunat_exito' => true
+                                'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
+                                'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
+                                'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
+                                'sunat_exito' => true
 
-                        ])->with('sunat_exito', 'success');
+                            ])->with('sunat_exito', 'success');
+                        }
+                        else {
+                            $guia->sunat = '0';
+                            $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
+                            $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
-                    }else{
+                            $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                            $respuesta_error = json_decode($respuesta_error, true);
+                            $guia->getCdrResponse = $respuesta_error;
+
+                            $guia->update();
+                            $dato = "Message";
+                            broadcast(new NotifySunatEvent($dato));
+                            Session::flash('error', 'Guia de remision sin exito en el envio a sunat.');
+                            return view('ventas.guias.index', [
+                                'id_sunat' =>  $id_sunat,
+                                'descripcion_sunat' =>  $descripcion_sunat,
+                                'sunat_error' => true,
+
+                            ])->with('sunat_error', 'error');
+                        }
+                    } else{
 
                         //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                         $guia->sunat = '0';
-                        $guia->update();
+                        $guia->regularize = '1';
 
                         if ($json_sunat->sunatResponse->error) {
                             $id_sunat = $json_sunat->sunatResponse->error->code;
                             $descripcion_sunat = $json_sunat->sunatResponse->error->message;
-
+                            $obj_erro = new stdClass;
+                            $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                            $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                            $respuesta_error = json_encode($obj_erro, true);
+                            $respuesta_error = json_decode($respuesta_error, true);
+                            $guia->getRegularizeResponse = $respuesta_error;
 
                         }else {
                             $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                             $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-
+                            $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                            $respuesta_error = json_decode($respuesta_error, true);
+                            $guia->getCdrResponse = $respuesta_error;
                         };
 
-
+                        $guia->update();
+                        $dato = "Message";
+                        broadcast(new NotifySunatEvent($dato));
                         Session::flash('error','Guia de remision sin exito en el envio a sunat.');
                         return view('ventas.guias.index',[
                             'id_sunat' =>  $id_sunat,
@@ -775,44 +808,65 @@ class GuiaController extends Controller
                 $json_sunat = json_decode($data);
 
                 if ($json_sunat->sunatResponse->success == true) {
+                    if($json_sunat->sunatResponse->cdrResponse->code == "0") {
+                        $guia->sunat = '1';
+                        $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_cdr = json_decode($respuesta_cdr, true);
+                        $guia->getCdrResponse = $respuesta_cdr;
+                        $data = pdfGuiaapi(json_encode($arreglo_guia));
+                        $name = $guia->serie . "-" . $guia->correlativo . '.pdf';
+                        $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia' . DIRECTORY_SEPARATOR . $name);
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia'));
+                        }
 
-                    $guia->sunat = '1';
-                    $data = pdfGuiaapi(json_encode($arreglo_guia));
-                    $name = $guia->serie."-".$guia->correlativo.'.pdf';
-                    $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'guia'.DIRECTORY_SEPARATOR.$name);
-                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'guia'))) {
-                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'guia'));
+                        //file_put_contents($pathToFile, $data);
+
+
+                        $guia->nombre_comprobante_archivo = $name;
+                        $guia->ruta_comprobante_archivo = 'public/sunat/guia/' . $name;
+                        $guia->update();
+
+                        //Registro de actividad
+                        $descripcion = "SE AGREGÓ LA GUIA DE REMISION ELECTRONICA: " . $guia->serie . "-" . $guia->correlativo;
+                        $gestion = "GUIA DE REMISION ELECTRONICA";
+                        crearRegistro($guia, $descripcion, $gestion);
+
+                        return array('success' => true, 'mensaje' => 'Guia de remisión enviada a Sunat con exito.');
                     }
+                    else {
+                        $guia->sunat = '0';
+                        $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
+                        $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
-                    //file_put_contents($pathToFile, $data);
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $guia->getCdrResponse = $respuesta_error;
 
-
-                    $guia->nombre_comprobante_archivo = $name;
-                    $guia->ruta_comprobante_archivo = 'public/sunat/guia/'.$name;
-                    $guia->update();
-
-                    //Registro de actividad
-                    $descripcion = "SE AGREGÓ LA GUIA DE REMISION ELECTRONICA: ". $guia->serie."-".$guia->correlativo;
-                    $gestion = "GUIA DE REMISION ELECTRONICA";
-                    crearRegistro($guia , $descripcion , $gestion);
-
-                    return array('success' => true,'mensaje' => 'Guia de remisión enviada a Sunat con exito.');
-
+                        $guia->update();
+                        return array('success' => false, 'mensaje' => $descripcion_sunat);
+                    }
                 }else{
 
                     //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                     $guia->sunat = '0';
-                    $guia->update();
+                    $guia->regularize = '1';
 
                     if ($json_sunat->sunatResponse->error) {
                         $id_sunat = $json_sunat->sunatResponse->error->code;
                         $descripcion_sunat = $json_sunat->sunatResponse->error->message;
-
-
+                        $obj_erro = new stdClass;
+                        $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                        $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                        $respuesta_error = json_encode($obj_erro, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $guia->getRegularizeResponse = $respuesta_error;
                     }else {
                         $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                         $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $guia->getCdrResponse = $respuesta_error;
                     };
 
 
@@ -823,6 +877,7 @@ class GuiaController extends Controller
                     $errorGuia->ecxepcion = $descripcion_sunat;
                     $errorGuia->save();
 
+                    $guia->update();
                     return array('success' => false, 'mensaje' => $descripcion_sunat);
                 }
             }else{

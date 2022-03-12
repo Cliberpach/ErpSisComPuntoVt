@@ -59,6 +59,12 @@ class Nota extends Model
         'code',
         'value',
         'estado',
+
+        'user_id',
+
+        'getCdrResponse',
+        'regularize',
+        'getRegularizeResponse',
     ];
 
     public function documento()

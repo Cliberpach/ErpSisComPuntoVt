@@ -227,16 +227,6 @@
     })
     @endif
 
-    @if(session('error'))
-    Swal.fire({
-        icon: 'success',
-        title: 'Guardado',
-        text: '¡Acción realizada satisfactoriamente!',
-        showConfirmButton: false,
-        timer: 1500
-    })
-    @endif
-
     @if(session('eliminar') == 'success')
     Swal.fire({
         icon: 'success',

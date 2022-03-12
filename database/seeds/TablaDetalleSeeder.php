@@ -652,7 +652,7 @@ class TablaDetalleSeeder extends Seeder
 
         $detalle = new Detalle();
         $detalle->descripcion = "MILLARES";
-        $detalle->simbolo = "MLL";
+        $detalle->simbolo = "MIL";
         $detalle->estado = 'ACTIVO';
         $detalle->tabla_id = 13;
         $detalle->save();

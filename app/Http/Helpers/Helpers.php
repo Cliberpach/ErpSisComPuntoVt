@@ -39,6 +39,8 @@ use Illuminate\Support\Facades\Log;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 use App\Movimientos\MovimientoAlmacen;
 use App\Notifications\FacturacionNotification;
+use App\Notifications\GuiaNotification;
+use App\Notifications\NotaNotification;
 use App\Notifications\RegularizeNotification;
 use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
@@ -1698,6 +1700,8 @@ if (!function_exists('refreshNotifications')) {
             Auth::user()->notify(new FacturacionNotification($documento));
         }
 
+        // Regularizaciones
+
         $regularizaciones =  DB::table('cotizacion_documento')
         ->select(
             'cotizacion_documento.*',
@@ -1717,10 +1721,44 @@ if (!function_exists('refreshNotifications')) {
 
         $regularizaciones = $regularizaciones->get();
 
-
         foreach($regularizaciones as $doc)
         {
             Auth::user()->notify(new RegularizeNotification($doc));
+        }
+
+        // Notas
+        $notas =  DB::table('nota_electronica')
+        ->select(
+            'nota_electronica.*',
+        )
+        ->whereIn('nota_electronica.tipDocAfectado', ['01', '03'])
+        ->where('nota_electronica.estado', '!=', 'ANULADO')
+        ->where('nota_electronica.sunat', '0');
+
+        if (!PuntoVenta() && !FullAccess()) {
+            $notas = $notas->where('user_id', Auth::user()->id);
+        }
+
+        $notas = $notas->orderBy('nota_electronica.id', 'desc')->get();
+        foreach ($notas as $nota) {
+            Auth::user()->notify(new NotaNotification($nota));
+        }
+
+        // Guia
+        $guias =  DB::table('guias_remision')
+        ->select(
+            'guias_remision.*',
+        )
+        ->where('guias_remision.estado', '!=', 'ANULADO')
+        ->where('guias_remision.sunat', '0');
+
+        if (!PuntoVenta() && !FullAccess()) {
+            $guias = $guias->where('user_id', Auth::user()->id);
+        }
+
+        $guias = $guias->orderBy('guias_remision.id', 'desc')->get();
+        foreach ($guias as $guia) {
+            Auth::user()->notify(new GuiaNotification($guia));
         }
     }
 }

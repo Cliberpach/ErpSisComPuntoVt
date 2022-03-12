@@ -40,7 +40,11 @@ class Documento extends Model
         'cotizacion_venta',
         'sunat',
         'envio_sunat',
+
         'getCdrResponse',
+        'regularize',
+        'getRegularizeResponse',
+        
         'correlativo',
         'banco_empresa_id',
         'serie',

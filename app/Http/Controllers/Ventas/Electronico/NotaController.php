@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Ventas\Electronico;
 
 use App\Almacenes\LoteProducto;
 use App\Almacenes\Producto;
+use App\Events\NotifySunatEvent;
 use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Mantenimiento\Empresa\Numeracion;
@@ -21,11 +22,14 @@ use Illuminate\Support\Facades\Validator;
 use Luecano\NumeroALetras\NumeroALetras;
 use Yajra\DataTables\Facades\DataTables;
 use Barryvdh\DomPDF\Facade as PDF;
+use stdClass;
 
 class NotaController extends Controller
 {
     public function index($id)
     {
+        $dato = "Message";
+        broadcast(new NotifySunatEvent($dato));
         $documento = Documento::find($id);
         return view('ventas.notas.index',compact('documento'));
     }
@@ -49,7 +53,7 @@ class NotaController extends Controller
                 'id' => $nota->id,
                 'tipo_venta' => $nota->documento->tipo_venta,
                 'documento_afectado' => $nota->numDocfectado,
-                'fecha_emision' =>  Carbon::parse($nota->fecha_emision)->format( 'd/m/Y'),
+                'fecha_emision' =>  $nota->fechaEmision,
                 'numero-sunat' =>  $nota->serie.'-'.$nota->correlativo,
                 'cliente' => $nota->tipo_documento_cliente.': '.$nota->documento_cliente.' - '.$nota->cliente,
                 'empresa' => $nota->empresa,
@@ -70,7 +74,8 @@ class NotaController extends Controller
         //NOTAS
         //CREDITO -> 0
         //DEBITO -> 1
-        if($request->nota === '0')
+        
+        if($request->nota == '0')
         {
             if( $request->nota_venta)
             {
@@ -209,6 +214,7 @@ class NotaController extends Controller
 
             $nota->value = self::convertirTotal($request->get('total'));
             $nota->code = '1000';
+            $nota->user_id = auth()->user()->id;
             $nota->save();
 
             //Llenado de los articulos
@@ -300,7 +306,7 @@ class NotaController extends Controller
             DB::commit();
             if(!isset($request->nota_venta))
             {
-                $envio_post = self::sunat_post($nota->id);
+               // $envio_post = self::sunat_post($nota->id);
             }
 
             $text = 'Nota de crédito creada, se creo un egreso con el monto de la nota de credito.';
@@ -524,7 +530,7 @@ class NotaController extends Controller
                 }
             })
             ->where('empresa_numeracion_facturaciones.empresa_id',$nota->empresa_id)
-            //->where('nota_electronica.sunat',"1")
+            ->whereIn('nota_electronica.tipDocAfectado', ['01', '03'])
             ->select('nota_electronica.*','empresa_numeracion_facturaciones.*')
             ->orderBy('nota_electronica.correlativo','DESC')
             ->get();
@@ -533,7 +539,7 @@ class NotaController extends Controller
             if (count($serie_comprobantes) === 1) {
                 //OBTENER EL DOCUMENTO INICIADO
                 $nota->correlativo = $numeracion->numero_iniciar;
-                $nota->serie = $nota->tipDocAfectado === '03' ? 'BB01' : 'FF01';//$numeracion->serie;
+                $nota->serie = $nota->tipDocAfectado == '03' ? 'BB01' : 'FF01';//$numeracion->serie;
                 $nota->update();
 
                 //ACTUALIZAR LA NUMERACION (SE REALIZO EL INICIO)
@@ -638,6 +644,8 @@ class NotaController extends Controller
                             "details" => self::obtenerProductos($detalles),
                             "legends" =>  self::obtenerLeyenda($nota),
                         );
+
+                        // return $arreglo_nota;
                         //OBTENER JSON DEL COMPROBANTE EL CUAL SE ENVIARA A SUNAT
                         $data = enviarNotaapi(json_encode($arreglo_nota));
 
@@ -645,90 +653,122 @@ class NotaController extends Controller
                         $json_sunat = json_decode($data);
 
                         if ($json_sunat->sunatResponse->success == true) {
+                            if($json_sunat->sunatResponse->cdrResponse->code == "0")
+                            {
+                                $nota->sunat = '1';
+                                $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                                $respuesta_cdr = json_decode($respuesta_cdr, true);
+                                $nota->getCdrResponse = $respuesta_cdr;
 
-                            $nota->sunat = '1';
+                                $data_comprobante = pdfNotaapi(json_encode($arreglo_nota));
+                                $name = $existe->get('numeracion')->serie . "-" . $nota->correlativo . '.pdf';
 
-                            $data_comprobante = pdfNotaapi(json_encode($arreglo_nota));
-                            $name = $existe->get('numeracion')->serie."-".$nota->correlativo.'.pdf';
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'));
+                                }
 
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'nota'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'nota'));
+                                }
+
+                                $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'nota' . DIRECTORY_SEPARATOR . $name);
+
+                                /*************************************** */
+                                $arreglo_qr = array(
+                                    "ruc" => $nota->ruc_empresa,
+                                    "tipo" => $nota->tipoDoc,
+                                    "serie" => $nota->serie,
+                                    "numero" => $nota->correlativo,
+                                    "emision" => self::obtenerFecha($nota->fechaEmision),
+                                    "igv" => 18,
+                                    "total" => floatval($nota->mtoImpVenta),
+                                    "clienteTipo" => $nota->cod_tipo_documento_cliente,
+                                    "clienteNumero" => $nota->documento_cliente
+                                );
+
+                                $data_qr = generarQrApi(json_encode($arreglo_qr), $nota->empresa_id);
+
+                                $name_qr = $nota->serie . "-" . $nota->correlativo . '.svg';
+
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs_nota'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs_nota'));
+                                }
+                                $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs_nota' . DIRECTORY_SEPARATOR . $name_qr);
+
+                                file_put_contents($pathToFile_qr, $data_qr);
+                                /*************************************** */
+
+                                file_put_contents($pathToFile, $data_comprobante);
+                                $nota->hash = $json_sunat->hash;
+                                $nota->ruta_qr = 'public/qrs_nota/' . $name_qr;
+                                $nota->nombre_comprobante_archivo = $name;
+                                $nota->ruta_comprobante_archivo = 'public/sunat/nota/' . $name;
+                                $nota->update();
+
+
+                                //Registro de actividad
+                                $descripcion = "SE AGREGÓ LA NOTA ELECTRONICA: " . $existe->get('numeracion')->serie . "-" . $nota->correlativo;
+                                $gestion = "NOTAS ELECTRONICAS";
+                                crearRegistro($nota, $descripcion, $gestion);
+
+                                Session::flash('success', 'Nota enviada a Sunat con exito.');
+                                return view('ventas.notas.index', [
+
+                                    'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
+                                    'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
+                                    'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
+                                    'sunat_exito' => true,
+                                    'documento' => $documento
+
+                                ])->with('sunat_exito', 'success');
                             }
+                            else {
+                                $nota->sunat = '0';
+                                $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
+                                $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'));
+                                $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                                $respuesta_error = json_decode($respuesta_error, true);
+                                $nota->getCdrResponse = $respuesta_error;
+
+                                $nota->update();
+                                Session::flash('error', 'Nota electronica sin exito en el envio a sunat.');
+                                $dato = "Message";
+                                broadcast(new NotifySunatEvent($dato));
+                                return view('ventas.notas.index', [
+                                    'id_sunat' =>  $id_sunat,
+                                    'descripcion_sunat' =>  $descripcion_sunat,
+                                    'sunat_error' => true,
+                                    'documento' => $documento
+                                ])->with('sunat_error', 'error');
                             }
-
-                            $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'.DIRECTORY_SEPARATOR.$name);
-
-                            /*************************************** */
-                            $arreglo_qr = array(
-                                "ruc" => $nota->ruc_empresa,
-                                "tipo" => $nota->tipoDoc,
-                                "serie" => $nota->serie,
-                                "numero" => $nota->correlativo,
-                                "emision" => self::obtenerFecha($nota->fechaEmision),
-                                "igv" => 18,
-                                "total" => floatval($nota->mtoImpVenta),
-                                "clienteTipo" => $nota->cod_tipo_documento_cliente,
-                                "clienteNumero" => $nota->documento_cliente
-                            );
-
-                            $data_qr = generarQrApi(json_encode($arreglo_qr), $nota->empresa_id);
-
-                            $name_qr = $nota->serie."-".$nota->correlativo.'.svg';
-
-                            if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'))) {
-                                mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'));
-                            }
-                            $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
-
-                            file_put_contents($pathToFile_qr, $data_qr);
-                            /*************************************** */
-
-                            file_put_contents($pathToFile, $data_comprobante);
-                            $nota->hash = $json_sunat->hash;
-                            $nota->ruta_qr = 'public/qrs_nota/'.$name_qr;
-                            $nota->nombre_comprobante_archivo = $name;
-                            $nota->ruta_comprobante_archivo = 'public/sunat/nota/'.$name;
-                            $nota->update();
-
-
-                            //Registro de actividad
-                            $descripcion = "SE AGREGÓ LA NOTA ELECTRONICA: ". $existe->get('numeracion')->serie."-".$nota->correlativo;
-                            $gestion = "NOTAS ELECTRONICAS";
-                            crearRegistro($nota , $descripcion , $gestion);
-
-                            Session::flash('success','Nota enviada a Sunat con exito.');
-                            return view('ventas.notas.index',[
-
-                                'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
-                                'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
-                                'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
-                                'sunat_exito' => true,
-                                'documento' =>$documento
-
-                            ])->with('sunat_exito', 'success');
-
                         }else{
 
                             //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                             $nota->sunat = '0';
-                            $nota->update();
+                            $nota->regularize = '1';
 
                             if ($json_sunat->sunatResponse->error) {
                                 $id_sunat = $json_sunat->sunatResponse->error->code;
                                 $descripcion_sunat = $json_sunat->sunatResponse->error->message;
-
-
+                                $obj_erro = new stdClass;
+                                $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                                $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                                $respuesta_error = json_encode($obj_erro, true);
+                                $respuesta_error = json_decode($respuesta_error, true);
+                                $nota->getRegularizeResponse = $respuesta_error;
                             }else {
                                 $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                                 $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-
+                                $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                                $respuesta_error = json_decode($respuesta_error, true);
+                                $nota->getCdrResponse = $respuesta_error;
                             };
 
-
+                            $nota->update();
                             Session::flash('error','Nota electronica sin exito en el envio a sunat.');
+                            $dato = "Message";
+                            broadcast(new NotifySunatEvent($dato));
                             return view('ventas.notas.index',[
                                 'id_sunat' =>  $id_sunat,
                                 'descripcion_sunat' =>  $descripcion_sunat,
@@ -830,84 +870,107 @@ class NotaController extends Controller
                 //RESPUESTA DE LA SUNAT EN JSON
                 $json_sunat = json_decode($data);
                 if ($json_sunat->sunatResponse->success == true) {
+                    if($json_sunat->sunatResponse->cdrResponse->code == "0") {
+                        $nota->sunat = '1';
+                        $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_cdr = json_decode($respuesta_cdr, true);
+                        $nota->getCdrResponse = $respuesta_cdr;
 
-                    $nota->sunat = '1';
+                        $data_comprobante = pdfNotaapi(json_encode($arreglo_nota));
+                        $name = $nota->serie . "-" . $nota->correlativo . '.pdf';
 
-                    $data_comprobante = pdfNotaapi(json_encode($arreglo_nota));
-                    $name = $nota->serie."-".$nota->correlativo.'.pdf';
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'));
+                        }
 
-                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
-                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'nota'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'nota'));
+                        }
+
+                        $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'nota' . DIRECTORY_SEPARATOR . $name);
+
+                        /*************************************** */
+                        $arreglo_qr = array(
+                            "ruc" => $nota->ruc_empresa,
+                            "tipo" => $nota->tipoDoc,
+                            "serie" => $nota->serie,
+                            "numero" => $nota->correlativo,
+                            "emision" => self::obtenerFecha($nota->fechaEmision),
+                            "igv" => 18,
+                            "total" => floatval($nota->mtoImpVenta),
+                            "clienteTipo" => $nota->cod_tipo_documento_cliente,
+                            "clienteNumero" => $nota->documento_cliente
+                        );
+
+                        $data_qr = generarQrApi(json_encode($arreglo_qr), $nota->empresa_id);
+
+                        $name_qr = $nota->serie . "-" . $nota->correlativo . '.svg';
+
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'));
+                        }
+
+                        if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs_nota'))) {
+                            mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs_nota'));
+                        }
+
+                        $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs_nota' . DIRECTORY_SEPARATOR . $name_qr);
+
+                        file_put_contents($pathToFile_qr, $data_qr);
+                        /*************************************** */
+
+                        file_put_contents($pathToFile, $data_comprobante);
+                        $nota->hash = $json_sunat->hash;
+                        $nota->ruta_qr = 'public/qrs_nota/' . $name_qr;
+                        $nota->nombre_comprobante_archivo = $name;
+                        $nota->ruta_comprobante_archivo = 'public/sunat/nota/' . $name;
+                        $nota->update();
+
+
+                        //Registro de actividad
+                        $descripcion = "SE AGREGÓ LA NOTA ELECTRONICA: " . $nota->serie . "-" . $nota->correlativo;
+                        $gestion = "NOTAS ELECTRONICAS";
+                        crearRegistro($nota, $descripcion, $gestion);
+
+                        return array('success' => true, 'mensaje' => 'Nota de crédito enviada a Sunat con exito.');
                     }
+                    else {
+                        $nota->sunat = '0';
+                        $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
+                        $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
-                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'))) {
-                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'));
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $nota->getCdrResponse = $respuesta_error;
+
+                        $nota->update();
+
+                        return array('success' => false, 'mensaje' => $descripcion_sunat);
                     }
-
-                    $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.'nota'.DIRECTORY_SEPARATOR.$name);
-
-                    /*************************************** */
-                    $arreglo_qr = array(
-                        "ruc" => $nota->ruc_empresa,
-                        "tipo" => $nota->tipoDoc,
-                        "serie" => $nota->serie,
-                        "numero" => $nota->correlativo,
-                        "emision" => self::obtenerFecha($nota->fechaEmision),
-                        "igv" => 18,
-                        "total" => floatval($nota->mtoImpVenta),
-                        "clienteTipo" => $nota->cod_tipo_documento_cliente,
-                        "clienteNumero" => $nota->documento_cliente
-                    );
-
-                    $data_qr = generarQrApi(json_encode($arreglo_qr), $nota->empresa_id);
-
-                    $name_qr = $nota->serie."-".$nota->correlativo.'.svg';
-
-                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
-                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
-                    }
-
-                    if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'))) {
-                        mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'));
-                    }
-
-                    $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs_nota'.DIRECTORY_SEPARATOR.$name_qr);
-
-                    file_put_contents($pathToFile_qr, $data_qr);
-                    /*************************************** */
-
-                    file_put_contents($pathToFile, $data_comprobante);
-                    $nota->hash = $json_sunat->hash;
-                    $nota->ruta_qr = 'public/qrs_nota/'.$name_qr;
-                    $nota->nombre_comprobante_archivo = $name;
-                    $nota->ruta_comprobante_archivo = 'public/sunat/nota/'.$name;
-                    $nota->update();
-
-
-                    //Registro de actividad
-                    $descripcion = "SE AGREGÓ LA NOTA ELECTRONICA: ". $nota->serie."-".$nota->correlativo;
-                    $gestion = "NOTAS ELECTRONICAS";
-                    crearRegistro($nota , $descripcion , $gestion);
-
-                    return array('success' => true,'mensaje' => 'Nota de crédito enviada a Sunat con exito.');
-
                 }else{
 
                     //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                     // $nota->correlativo = null;
                     // $nota->serie = null;
                     $nota->sunat = '0';
-                    $nota->update();
+                    $nota->regularize = '1';
 
                     if ($json_sunat->sunatResponse->error) {
                         $id_sunat = $json_sunat->sunatResponse->error->code;
                         $descripcion_sunat = $json_sunat->sunatResponse->error->message;
-
+                        $obj_erro = new stdClass;
+                        $obj_erro->code = $json_sunat->sunatResponse->error->code;
+                        $obj_erro->description = $json_sunat->sunatResponse->error->message;
+                        $respuesta_error = json_encode($obj_erro, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $nota->getRegularizeResponse = $respuesta_error;
 
                     }else {
                         $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                         $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
-
+                        $respuesta_error = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                        $respuesta_error = json_decode($respuesta_error, true);
+                        $nota->getCdrResponse = $respuesta_error;
                     };
 
 
@@ -917,6 +980,9 @@ class NotaController extends Controller
                     $errorNota->descripcion = 'Error al enviar a sunat';
                     $errorNota->ecxepcion = $descripcion_sunat;
                     $errorNota->save();
+
+
+                    $nota->update();
 
                     return array('success' => false, 'mensaje' => $descripcion_sunat);
                 }
