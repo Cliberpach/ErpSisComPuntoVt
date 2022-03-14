@@ -382,7 +382,16 @@ class DocumentoController extends Controller
             }
             $documento->update();
 
-
+            if ($documento->convertir) {
+                $doc_convertido = Documento::find($documento->convertir);
+                $doc_convertido->estado_pago = $documento->estado_pago;
+                $doc_convertido->importe = $documento->importe;
+                $doc_convertido->efectivo = $documento->efectivo;
+                $doc_convertido->tipo_pago_id = $documento->tipo_pago_id;
+                $doc_convertido->banco_empresa_id = $documento->banco_empresa_id;
+                $doc_convertido->ruta_pago = $documento->ruta_pago;
+                $doc_convertido->update();
+            }
 
             DB::commit();
             Session::flash('success', 'Pago editado con exito.');
