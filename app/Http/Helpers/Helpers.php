@@ -1441,7 +1441,7 @@ if (!function_exists('utilidad_mensual')) {
         $ventas = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get();
         $coleccion = collect();
         foreach ($ventas as $venta) {
-            if($venta->estado_pago == 'PAGADA'&& ifNoConvertido($ventas->id))
+            if($venta->estado_pago == 'PAGADA'&& ifNoConvertido($venta->id))
             {
                 $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
                 foreach ($detalles as $detalle) {
