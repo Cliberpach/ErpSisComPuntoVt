@@ -1441,19 +1441,21 @@ if (!function_exists('utilidad_mensual')) {
         $ventas = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get();
         $coleccion = collect();
         foreach ($ventas as $venta) {
-            $detalles = DocumentoDetalle::where('estado','ACTIVO')->where('documento_id',$venta->id)->get();
-            foreach($detalles as $detalle)
+            if($venta->estado_pago == 'PAGADA'&& ifNoConvertido($ventas->documento->id))
             {
-                $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio + ($detalle->lote->detalle_compra->costo_flete / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
-                $coleccion->push([
-                    "fecha_doc" => $venta->fecha_documento,
-                    "cantidad" => $detalle->cantidad,
-                    "producto" => $detalle->lote->producto->nombre,
-                    "precio_venta" => $detalle->precio_nuevo,
-                    "precio_compra" => number_format($precom, 2),
-                    "utilidad" => number_format($detalle->precio_nuevo - $precom,2),
-                    "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
-                ]);
+                $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
+                foreach ($detalles as $detalle) {
+                    $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
+                    $coleccion->push([
+                        "fecha_doc" => $venta->fecha_documento,
+                        "cantidad" => $detalle->cantidad,
+                        "producto" => $detalle->lote->producto->nombre,
+                        "precio_venta" => $detalle->precio_nuevo,
+                        "precio_compra" => $precom,
+                        "utilidad" => $detalle->precio_nuevo - $precom,
+                        "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
+                    ]);
+                }
             }
         }
 
