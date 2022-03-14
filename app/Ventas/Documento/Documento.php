@@ -41,6 +41,10 @@ class Documento extends Model
         'sunat',
         'envio_sunat',
 
+        'importe',
+        'efectivo',
+        'tipo_pago_id',
+
         'getCdrResponse',
         'regularize',
         'getRegularizeResponse',
@@ -291,16 +295,6 @@ class Documento extends Model
                     $cuenta_cliente->estado = 'ANULADO';
                     $cuenta_cliente->update();
                 }
-            }
-
-            if($documento->convertir)
-            {
-                $doc_convertido = Documento::find($documento->convertir);
-                $doc_convertido->estado_pago = $documento->estado_pago;
-                $doc_convertido->importe = $documento->importe;
-                $doc_convertido->efectivo = $documento->efectivo;
-                $doc_convertido->tipo_pago_id = $documento->tipo_pago_id;
-                $doc_convertido->update();
             }
         });
 
