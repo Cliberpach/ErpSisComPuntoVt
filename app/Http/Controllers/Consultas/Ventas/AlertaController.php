@@ -503,7 +503,7 @@ class AlertaController extends Controller
                 'nota_electronica.correlativo',
                 'nota_electronica.desMotivo as motivo',
                 'nota_electronica.cliente',
-            'nota_electronica.mtoImpVenta as monto',
+                'nota_electronica.mtoImpVenta as monto',
                 'nota_electronica.sunat',
                 'nota_electronica.regularize',
                 'nota_electronica.getCdrResponse',
