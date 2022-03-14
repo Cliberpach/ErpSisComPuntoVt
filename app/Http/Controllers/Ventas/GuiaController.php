@@ -620,14 +620,10 @@ class GuiaController extends Controller
                             crearRegistro($guia, $descripcion, $gestion);
 
                             Session::flash('success', 'Guia de remision enviada a Sunat con exito.');
-                            return view('ventas.guias.index', [
-
-                                'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
-                                'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
-                                'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
-                                'sunat_exito' => true
-
-                            ])->with('sunat_exito', 'success');
+                            Session::flash('sunat_exito', '1');
+                            Session::flash('id_sunat', $json_sunat->sunatResponse->cdrResponse->id);
+                            Session::flash('descripcion_sunat', $json_sunat->sunatResponse->cdrResponse->description,);
+                            return redirect()->route('ventas.guiasremision.index')->with('sunat_exito', 'success');
                         }
                         else {
                             $guia->sunat = '0';
@@ -639,15 +635,11 @@ class GuiaController extends Controller
                             $guia->getCdrResponse = $respuesta_error;
 
                             $guia->update();
-                            $dato = "Message";
-                            broadcast(new NotifySunatEvent($dato));
                             Session::flash('error', 'Guia de remision sin exito en el envio a sunat.');
-                            return view('ventas.guias.index', [
-                                'id_sunat' =>  $id_sunat,
-                                'descripcion_sunat' =>  $descripcion_sunat,
-                                'sunat_error' => true,
-
-                            ])->with('sunat_error', 'error');
+                            Session::flash('sunat_error', '1');
+                            Session::flash('id_sunat', $id_sunat);
+                            Session::flash('descripcion_sunat', $descripcion_sunat);
+                            return redirect()->route('ventas.guiasremision.index')->with('sunat_error', 'error');
                         }
                     } else{
 
@@ -674,15 +666,11 @@ class GuiaController extends Controller
                         };
 
                         $guia->update();
-                        $dato = "Message";
-                        broadcast(new NotifySunatEvent($dato));
-                        Session::flash('error','Guia de remision sin exito en el envio a sunat.');
-                        return view('ventas.guias.index',[
-                            'id_sunat' =>  $id_sunat,
-                            'descripcion_sunat' =>  $descripcion_sunat,
-                            'sunat_error' => true,
-
-                        ])->with('sunat_error', 'error');
+                        Session::flash('error', 'Guia de remision sin exito en el envio a sunat.');
+                        Session::flash('sunat_error', '1');
+                        Session::flash('id_sunat', $id_sunat);
+                        Session::flash('descripcion_sunat', $descripcion_sunat);
+                        return redirect()->route('ventas.guiasremision.index')->with('sunat_error', 'error');
                     }
                 }else{
                     $guia->sunat = '1';

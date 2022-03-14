@@ -289,15 +289,11 @@ class ComprobanteController extends Controller
                                 $gestion = "COMPROBANTES ELECTRONICOS";
                                 crearRegistro($documento , $descripcion , $gestion);
 
-                                Session::flash('success','Documento de Venta enviada a Sunat con exito.');
-                                return view('ventas.documentos.index',[
-
-                                    'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
-                                    'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
-                                    'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
-                                    'sunat_exito' => true
-
-                                ])->with('sunat_exito', 'success');
+                                Session::flash('success', 'Documento de Venta enviada a Sunat con exito.');
+                                Session::flash('sunat_exito', '1');
+                                Session::flash('id_sunat', $json_sunat->sunatResponse->cdrResponse->id);
+                                Session::flash('descripcion_sunat', $json_sunat->sunatResponse->cdrResponse->description,);
+                                return redirect()->route('ventas.documento.index')->with('sunat_exito', 'success');
                             }
                             else
                             {
@@ -310,15 +306,11 @@ class ComprobanteController extends Controller
                                 $documento->getCdrResponse = $respuesta_error;
 
                                 $documento->update();
-                                Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
-                                $dato = "Message";
-                                broadcast(new NotifySunatEvent($dato));
-                                return view('ventas.documentos.index',[
-                                    'id_sunat' =>  $id_sunat,
-                                    'descripcion_sunat' =>  $descripcion_sunat,
-                                    'sunat_error' => true,
-
-                                ])->with('sunat_error', 'error');
+                                Session::flash('error', 'Documento de Venta sin exito en el envio a sunat.');
+                                Session::flash('sunat_error', '1');
+                                Session::flash('id_sunat', $id_sunat);
+                                Session::flash('descripcion_sunat', $descripcion_sunat);
+                                return redirect()->route('ventas.documento.index')->with('sunat_error', 'error');
                             }
 
                         }else{
@@ -349,15 +341,11 @@ class ComprobanteController extends Controller
                             };
 
                             $documento->update();
-                            Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
-                            $dato = "Message";
-                            broadcast(new NotifySunatEvent($dato));
-                            return view('ventas.documentos.index',[
-                                'id_sunat' =>  $id_sunat,
-                                'descripcion_sunat' =>  $descripcion_sunat,
-                                'sunat_error' => true,
-
-                            ])->with('sunat_error', 'error');
+                            Session::flash('error', 'Documento de Venta sin exito en el envio a sunat.');
+                            Session::flash('sunat_error', '1');
+                            Session::flash('id_sunat', $id_sunat);
+                            Session::flash('descripcion_sunat', $descripcion_sunat);
+                            return redirect()->route('ventas.documento.index')->with('sunat_error', 'error');
                         }
                     }else{
                         $documento->sunat = '1';

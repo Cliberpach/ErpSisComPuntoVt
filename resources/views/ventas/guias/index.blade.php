@@ -305,32 +305,24 @@ function enviarSunat(id , sunat) {
 }
 
 
-@if(!empty($sunat_exito))
-    Swal.fire({
-        icon: 'success',
-        title: '{{$id_sunat}}',
-        text: '{{$descripcion_sunat}}',
-        showConfirmButton: false,
-        timer: 2500
-    })
-@endif
+    @if(Session::has('sunat_exito'))
+        Swal.fire({
+            icon: 'success',        
+            title: '{{ Session::get("id_sunat") }}',
+            text: '{{ Session::get("descripcion_sunat") }}',
+            showConfirmButton: false,
+            timer: 2500
+        })
+    @endif
 
-
-
-@if(!empty($sunat_error))
-    Swal.fire({
-        icon: 'error',
-        title: '{{$id_sunat}}',
-        text: '{{$descripcion_sunat}}',
-        showConfirmButton: false,
-        timer: 5500
-    })
-@endif
-
-
-
-
-
-
+    @if(Session::has('sunat_error'))
+        Swal.fire({
+            icon: 'error',
+            title: '{{ Session::get("id_sunat") }}',
+            text: '{{ Session::get("descripcion_sunat") }}',
+            showConfirmButton: false,
+            timer: 5500
+        })
+    @endif
 </script>
 @endpush

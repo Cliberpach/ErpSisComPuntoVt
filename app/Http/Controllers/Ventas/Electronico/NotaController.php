@@ -712,15 +712,10 @@ class NotaController extends Controller
                                 crearRegistro($nota, $descripcion, $gestion);
 
                                 Session::flash('success', 'Nota enviada a Sunat con exito.');
-                                return view('ventas.notas.index', [
-
-                                    'id_sunat' => $json_sunat->sunatResponse->cdrResponse->id,
-                                    'descripcion_sunat' => $json_sunat->sunatResponse->cdrResponse->description,
-                                    'notas_sunat' => $json_sunat->sunatResponse->cdrResponse->notes,
-                                    'sunat_exito' => true,
-                                    'documento' => $documento
-
-                                ])->with('sunat_exito', 'success');
+                                Session::flash('sunat_exito', '1');
+                                Session::flash('id_sunat', $json_sunat->sunatResponse->cdrResponse->id);
+                                Session::flash('descripcion_sunat', $json_sunat->sunatResponse->cdrResponse->description);
+                                return redirect()->route('ventas.notas', $documento->id)->with('sunat_exito', 'success');
                             }
                             else {
                                 $nota->sunat = '0';
@@ -732,15 +727,12 @@ class NotaController extends Controller
                                 $nota->getCdrResponse = $respuesta_error;
 
                                 $nota->update();
+                                
                                 Session::flash('error', 'Nota electronica sin exito en el envio a sunat.');
-                                $dato = "Message";
-                                broadcast(new NotifySunatEvent($dato));
-                                return view('ventas.notas.index', [
-                                    'id_sunat' =>  $id_sunat,
-                                    'descripcion_sunat' =>  $descripcion_sunat,
-                                    'sunat_error' => true,
-                                    'documento' => $documento
-                                ])->with('sunat_error', 'error');
+                                Session::flash('sunat_error', '1');
+                                Session::flash('id_sunat', $id_sunat);
+                                Session::flash('descripcion_sunat', $descripcion_sunat);
+                                return redirect()->route('ventas.notas', $documento->id)->with('sunat_error', 'error');
                             }
                         }else{
 
@@ -766,15 +758,11 @@ class NotaController extends Controller
                             };
 
                             $nota->update();
-                            Session::flash('error','Nota electronica sin exito en el envio a sunat.');
-                            $dato = "Message";
-                            broadcast(new NotifySunatEvent($dato));
-                            return view('ventas.notas.index',[
-                                'id_sunat' =>  $id_sunat,
-                                'descripcion_sunat' =>  $descripcion_sunat,
-                                'sunat_error' => true,
-                                'documento' =>$documento
-                            ])->with('sunat_error', 'error');
+                            Session::flash('error', 'Nota electronica sin exito en el envio a sunat.');
+                            Session::flash('sunat_error', '1');
+                            Session::flash('id_sunat', $id_sunat);
+                            Session::flash('descripcion_sunat', $descripcion_sunat);
+                            return redirect()->route('ventas.notas', $documento->id)->with('sunat_error', 'error');
                         }
                     }else{
                         $nota->sunat = '1';
