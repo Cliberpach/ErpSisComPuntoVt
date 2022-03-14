@@ -36,34 +36,33 @@ class AlertaController extends Controller
     {
         $fecha_hoy = Carbon::now()->toDateString();
         $consulta =  DB::table('cotizacion_documento')
-        ->join('tabladetalles','tabladetalles.id','=','cotizacion_documento.tipo_venta')
-        ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
-        ->select(
-            DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
-            'cotizacion_documento.id',
-            'cotizacion_documento.serie',
-            'cotizacion_documento.correlativo',
-            'cotizacion_documento.fecha_documento',
-            'cotizacion_documento.estado',
-            'tabladetalles.descripcion as tipo',
-            'clientes.nombre as cliente',
-            'cotizacion_documento.total as monto',
-            DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
-            'cotizacion_documento.sunat',
-            'cotizacion_documento.getCdrResponse',
-            DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.code"))),"-") as code'),
-            DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.description"))),"-") as description')
-        )
-        ->orderBy('cotizacion_documento.id','DESC')
-        ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
-        ->where('cotizacion_documento.estado', '!=','ANULADO')
-        ->where('cotizacion_documento.sunat','0')
-        ->where('cotizacion_documento.contingencia','0')
-        ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
+            ->join('tabladetalles', 'tabladetalles.id', '=', 'cotizacion_documento.tipo_venta')
+            ->join('clientes', 'clientes.id', '=', 'cotizacion_documento.cliente_id')
+            ->select(
+                DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
+                'cotizacion_documento.id',
+                'cotizacion_documento.serie',
+                'cotizacion_documento.correlativo',
+                'cotizacion_documento.fecha_documento',
+                'cotizacion_documento.estado',
+                'tabladetalles.descripcion as tipo',
+                'clientes.nombre as cliente',
+                'cotizacion_documento.total as monto',
+                DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
+                'cotizacion_documento.sunat',
+                'cotizacion_documento.getCdrResponse',
+                DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.code"))),"-") as code'),
+                DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.description"))),"-") as description')
+            )
+            ->orderBy('cotizacion_documento.id', 'DESC')
+            ->whereIn('cotizacion_documento.tipo_venta', ['127', '128'])
+            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('cotizacion_documento.sunat', '0')
+            ->where('cotizacion_documento.contingencia', '0')
+            ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
-        if(!PuntoVenta() && !FullAccess())
-        {
-            $consulta = $consulta->where('user_id',Auth::user()->id);
+        if (!PuntoVenta() && !FullAccess()) {
+            $consulta = $consulta->where('user_id', Auth::user()->id);
         }
 
         return datatables()->query(
@@ -80,35 +79,34 @@ class AlertaController extends Controller
     {
         $fecha_hoy = Carbon::now()->toDateString();
         $consulta =  DB::table('cotizacion_documento')
-        ->join('tabladetalles','tabladetalles.id','=','cotizacion_documento.tipo_venta')
-        ->join('clientes','clientes.id','=','cotizacion_documento.cliente_id')
-        ->select(
-            DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
-            'cotizacion_documento.id',
-            'cotizacion_documento.serie',
-            'cotizacion_documento.correlativo',
-            'cotizacion_documento.fecha_documento',
-            'cotizacion_documento.estado',
-            'tabladetalles.descripcion as tipo',
-            'clientes.nombre as cliente',
-            'cotizacion_documento.total as monto',
-            DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
-            'cotizacion_documento.sunat',
-            'cotizacion_documento.getRegularizeResponse',
-            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code'),
-            DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.description")) as description')
-        )
-        ->orderBy('cotizacion_documento.id','DESC')
-        ->whereIn('cotizacion_documento.tipo_venta',['127','128'])
-        ->where('cotizacion_documento.estado', '!=','ANULADO')
-        ->where('cotizacion_documento.sunat', '!=','2')
-        ->where('cotizacion_documento.contingencia', '0')
-        ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'),'1033')
-        ->where('cotizacion_documento.regularize','1');
+            ->join('tabladetalles', 'tabladetalles.id', '=', 'cotizacion_documento.tipo_venta')
+            ->join('clientes', 'clientes.id', '=', 'cotizacion_documento.cliente_id')
+            ->select(
+                DB::raw('(CONCAT(cotizacion_documento.serie, "-" , cotizacion_documento.correlativo)) as numero_doc'),
+                'cotizacion_documento.id',
+                'cotizacion_documento.serie',
+                'cotizacion_documento.correlativo',
+                'cotizacion_documento.fecha_documento',
+                'cotizacion_documento.estado',
+                'tabladetalles.descripcion as tipo',
+                'clientes.nombre as cliente',
+                'cotizacion_documento.total as monto',
+                DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
+                'cotizacion_documento.sunat',
+                'cotizacion_documento.getRegularizeResponse',
+                DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code'),
+                DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.description")) as description')
+            )
+            ->orderBy('cotizacion_documento.id', 'DESC')
+            ->whereIn('cotizacion_documento.tipo_venta', ['127', '128'])
+            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('cotizacion_documento.sunat', '!=', '2')
+            ->where('cotizacion_documento.contingencia', '0')
+            ->where(DB::raw('JSON_EXTRACT(cotizacion_documento.getRegularizeResponse, "$.code")'), '1033')
+            ->where('cotizacion_documento.regularize', '1');
 
-        if(!PuntoVenta() && !FullAccess())
-        {
-            $consulta = $consulta->where('user_id',Auth::user()->id);
+        if (!PuntoVenta() && !FullAccess()) {
+            $consulta = $consulta->where('user_id', Auth::user()->id);
         }
 
         return datatables()->query(
@@ -122,7 +120,7 @@ class AlertaController extends Controller
         $convertir = $formatter->toInvoice($documento->total, 2, 'SOLES');
 
         //CREAR LEYENDA DEL COMPROBANTE
-        $arrayLeyenda = Array();
+        $arrayLeyenda = array();
         $arrayLeyenda[] = array(
             "code" => "1000",
             "value" => $convertir
@@ -132,14 +130,14 @@ class AlertaController extends Controller
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('documento_id',$id)->where('eliminado', '0')->where('estado', 'ACTIVO')->get();
-        $arrayProductos = Array();
-        for($i = 0; $i < count($detalles); $i++){
+        $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->where('estado', 'ACTIVO')->get();
+        $arrayProductos = array();
+        for ($i = 0; $i < count($detalles); $i++) {
 
             $arrayProductos[] = array(
                 "codProducto" => $detalles[$i]->codigo_producto,
                 "unidad" => $detalles[$i]->unidad,
-                "descripcion"=> $detalles[$i]->nombre_producto.' - '.$detalles[$i]->codigo_lote,
+                "descripcion" => $detalles[$i]->nombre_producto . ' - ' . $detalles[$i]->codigo_lote,
                 "cantidad" => (float)$detalles[$i]->cantidad,
                 "mtoValorUnitario" => (float)($detalles[$i]->precio_nuevo / 1.18),
                 "mtoValorVenta" => (float)($detalles[$i]->valor_venta / 1.18),
@@ -159,10 +157,9 @@ class AlertaController extends Controller
     public function obtenerCuotas($id)
     {
         $documento = Documento::find($id);
-        $arrayCuotas = Array();
+        $arrayCuotas = array();
         $condicion = Condicion::find($documento->condicion_id);
-        if(strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO')
-        {
+        if (strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO') {
             $arrayCuotas[] = array(
                 "moneda" => "PEN",
                 "monto" => (float)$documento->total,
@@ -191,7 +188,7 @@ class AlertaController extends Controller
         $date = strtotime($fecha);
         $fecha_emision = date('Y-m-d', $date);
         $hora_emision = date('H:i:s', $date);
-        $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
+        $fecha = $fecha_emision . 'T' . $hora_emision . '-05:00';
 
         return $fecha;
     }
@@ -201,7 +198,7 @@ class AlertaController extends Controller
         $date = strtotime($documento->fecha_documento);
         $fecha_emision = date('Y-m-d', $date);
         $hora_emision = date('H:i:s', $date);
-        $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
+        $fecha = $fecha_emision . 'T' . $hora_emision . '-05:00';
 
         return $fecha;
     }
@@ -211,25 +208,24 @@ class AlertaController extends Controller
         $date = strtotime($documento->fecha_vencimiento);
         $fecha_emision = date('Y-m-d', $date);
         $hora_emision = date('H:i:s', $date);
-        $fecha = $fecha_emision.'T'.$hora_emision.'-05:00';
+        $fecha = $fecha_emision . 'T' . $hora_emision . '-05:00';
 
         return $fecha;
     }
 
     public function sunat($id)
     {
-        try
-        {
+        try {
             $documento = Documento::findOrFail($id);
             //OBTENER CORRELATIVO DEL COMPROBANTE ELECTRONICO
             $existe = event(new DocumentoNumeracion($documento));
-            if($existe[0]){
+            if ($existe[0]) {
                 if ($existe[0]->get('existe') == true) {
                     if ($documento->sunat != '1') {
                         //ARREGLO COMPROBANTE
                         $arreglo_comprobante = array(
                             "tipoOperacion" => $documento->tipoOperacion(),
-                            "tipoDoc"=> $documento->tipoDocumento(),
+                            "tipoDoc" => $documento->tipoDocumento(),
                             "serie" => $existe[0]->get('numeracion')->serie,
                             "correlativo" => $documento->correlativo,
                             "fechaEmision" => self::obtenerFechaEmision($documento),
@@ -255,7 +251,8 @@ class AlertaController extends Controller
                                 "razonSocial" => $documento->empresa,
                                 "address" => array(
                                     "direccion" => $documento->direccion_fiscal_empresa,
-                                )),
+                                )
+                            ),
                             "mtoOperGravadas" => (float)$documento->sub_total,
                             "mtoOperExoneradas" => 0,
                             "mtoIGV" => (float)$documento->total_igv,
@@ -277,29 +274,28 @@ class AlertaController extends Controller
                         $json_sunat = json_decode($data);
 
                         if ($json_sunat->sunatResponse->success == true) {
-                            if($json_sunat->sunatResponse->cdrResponse->code == "0")
-                            {
+                            if ($json_sunat->sunatResponse->cdrResponse->code == "0") {
                                 $documento->sunat = '1';
                                 $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
                                 $respuesta_cdr = json_decode($respuesta_cdr, true);
                                 $documento->getCdrResponse = $respuesta_cdr;
 
                                 $data_comprobante = generarComprobanteapi(json_encode($arreglo_comprobante), $documento->empresa_id);
-                                $name = $documento->serie."-".$documento->correlativo.'.pdf';
+                                $name = $documento->serie . "-" . $documento->correlativo . '.pdf';
 
                                 $data_cdr = base64_decode($json_sunat->sunatResponse->cdrZip);
-                                $name_cdr = 'R-'.$documento->serie."-".$documento->correlativo.'.zip';
+                                $name_cdr = 'R-' . $documento->serie . "-" . $documento->correlativo . '.zip';
 
-                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'))) {
-                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'));
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat'));
                                 }
 
-                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'))) {
-                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'));
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'cdr'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'cdr'));
                                 }
 
-                                $pathToFile = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'sunat'.DIRECTORY_SEPARATOR.$name);
-                                $pathToFile_cdr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'cdr'.DIRECTORY_SEPARATOR.$name_cdr);
+                                $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . $name);
+                                $pathToFile_cdr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'cdr' . DIRECTORY_SEPARATOR . $name_cdr);
 
                                 file_put_contents($pathToFile, $data_comprobante);
                                 file_put_contents($pathToFile_cdr, $data_cdr);
@@ -319,23 +315,23 @@ class AlertaController extends Controller
                                 /********************************/
                                 $data_qr = generarQrApi(json_encode($arreglo_qr), $documento->empresa_id);
 
-                                $name_qr = $documento->serie."-".$documento->correlativo.'.svg';
+                                $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
 
-                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'))) {
-                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'));
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs'));
                                 }
 
-                                $pathToFile_qr = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'qrs'.DIRECTORY_SEPARATOR.$name_qr);
+                                $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
 
                                 file_put_contents($pathToFile_qr, $data_qr);
 
                                 /********************************/
 
                                 $data_xml = generarXmlapi(json_encode($arreglo_comprobante), $documento->empresa_id);
-                                $name_xml = $documento->serie.'-'.$documento->correlativo.'.xml';
-                                $pathToFile_xml = storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'.DIRECTORY_SEPARATOR.$name_xml);
-                                if(!file_exists(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'))) {
-                                    mkdir(storage_path('app'.DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR.'xml'));
+                                $name_xml = $documento->serie . '-' . $documento->correlativo . '.xml';
+                                $pathToFile_xml = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . $name_xml);
+                                if (!file_exists(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml'))) {
+                                    mkdir(storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'xml'));
                                 }
                                 file_put_contents($pathToFile_xml, $data_xml);
 
@@ -344,17 +340,17 @@ class AlertaController extends Controller
                                 $documento->nombre_comprobante_archivo = $name;
                                 $documento->hash = $json_sunat->hash;
                                 $documento->xml = $name_xml;
-                                $documento->ruta_comprobante_archivo = 'public/sunat/'.$name;
-                                $documento->ruta_qr = 'public/qrs/'.$name_qr;
+                                $documento->ruta_comprobante_archivo = 'public/sunat/' . $name;
+                                $documento->ruta_qr = 'public/qrs/' . $name_qr;
                                 $documento->update();
 
 
                                 //Registro de actividad
-                                $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: ". $documento->serie."-".$documento->correlativo;
+                                $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: " . $documento->serie . "-" . $documento->correlativo;
                                 $gestion = "COMPROBANTES ELECTRONICOS";
-                                crearRegistro($documento , $descripcion , $gestion);
+                                crearRegistro($documento, $descripcion, $gestion);
 
-                                Session::flash('success','Documento de Venta enviada a Sunat con exito.');
+                                Session::flash('success', 'Documento de Venta enviada a Sunat con exito.');
                                 Session::flash('sunat_exito', '1');
                                 Session::flash('id_sunat', $json_sunat->sunatResponse->cdrResponse->id);
                                 Session::flash('descripcion_sunat', $json_sunat->sunatResponse->cdrResponse->description,);
@@ -368,9 +364,7 @@ class AlertaController extends Controller
 
                                 // ])->with('sunat_exito', 'success');
 
-                            }
-                            else
-                            {
+                            } else {
                                 $documento->sunat = '0';
 
                                 $id_sunat = $json_sunat->sunatResponse->cdrResponse->code;
@@ -381,7 +375,7 @@ class AlertaController extends Controller
                                 $documento->getCdrResponse = $respuesta_error;
 
                                 $documento->update();
-                                Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
+                                Session::flash('error', 'Documento de Venta sin exito en el envio a sunat.');
                                 Session::flash('sunat_error', '1');
                                 Session::flash('id_sunat', $id_sunat);
                                 Session::flash('descripcion_sunat', $descripcion_sunat);
@@ -395,7 +389,7 @@ class AlertaController extends Controller
 
                                 // ])->with('sunat_error', 'error');
                             }
-                        }else{
+                        } else {
 
                             //COMO SUNAT NO LO ADMITE VUELVE A SER 0
                             $documento->sunat = '0';
@@ -411,9 +405,7 @@ class AlertaController extends Controller
                                 $respuesta_error = json_encode($obj_erro, true);
                                 $respuesta_error = json_decode($respuesta_error, true);
                                 $documento->getRegularizeResponse = $respuesta_error;
-
-
-                            }else {
+                            } else {
                                 $id_sunat = $json_sunat->sunatResponse->cdrResponse->id;
                                 $descripcion_sunat = $json_sunat->sunatResponse->cdrResponse->description;
 
@@ -423,7 +415,7 @@ class AlertaController extends Controller
                             };
 
                             $documento->update();
-                            Session::flash('error','Documento de Venta sin exito en el envio a sunat.');
+                            Session::flash('error', 'Documento de Venta sin exito en el envio a sunat.');
                             Session::flash('sunat_error', '1');
                             Session::flash('id_sunat', $id_sunat);
                             Session::flash('descripcion_sunat', $descripcion_sunat);
@@ -435,23 +427,21 @@ class AlertaController extends Controller
 
                             // ])->with('sunat_error', 'error');
                         }
-                    }else{
+                    } else {
                         $documento->sunat = '1';
                         $documento->update();
-                        Session::flash('error','Documento de venta fue enviado a Sunat.');
+                        Session::flash('error', 'Documento de venta fue enviado a Sunat.');
                         return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
                     }
-                }else{
-                    Session::flash('error','Tipo de Comprobante no registrado en la empresa.');
+                } else {
+                    Session::flash('error', 'Tipo de Comprobante no registrado en la empresa.');
                     return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
                 }
-            }else{
-                Session::flash('error','Empresa sin parametros para emitir comprobantes electronicos');
+            } else {
+                Session::flash('error', 'Empresa sin parametros para emitir comprobantes electronicos');
                 return redirect()->route('consultas.ventas.alerta.envio');
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             $documento = Documento::findOrFail($id);
             $documento->regularize = '1';
             $documento->sunat = '0';
@@ -466,71 +456,65 @@ class AlertaController extends Controller
             Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.');
             return redirect()->route('consultas.ventas.alerta.envio');
         }
-
     }
 
     public function cdr($id)
     {
 
-        try
-        {
+        try {
             $documento = Documento::findOrFail($id);
             $json_data = json_decode($documento->getRegularizeResponse, false);
-            if($documento->regularize == '1' && $json_data->code == '1033')
-            {
+            if ($documento->regularize == '1' && $json_data->code == '1033') {
                 $documento->regularize = '0';
                 $documento->sunat = '1';
                 $documento->update();
-                Session::flash('success','Documento de Venta regularizado con exito.');
-                return view('consultas.ventas.alertas.regularize',[
+                Session::flash('success', 'Documento de Venta regularizado con exito.');
+                return view('consultas.ventas.alertas.regularize', [
 
-                    'id_sunat' => $documento->serie.'-'.$documento->correlativo,
+                    'id_sunat' => $documento->serie . '-' . $documento->correlativo,
                     'descripcion_sunat' => 'CDR regularizado.',
                     'notas_sunat' => '',
                     'sunat_exito' => true
 
                 ])->with('sunat_exito', 'success');
-            }
-            else
-            {
-                Session::flash('error','Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
+            } else {
+                Session::flash('error', 'Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
                 return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_existe', 'error');
             }
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             Session::flash('error', 'No se puede conectar con el servidor, porfavor intentar nuevamente.'); //$e->getMessage()
             return redirect()->route('consultas.ventas.alerta.regularize');
         }
-
     }
 
-    public function notas() {
+    public function notas()
+    {
         $dato = "Message";
         broadcast(new NotifySunatEvent($dato));
         return view('consultas.ventas.alertas.notas');
     }
 
-    public function getTableNotas() {
+    public function getTableNotas()
+    {
         $consulta = DB::table('nota_electronica')
-        ->select(
-            'nota_electronica.id',
-            'nota_electronica.serie',
-            'nota_electronica.correlativo',
-            'nota_electronica.desMotivo as motivo',
-            'nota_electronica.cliente',
-            'nota_electronica.mtoOperGravadas as monto',
-            'nota_electronica.sunat',
-            'nota_electronica.regularize',
-            'nota_electronica.getCdrResponse',
-            'nota_electronica.fechaEmision as fecha',
-            DB::raw('json_unquote(json_extract(nota_electronica.getRegularizeResponse, "$.code")) as code_regularize'),
-            DB::raw('ifnull((json_unquote(json_extract(nota_electronica.getCdrResponse, "$.code"))),"-") as code'),
-            DB::raw('ifnull((json_unquote(json_extract(nota_electronica.getCdrResponse, "$.description"))),"-") as description')
-        )
-        ->whereIn('nota_electronica.tipDocAfectado', ['01', '03'])
-        ->where('nota_electronica.estado', '!=', 'ANULADO')
-        ->where('nota_electronica.sunat', '0');
+            ->select(
+                'nota_electronica.id',
+                'nota_electronica.serie',
+                'nota_electronica.correlativo',
+                'nota_electronica.desMotivo as motivo',
+                'nota_electronica.cliente',
+                'nota_electronica.mtoOperGravadas as monto',
+                'nota_electronica.sunat',
+                'nota_electronica.regularize',
+                'nota_electronica.getCdrResponse',
+                'nota_electronica.fechaEmision as fecha',
+                DB::raw('ifnull((json_unquote(json_extract(nota_electronica.getRegularizeResponse, "$.code"))),"-") as code_regularize'),
+                DB::raw('ifnull((json_unquote(json_extract(nota_electronica.getCdrResponse, "$.code"))),"-") as code'),
+                DB::raw('ifnull((json_unquote(json_extract(nota_electronica.getCdrResponse, "$.description"))),"-") as description')
+            )
+            ->whereIn('nota_electronica.tipDocAfectado', ['01', '03'])
+            ->where('nota_electronica.estado', '!=', 'ANULADO')
+            ->where('nota_electronica.sunat', '0');
 
         if (!PuntoVenta() && !FullAccess()) {
             $consulta = $consulta->where('user_id', Auth::user()->id);
@@ -787,7 +771,8 @@ class AlertaController extends Controller
         return $fecha;
     }
 
-    public function guias() {
+    public function guias()
+    {
         $dato = "Message";
         broadcast(new NotifySunatEvent($dato));
         return view('consultas.ventas.alertas.guias');
@@ -796,24 +781,24 @@ class AlertaController extends Controller
     public function getTableGuias()
     {
         $consulta =  DB::table('guias_remision')
-        ->select(
-            'guias_remision.id',
-            'guias_remision.serie',
-            'guias_remision.correlativo',
-            'guias_remision.documento_cliente',
-            'guias_remision.cliente',
-            'guias_remision.sunat',
-            'guias_remision.cantidad_productos',
-            'guias_remision.peso_productos',
-            'guias_remision.regularize',
-            'guias_remision.getCdrResponse',
-            DB::raw('DATE_FORMAT(guias_remision.created_at, "%Y-%m-%d") as fecha'),
-            DB::raw('json_unquote(json_extract(guias_remision.getRegularizeResponse, "$.code")) as code_regularize'),
-            DB::raw('ifnull((json_unquote(json_extract(guias_remision.getCdrResponse, "$.code"))),"-") as code'),
-            DB::raw('ifnull((json_unquote(json_extract(guias_remision.getCdrResponse, "$.description"))),"-") as description')
-        )
-        ->where('guias_remision.estado', '!=', 'ANULADO')
-        ->where('guias_remision.sunat', '0');
+            ->select(
+                'guias_remision.id',
+                'guias_remision.serie',
+                'guias_remision.correlativo',
+                'guias_remision.documento_cliente',
+                'guias_remision.cliente',
+                'guias_remision.sunat',
+                'guias_remision.cantidad_productos',
+                'guias_remision.peso_productos',
+                'guias_remision.regularize',
+                'guias_remision.getCdrResponse',
+                DB::raw('DATE_FORMAT(guias_remision.created_at, "%Y-%m-%d") as fecha'),
+                DB::raw('ifnull((json_unquote(json_extract(guias_remision.getRegularizeResponse, "$.code"))),"-") as code_regularize'),
+                DB::raw('ifnull((json_unquote(json_extract(guias_remision.getCdrResponse, "$.code"))),"-") as code'),
+                DB::raw('ifnull((json_unquote(json_extract(guias_remision.getCdrResponse, "$.description"))),"-") as description')
+            )
+            ->where('guias_remision.estado', '!=', 'ANULADO')
+            ->where('guias_remision.sunat', '0');
 
         if (!PuntoVenta() && !FullAccess()) {
             $consulta = $consulta->where('user_id', Auth::user()->id);
@@ -916,7 +901,7 @@ class AlertaController extends Controller
                     Session::flash('success', 'Guia de remision enviada a Sunat con exito.');
                     Session::flash('sunat_exito', '1');
                     Session::flash('id_sunat', $json_sunat->sunatResponse->cdrResponse->id);
-                    Session::flash('descripcion_sunat',$json_sunat->sunatResponse->cdrResponse->description,);
+                    Session::flash('descripcion_sunat', $json_sunat->sunatResponse->cdrResponse->description,);
                     return redirect()->route('consultas.ventas.alerta.guias')->with('sunat_exito', 'success');
                     // return view('consultas.ventas.alertas.guias', [
 
@@ -942,7 +927,7 @@ class AlertaController extends Controller
                     Session::flash('id_sunat', $id_sunat);
                     Session::flash('descripcion_sunat', $descripcion_sunat);
                     return redirect()->route('consultas.ventas.alerta.guias')->with('sunat_error', 'error');
-                    
+
                     // Session::flash('error', 'Guia de remision sin exito en el envio a sunat.');
                     // return view('consultas.ventas.alertas.guias', [
                     //     'id_sunat' =>  $id_sunat,
