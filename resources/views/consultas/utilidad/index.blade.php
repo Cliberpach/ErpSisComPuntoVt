@@ -177,8 +177,8 @@
                 let respuesta = value.data;
                 $('#inversion_dolar').text(respuesta.inversion_mensual_dolares.toFixed(2));
                 $('#inversion_soles').text(respuesta.inversion_mensual.toFixed(2));
-                $('#venta_dolar').text(respuesta.ventas_mensual_dolares.toFixed(2));
-                $('#venta_soles').text(respuesta.ventas_mensual.toFixed(2));
+                $('#ventas_dolar').text(respuesta.ventas_mensual_dolares.toFixed(2));
+                $('#ventas_soles').text(respuesta.ventas_mensual.toFixed(2));
                 $('#utilidad_dolar').text(respuesta.utilidad_mensual_dolares.toFixed(2));
                 $('#utilidad_soles').text(respuesta.utilidad_mensual.toFixed(2));
                 $('#porcentaje_dolar').text(respuesta.porcentaje.toFixed(2)+'%');

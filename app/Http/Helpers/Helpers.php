@@ -1427,7 +1427,7 @@ if (!function_exists('ventas_mensual')) {
         $fecha_hoy = Carbon::now();
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
-        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
+        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get()->sum('total');
         return (float)$total;
     }
 }
@@ -1435,7 +1435,7 @@ if (!function_exists('ventas_mensual')) {
 if (!function_exists('ventas_mensual_random')) {
     function ventas_mensual_random($mes,$anio)
     {
-        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
+        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get()->sum('total');
         return (float)$total;
     }
 }
