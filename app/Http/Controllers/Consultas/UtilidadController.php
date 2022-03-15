@@ -3,19 +3,70 @@
 namespace App\Http\Controllers\Consultas;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UtilidadController extends Controller
 {
     public function index()
     {
         $this->authorize('haveaccess','utilidad_mensual.index');
-        $inversion_mensual = compras_mensual();
-        $ventas_mensual = ventas_mensual();
-        $utilidad_mensual = utilidad_mensual();
+
+        $lstAnios = DB::table('lote_productos')->select(DB::raw('year(created_at) as value'))->distinct()->orderBy('value', 'desc')->get();
+
+        $fecha_hoy = Carbon::now();
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+
+        return view('consultas.utilidad.index',[
+            'lstAnios' => $lstAnios,
+            'mes' => $mes,
+            'anio_' => $anio,
+        ]);
+    }
+
+    public function getDatos($mes, $anio)
+    {
+        $fecini = $anio . '-' . $mes . '-01';
+        $fecini = date('Y-m-d', strtotime($fecini));
+        $fecfin = date('Y-m-d', strtotime($fecini . "+ 1 month"));
+ 
+        $inversion_compleja =  DB::table('productos')
+        ->join('categorias', 'categorias.id', '=', 'productos.categoria_id')
+        ->join('marcas', 'marcas.id', '=', 'productos.marca_id')
+        ->select(
+            'productos.id',
+            'productos.nombre',
+            'categorias.descripcion as categoria',
+            'marcas.marca',
+            DB::raw("(
+                (
+                    ifnull((SELECT sum(ddc.cantidad * ddc.precio_soles) from compra_documento_detalles ddc INNER JOIN compra_documentos dc ON ddc.documento_id = dc.id WHERE dc.fecha_emision < '{$fecini}' AND ddc.producto_id = productos.id AND dc.estado != 'ANULADO'),0) +
+                    ifnull((SELECT sum(dni.cantidad * dni.costo_soles) from detalle_nota_ingreso dni INNER JOIN nota_ingreso ni ON dni.nota_ingreso_id = ni.id WHERE ni.fecha < '{$fecini}' AND dni.producto_id = productos.id AND ni.estado != 'ANULADO'),0) -
+                    ifnull((SELECT SUM(ddv.cantidad * ddv.precio_nuevo) FROM cotizacion_documento_detalles ddv INNER JOIN cotizacion_documento dv ON ddv.documento_id = dv.id INNER JOIN lote_productos lp ON ddv.lote_id = lp.id WHERE dv.fecha_documento < '{$fecini}' AND dv.estado != 'ANULADO' AND lp.producto_id = productos.id AND ddv.eliminado = '0'),0) -
+                    ifnull((SELECT SUM(ddv.cantidad * ddv.precio_nuevo) FROM cotizacion_documento_detalles ddv INNER JOIN cotizacion_documento dv ON ddv.documento_id = dv.id INNER JOIN lote_productos lp ON ddv.lote_id = lp.id WHERE dv.fecha_documento < '{$fecini}' AND dv.estado != 'ANULADO' AND lp.producto_id = productos.id AND dv.tipo_venta != '129' AND dv.convertir != '' AND ddv.eliminado = '0'),0) -
+                    ifnull((SELECT SUM(dns.cantidad * productos.precio_compra) FROM detalle_nota_salidad dns INNER JOIN nota_salidad ns ON dns.nota_salidad_id = ns.id WHERE ns.fecha < '{$fecini}' AND ns.estado != 'ANULADO' AND dns.producto_id = productos.id),0) +
+                    ifnull((SELECT SUM(ned.cantidad * ned.mtoPrecioUnitario) FROM nota_electronica_detalle ned INNER JOIN nota_electronica ne ON ned.nota_id = ne.id INNER JOIN cotizacion_documento_detalles cdd ON cdd.id = ned.detalle_id INNER JOIN lote_productos lpn ON lpn.id = cdd.lote_id WHERE ne.fechaEmision < '{$fecini}' AND ne.estado != 'ANULADO' AND lpn.producto_id = productos.id),0)
+                ) -
+                (
+                    ifnull((SELECT SUM(vdd.cantidad * vdd.precio_nuevo) from cotizacion_documento_detalles vdd INNER JOIN cotizacion_documento vd ON vdd.documento_id = vd.id INNER JOIN lote_productos lp ON vdd.lote_id = lp.id WHERE vd.fecha_documento >= '{$fecini}' and vd.fecha_documento <= '{$fecfin}' AND vd.estado != 'ANULADO' AND lp.producto_id = productos.id AND vdd.eliminado = '0'),0) -
+                    ifnull((SELECT SUM(vdd.cantidad * vdd.precio_nuevo) from cotizacion_documento_detalles vdd INNER JOIN cotizacion_documento vd ON vdd.documento_id = vd.id INNER JOIN lote_productos lp ON vdd.lote_id = lp.id WHERE vd.fecha_documento >= '{$fecini}' and vd.fecha_documento <= '{$fecfin}' AND vd.estado != 'ANULADO' AND lp.producto_id = productos.id AND vd.tipo_venta != '129' AND vd.convertir != '' AND vdd.eliminado = '0'),0) +
+                    ifnull((SELECT SUM(dns.cantidad * productos.precio_compra) FROM detalle_nota_salidad dns INNER JOIN nota_salidad ns ON dns.nota_salidad_id = ns.id WHERE ns.fecha >= '{$fecini}' AND ns.fecha <= '{$fecfin}' AND ns.estado != 'ANULADO' AND dns.producto_id = productos.id),0)
+                ) +
+                ifnull((SELECT SUM(cdd.cantidad * cdd.precio_soles) from compra_documento_detalles cdd INNER JOIN compra_documentos cd ON cdd.documento_id = cd.id WHERE cd.fecha_emision >= '{$fecini}' AND cd.fecha_emision <= '{$fecfin}' AND cd.estado != 'ANULADO' AND cdd.producto_id = productos.id),0) +
+                ifnull((SELECT sum(dni.cantidad * dni.costo_soles) from detalle_nota_ingreso dni INNER JOIN nota_ingreso ni ON dni.nota_ingreso_id = ni.id WHERE ni.fecha >= '{$fecini}' AND ni.fecha <= '{$fecfin}' AND dni.producto_id = productos.id AND ni.estado != 'ANULADO'),0) +
+                ifnull((SELECT SUM(ned.cantidad * ned.mtoPrecioUnitario) FROM nota_electronica_detalle ned INNER JOIN nota_electronica ne ON ned.nota_id = ne.id INNER JOIN cotizacion_documento_detalles cdd ON cdd.id = ned.detalle_id INNER JOIN lote_productos lpn ON lpn.id = cdd.lote_id WHERE ne.fechaEmision >= '{$fecini}' AND ne.fechaEmision <= '{$fecfin}' AND  ne.estado != 'ANULADO' AND lpn.producto_id = productos.id),0)
+            ) as inversion")
+        )
+        ->orderBy('productos.codigo','desc')
+        ->get();
+
+        $inversion_mensual = $inversion_compleja->sum('inversion');
+        $ventas_mensual = ventas_mensual_random($mes,$anio);
+        $utilidad_mensual = utilidad_mensual_random($mes,$anio);
         $porcentaje = 0;
-        if($ventas_mensual > 0)
-        {
+        if ($ventas_mensual > 0) {
             $porcentaje = ($utilidad_mensual * 100) / $ventas_mensual;
         }
 
@@ -28,14 +79,14 @@ class UtilidadController extends Controller
         $ventas_mensual_dolares = $ventas_mensual / $dolar;
         $utilidad_mensual_dolares = $utilidad_mensual / $dolar;
 
-        return view('consultas.utilidad.index',[
-            'inversion_mensual' => number_format($inversion_mensual, 2),
-            'inversion_mensual_dolares' => number_format($inversion_mensual_dolares, 2),
-            'ventas_mensual' => number_format($ventas_mensual, 2),
-            'ventas_mensual_dolares' => number_format($ventas_mensual_dolares, 2),
-            'utilidad_mensual' => number_format($utilidad_mensual, 2),
-            'utilidad_mensual_dolares' => number_format($utilidad_mensual_dolares, 2),
-            'porcentaje' => number_format($porcentaje, 2),
+        return response()->json([
+            'inversion_mensual' => $inversion_mensual,
+            'ventas_mensual' => $ventas_mensual,
+            'utilidad_mensual' => $utilidad_mensual,
+            'inversion_mensual_dolares' => $inversion_mensual_dolares,
+            'ventas_mensual_dolares' => $ventas_mensual_dolares,
+            'utilidad_mensual_dolares' => $utilidad_mensual_dolares,
+            'porcentaje' => $porcentaje,
         ]);
     }
 }

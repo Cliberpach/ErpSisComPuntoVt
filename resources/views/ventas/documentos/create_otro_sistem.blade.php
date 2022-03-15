@@ -42,7 +42,7 @@
                         {{ csrf_field() }}
 
                         @if (!empty($cotizacion))
-                            <input type="hidden" name="cotizacion_id" value="{{ $cotizacion->id }}">
+                        <input type="hidden" name="cotizacion_id" value="{{ $cotizacion->id }}">
                         @endif
                         <div class="row">
                             <div class="col-12 col-md-6 b-r">
@@ -55,28 +55,22 @@
                                                     <i class="fa fa-calendar"></i>
                                                 </span>
                                                 @if (!empty($cotizacion))
-                                                    <input type="date" id="fecha_documento_campo" name="fecha_documento_campo"
-                                                        class="form-control {{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_documento_campo', $cotizacion->fecha_documento) }}"
-                                                        autocomplete="off" required readonly>
+                                                <input type="date" id="fecha_documento_campo" name="fecha_documento_campo" class="form-control {{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}" value="{{ old('fecha_documento_campo', $cotizacion->fecha_documento) }}" autocomplete="off" required readonly>
                                                 @else
-                                                    <input type="date" id="fecha_documento_campo" name="fecha_documento_campo"
-                                                        class="form-control input-required{{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_documento_campo', $fecha_hoy) }}" autocomplete="off"
-                                                        required>
+                                                <input type="date" id="fecha_documento_campo" name="fecha_documento_campo" class="form-control input-required{{ $errors->has('fecha_documento_campo') ? ' is-invalid' : '' }}" value="{{ old('fecha_documento_campo', $fecha_hoy) }}" autocomplete="off" required>
                                                 @endif
 
                                                 @if ($errors->has('fecha_documento_campo'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('fecha_documento_campo') }}</strong>
-                                                    </span>
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('fecha_documento_campo') }}</strong>
+                                                </span>
                                                 @endif
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-12 col-md-6" id="fecha_entrega">
-                                        <div class="form-group d-none">
+                                        <div class="form-group">
                                             <label class="">Fecha de Atención</label>
                                             <div class="input-group">
                                                 <span class="input-group-addon">
@@ -84,37 +78,19 @@
                                                 </span>
 
                                                 @if (!empty($cotizacion))
-                                                    <input type="date" id="fecha_atencion_campo" name="fecha_atencion_campo"
-                                                        class="form-control {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_atencion', $cotizacion->fecha_atencion) }}"
-                                                        autocomplete="off" readonly disabled>
+                                                <input type="date" id="fecha_atencion_campo" name="fecha_atencion_campo" class="form-control {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}" value="{{ old('fecha_atencion', $cotizacion->fecha_atencion) }}" autocomplete="off" readonly disabled>
                                                 @else
 
-                                                    <input type="date" id="fecha_atencion_campo" name="fecha_atencion_campo"
-                                                        class="form-control input-required {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}"
-                                                        value="{{ old('fecha_atencion', $fecha_hoy) }}" autocomplete="off" required
-                                                        readonly disabled>
+                                                <input type="date" id="fecha_atencion_campo" name="fecha_atencion_campo" class="form-control input-required {{ $errors->has('fecha_atencion') ? ' is-invalid' : '' }}" value="{{ old('fecha_atencion', $fecha_hoy) }}" autocomplete="off" required readonly disabled>
 
                                                 @endif
 
                                                 @if ($errors->has('fecha_atencion'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('fecha_atencion') }}</strong>
-                                                    </span>
-                                                    @endif
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Placa</label>
-                                            <input type="text" type="text" placeholder=""
-                                            class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
-                                            name="observacion" id="observacion" onkeyup="return mayus(this)"
-                                            value="{{ old('observacion') }}" maxlength="7">
-                                            @if ($errors->has('observacion'))
                                                 <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('observacion') }}</strong>
+                                                    <strong>{{ $errors->first('fecha_atencion') }}</strong>
                                                 </span>
-                                            @endif
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -123,23 +99,21 @@
                                     <div class="col-12 col-md-6 select-required">
                                         <div class="form-group">
                                             <label class="required">Tipo de Comprobante: </label>
-                                            <select
-                                                class="select2_form form-control {{ $errors->has('tipo_venta') ? ' is-invalid' : '' }}"
-                                                style="text-transform: uppercase; width:100%" value="{{ old('tipo_venta') }}"
-                                                name="tipo_venta" id="tipo_venta" required @if (!empty($cotizacion)) '' @else onchange="consultarSeguntipo()" @endif>
+                                            <select class="select2_form form-control {{ $errors->has('tipo_venta') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{ old('tipo_venta') }}" name="tipo_venta" id="tipo_venta" required @if (!empty($cotizacion)) '' @else onchange="consultarSeguntipo()" @endif>
                                                 <option></option>
 
                                                 @foreach (tipos_venta() as $tipo)
-                                                    @if (ifComprobanteSeleccionado($tipo->id) && ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS'))
-                                                        <option value="{{ $tipo->id }}" @if (old('tipo_venta') == $tipo->id || $tipo->id == 129) {{ 'selected' }} @endif>
-                                                            {{ $tipo->nombre }}</option>
-                                                    @endif
+                                                @if (ifComprobanteSeleccionado($tipo->id) && ($tipo->tipo == 'VENTA' || $tipo->tipo == 'AMBOS'))
+                                                <option value="{{ $tipo->id }}" @if (old('tipo_venta')==$tipo->id || $tipo->id == 129) {{ 'selected' }} @endif>
+                                                    {{ $tipo->nombre }}
+                                                </option>
+                                                @endif
                                                 @endforeach
 
                                                 @if ($errors->has('tipo_venta'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('tipo_venta') }}</strong>
-                                                    </span>
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('tipo_venta') }}</strong>
+                                                </span>
                                                 @endif
 
 
@@ -151,13 +125,12 @@
                                     <div class="col-12 col-md-6 select-required">
                                         <div class="form-group">
                                             <label>Moneda:</label>
-                                            <select id="moneda" name="moneda"
-                                                class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
-                                                disabled>
+                                            <select id="moneda" name="moneda" class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}" disabled>
                                                 <option selected>SOLES</option>
                                             </select>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
 
@@ -169,28 +142,23 @@
                                             <label class="required">Empresa: </label>
 
                                             @if (!empty($cotizacion))
-                                                <select
-                                                    class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}"
-                                                    style="text-transform: uppercase; width:100%"
-                                                    value="{{ old('empresa_id', $cotizacion->empresa_id) }}" name="empresa_id" id="empresa_id"
-                                                    disabled>
-                                                    <option></option>
-                                                    @foreach ($empresas as $empresa)
-                                                        <option value="{{ $empresa->id }}" @if (old('empresa_id', $cotizacion->empresa_id) == $empresa->id){{ 'selected' }}@endif {{ $empresa->id === 1 ? 'selected' : '' }}>{{ $empresa->razon_social }}</option>
-                                                    @endforeach
-                                                </select>
+                                            <select class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{ old('empresa_id', $cotizacion->empresa_id) }}" name="empresa_id" id="empresa_id" disabled>
+                                                <option></option>
+                                                @foreach ($empresas as $empresa)
+                                                <option value="{{ $empresa->id }}" @if (old('empresa_id', $cotizacion->empresa_id) == $empresa->id){{ 'selected' }}@endif {{ $empresa->id === 1 ? 'selected' : '' }}>{{ $empresa->razon_social }}</option>
+                                                @endforeach
+                                            </select>
                                             @else
-                                                <select class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}"
-                                                    style="text-transform: uppercase; width:100%" value="{{ old('empresa_id') }}" name="empresa_id"
-                                                    id="empresa_id" required onchange="obtenerTiposComprobantes(this)" disabled>
-                                                    <option></option>
-                                                    @foreach ($empresas as $empresa)
-                                                        <option value="{{ $empresa->id }}" @if (old('empresa_id') == $empresa->id)
-                                                            {{ 'selected' }}
+                                            <select class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{ old('empresa_id') }}" name="empresa_id" id="empresa_id" required onchange="obtenerTiposComprobantes(this)" disabled>
+                                                <option></option>
+                                                @foreach ($empresas as $empresa)
+                                                <option value="{{ $empresa->id }}" @if (old('empresa_id')==$empresa->id)
+                                                    {{ 'selected' }}
                                                     @endif
-                                                    {{ $empresa->id === 1 ? 'selected' : '' }}>{{ $empresa->razon_social }}</option>
-                                                    @endforeach
-                                                </select>
+                                                    {{ $empresa->id === 1 ? 'selected' : '' }}>{{ $empresa->razon_social }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                             @endif
                                         </div>
                                     </div>
@@ -201,30 +169,22 @@
                                         <div class="form-group">
                                             @if (!empty($cotizacion))
                                             <label class="required">Condición</label>
-                                            <select id="condicion_id" name="condicion_id"
-                                                class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                                required onchange="changeFormaPago()" disabled>
+                                            <select id="condicion_id" name="condicion_id" class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}" required disabled onchange="changeFormaPago()>
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
-                                                    <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ old('condicion_id') == $condicion->id.'-'.$condicion->descripcion || $condicion->id == $cotizacion->condicion_id ? 'selected' : '' }}
-                                                        data-dias="{{$condicion->dias}}">
-                                                        {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
-                                                    </option>
+                                                    <option value=" {{ $condicion->id }}-{{ $condicion->descripcion }}" {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
+                                                {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                             @else
                                             <label class="required">Condición</label>
-                                            <select id="condicion_id" name="condicion_id"
-                                                class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                                required onchange="changeFormaPago()">
+                                            <select id="condicion_id" name="condicion_id" class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}" required onchange="changeFormaPago()">
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
-                                                    <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ old('condicion_id') == $condicion->id.'-'.$condicion->descripcion || $condicion->descripcion == 'CONTADO' ? 'selected' : '' }}
-                                                        data-dias="{{$condicion->dias}}">
-                                                        {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
-                                                    </option>
+                                                <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}" {{ old('condicion_id') == $condicion->id.'-'.$condicion->descripcion || $condicion->descripcion == 'CONTADO' ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
+                                                    {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
+                                                </option>
                                                 @endforeach
                                             </select>
                                             @endif
@@ -237,14 +197,11 @@
                                                 <span class="input-group-addon">
                                                     <i class="fa fa-calendar"></i>
                                                 </span>
-                                                <input type="date" id="fecha_vencimiento_campo" name="fecha_vencimiento_campo"
-                                                    class="form-control input-required" autocomplete="off"
-                                                    {{ $errors->has('fecha_vencimiento_campo') ? ' is-invalid' : '' }}
-                                                    value="{{ old('fecha_vencimiento_campo', $fecha_hoy) }}" required>
+                                                <input type="date" id="fecha_vencimiento_campo" name="fecha_vencimiento_campo" class="form-control input-required" autocomplete="off" {{ $errors->has('fecha_vencimiento_campo') ? ' is-invalid' : '' }} value="{{ old('fecha_vencimiento_campo', $fecha_hoy) }}" required>
                                                 @if ($errors->has('fecha_vencimiento_campo'))
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $errors->first('fecha_vencimiento_campo') }}</strong>
-                                                    </span>
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('fecha_vencimiento_campo') }}</strong>
+                                                </span>
                                                 @endif
                                             </div>
                                         </div>
@@ -258,23 +215,18 @@
                                             <input type="hidden" name="tipo_cliente_documento" id="tipo_cliente_documento">
                                             <input type="hidden" name="tipo_cliente_2" id="tipo_cliente_2" value='1'>
                                             @if (!empty($cotizacion))
-                                                <select
-                                                    class="select2_form form-control input-required {{ $errors->has('cliente_id') ? ' is-invalid' : '' }}"
-                                                    style="text-transform: uppercase; width:100%"
-                                                    value="{{ old('cliente_id', $cotizacion->cliente_id) }}" name="cliente_id" id="cliente_id"
-                                                    disabled>
-                                                    <option></option>
-                                                    @foreach ($clientes as $cliente)
-                                                        <option value="{{ $cliente->id }}" @if (old('cliente_id', $cotizacion->cliente_id) == $cliente->id){{ 'selected' }}@endif tabladetalle="{{$cliente->tabladetalles_id}}">{{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
+                                            <select class="select2_form form-control input-required {{ $errors->has('cliente_id') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{ old('cliente_id', $cotizacion->cliente_id) }}" name="cliente_id" id="cliente_id" disabled>
+                                                <option></option>
+                                                @foreach ($clientes as $cliente)
+                                                <option value="{{ $cliente->id }}" @if (old('cliente_id', $cotizacion->cliente_id) == $cliente->id){{ 'selected' }}@endif tabladetalle="{{$cliente->tabladetalles_id}}">{{ $cliente->getDocumento() }} - {{ $cliente->nombre }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                             @else
-                                                <select class="select2_form form-control input-required {{ $errors->has('cliente_id') ? ' is-invalid' : '' }}"
-                                                    style="text-transform: uppercase; width:100%" value="{{ old('cliente_id') }}" name="cliente_id"
-                                                    id="cliente_id" required onchange="obtenerTipocliente(this.value)"> <!-- disabled -->
-                                                    <option></option>
-                                                </select>
+                                            <select class="select2_form form-control input-required {{ $errors->has('cliente_id') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{ old('cliente_id') }}" name="cliente_id" id="cliente_id" required onchange="obtenerTipocliente(this.value)">
+                                                <!-- disabled -->
+                                                <option></option>
+                                            </select>
                                             @endif
                                         </div>
                                     </div>
@@ -288,7 +240,13 @@
                                 <div class="row d-none">
                                     <div class="col-12">
                                         <div class="form-group">
-
+                                            <label>Observación:</label>
+                                            <textarea type="text" placeholder="" class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}" name="observacion" id="observacion" onkeyup="return mayus(this)" value="{{ old('observacion') }}">{{ old('observacion') }}</textarea>
+                                            @if ($errors->has('observacion'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('observacion') }}</strong>
+                                            </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -314,9 +272,9 @@
                         </div>
 
                         @if(!empty($cotizacion))
-                            <input type="hidden" name="igv" id="igv" value="{{ $cotizacion->igv }}">
+                        <input type="hidden" name="igv" id="igv" value="{{ $cotizacion->igv }}">
                         @else
-                            <input type="hidden" name="igv" id="igv" value="18">
+                        <input type="hidden" name="igv" id="igv" value="18">
                         @endif
 
                         <input type="hidden" name="monto_sub_total" id="monto_sub_total" value="{{ old('monto_sub_total') }}">
@@ -328,7 +286,7 @@
                     <hr>
                     <div class="row">
 
-                        <div class="col-lg-12">
+                        <div class="col-12">
                             <div class="panel panel-primary" id="panel_detalle">
                                 <div class="panel-heading">
                                     <h4 class=""><b>Detalle del Documento de Venta</b></h4>
@@ -342,67 +300,61 @@
                                         <div class="sk-rect5"></div>
                                     </div>
                                     @if (empty($cotizacion))
-                                        <div class="row">
-                                            <div class="col-lg-6 col-xs-12">
-                                                <label class="col-form-label required">Producto:</label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control" id="producto_lote" readonly>
-                                                    <span class="input-group-append">
-                                                        <button type="button" class="btn btn-primary" disabled id="buscarLotes"
-                                                            data-toggle="modal" data-target="#modal_lote"><i
-                                                                class='fa fa-search'></i> Buscar
-                                                        </button>
-                                                    </span>
-                                                </div>
-                                                <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-xs-12">
+                                            <label class="col-form-label required">Producto:</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="producto_lote" readonly>
+                                                <span class="input-group-append">
+                                                    <button type="button" class="btn btn-primary" disabled id="buscarLotes" data-toggle="modal" data-target="#modal_lote"><i class='fa fa-search'></i> Buscar
+                                                    </button>
+                                                </span>
+                                            </div>
+                                            <div class="invalid-feedback"><b><span id="error-producto"></span></b>
+                                            </div>
+                                        </div>
+
+                                        <input type="hidden" name="producto_id" id="producto_id">
+                                        <input type="hidden" name="producto_unidad" id="producto_unidad">
+                                        <input type="hidden" name="producto_json" id="producto_json">
+
+                                        <div class="col-lg-2 col-xs-12">
+                                            <label class="col-form-label required">Cantidad:</label>
+                                            <input type="text" name="cantidad" id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'precio')" disabled>
+                                            <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-2 col-xs-12">
+                                            <div class="form-group">
+                                                <label class="col-form-label required" for="amount">Precio:</label>
+                                                <input type="number" id="precio" name="precio" class="form-control" onkeydown="nextFocus(event,'btn_agregar_detalle')" disabled>
+                                                <div class="invalid-feedback"><b><span id="error-precio"></span></b>
                                                 </div>
                                             </div>
+                                        </div>
 
-                                            <input type="hidden" name="producto_id" id="producto_id">
-                                            <input type="hidden" name="producto_unidad" id="producto_unidad">
-                                            <input type="hidden" name="producto_json" id="producto_json">
 
-                                            <div class="col-lg-2 col-xs-12">
 
-                                                <label class="col-form-label required">Cantidad:</label>
-                                                <input type="text" name="cantidad"  id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'precio')" disabled>
-                                                <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
-                                                </div>
+                                        <div class="col-lg-2 col-xs-12">
+
+                                            <div class="form-group">
+                                                <label class="col-form-label" for="amount">&nbsp;</label>
+                                                <button type=button class="btn btn-block btn-warning" style='color:white;' id="btn_agregar_detalle" disabled> <i class="fa fa-plus"></i>
+                                                    AGREGAR</button>
                                             </div>
-
-                                            <div class="col-lg-2 col-xs-12">
-                                                <div class="form-group">
-                                                    <label class="col-form-label required" for="amount">Precio:</label>
-                                                    <input type="number" id="precio" name="precio" class="form-control" onkeydown="nextFocus(event,'btn_agregar_detalle')" disabled>
-                                                    <div class="invalid-feedback"><b><span id="error-precio"></span></b>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-
-                                            <div class="col-lg-2 col-xs-12">
-
-                                                <div class="form-group">
-                                                    <label class="col-form-label" for="amount">&nbsp;</label>
-                                                    <button type=button class="btn btn-block btn-warning" style='color:white;'
-                                                        id="btn_agregar_detalle" disabled> <i class="fa fa-plus"></i>
-                                                        AGREGAR</button>
-                                                </div>
-
-                                            </div>
-
-
 
                                         </div>
-                                        <hr>
+
+
+
+                                    </div>
+                                    <hr>
                                     @endif
 
 
                                     <div class="table-responsive">
-                                        <table
-                                            class="table dataTables-detalle-documento table-striped table-bordered table-hover"
-                                            style="text-transform:uppercase">
+                                        <table class="table dataTables-detalle-documento table-striped table-bordered table-hover" style="text-transform:uppercase">
                                             <thead>
                                                 <tr>
                                                     <th></th>
@@ -426,13 +378,11 @@
                                                 </tr>
                                                 <tr>
                                                     <th class="text-right" colspan="9">Sub Total:</th>
-                                                    <th class="text-center"><span
-                                                            id="subtotal">@if (!empty($cotizacion)) {{ $cotizacion->sub_total }} @else 0.0 @endif</span></th>
+                                                    <th class="text-center"><span id="subtotal">@if (!empty($cotizacion)) {{ $cotizacion->sub_total }} @else 0.0 @endif</span></th>
                                                 </tr>
                                                 <tr>
                                                     <th class="text-right" colspan="9">IGV <span id="igv_int"></span>:</th>
-                                                    <th class="text-center"><span
-                                                            id="igv_monto">@if (!empty($cotizacion)) {{ $cotizacion->total_igv }} @else 0.0 @endif</span></th>
+                                                    <th class="text-center"><span id="igv_monto">@if (!empty($cotizacion)) {{ $cotizacion->total_igv }} @else 0.0 @endif</span></th>
                                                 </tr>
                                                 <tr>
                                                     <th class="text-right" colspan="9">TOTAL:</th>
@@ -461,15 +411,15 @@
                                 <i class="fa fa-arrow-left"></i> Regresar
                             </a>
                             @if (empty($errores))
-                                <button type="button" id="btn_grabar" class="btn btn-w-m btn-primary">
-                                    <i class="fa fa-save"></i> Grabar
-                                </button>
+                            <button type="button" id="btn_grabar" class="btn btn-w-m btn-primary">
+                                <i class="fa fa-save"></i> Grabar
+                            </button>
                             @else
-                                @if (count($errores) == 0)
-                                    <button type="button" id="btn_grabar" class="btn btn-w-m btn-primary">
-                                        <i class="fa fa-save"></i> Grabar
-                                    </button>
-                                @endif
+                            @if (count($errores) == 0)
+                            <button type="button" id="btn_grabar" class="btn btn-w-m btn-primary">
+                                <i class="fa fa-save"></i> Grabar
+                            </button>
+                            @endif
                             @endif
                         </div>
                     </div>
@@ -485,8 +435,7 @@
 @stop
 
 @push('styles')
-<link href="{{ asset('Inspinia/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css') }}"
-    rel="stylesheet">
+<link href="{{ asset('Inspinia/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css') }}" rel="stylesheet">
 <link href="{{ asset('Inspinia/css/plugins/datapicker/datepicker3.css') }}" rel="stylesheet">
 <link href="{{ asset('Inspinia/css/plugins/daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet">
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
@@ -497,7 +446,6 @@
     .my-swal {
         z-index: 3000 !important;
     }
-
 </style>
 
 @endpush
@@ -517,9 +465,9 @@
 <script src="{{ asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
 <script>
-
     //PRUEBA
     var clientes_global = [];
     const swalWithBootstrapButtons = Swal.mixin({
@@ -547,7 +495,8 @@
         let indice = table.row($(this).parents('tr')).index();
         $.ajax({
             type: 'POST',
-            url: '{{ route('ventas.documento.obtener.lote') }}',
+            url: '{{ route('
+            ventas.documento.obtener.lote ') }}',
             data: {
                 '_token': $('input[name=_token]').val(),
                 'lote_id': data[0],
@@ -588,7 +537,6 @@
             });
         })
     }
-
 
     //Borrar registro de Producto
     $(document).on('click', '.btn-delete', function(event) {
@@ -642,73 +590,22 @@
         });
 
         @if(empty($cotizacion))
-            obtenerClientes();
+        obtenerClientes();
         @else
-            $.ajax({
-                dataType: 'json',
-                url: '{{ route('ventas.customers_all') }}',
-                type: 'post',
-                data: {
-                    '_token': $('input[name=_token]').val(),
-                    'tipo_id': $('#tipo_venta').val()
-                },
-                success: function(data) {
-                    clientes_global = data.clientes;
-                },
-            })
-        @endif
-    });
-
-    function changeFormaPago()
-    {
-        let condicion_id = $('#condicion_id').val();
-        if(condicion_id)
-        {
-            let cadena = condicion_id.split('-');
-            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
-            let fecha = new Date('{{ $fecha_hoy }}')
-
-            fecha.setDate(fecha.getDate() + dias)
-
-            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
-            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
-            let resultado = fecha.getFullYear() + '-' + month + '-' + day
-            $("#fecha_vencimiento_campo").val(resultado);
-            if(cadena[1] == 'CONTADO')
-            {
-                $('#fecha_vencimiento').addClass('d-none');
-            }
-            else
-            {
-                $('#fecha_vencimiento').removeClass('d-none');
-            }
-        }
-        else
-        {
-            $('#fecha_vencimiento').addClass('d-none');
-            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
-        }
-    }
-
-    function obtenerProducto(id) {
-        // Consultamos nuestra BBDD
-        var url = '{{ route('almacenes.producto.productoDescripcion', ':id') }}';
-        url = url.replace(':id', id);
         $.ajax({
             dataType: 'json',
-            type: 'get',
-            url: url,
-        }).done(function(result) {
-
-            $('#presentacion_producto').val(result.medida)
-            $('#codigo_nombre_producto').val(result.codigo + ' - ' + result.nombre)
-            llegarDatos()
-            sumaTotal()
-            limpiarDetalle()
-        });
-    }
-
-    $(document).ready(function() {
+            url: '{{ route('
+            ventas.customers_all ') }}',
+            type: 'post',
+            data: {
+                '_token': $('input[name=_token]').val(),
+                'tipo_id': $('#tipo_venta').val()
+            },
+            success: function(data) {
+                clientes_global = data.clientes;
+            },
+        })
+        @endif
 
         //DATATABLE - COTIZACION
         table = $('.dataTables-detalle-documento').DataTable({
@@ -729,13 +626,13 @@
                     data: null,
 
                     render: function(data, type, row) {
-                        @if (!empty($cotizacion))
-                            return "-";
+                        @if(!empty($cotizacion))
+                        return "-";
                         @else
-                            return "<div class='btn-group'>" +
-                                "<a class='btn btn-sm btn-warning btn-edit' style='color:white'>"+ "<i class='fa fa-pencil'></i>"+"</a>" +
-                                "<a class='btn btn-sm btn-danger btn-delete' style='color:white'>"+"<i class='fa fa-trash'></i>"+"</a>"+
-                                "</div>";
+                        return "<div class='btn-group'>" +
+                            "<a class='btn btn-sm btn-warning btn-edit' style='color:white'>" + "<i class='fa fa-pencil'></i>" + "</a>" +
+                            "<a class='btn btn-sm btn-danger btn-delete' style='color:white'>" + "<i class='fa fa-trash'></i>" + "</a>" +
+                            "</div>";
                         @endif
                     }
 
@@ -834,36 +731,74 @@
             ],
         });
 
-        @if (!empty($cotizacion))
+        @if(!empty($cotizacion))
 
-            @if ($cotizacion->igv_check == '1')
-                $('#igv').prop('disabled', false)
-                $("#igv_check").prop('checked',true)
+        @if($cotizacion - > igv_check == '1')
+        $('#igv').prop('disabled', false)
+        $("#igv_check").prop('checked', true)
 
-                $('#igv_requerido').addClass("required")
-                $('#igv').prop('required', true)
-                var igv = ($('#igv').val()) + ' %'
-                $('#igv_int').text(igv)
-                // sumaTotal()
-            @else
-                if ($("#igv_check").prop('checked')) {
-                    $('#igv').attr('disabled', false)
-                    $('#igv_requerido').addClass("required")
-                } else {
-                    $('#igv').attr('disabled', true)
-                    $('#igv_requerido').removeClass("required")
-                }
-            @endif
+        $('#igv_requerido').addClass("required")
+        $('#igv').prop('required', true)
+        var igv = ($('#igv').val()) + ' %'
+        $('#igv_int').text(igv)
+        @else
+        if ($("#igv_check").prop('checked')) {
+            $('#igv').attr('disabled', false)
+            $('#igv_requerido').addClass("required")
+        } else {
+            $('#igv').attr('disabled', true)
+            $('#igv_requerido').removeClass("required")
+        }
+        @endif
 
-            @if ($lotes)
-                obtenerTabla()
-            @endif
+        @if($lotes)
+        obtenerTabla()
+        @endif
         @endif
 
 
         //Controlar Error
         $.fn.DataTable.ext.errMode = 'throw';
     });
+
+    function changeFormaPago() {
+        let condicion_id = $('#condicion_id').val();
+        if (condicion_id) {
+            let cadena = condicion_id.split('-');
+            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
+            let fecha = new Date('{{ $fecha_hoy }}')
+
+            fecha.setDate(fecha.getDate() + dias)
+
+            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
+            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
+            let resultado = fecha.getFullYear() + '-' + month + '-' + day
+            $("#fecha_vencimiento_campo").val(resultado);
+            if (cadena[1] == 'CONTADO') {
+                $('#fecha_vencimiento').addClass('d-none');
+            } else {
+                $('#fecha_vencimiento').removeClass('d-none');
+            }
+        } else {
+            $('#fecha_vencimiento').addClass('d-none');
+            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
+        }
+    }
+
+    function obtenerProducto(id) {
+        // Consultamos nuestra BBDD
+        var url = '{{ route('
+        almacenes.producto.productoDescripcion ', ': id ') }}';
+        url = url.replace(':id', id);
+        axios.get(url).then(response => {
+            result = response.data
+            $('#presentacion_producto').val(result.medida)
+            $('#codigo_nombre_producto').val(result.codigo + ' - ' + result.nombre)
+            llegarDatos()
+            sumaTotal()
+            limpiarDetalle()
+        })
+    }
 
     function limpiarErrores() {
         $('#cantidad').removeClass("is-invalid")
@@ -881,8 +816,7 @@
         agregarDetalle('VISTA');
     })
 
-    function agregarDetalle(condicion)
-    {
+    function agregarDetalle(condicion) {
         limpiarErrores()
         var enviar = true;
         var producto_json = JSON.parse($('#producto_json').val());
@@ -913,14 +847,10 @@
                 $('#error-precio').text('El campo precio debe ser mayor a 0.')
             }
 
-            if(convertFloat($('#precio').val()) < convertFloat(evaluarPrecioigv(producto_json)))
-            {
-                if(codigo.estado_precio_menor == '1')
-                {
-                    if($('#codigo_precio_menor').val() != codigo.codigo_precio_menor)
-                    {
-                        if(condicion == 'MODAL')
-                        {
+            if (convertFloat($('#precio').val()) < convertFloat(evaluarPrecioigv(producto_json))) {
+                if (codigo.estado_precio_menor == '1') {
+                    if ($('#codigo_precio_menor').val() != codigo.codigo_precio_menor) {
+                        if (condicion == 'MODAL') {
                             toastr.error('El codigo para poder vender a un precio menor a lo establecido es incorrecto.', 'Error');
                         } else {
                             $('#codigo_precio_menor').val('');
@@ -930,8 +860,7 @@
                     } else {
                         $('#modal-codigo-precio').modal('hide');
                     }
-                }
-                else{
+                } else {
                     toastr.error('No puedes vender a un precio menor a lo establecido.', 'Error');
                     enviar = false;
                 }
@@ -939,7 +868,7 @@
         }
 
         if ($('#cantidad').val() == '') {
-            toastr.error('Ingrese cantidad del artículo.', 'Error');
+            toastr.error('Ingrese cantidad del producto.', 'Error');
             enviar = false;
             $("#cantidad").addClass("is-invalid");
             $('#error-cantidad').text('El campo Cantidad es obligatorio.')
@@ -1007,16 +936,15 @@
         }
         agregarTabla(detalle);
         cambiarCantidad(detalle, '1');
-        $('#precio').prop('disabled' , true)
-        $('#cantidad').prop('disabled' , true)
+        $('#precio').prop('disabled', true)
+        $('#cantidad').prop('disabled', true)
     }
 
     function obtenerMonto(producto_id) {
         if (producto_id.length > 0) {
             var tipo = $('#tipo_cliente_documento').val()
             $.get('/almacenes/productos/obtenerProducto/' + producto_id, function(data) {
-                for (var i = 0; i < data.cliente_producto.length; i++)
-                {
+                for (var i = 0; i < data.cliente_producto.length; i++) {
                     //SOLO SOLES LOS MONTOS
                     if (data.cliente_producto[i].cliente == tipo && data.cliente_producto[i].moneda == '1') {
                         if (data.cliente_producto[i].igv == '0') {
@@ -1033,8 +961,6 @@
                 }
             });
         }
-
-
     }
 
     //AGREGAR EL DETALLE A LA TABLA
@@ -1055,9 +981,6 @@
             $detalle.descuento,
             $detalle.precio_minimo,
         ]).draw(false);
-        //cargarProductos()
-        //INGRESADO EL PRODUCTO SUMA TOTAL DEL DETALLE
-        //sumaTotal()
         //LIMPIAR LOS CAMPOS DESPUES DE LA BUSQUEDA
         $('#precio').val('')
         $('#cantidad').val('')
@@ -1081,7 +1004,7 @@
                 precio_inicial: value[10],
                 descuento: value[11],
                 cantidad: value[2],
-                valor_venta: value[9],                
+                valor_venta: value[9],
                 precio_minimo: value[12],
             };
             productos.push(fila);
@@ -1094,7 +1017,8 @@
         $.ajax({
             dataType: 'json',
             type: 'post',
-            url: '{{ route('ventas.documento.cantidad') }}',
+            url: '{{ route('
+            ventas.documento.cantidad ') }}',
             data: {
                 '_token': $('input[name=_token]').val(),
                 'producto_id': detalle.producto_id,
@@ -1113,7 +1037,8 @@
         return $.ajax({
             dataType: 'json',
             type: 'post',
-            url: '{{ route('ventas.documento.devolver.cantidades') }}',
+            url: '{{ route('
+            ventas.documento.devolver.cantidades ') }}',
             data: {
                 '_token': $('input[name=_token]').val(),
                 'cantidades': $('#productos_tabla').val(),
@@ -1127,20 +1052,20 @@
         let total = 0.00;
         let detalles = [];
 
-        @if (!empty($cotizacion))
-            @if ($cotizacion->igv_check == '1')
-                t.rows().data().each(function(el, index) {
-                let igv = convertFloat('{{ $cotizacion->igv }}');
-                let igv_calculado = convertFloat(igv / 100);
-                let pdescuento = convertFloat(el[11]);
-                let precio_inicial = convertFloat(el[10]);
-                let precio_unitario = precio_inicial;
-                let valor_unitario = precio_unitario / (1 + igv_calculado);
-                let dinero = precio_unitario * (pdescuento / 100);
-                let precio_nuevo = precio_unitario - dinero;
-                let valor_venta = precio_nuevo * el[2];
+        @if(!empty($cotizacion))
+        @if($cotizacion - > igv_check == '1')
+        t.rows().data().each(function(el, index) {
+            let igv = convertFloat('{{ $cotizacion->igv }}');
+            let igv_calculado = convertFloat(igv / 100);
+            let pdescuento = convertFloat(el[11]);
+            let precio_inicial = convertFloat(el[10]);
+            let precio_unitario = precio_inicial;
+            let valor_unitario = precio_unitario / (1 + igv_calculado);
+            let dinero = precio_unitario * (pdescuento / 100);
+            let precio_nuevo = precio_unitario - dinero;
+            let valor_venta = precio_nuevo * el[2];
 
-                let detalle = {
+            let detalle = {
                 producto_id: el[0],
                 unidad: el[3],
                 producto: el[4],
@@ -1153,107 +1078,105 @@
                 descuento: pdescuento,
                 precio_nuevo: precio_nuevo,
                 precio_minimo: el[12],
-                }
-                detalles.push(detalle);
-                });
-
-                t.clear().draw();
-
-                if(detalles.length > 0)
-                {
-                    for(let i = 0; i < detalles.length; i++) {
-                        agregarTabla(detalles[i]);
-                    }
-                }
-
-                t.rows().data().each(function(el, index) {
-                    total=Number(el[9]) + total
-                });
-                conIgv(convertFloat(total),convertFloat('{{ $cotizacion->igv }}'))
-            @else
-                t.rows().data().each(function(el, index) {
-                    let igv=convertFloat(18);
-                    let igv_calculado=convertFloat(igv / 100);
-                    let pdescuento=convertFloat(el[11]); let
-                    precio_inicial=convertFloat(el[10]);
-                    let precio_unitario = precio_inicial / 1.18;
-                    let valor_unitario = precio_unitario / 1.18;
-                    let dinero=precio_unitario * (pdescuento / 100);
-                    let precio_nuevo = precio_unitario - dinero;
-                    let valor_venta = precio_nuevo * el[2];
-
-                    let detalle = {
-                        producto_id: el[0],
-                        unidad: el[3],
-                        producto: el[4],
-                        precio_unitario: precio_unitario,
-                        valor_unitario: valor_unitario,
-                        valor_venta: valor_venta,
-                        cantidad: convertFloat(el[2]),
-                        precio_inicial: precio_inicial,
-                        dinero: dinero,
-                        descuento: pdescuento,
-                        precio_nuevo: precio_nuevo,
-                        precio_minimo: el[12],
-                    }
-
-                    detalles.push(detalle);
-                });
-
-                t.clear().draw();
-                if(detalles.length> 0)
-                {
-                    for(let i = 0; i < detalles.length; i++) {
-                        agregarTabla(detalles[i]);
-                    }
-                }
-
-                t.rows().data().each(function(el, index) {
-                    total=Number(el[9]) + total
-                });
-                conIgv(convertFloat(total), convertFloat(18))
-            @endif
-        @else
-            t.rows().data().each(function(el, index) {
-                let igv = convertFloat(18);
-                let igv_calculado = convertFloat(igv / 100);
-                let pdescuento = convertFloat(el[11]);
-                let precio_inicial = convertFloat(el[10]);
-                let precio_unitario = precio_inicial;
-                let valor_unitario = precio_unitario / (1 + igv_calculado);
-                let dinero = precio_unitario * (pdescuento / 100);
-                let precio_nuevo = precio_unitario - dinero;
-                let valor_venta = precio_nuevo * el[2];
-
-                let detalle = {
-                    producto_id: el[0],
-                    unidad: el[3],
-                    producto: el[4],
-                    precio_unitario: precio_unitario,
-                    valor_unitario: valor_unitario,
-                    valor_venta: valor_venta,
-                    cantidad: convertFloat(el[2]),
-                    precio_inicial: precio_inicial,
-                    dinero: dinero,
-                    descuento: pdescuento,
-                    precio_nuevo: precio_nuevo,
-                    precio_minimo: el[12],
-                }
-                detalles.push(detalle);
-            });
-
-            t.clear().draw();
-
-            if(detalles.length > 0)
-            {
-                for(let i = 0; i < detalles.length; i++) {
-                    agregarTabla(detalles[i]);
-                }
             }
-            t.rows().data().each(function(el, index) {
-                total=Number(el[9]) + total
-            });
-            conIgv(convertFloat(total),convertFloat(18))
+            detalles.push(detalle);
+        });
+
+        t.clear().draw();
+
+        if (detalles.length > 0) {
+            for (let i = 0; i < detalles.length; i++) {
+                agregarTabla(detalles[i]);
+            }
+        }
+
+        t.rows().data().each(function(el, index) {
+            total = Number(el[9]) + total
+        });
+        conIgv(convertFloat(total), convertFloat('{{ $cotizacion->igv }}'))
+        @else
+        t.rows().data().each(function(el, index) {
+            let igv = convertFloat(18);
+            let igv_calculado = convertFloat(igv / 100);
+            let pdescuento = convertFloat(el[11]);
+            let
+                precio_inicial = convertFloat(el[10]);
+            let precio_unitario = precio_inicial / 1.18;
+            let valor_unitario = precio_unitario / 1.18;
+            let dinero = precio_unitario * (pdescuento / 100);
+            let precio_nuevo = precio_unitario - dinero;
+            let valor_venta = precio_nuevo * el[2];
+
+            let detalle = {
+                producto_id: el[0],
+                unidad: el[3],
+                producto: el[4],
+                precio_unitario: precio_unitario,
+                valor_unitario: valor_unitario,
+                valor_venta: valor_venta,
+                cantidad: convertFloat(el[2]),
+                precio_inicial: precio_inicial,
+                dinero: dinero,
+                descuento: pdescuento,
+                precio_nuevo: precio_nuevo,
+                precio_minimo: el[12],
+            }
+
+            detalles.push(detalle);
+        });
+
+        t.clear().draw();
+        if (detalles.length > 0) {
+            for (let i = 0; i < detalles.length; i++) {
+                agregarTabla(detalles[i]);
+            }
+        }
+
+        t.rows().data().each(function(el, index) {
+            total = Number(el[9]) + total
+        });
+        conIgv(convertFloat(total), convertFloat(18))
+        @endif
+        @else
+        t.rows().data().each(function(el, index) {
+            let igv = convertFloat(18);
+            let igv_calculado = convertFloat(igv / 100);
+            let pdescuento = convertFloat(el[11]);
+            let precio_inicial = convertFloat(el[10]);
+            let precio_unitario = precio_inicial;
+            let valor_unitario = precio_unitario / (1 + igv_calculado);
+            let dinero = precio_unitario * (pdescuento / 100);
+            let precio_nuevo = precio_unitario - dinero;
+            let valor_venta = precio_nuevo * el[2];
+
+            let detalle = {
+                producto_id: el[0],
+                unidad: el[3],
+                producto: el[4],
+                precio_unitario: precio_unitario,
+                valor_unitario: valor_unitario,
+                valor_venta: valor_venta,
+                cantidad: convertFloat(el[2]),
+                precio_inicial: precio_inicial,
+                dinero: dinero,
+                descuento: pdescuento,
+                precio_nuevo: precio_nuevo,
+                precio_minimo: el[12],
+            }
+            detalles.push(detalle);
+        });
+
+        t.clear().draw();
+
+        if (detalles.length > 0) {
+            for (let i = 0; i < detalles.length; i++) {
+                agregarTabla(detalles[i]);
+            }
+        }
+        t.rows().data().each(function(el, index) {
+            total = Number(el[9]) + total
+        });
+        conIgv(convertFloat(total), convertFloat(18))
         @endif
     }
 
@@ -1312,7 +1235,7 @@
     }
 
     $('#btn_grabar').click(function(e) {
-    //$('#enviar_documento').submit(function(e) {
+        //$('#enviar_documento').submit(function(e) {
         e.preventDefault();
         cargarProductos();
         let correcto = validarCampos();
@@ -1327,15 +1250,12 @@
             $('#importe_venta').val(total);
             let condicion_id = $('#condicion_id').val();
             let cadena = condicion_id.split('-');
-            if(cadena[1] != 'CONTADO')
-            {
+            if (cadena[1] != 'CONTADO') {
                 $('#importe_form').val(0.00);
                 $('#efectivo_form').val(0.00);
                 $('#tipo_pago_id').val('');
                 enviarVenta();
-            }
-            else
-            {
+            } else {
                 $('#importe_form').val(0.00);
                 $('#efectivo_form').val(0.00);
                 $('#tipo_pago_id').val('');
@@ -1419,37 +1339,29 @@
             correcto = false;
             toastr.error('El campo fecha de vencimiento es requerido.');
         }
-        if(clientes_global.length > 0)
-        {
+        if (clientes_global.length > 0) {
             let index = clientes_global.findIndex(cliente => cliente.id == cliente_id);
-            if(index != undefined)
-            {
+            if (index != undefined) {
                 let cliente = clientes_global[index];
-                if(cliente != undefined)
-                {
-                    if(convertFloat(tipo_venta) === 127 && cliente.tipo_documento != 'RUC')
-                    {
+                if (cliente != undefined) {
+                    if (convertFloat(tipo_venta) === 127 && cliente.tipo_documento != 'RUC') {
                         correcto = false;
                         toastr.error('El tipo de comprobante seleccionado requiere que el cliente tenga RUC.');
                     }
 
-                    if(convertFloat(tipo_venta) === 128 && cliente.tipo_documento != 'DNI')
-                    {
+                    if (convertFloat(tipo_venta) === 128 && cliente.tipo_documento != 'DNI') {
                         correcto = false;
                         toastr.error('El tipo de comprobante seleccionado requiere que el cliente tenga DNI.');
                     }
-                }
-                else{
+                } else {
                     correcto = false;
                     toastr.error('Ocurrió un error porfavor seleccionar nuevamente un cliente.');
                 }
-            }
-            else{
+            } else {
                 correcto = false;
                 toastr.error('Ocurrió un error porfavor seleccionar nuevamente un cliente.');
             }
-        }
-        else{
+        } else {
             correcto = false;
             toastr.error('Ocurrió un error porfavor recargar la pagina.');
         }
@@ -1484,44 +1396,43 @@
 
     function obtenerTabla() {
         var t = $('.dataTables-detalle-documento').DataTable();
-        @if (!empty($cotizacion))
-            @foreach ($lotes as $lote)
-                t.row.add([
-                "{{ $lote->producto_id }}",
-                '',
-                "{{ $lote->cantidad }}",
-                "{{ $lote->unidad }}",
-                "{{ $lote->descripcion_producto }}",
-                "{{ $lote->valor_unitario }}",
-                "{{ $lote->precio_unitario }}",
-                "{{ $lote->dinero }}",
-                "{{ $lote->precio_nuevo }}",
-                "{{ $lote->valor_venta }}",
-                "{{ $lote->precio_inicial }}",
-                "{{ $lote->descuento }}",
-                "{{ $lote->precio_nuevo }}",
-                ])
-            @endforeach
-            //SUMATORIA TOTAL
-            sumaTotal()
+        @if(!empty($cotizacion))
+        @foreach($lotes as $lote)
+        t.row.add([
+            "{{ $lote->producto_id }}",
+            '',
+            "{{ $lote->cantidad }}",
+            "{{ $lote->unidad }}",
+            "{{ $lote->descripcion_producto }}",
+            "{{ $lote->valor_unitario }}",
+            "{{ $lote->precio_unitario }}",
+            "{{ $lote->dinero }}",
+            "{{ $lote->precio_nuevo }}",
+            "{{ $lote->valor_venta }}",
+            "{{ $lote->precio_inicial }}",
+            "{{ $lote->descuento }}",
+            "{{ $lote->precio_nuevo }}",
+        ])
+        @endforeach
+        //SUMATORIA TOTAL
+        sumaTotal()
         @endif
     }
 
     //OBTENER TIPOS DE COMPROBANTES
     function obtenerTiposComprobantes() {
-        $('#fecha_documento_campo').attr("readonly",true);
+        $('#fecha_documento_campo').attr("readonly", true);
         if ($('#empresa_id').val() != '' && $('#tipo_venta').val() != '') {
-            if($('#tipo_venta').val() == 129)
-            {
+            if ($('#tipo_venta').val() == 129) {
                 $('#fecha_documento_campo').removeAttr("readonly");
-            }
-            else{
+            } else {
                 $('#fecha_documento_campo').val("{{$fecha_hoy}}");
-                $('#fecha_documento_campo').attr("readonly",true);
+                $('#fecha_documento_campo').attr("readonly", true);
             }
             $.ajax({
                 dataType: 'json',
-                url: '{{ route('ventas.vouchersAvaible') }}',
+                url: '{{ route('
+                ventas.vouchersAvaible ') }}',
                 type: 'post',
                 data: {
                     '_token': $('input[name=_token]').val(),
@@ -1551,25 +1462,25 @@
 
     function obtenerClientes() {
         clientes_global = [];
-        $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         $("#cliente_id").empty().trigger('change');
+        $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
         $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
-        axios.post('{{ route('ventas.customers_all') }}',{'_token': $('input[name=_token]').val(), 'tipo_id': $('#tipo_venta').val()}).then(response => {
+        axios.post('{{ route('
+            ventas.customers_all ') }}', {
+                '_token': $('input[name=_token]').val(),
+                'tipo_id': $('#tipo_venta').val()
+            }).then(response => {
 
             let data = response.data;
             clientes_global = data.clientes;
             if (data.clientes.length > 0) {
                 $('#cliente_id').append('<option></option>').trigger('change');
-                for(var i = 0;i < data.clientes.length; i++)
-                {
+                for (var i = 0; i < data.clientes.length; i++) {
                     var newOption = '';
-                    if(data.clientes[i].id == 1)
-                    {
-                        newOption = '<option value="'+data.clientes[i].id+'" selected tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
-                    }
-                    else
-                    {
-                        newOption = '<option value="'+data.clientes[i].id+'" tabladetalle="'+data.clientes[i].tabladetalles_id+'">'+data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre+'</option>'
+                    if (data.clientes[i].id == 1) {
+                        newOption = '<option value="' + data.clientes[i].id + '" selected tabladetalle="' + data.clientes[i].tabladetalles_id + '">' + data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre + '</option>'
+                    } else {
+                        newOption = '<option value="' + data.clientes[i].id + '" tabladetalle="' + data.clientes[i].tabladetalles_id + '">' + data.clientes[i].tipo_documento + ': ' + data.clientes[i].documento + ' - ' + data.clientes[i].nombre + '</option>'
                     }
                     $('#cliente_id').append(newOption).trigger('change');
                 }
@@ -1577,9 +1488,8 @@
             } else {
                 toastr.error('Clientes no encontrados.', 'Error');
             }
-
-            $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
             $('#tipo_cliente_documento').val(data.tipo);
+            $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
             obtenerTipocliente(1)
             $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         })
@@ -1588,14 +1498,12 @@
     function obtenerTipocliente(cliente_id) {
         if (cliente_id != '') {
             $('#buscarLotes').prop("disabled", false)
-        }
-        else{
+        } else {
             $('#buscarLotes').prop("disabled", true)
         }
     }
 
-    function enviarVenta()
-    {
+    function enviarVenta() {
         axios.get("{{ route('Caja.movimiento.verificarestado') }}").then((value) => {
             let data = value.data;
             if (!data.success) {
@@ -1622,19 +1530,16 @@
                     //HABILITAR EL CARGAR PAGINA
                     //$('#asegurarCierre').val(2)
                     //$('#enviar_documento').submit();
-                }
-                else
-                {
+                } else {
                     envio_ok = false;
                 }
 
-                if(envio_ok)
-                {
+                if (envio_ok) {
                     let formDocumento = document.getElementById('enviar_documento');
                     let formData = new FormData(formDocumento);
 
                     var object = {};
-                    formData.forEach(function(value, key){
+                    formData.forEach(function(value, key) {
                         object[key] = value;
                     });
 
@@ -1669,7 +1574,7 @@
                         showLoaderOnConfirm: true,
                         allowOutsideClick: false,
                         preConfirm: (login) => {
-                            return fetch(url,init)
+                            return fetch(url, init)
                                 .then(response => {
                                     if (!response.ok) {
                                         throw new Error(response.statusText)
@@ -1685,8 +1590,7 @@
                         allowOutsideClick: () => !Swal.isLoading()
                     }).then((result) => {
                         if (result.value !== undefined && result.isConfirmed) {
-                            if(result.value.errors)
-                            {
+                            if (result.value.errors) {
                                 let mensaje = sHtmlErrores(result.value.data.mensajes);
                                 toastr.error(mensaje);
                                 $('#asegurarCierre').val(1);
@@ -1695,30 +1599,27 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
-                                @if (!empty($cotizacion))
+                                @if(!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                                 @endif
-                            }
-                            else if(result.value.success)
-                            {
-                                toastr.success('¡Documento de venta creado!','Exito')
+                            } else if (result.value.success) {
+                                toastr.success('¡Documento de venta creado!', 'Exito')
 
                                 let id = result.value.documento_id;
                                 var url_open_pdf = '{{ route("ventas.documento.comprobante", ":id")}}';
-                                url_open_pdf = url_open_pdf.replace(':id',id+'-80');
-                                window.open(url_open_pdf,'Comprobante SISCOM','location=1, status=1, scrollbars=1,width=900, height=600');
+                                url_open_pdf = url_open_pdf.replace(':id', id + '-80');
+                                window.open(url_open_pdf, 'Comprobante SISCOM', 'location=1, status=1, scrollbars=1,width=900, height=600');
 
                                 $('#asegurarCierre').val(2);
 
                                 location = "{{ route('ventas.documento.index') }}";
-                            }
-                            else
-                            {
+                            } else {
                                 $('#asegurarCierre').val(1);
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Error',
-                                    text: '¡'+ result.value.mensaje +'!',
+                                    text: '¡' + result.value.mensaje + '!',
                                     customClass: {
                                         container: 'my-swal'
                                     },
@@ -1730,8 +1631,9 @@
                                 document.getElementById("fecha_documento_campo").disabled = true;
                                 document.getElementById("fecha_atencion_campo").disabled = true;
                                 document.getElementById("empresa_id").disabled = true;
-                                @if (!empty($cotizacion))
+                                @if(!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
+                                document.getElementById("condicion_id").disabled = true;
                                 @endif
                             }
                         }
@@ -1742,11 +1644,11 @@
     }
 
     //ERRORES DEVOLUCIONES
-    @if (!empty($errores))
-        $('#asegurarCierre').val(1)
-        @foreach ($errores as $error)
-            toastr.error('La cantidad solicitada '+"{{ $error->cantidad }}"+' excede al stock del producto'+"{{ $error->producto }}", 'Error');
-        @endforeach
+    @if(!empty($errores))
+    $('#asegurarCierre').val(1)
+    @foreach($errores as $error)
+    toastr.error('La cantidad solicitada ' + "{{ $error->cantidad }}" + ' excede al stock del producto' + "{{ $error->producto }}", 'Error');
+    @endforeach
     @endif
 
     function modalCliente() {
@@ -1762,7 +1664,9 @@
     function nextFocus(event, inputS) {
         if (event.keyCode == 13) {
 
-            setTimeout(function() { $('#'+inputS).focus() }, 10);
+            setTimeout(function() {
+                $('#' + inputS).focus()
+            }, 10);
             document.getElementById(inputS).focus();
         }
     }
@@ -1771,7 +1675,6 @@
 </script>
 
 <script>
-
     window.onbeforeunload = () => {
         if ($('#asegurarCierre').val() == 1) {
             while (true) {

@@ -1428,7 +1428,15 @@ if (!function_exists('ventas_mensual')) {
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        return $total;
+        return (float)$total;
+    }
+}
+
+if (!function_exists('ventas_mensual_random')) {
+    function ventas_mensual_random($mes,$anio)
+    {
+        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
+        return (float)$total;
     }
 }
 
@@ -1441,8 +1449,36 @@ if (!function_exists('utilidad_mensual')) {
         $ventas = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->get();
         $coleccion = collect();
         foreach ($ventas as $venta) {
-            if($venta->estado_pago == 'PAGADA'&& ifNoConvertido($venta->id))
+            if(ifNoConvertido($venta->id))
             {
+                $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
+                foreach ($detalles as $detalle) {
+                    $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
+                    $coleccion->push([
+                        "fecha_doc" => $venta->fecha_documento,
+                        "cantidad" => $detalle->cantidad,
+                        "producto" => $detalle->lote->producto->nombre,
+                        "precio_venta" => $detalle->precio_nuevo,
+                        "precio_compra" => $precom,
+                        "utilidad" => $detalle->precio_nuevo - $precom,
+                        "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
+                    ]);
+                }
+            }
+        }
+
+        $utilidad = $coleccion->sum('importe');
+        return $utilidad;
+    }
+}
+
+if (!function_exists('utilidad_mensual_random')) {
+    function utilidad_mensual_random($mes,$anio)
+    {
+        $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
+        $coleccion = collect();
+        foreach ($ventas as $venta) {
+            if (ifNoConvertido($venta->id)) {
                 $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
                 foreach ($detalles as $detalle) {
                     $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
@@ -1466,13 +1502,24 @@ if (!function_exists('utilidad_mensual')) {
 
 
 
-if (!function_exists('compras_mensual')) {
-    function compras_mensual()
+if (!function_exists('inversion_mensual')) {
+    function inversion_mensual()
     {
         $fecha_hoy = Carbon::now();
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_emision',$mes)->whereYear('fecha_emision',$anio)->sum('total_soles');
+        return $total;
+    }
+}
+
+if (!function_exists('compras_mensual')) {
+    function compras_mensual()
+    {
+        $fecha_hoy = Carbon::now();
+        $mes = date_format($fecha_hoy, 'm');
+        $anio = date_format($fecha_hoy, 'Y');
+        $total = Documento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_emision', $mes)->whereYear('fecha_emision', $anio)->sum('total_soles');
         return $total;
     }
 }

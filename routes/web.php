@@ -651,6 +651,7 @@ function(){
     Route::prefix('consultas/utilidad')->group(function(){
 
         Route::get('index', 'Consultas\UtilidadController@index')->name('consultas.utilidad.index');
+        Route::get('getDatos/{mes}/{anio}', 'Consultas\UtilidadController@getDatos')->name('consultas.utilidad.getDatos');
 
     });
 
@@ -745,6 +746,15 @@ Route::get('/buscar','BuscarController@index');
 Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
+
+    $mes = '12';
+    $anio = '2022';
+    $fecini = $anio . '-' . $mes . '-01';
+    $fecini = date('Y-m-d', strtotime($fecini));
+    $fecfin = date('Y-m-d', strtotime($fecini . "+ 1 month"));
+
+    return $fecfin;
+
     $curl = curl_init();
     $data = [
         "ruc_emisor" => "20481753091",

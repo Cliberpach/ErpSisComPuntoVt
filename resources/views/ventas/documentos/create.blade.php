@@ -76,7 +76,7 @@
                                     </div>
 
                                     <div class="col-12 col-md-6" id="fecha_entrega">
-                                        <div class="form-group">
+                                        <div class="form-group d-none">
                                             <label class="">Fecha de Atención</label>
                                             <div class="input-group">
                                                 <span class="input-group-addon">
@@ -103,6 +103,18 @@
                                                     </span>
                                                     @endif
                                             </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Placa</label>
+                                            <input type="text" type="text" placeholder=""
+                                            class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
+                                            name="observacion" id="observacion" onkeyup="return mayus(this)"
+                                            value="{{ old('observacion') }}" maxlength="7">
+                                            @if ($errors->has('observacion'))
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('observacion') }}</strong>
+                                                </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -146,7 +158,6 @@
                                             </select>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
 
@@ -192,11 +203,12 @@
                                             <label class="required">Condición</label>
                                             <select id="condicion_id" name="condicion_id"
                                                 class="select2_form form-control {{ $errors->has('condicion_id') ? ' is-invalid' : '' }}"
-                                                required disabled onchange="changeFormaPago()>
+                                                required onchange="changeFormaPago()" disabled>
                                                 <option></option>
                                                 @foreach ($condiciones as $condicion)
                                                     <option value="{{ $condicion->id }}-{{ $condicion->descripcion }}"
-                                                        {{ (old('condicion_id') == $condicion->id || $cotizacion->condicion_id == $condicion->id) ? 'selected' : '' }} data-dias="{{$condicion->dias}}">
+                                                        {{ old('condicion_id') == $condicion->id.'-'.$condicion->descripcion || $condicion->id == $cotizacion->condicion_id ? 'selected' : '' }}
+                                                        data-dias="{{$condicion->dias}}">
                                                         {{ $condicion->descripcion }} {{ $condicion->dias > 0 ? $condicion->dias.' dias' : '' }}
                                                     </option>
                                                 @endforeach
@@ -276,16 +288,7 @@
                                 <div class="row d-none">
                                     <div class="col-12">
                                         <div class="form-group">
-                                            <label>Observación:</label>
-                                            <textarea type="text" placeholder=""
-                                                class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
-                                                name="observacion" id="observacion" onkeyup="return mayus(this)"
-                                                value="{{ old('observacion') }}">{{ old('observacion') }}</textarea>
-                                            @if ($errors->has('observacion'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('observacion') }}</strong>
-                                                </span>
-                                            @endif
+
                                         </div>
                                     </div>
                                 </div>
@@ -325,7 +328,7 @@
                     <hr>
                     <div class="row">
 
-                        <div class="col-12">
+                        <div class="col-lg-12">
                             <div class="panel panel-primary" id="panel_detalle">
                                 <div class="panel-heading">
                                     <h4 class=""><b>Detalle del Documento de Venta</b></h4>
@@ -360,6 +363,7 @@
                                             <input type="hidden" name="producto_json" id="producto_json">
 
                                             <div class="col-lg-2 col-xs-12">
+
                                                 <label class="col-form-label required">Cantidad:</label>
                                                 <input type="text" name="cantidad"  id="cantidad" class="form-control" onkeypress="return filterFloat(event, this, false);" onkeydown="nextFocus(event,'precio')" disabled>
                                                 <div class="invalid-feedback"><b><span id="error-cantidad"></span></b>
@@ -513,7 +517,6 @@
 <script src="{{ asset('Inspinia/js/plugins/dataTables/dataTables.bootstrap4.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
 <script src="{{ asset('Inspinia/js/plugins/iCheck/icheck.min.js') }}"></script>
 <script>
 
@@ -586,6 +589,7 @@
         })
     }
 
+
     //Borrar registro de Producto
     $(document).on('click', '.btn-delete', function(event) {
 
@@ -653,6 +657,58 @@
                 },
             })
         @endif
+    });
+
+    function changeFormaPago()
+    {
+        let condicion_id = $('#condicion_id').val();
+        if(condicion_id)
+        {
+            let cadena = condicion_id.split('-');
+            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
+            let fecha = new Date('{{ $fecha_hoy }}')
+
+            fecha.setDate(fecha.getDate() + dias)
+
+            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
+            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
+            let resultado = fecha.getFullYear() + '-' + month + '-' + day
+            $("#fecha_vencimiento_campo").val(resultado);
+            if(cadena[1] == 'CONTADO')
+            {
+                $('#fecha_vencimiento').addClass('d-none');
+            }
+            else
+            {
+                $('#fecha_vencimiento').removeClass('d-none');
+            }
+        }
+        else
+        {
+            $('#fecha_vencimiento').addClass('d-none');
+            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
+        }
+    }
+
+    function obtenerProducto(id) {
+        // Consultamos nuestra BBDD
+        var url = '{{ route('almacenes.producto.productoDescripcion', ':id') }}';
+        url = url.replace(':id', id);
+        $.ajax({
+            dataType: 'json',
+            type: 'get',
+            url: url,
+        }).done(function(result) {
+
+            $('#presentacion_producto').val(result.medida)
+            $('#codigo_nombre_producto').val(result.codigo + ' - ' + result.nombre)
+            llegarDatos()
+            sumaTotal()
+            limpiarDetalle()
+        });
+    }
+
+    $(document).ready(function() {
 
         //DATATABLE - COTIZACION
         table = $('.dataTables-detalle-documento').DataTable({
@@ -788,6 +844,7 @@
                 $('#igv').prop('required', true)
                 var igv = ($('#igv').val()) + ' %'
                 $('#igv_int').text(igv)
+                // sumaTotal()
             @else
                 if ($("#igv_check").prop('checked')) {
                     $('#igv').attr('disabled', false)
@@ -808,51 +865,6 @@
         $.fn.DataTable.ext.errMode = 'throw';
     });
 
-    function changeFormaPago()
-    {
-        let condicion_id = $('#condicion_id').val();
-        if(condicion_id)
-        {
-            let cadena = condicion_id.split('-');
-            let dias = convertFloat($('#condicion_id option:selected').data('dias')) + 1
-            let fecha = new Date('{{ $fecha_hoy }}')
-
-            fecha.setDate(fecha.getDate() + dias)
-
-            let month = (fecha.getMonth() + 1).toString().length > 1 ? (fecha.getMonth() + 1) : '0' + (fecha.getMonth() + 1)
-            let day = (fecha.getDate()).toString().length > 1 ? (fecha.getDate()) : '0' + (fecha.getDate())
-            let resultado = fecha.getFullYear() + '-' + month + '-' + day
-            $("#fecha_vencimiento_campo").val(resultado);
-            if(cadena[1] == 'CONTADO')
-            {
-                $('#fecha_vencimiento').addClass('d-none');
-            }
-            else
-            {
-                $('#fecha_vencimiento').removeClass('d-none');
-            }
-        }
-        else
-        {
-            $('#fecha_vencimiento').addClass('d-none');
-            $("#fecha_vencimiento_campo").val('{{ $fecha_hoy }}');
-        }
-    }
-
-    function obtenerProducto(id) {
-        // Consultamos nuestra BBDD
-        var url = '{{ route('almacenes.producto.productoDescripcion', ':id') }}';
-        url = url.replace(':id', id);
-        axios.get(url).then(response => {
-            result = response.data
-            $('#presentacion_producto').val(result.medida)
-            $('#codigo_nombre_producto').val(result.codigo + ' - ' + result.nombre)
-            llegarDatos()
-            sumaTotal()
-            limpiarDetalle()
-        })
-    }
-
     function limpiarErrores() {
         $('#cantidad').removeClass("is-invalid")
         $('#error-cantidad').text('')
@@ -869,7 +881,8 @@
         agregarDetalle('VISTA');
     })
 
-    function agregarDetalle(condicion){
+    function agregarDetalle(condicion)
+    {
         limpiarErrores()
         var enviar = true;
         var producto_json = JSON.parse($('#producto_json').val());
@@ -914,8 +927,7 @@
                             $('#modal-codigo-precio').modal('show');
                         }
                         enviar = false;
-                    }
-                    else{
+                    } else {
                         $('#modal-codigo-precio').modal('hide');
                     }
                 }
@@ -927,7 +939,7 @@
         }
 
         if ($('#cantidad').val() == '') {
-            toastr.error('Ingrese cantidad del producto.', 'Error');
+            toastr.error('Ingrese cantidad del artículo.', 'Error');
             enviar = false;
             $("#cantidad").addClass("is-invalid");
             $('#error-cantidad').text('El campo Cantidad es obligatorio.')
@@ -1021,6 +1033,8 @@
                 }
             });
         }
+
+
     }
 
     //AGREGAR EL DETALLE A LA TABLA
@@ -1041,6 +1055,9 @@
             $detalle.descuento,
             $detalle.precio_minimo,
         ]).draw(false);
+        //cargarProductos()
+        //INGRESADO EL PRODUCTO SUMA TOTAL DEL DETALLE
+        //sumaTotal()
         //LIMPIAR LOS CAMPOS DESPUES DE LA BUSQUEDA
         $('#precio').val('')
         $('#cantidad').val('')
@@ -1064,7 +1081,7 @@
                 precio_inicial: value[10],
                 descuento: value[11],
                 cantidad: value[2],
-                valor_venta: value[9],
+                valor_venta: value[9],                
                 precio_minimo: value[12],
             };
             productos.push(fila);
@@ -1534,8 +1551,8 @@
 
     function obtenerClientes() {
         clientes_global = [];
-        $("#cliente_id").empty().trigger('change');
         $("#cliente_id").removeAttr('onchange', 'obtenerTipocliente(this.value)');
+        $("#cliente_id").empty().trigger('change');
         $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         axios.post('{{ route('ventas.customers_all') }}',{'_token': $('input[name=_token]').val(), 'tipo_id': $('#tipo_venta').val()}).then(response => {
 
@@ -1560,8 +1577,9 @@
             } else {
                 toastr.error('Clientes no encontrados.', 'Error');
             }
-            $('#tipo_cliente_documento').val(data.tipo);
+
             $("#cliente_id").attr('onchange', 'obtenerTipocliente(this.value)');
+            $('#tipo_cliente_documento').val(data.tipo);
             obtenerTipocliente(1)
             $('#panel_detalle').children('.ibox-content').toggleClass('sk-loading');
         })
@@ -1679,7 +1697,6 @@
                                 document.getElementById("empresa_id").disabled = true;
                                 @if (!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
-                                document.getElementById("condicion_id").disabled = true;
                                 @endif
                             }
                             else if(result.value.success)
@@ -1715,7 +1732,6 @@
                                 document.getElementById("empresa_id").disabled = true;
                                 @if (!empty($cotizacion))
                                 document.getElementById("cliente_id").disabled = true;
-                                document.getElementById("condicion_id").disabled = true;
                                 @endif
                             }
                         }

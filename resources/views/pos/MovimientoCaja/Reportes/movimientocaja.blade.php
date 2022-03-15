@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Reporte Caja Movimiento</title>
     <link rel="icon" href="{{ base_path() . '/img/siscom.ico' }}" />
+
     <style>
         body {
             font-family: Arial, Helvetica, sans-serif;
@@ -289,7 +290,7 @@
                 <tr>
                     <td style="padding-left: 5px;">Colaborador</td>
                     <td>:</td>
-                    <td>{{ $movimiento->colaborador->persona->apellido_paterno . ' ' . $movimiento->colaborador->persona->apellido_materno . ' ' . $movimiento->Colaborador->persona->nombres }}
+                    <td>{{ $movimiento->colaborador->persona->apellido_paterno . ' ' . $movimiento->colaborador->persona->apellido_materno . ' ' . $movimiento->colaborador->persona->nombres }}
                     </td>
                     {{-- <td>{{ getFechaFormato( $documento->fecha_documento ,'d/m/Y')}}</td> --}}
                 </tr>
