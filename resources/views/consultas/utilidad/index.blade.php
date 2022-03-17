@@ -114,7 +114,7 @@
 
 @stop
 @push('styles')
-<link href="http://fonts.cdnfonts.com/css/dot-matrix" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/dot-matrix" rel="stylesheet">
 <link href="{{ asset('Inspinia/css/plugins/select2/select2.min.css') }}" rel="stylesheet">
 <!-- DataTable -->
 <link href="{{asset('Inspinia/css/plugins/dataTables/datatables.min.css')}}" rel="stylesheet">
