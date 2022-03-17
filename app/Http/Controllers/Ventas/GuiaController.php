@@ -595,6 +595,9 @@ class GuiaController extends Controller
                     if ($json_sunat->sunatResponse->success == true) {
                         if($json_sunat->sunatResponse->cdrResponse->code == "0") {
                             $guia->sunat = '1';
+                            $respuesta_cdr = json_encode($json_sunat->sunatResponse->cdrResponse, true);
+                            $respuesta_cdr = json_decode($respuesta_cdr, true);
+                            $guia->getCdrResponse = $respuesta_cdr;
                             $data = pdfGuiaapi(json_encode($arreglo_guia));
                             $name = $existe[0]->get('numeracion')->serie . "-" . $guia->correlativo . '.pdf';
                             $pathToFile = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'sunat' . DIRECTORY_SEPARATOR . 'guia' . DIRECTORY_SEPARATOR . $name);
