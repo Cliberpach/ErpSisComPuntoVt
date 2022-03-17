@@ -192,8 +192,8 @@
     function limpiar(){
         $('#inversion_dolar').text("0.00");
         $('#inversion_soles').text("0.00");
-        $('#venta_dolar').text("0.00");
-        $('#venta_soles').text("0.00");
+        $('#ventas_dolar').text("0.00");
+        $('#ventas_soles').text("0.00");
         $('#utilidad_dolar').text("0.00");
         $('#utilidad_soles').text("0.00");
         $('#porcentaje_dolar').text("0.00%");
