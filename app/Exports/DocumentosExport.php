@@ -267,7 +267,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => '-',
                     'TRANSFERENCIA' => '-',
                     'YAPE/PLIN' => '-',
-                    'ENVIADA' => $nota->sunat == '1' || $doc->sunat == '2' ? 'SI' : 'NO',
+                    'ENVIADA' => $nota->sunat == '1' || $nota->sunat == '2' ? 'SI' : 'NO',
                     'HASH' => $nota->hash
                 ]);
             }
