@@ -113,7 +113,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => $efectivo,
                     'TRANSFERENCIA' => $transferencia,
                     'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
+                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' || $doc->sunat == '2' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
                     'HASH' => $doc->hash
                 ]);
             }
@@ -174,7 +174,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => $efectivo,
                     'TRANSFERENCIA' => $transferencia,
                     'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
+                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
                     'HASH' => $doc->hash
                 ]);
             }
@@ -235,7 +235,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => $efectivo,
                     'TRANSFERENCIA' => $transferencia,
                     'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
+                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
                     'HASH' => $doc->hash
                 ]);
             }
@@ -267,7 +267,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => '-',
                     'TRANSFERENCIA' => '-',
                     'YAPE/PLIN' => '-',
-                    'ENVIADA' => $nota->sunat == '1' ? 'SI' : 'NO',
+                    'ENVIADA' => $nota->sunat == '1' || $doc->sunat == '2' ? 'SI' : 'NO',
                     'HASH' => $nota->hash
                 ]);
             }
@@ -305,7 +305,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'EFECTIVO' => '-',
                     'TRANSFERENCIA' => '-',
                     'YAPE/PLIN' => '-',
-                    'ENVIADA' => $nota->sunat == '1' ? 'SI' : 'NO',
+                    'ENVIADA' => $nota->sunat == '1' || $nota->sunat == '2' ? 'SI' : 'NO',
                     'HASH' => $nota->hash
                 ]);
             }

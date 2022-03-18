@@ -746,44 +746,18 @@ Route::get('/buscar','BuscarController@index');
 Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
-
-    $mes = '12';
-    $anio = '2022';
-    $fecini = $anio . '-' . $mes . '-01';
-    $fecini = date('Y-m-d', strtotime($fecini));
-    $fecfin = date('Y-m-d', strtotime($fecini . "+ 1 month"));
-
-    return $fecfin;
-
-    $curl = curl_init();
-    $data = [
-        "ruc_emisor" => "20481753091",
-        "codigo_tipo_documento" => "03",
-        "serie_documento" => "B001",
-        "numero_documento" => "7511",
-        "fecha_de_emision" => "2022-03-07",
-        "total" => "2.00"
-    ];
-
-    $post_data = http_build_query($data);
-
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://apiperu.dev/api/cpe?api_token=c36358c49922c564f035d4dc2ff3492fbcfd31ee561866960f75b79f7d645d7d",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CUSTOMREQUEST => "POST",
-        CURLOPT_POSTFIELDS => $post_data,
-        CURLOPT_SSL_VERIFYPEER => false
-    ));
-
-    $response = curl_exec($curl);
-    $err = curl_error($curl);
-
-    curl_close($curl);
-
-    if ($err) {
-        return "cURL Error #:" . $err;
-    } else {
-        return $response;
-    }
+    $comprobante = array(
+        'ruc' => '11111111111',
+        'tipo' => '',
+        'serie' => '',
+        'correlativo' => '',
+        'fecha_emision' => '',
+        'total' => ''
+    );
+    $comprobante = json_encode($comprobante, false);
+    $comprobante = json_decode($comprobante, false);
+    $data = consultaCrd($comprobante);
+    $data = json_decode($data);
+    return $data->message;
     return '<div style="width:100%; height: 100vh;text-align:center;"><h1 style="font-size: 350px;">SISCOM</h1></div';
 });

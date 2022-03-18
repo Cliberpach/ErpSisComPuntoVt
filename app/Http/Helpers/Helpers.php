@@ -314,10 +314,48 @@ if (!function_exists('consultaRuc')) {
         return Parametro::findOrFail(1);
     }
 }
+
 if (!function_exists('consultaDni')) {
     function consultaDni()
     {
         return Parametro::findOrFail(2);
+    }
+}
+
+if (!function_exists('consultaCrd')) {
+    function consultaCrd($comprobante)
+    {
+        $curl = curl_init();
+        $data = [
+            "ruc_emisor" => $comprobante->ruc,
+            "codigo_tipo_documento" => $comprobante->tipo,
+            "serie_documento" => $comprobante->serie,
+            "numero_documento" => $comprobante->correlativo,
+            "fecha_de_emision" => $comprobante->fecha_emision,
+            "total" => $comprobante->total
+        ];
+
+        $post_data = http_build_query($data);
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://apiperu.dev/api/cpe?api_token=c36358c49922c564f035d4dc2ff3492fbcfd31ee561866960f75b79f7d645d7d",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => $post_data,
+            CURLOPT_SSL_VERIFYPEER => false
+        ));
+
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+
+        if ($err) {
+            $resultado = json_encode(array('success' => false, 'error' => $err));
+            return $resultado;
+        } else {
+            return $response;
+        }
     }
 }
 

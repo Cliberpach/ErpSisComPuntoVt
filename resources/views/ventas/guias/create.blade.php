@@ -320,7 +320,7 @@
                                     <label class="required">Dirección de la tienda o destino (Llegada): </label>
                                     <textarea type="text" placeholder=""
                                         class="form-control input-required {{ $errors->has('direccion_tienda') ? ' is-invalid' : '' }}"
-                                        name="direccion_tienda" id="direccion_tienda" value="{{old('direccion_tienda')}}"  required >{{old('direccion_tienda')}}</textarea>
+                                        name="direccion_tienda" id="direccion_tienda" value="{{old('direccion_tienda')}}"  required>{{old('direccion_tienda')}}</textarea>
 
 
                                     @if ($errors->has('direccion_tienda'))
