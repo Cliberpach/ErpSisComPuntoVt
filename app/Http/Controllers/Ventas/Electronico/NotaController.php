@@ -539,7 +539,7 @@ class NotaController extends Controller
             if (count($serie_comprobantes) === 1) {
                 //OBTENER EL DOCUMENTO INICIADO
                 $nota->correlativo = $numeracion->numero_iniciar;
-                $nota->serie = $nota->tipDocAfectado == '03' ? 'BB01' : 'FF01';//$numeracion->serie;
+                $nota->serie = $numeracion->serie;//$numeracion->serie;
                 $nota->update();
 
                 //ACTUALIZAR LA NUMERACION (SE REALIZO EL INICIO)
@@ -551,7 +551,7 @@ class NotaController extends Controller
                 if($nota->sunat != '1' ){
                     $ultimo_comprobante = $serie_comprobantes->first();
                     $nota->correlativo = $ultimo_comprobante->correlativo+1;
-                    $nota->serie = $nota->tipDocAfectado === '03' ? 'BB01' : 'FF01';//$numeracion->serie;
+                    $nota->serie = $numeracion->serie;//$numeracion->serie;
                     $nota->update();
 
                     //ACTUALIZAR LA NUMERACION (SE REALIZO EL INICIO)

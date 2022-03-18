@@ -387,35 +387,24 @@ function cdr(id) {
 
 }
 
-@if(!empty($sunat_exito))
+@if(Session::has('sunat_exito'))
     Swal.fire({
-        icon: 'success',
-        title: '{{$id_sunat}}',
-        text: '{{$descripcion_sunat}}',
+        icon: 'success',        
+        title: '{{ Session::get("id_sunat") }}',
+        text: '{{ Session::get("descripcion_sunat") }}',
         showConfirmButton: false,
         timer: 2500
     })
 @endif
 
-@if(!empty($sunat_error))
+@if(Session::has('sunat_error'))
     Swal.fire({
         icon: 'error',
-        title: '{{$id_sunat}}',
-        text: '{{$descripcion_sunat}}',
+        title: '{{ Session::get("id_sunat") }}',
+        text: '{{ Session::get("descripcion_sunat") }}',
         showConfirmButton: false,
         timer: 5500
     })
-@endif
-
-@if(Session::has('documento_id'))
-    let doc = '{{ Session::get("documento_id")}}';
-    let id = doc+'-100';
-
-    var url = '{{ route("ventas.documento.comprobante", ":id")}}';
-    url = url.replace(':id', id);
-    // $('#nueva_ventana').attr('href',url);
-    // document.getElementById('nueva_ventana').click;
-    window.open(url, "Comprobante SISCOM", "width=900, height=600")
 @endif
 
 </script>
