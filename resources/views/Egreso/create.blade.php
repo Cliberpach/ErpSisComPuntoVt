@@ -143,6 +143,8 @@
                     if (!data.success) {
                             toastr.error(data.mensaje);
                     }  else {
+                        $('.btn-submit-egreso').attr('disabled',true);
+                        $('.btn-submit-egreso').html('Cargando <span class="loading bullet"></span> ');
                         this.submit();
                     }
                 })

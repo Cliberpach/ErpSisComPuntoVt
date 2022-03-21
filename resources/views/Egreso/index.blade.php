@@ -54,6 +54,7 @@
 @push('styles')
 <!-- DataTable -->
 <link href="{{ asset('Inspinia/css/plugins/dataTables/datatables.min.css') }}" rel="stylesheet">
+<link href="{{ asset('Inspinia/css/plugins/textSpinners/spinners.css') }}" rel="stylesheet">
 <style>
     .my-swal {
         z-index: 3000 !important;
