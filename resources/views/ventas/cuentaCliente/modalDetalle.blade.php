@@ -162,7 +162,9 @@
             </div>
             <div class="modal-footer">
                 <div class="col-md-6 text-right">
-                    <button type="submit" class="btn btn-primary btn-sm" id="btn_guardar_detalle" form="frmDetalle"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="submit" class="btn btn-primary btn-sm" id="btn_guardar_detalle" form="frmDetalle">
+                        Guardar
+                    </button>
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i
                             class="fa fa-times"></i> Cancelar</button>
                 </div>
@@ -240,6 +242,8 @@
                              toastr.error(data.mensaje);
                         }  else {
                             if (enviar) {
+                                $('#btn_guardar_detalle').attr('disabled',true);
+                                $('#btn_guardar_detalle').html('Cargando <span class="loading bullet"></span> ');
                                 this.submit();
                             }
                         }

@@ -72,7 +72,7 @@
                         </div>
                         <div class="col-12">
                             <div class="table-responsive">
-                                <table class="table table-hover table-bordered" style="font-size: 2.5vw; font-family: 'Dot Matrix', sans-serif;">
+                                <table class="table table-hover table-bordered" style="font-size: 2.5vw;">
                                     <thead>
                                         <tr>
                                             <th class="text-center"></th>

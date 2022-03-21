@@ -239,6 +239,8 @@
                              toastr.error(data.mensaje);
                         }  else {
                             if (enviar) {
+                                $('#btn_guardar_detalle').attr('disabled',true);
+                                $('#btn_guardar_detalle').html('Cargando <span class="loading bullet"></span> ');
                                 const config = {
                                     headers: {
                                         "content-type": "multipart/form-data"
