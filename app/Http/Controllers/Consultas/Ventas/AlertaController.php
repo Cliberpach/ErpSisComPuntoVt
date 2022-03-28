@@ -474,7 +474,9 @@ class AlertaController extends Controller
             $comprobante = json_encode($comprobante, false);
             $comprobante = json_decode($comprobante, false);
             $data = consultaCrd($comprobante);
+            return $data;
             $data = json_decode($data);
+            
             if($data->success)
             {
                 if($data->comprobante_estado_codigo == '1' && strtoupper($data->comprobante_estado_descripcion) == 'ACEPTADO')
