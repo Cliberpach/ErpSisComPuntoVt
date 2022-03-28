@@ -475,35 +475,31 @@ class AlertaController extends Controller
             $comprobante = json_decode($comprobante, false);
             $data = consultaCrd($comprobante);
             $data = json_decode($data);
-            
-            if($data->success)
-            {
-                if($data->comprobante_estado_codigo == '1' && strtoupper($data->comprobante_estado_descripcion) == 'ACEPTADO')
-                {
+
+            if ($data->success) {
+                if ($data->data->comprobante_estado_codigo == '1' && strtoupper($data->data->comprobante_estado_descripcion) == 'ACEPTADO') {
                     Session::flash('success', 'Documento de Venta enviada a Sunat con exito.');
                     Session::flash('sunat_exito', '1');
                     Session::flash('id_sunat', $documento->serie . '-' . $documento->correlativo);
                     Session::flash('descripcion_sunat', 'CDR regularizado.');
                     return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_exito', 'success');
-                }
-                else {
+                } else {
                     $documento->sunat = '0';
                     $documento->regularize = '0';
                     $documento->getCdrResponse = null;
-                    $documento->getRegularizeResponse= null;
+                    $documento->getRegularizeResponse = null;
                     $documento->update();
                     Session::flash('error', 'Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
-                    return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_error', 'error');  
+                    return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_error', 'error');
                 }
-            }
-            else {
+            } else {
                 $documento->sunat = '0';
                 $documento->regularize = '0';
                 $documento->getCdrResponse = null;
                 $documento->getRegularizeResponse = null;
                 $documento->update();
                 Session::flash('error', 'Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
-                return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_error', 'error');  
+                return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_error', 'error');
             }
             // $json_data = json_decode($documento->getRegularizeResponse, false);
             // if ($documento->regularize == '1' && $json_data->code == '1033') {
