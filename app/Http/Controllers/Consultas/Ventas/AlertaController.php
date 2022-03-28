@@ -468,13 +468,12 @@ class AlertaController extends Controller
                 'tipo' => $documento->tipoDocumento(),
                 'serie' => $documento->serie,
                 'correlativo' => $documento->correlativo,
-                'fecha_emision' => $documento->fecha_emision,
+                'fecha_emision' => $documento->fecha_documento,
                 'total' => $documento->total
             );
             $comprobante = json_encode($comprobante, false);
             $comprobante = json_decode($comprobante, false);
             $data = consultaCrd($comprobante);
-            return $data;
             $data = json_decode($data);
             
             if($data->success)
