@@ -431,11 +431,11 @@ class AlertaController extends Controller
                         $documento->sunat = '1';
                         $documento->update();
                         Session::flash('error', 'Documento de venta fue enviado a Sunat.');
-                        return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
+                        return redirect()->route('consultas.ventas.alerta.envio');
                     }
                 } else {
                     Session::flash('error', 'Tipo de Comprobante no registrado en la empresa.');
-                    return redirect()->route('consultas.ventas.alerta.envio')->with('sunat_existe', 'error');
+                    return redirect()->route('consultas.ventas.alerta.envio');
                 }
             } else {
                 Session::flash('error', 'Empresa sin parametros para emitir comprobantes electronicos');
@@ -478,6 +478,10 @@ class AlertaController extends Controller
 
             if ($data->success) {
                 if ($data->data->comprobante_estado_codigo == '1' && strtoupper($data->data->comprobante_estado_descripcion) == 'ACEPTADO') {
+                    $documento->sunat = '1';
+                    $documento->regularize = '0';
+                    $documento->update();
+
                     Session::flash('success', 'Documento de Venta enviada a Sunat con exito.');
                     Session::flash('sunat_exito', '1');
                     Session::flash('id_sunat', $documento->serie . '-' . $documento->correlativo);
