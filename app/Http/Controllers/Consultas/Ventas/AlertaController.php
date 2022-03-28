@@ -486,7 +486,7 @@ class AlertaController extends Controller
                     Session::flash('sunat_exito', '1');
                     Session::flash('id_sunat', $documento->serie . '-' . $documento->correlativo);
                     Session::flash('descripcion_sunat', 'CDR regularizado.');
-                    return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_exito', 'success');
+                    return redirect()->route('consultas.ventas.alerta.regularize');
                 } else {
                     $documento->sunat = '0';
                     $documento->regularize = '0';
@@ -494,7 +494,7 @@ class AlertaController extends Controller
                     $documento->getRegularizeResponse = null;
                     $documento->update();
                     Session::flash('error', 'Este documento tiene un error diferente al CDR, intentar enviar a sunat.');
-                    return redirect()->route('consultas.ventas.alerta.regularize')->with('sunat_error', 'error');
+                    return redirect()->route('consultas.ventas.alerta.regularize');
                 }
             } else {
                 $documento->sunat = '0';
