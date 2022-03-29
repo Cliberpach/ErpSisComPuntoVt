@@ -24,7 +24,7 @@ class Cotizacion extends Model
 
     public function documento()
     {
-        return $this->hasOne('App\Ventas\Documento\Documento', 'cotizacion_id');
+        return $this->hasOne('App\Ventas\Documento\Documento', 'cotizacion_venta');
     }
 
     public function empresa()
