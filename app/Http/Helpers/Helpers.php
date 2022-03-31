@@ -1466,7 +1466,7 @@ if (!function_exists('ventas_mensual')) {
         $mes = date_format($fecha_hoy,'m');
         $anio = date_format($fecha_hoy,'Y');
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        $total_invalida = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->where('convertir', '!=', '')->where('tipo_venta','129')->sum('total');
+        $total_invalida = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->where('convertir', '!=', '')->where('tipo_venta','!=','129')->sum('total');
         $total_notas = Nota::whereMonth('fechaEmision',$mes)->whereYear('fechaEmision',$anio)->sum('mtoImpVenta');
         return (float)($total - $total_invalida - $total_notas);
     }
@@ -1476,7 +1476,7 @@ if (!function_exists('ventas_mensual_random')) {
     function ventas_mensual_random($mes,$anio)
     {
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->where('convertir','!=','')->where('tipo_venta','129')->sum('total');
+        $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->where('convertir','!=','')->where('tipo_venta','!=','129')->sum('total');
         $total_notas = Nota::whereMonth('fechaEmision', $mes)->whereYear('fechaEmision', $anio)->sum('mtoImpVenta');
         return (float)($total - $total_invalida - $total_notas);
     }
