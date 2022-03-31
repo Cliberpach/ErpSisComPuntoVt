@@ -46,7 +46,7 @@ use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use App\Ventas\Documento\Documento as DocumentoDocumento;
 use Luecano\NumeroALetras\NumeroALetras;
-
+use App\Ventas\Nota;
 // TABLAS-DETALLES
 
 if (!function_exists('tipos_moneda')) {
@@ -1467,7 +1467,8 @@ if (!function_exists('ventas_mensual')) {
         $anio = date_format($fecha_hoy,'Y');
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
         $total_invalida = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->where('convertir', '!=', '')->where('tipo_venta','129')->sum('total');
-        return (float)($total - $total_invalida);
+        $total_notas = Nota::whereMonth('fechaEmision',$mes)->whereYear('fechaEmision',$anio)->sum('mtoImpVenta');
+        return (float)($total - $total_invalida - $total_notas);
     }
 }
 
@@ -1476,7 +1477,8 @@ if (!function_exists('ventas_mensual_random')) {
     {
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
         $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->where('convertir','!=','')->where('tipo_venta','129')->sum('total');
-        return (float)($total - $total_invalida);
+        $total_notas = Nota::whereMonth('fechaEmision', $mes)->whereYear('fechaEmision', $anio)->sum('mtoImpVenta');
+        return (float)($total - $total_invalida - $total_notas);
     }
 }
 
@@ -1663,7 +1665,7 @@ if (!function_exists('ifNoConvertido')) {
     function ifNoConvertido($id)
     {
         $doc = DocumentoDocumento::find($id);
-        if($doc->tipo_venta != '129')
+        if($doc->tipo_venta == '129')
         {
             return true;
         }
