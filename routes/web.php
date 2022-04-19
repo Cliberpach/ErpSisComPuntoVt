@@ -746,6 +746,8 @@ Route::get('/buscar','BuscarController@index');
 Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDocument');
 
 Route::get('ruta', function () {
+    actualizarStockProductos();
+    return "ok";
     $comprobante = array(
         'ruc' => '11111111111',
         'tipo' => '',

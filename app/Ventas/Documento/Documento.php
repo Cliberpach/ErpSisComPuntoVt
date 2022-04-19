@@ -225,7 +225,7 @@ class Documento extends Model
                 $cuenta_cliente->fecha_doc = $documento->fecha_documento;
                 $cuenta_cliente->monto = $documento->total;
                 $cuenta_cliente->acta = 'DOCUMENTO VENTA';
-                $cuenta_cliente->saldo = $documento->total;
+                $cuenta_cliente->saldo = $documento->total - $documento->notas->sum("mtoImpVenta");
                 $cuenta_cliente->update();
 
                 if ($cuenta_cliente->saldo - $cuenta_cliente->detalles->sum('monto') > 0) {
@@ -249,7 +249,7 @@ class Documento extends Model
                         $cuenta_cliente->cotizacion_documento_id = $documento->id;
                         $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
                         $cuenta_cliente->fecha_doc = $documento->fecha_documento;
-                        $cuenta_cliente->monto = $documento->total;
+                        $cuenta_cliente->monto = $documento->total - $documento->notas->sum("mtoImpVenta");
                         $cuenta_cliente->acta = 'DOCUMENTO VENTA';
                         $cuenta_cliente->saldo = $documento->total;
                         $cuenta_cliente->save();
@@ -267,7 +267,7 @@ class Documento extends Model
                         //$cuenta_a_convertir->cotizacion_documento_id = $doc_convertido->id;
                         //$cuenta_a_convertir->numero_doc = $doc_convertido->serie . ' - ' . $doc_convertido->correlativo;
                         //$cuenta_a_convertir->fecha_doc = $doc_convertido->fecha_documento;
-                        $cuenta_a_convertir->monto = $doc_convertido->total;
+                        $cuenta_a_convertir->monto = $doc_convertido->total - $doc_convertido->notas->sum("mtoImpVenta");
                         $cuenta_a_convertir->acta = 'DOCUMENTO VENTA';
                         $cuenta_a_convertir->update();
                     } else {
@@ -275,7 +275,7 @@ class Documento extends Model
                         $cuenta_cliente->cotizacion_documento_id = $documento->id;
                         $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
                         $cuenta_cliente->fecha_doc = $documento->fecha_documento;
-                        $cuenta_cliente->monto = $documento->total;
+                        $cuenta_cliente->monto = $documento->total - $documento->notas->sum("mtoImpVenta");
                         $cuenta_cliente->acta = 'DOCUMENTO VENTA';
                         $cuenta_cliente->saldo = $documento->total;
                         $cuenta_cliente->save();
