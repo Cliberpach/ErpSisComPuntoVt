@@ -12,6 +12,7 @@ class NotaSalidad extends Model
         'fecha',
         'origen',
         'destino',
+        'observacion',
         'usuario',
         'estado'
     ];

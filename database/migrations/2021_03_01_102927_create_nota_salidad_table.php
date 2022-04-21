@@ -19,6 +19,7 @@ class CreateNotaSalidadTable extends Migration
             $table->date("fecha");
             $table->string("origen")->nullable();
             $table->string("destino")->nullable();
+            $table->string("observacion")->nullable();
             $table->string("usuario");
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();

@@ -48,7 +48,7 @@
                             	<div class="form-group row">
 
                                     <input type="hidden" id="numero" name="numero" class="form-control" value="{{$ngenerado}}" >
-                                    <div class="col-sm-4"  id="fecha">
+                                    <div class="col-12 col-md-2"  id="fecha">
                                         <label>Fecha</label>
                                         <div class="input-group date">
                                             <span class="input-group-addon">
@@ -65,11 +65,11 @@
                                             @endif
                                         </div>
                                     </div>
-                                <div class="col-sm-4">
+                                    <div class="col-12 col-md-3">
                                         <label>Origen</label>
                                         <input type="text" name="origen" id="origen" readonly value="ALMACEN" class="form-control">
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-12 col-md-3">
                                         <label class="required">Destino</label>
                                         <select name="destino" id="destino" class="select2_form form-control {{ $errors->has('destino') ? ' is-invalid' : '' }}" required>
                                             <option value="">Seleccionar Destino</option>
@@ -82,6 +82,11 @@
                                             <strong>{{ $errors->first('destino') }}</strong>
                                         </span>
                                         @endif
+                                    </div>
+
+                                    <div class="col-12 col-md-4">
+                                        <label>Observación</label>
+                                        <textarea type="text" name="observacion" rows="2" id="observacion" class="form-control" placeholder="Observación"></textarea>
                                     </div>
 
                                 </div>

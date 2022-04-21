@@ -45,7 +45,7 @@
                                 </div>
                             	<div class="form-group row">
 
-                                    <div class="col-sm-4"  id="fecha">
+                                    <div class="col-12 col-md-2"  id="fecha">
                                         <label>Fecha</label>
                                         <div class="input-group date">
                                             <span class="input-group-addon">
@@ -62,11 +62,11 @@
                                             @endif
                                         </div>
                                     </div>
-                                <div class="col-sm-4">
+                                    <div class="col-12 col-md-3">
                                         <label>Origen</label>
                                         <input type="text" name="origen" id="origen" readonly value="ALMACEN DE PRODUCTO TERMINADO" class="form-control">
                                     </div>
-                                    <div class="col-sm-4">
+                                    <div class="col-12 col-md-3">
                                         <label class="required">Destino</label>
                                         <select name="destino" id="destino" class="form-control" disabled>
                                             <option value="">Seleccionar Destino</option>
@@ -75,6 +75,12 @@
                                             @endforeach
                                         </select>
                                     </div>
+
+                                    <div class="col-12 col-md-4">
+                                        <label>Observación</label>
+                                        <textarea type="text" name="observacion" rows="2" id="observacion" class="form-control" placeholder="Observación" readonly>{{ $notasalidad->observacion }}</textarea>
+                                    </div>
+
 
                                 </div>
                             </div>

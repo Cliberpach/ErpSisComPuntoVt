@@ -9,6 +9,7 @@ use App\Almacenes\NotaSalidad;
 use App\Almacenes\Producto;
 use App\Compras\Documento\Pago\Detalle;
 use App\Http\Controllers\Controller;
+use App\Mantenimiento\Empresa\Empresa;
 use App\Mantenimiento\Tabla\General;
 use App\User;
 use Carbon\Carbon;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class NotaSalidadController extends Controller
 {
@@ -115,6 +117,7 @@ class NotaSalidadController extends Controller
         $destino=DB::table('tabladetalles')->where('id',$request->destino)->first();
         $notasalidad->destino=$destino->descripcion;
         $notasalidad->origen=$request->origen;
+        $notasalidad->observacion=$request->observacion;
         $notasalidad->usuario=Auth()->user()->usuario;
         $notasalidad->save();
 
@@ -263,6 +266,7 @@ class NotaSalidadController extends Controller
          $notasalidad->fecha=$request->get('fecha');
          $destino=DB::table('tabladetalles')->where('id',$request->destino)->first();
          $notasalidad->destino=$destino->descripcion;
+         $notasalidad->observacion=$request->observacion;
          $notasalidad->usuario=Auth()->user()->usuario;
          $notasalidad->update();
 
@@ -322,6 +326,21 @@ class NotaSalidadController extends Controller
         }
         Session::flash('success','NOTA DE SALIDAD');
         return redirect()->route('almacenes.nota_salidad.index')->with('guardar', 'success');
+    }
+
+    public function getPdf($id) {
+        $documento = NotaSalidad::find($id);
+        $detalles = DetalleNotaSalidad::where('nota_salidad_id', $id)->get();
+
+        $pdf = PDF::loadview('almacenes.nota_salidad.impresion.comprobante_normal', [
+            'documento' => $documento,
+            'detalles' => $detalles,
+            'moneda' => "SOLES",
+            'empresa' => Empresa::first(),
+        ])->setPaper('a4')->setWarnings(false);
+
+        return $pdf->stream($documento->numero . '.pdf');
+
     }
 
     public function getLot()

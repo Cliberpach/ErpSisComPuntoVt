@@ -119,6 +119,7 @@ $(document).ready(function() {
                     return "<div class='btn-group' style='text-transform:capitalize;'><button data-toggle='dropdown' class='btn btn-primary btn-sm  dropdown-toggle'><i class='fa fa-bars'></i></button><ul class='dropdown-menu'>" +
                         "<li><a class='dropdown-item' href='" + url_detalles +
                         "' title='Detalles' ><b><i class='fa fa-eye'></i> Detalles</a></b></li>" +
+                        "<li class=''><a class='dropdown-item' href='#' title='Comprobante' onclick='comprobante("+data.id+")'><b><i class='fa fa-file-pdf-o'></i> Comprobante</a></b></li>" +
                         "<li class='d-none'><a class='dropdown-item' href='" + url_editar +
                         "' title='Modificar' ><b><i class='fa fa-edit'></i> Modificar</a></b></li>" +
                         "<li class='d-none'><a class='dropdown-item' onclick='eliminar(" + data.id +
@@ -148,6 +149,12 @@ const swalWithBootstrapButtons = Swal.mixin({
     },
     buttonsStyling: false
 })
+
+function comprobante(id) {
+    var url = '{{ route("almacenes.nota_salidad.getPdf", ":id")}}';
+    url = url.replace(':id',id+'-100');
+    window.open(url, "Comprobante SISCOM", "width=900, height=600")
+}
 
 
 function eliminar(id) {

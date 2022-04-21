@@ -261,7 +261,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'CLIENTE' => $nota->cliente,
                     'ESTADO' => $nota->sunat == '2' ? "NULO" : "VALIDO",
                     'MONEDA' => $nota->tipoMoneda,
-                    'MONTO' => $nota->mtoImpVenta,
+                    'MONTO' => -($nota->mtoImpVenta),
                     'OP.GRAVADA' => $nota->mtoOperGravadas,
                     'IVG' => $nota->mtoIGV,
                     'EFECTIVO' => '-',
