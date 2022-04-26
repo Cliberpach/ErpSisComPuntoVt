@@ -223,7 +223,7 @@ class Documento extends Model
                 $cuenta_cliente->cotizacion_documento_id = $documento->id;
                 $cuenta_cliente->numero_doc = $documento->serie . ' - ' . $documento->correlativo;
                 $cuenta_cliente->fecha_doc = $documento->fecha_documento;
-                $cuenta_cliente->monto = $documento->total;
+                $cuenta_cliente->monto = $documento->total - $documento->notas->sum("mtoImpVenta");
                 $cuenta_cliente->acta = 'DOCUMENTO VENTA';
                 $cuenta_cliente->saldo = $documento->total - $documento->notas->sum("mtoImpVenta");
                 $cuenta_cliente->update();

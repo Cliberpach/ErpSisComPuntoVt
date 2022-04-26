@@ -246,6 +246,33 @@ if (!function_exists('docValido')) {
     }
 }
 
+// DOCUMENTO DE COMPRA VALIDO PARA NOTA DE CRÉDITO
+if (!function_exists('docCompraValido')) {
+    function docCompraValido($id)
+    {
+        $documento = Documento::find($id);
+        $detalles = Detalle_Documento::where('documento_id', $id)->get();
+        $cont = 0;
+
+        foreach ($detalles as $detalle) {
+            $cant_nota_electronica = 0;
+            foreach($detalle->loteProducto->detalles_venta as $item) {
+                $cant_nota_electronica = $cant_nota_electronica + $item->detalles->sum("cantidad");
+            }
+            $cantidad = $detalle->loteProducto->cantidad_inicial + $cant_nota_electronica - $detalle->loteProducto->detalles_venta->sum("cantidad") - $detalle->loteProducto->detalles_salida->sum("cantidad") - $detalle->detalles->sum('cantidad');
+            if ($cantidad == 0) {
+                $cont = $cont + 1;
+            }
+        }
+
+        if (count($detalles) == $cont) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
 // UBIGEO
 if (!function_exists('departamentos')) {
     function departamentos($id = null)

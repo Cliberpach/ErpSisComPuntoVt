@@ -17,6 +17,8 @@ class Egreso extends Model
         'importe',
         'efectivo',
         'tipo_pago_id',
+        'usuario',
+        'user_id',
         'estado'
     ];
     public $timestamps=true;
@@ -25,5 +27,10 @@ class Egreso extends Model
     }
     public function tipoDocumento() {
         return $this->belongsTo(Detalle::class,'tipodocumento_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\User', 'user_id');
     }
 }

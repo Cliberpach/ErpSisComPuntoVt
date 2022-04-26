@@ -28,7 +28,13 @@ class CuentaProveedorController extends Controller
         $datos=array();
         $cuentaProveedor=CuentaProveedor::get();
         foreach ($cuentaProveedor as $key => $value) {
-            $detalle_ultimo = DetalleCuentaProveedor::where('cuenta_proveedor_id',$value->id)->get()->last();
+            $detalle_ultimo = DetalleCuentaProveedor::where('cuenta_proveedor_id', $value->id)->get()->last();
+
+            $total_pagar = $value->documento->total - $value->documento->notas->sum("mtoImpVenta");
+
+            $nuevo_monto = $value->documento->total - $value->documento->notas->sum("mtoImpVenta") - $detalle_ultimo->monto;
+            $detalle_ultimo->saldo = $nuevo_monto;
+            $detalle_ultimo->update();
 
             if(!empty($detalle_ultimo))
             {
@@ -46,15 +52,27 @@ class CuentaProveedorController extends Controller
                     $cuenta->update();
                 }
             }
+
+            $acta =  $value->detallePago->sum("monto");
+            if ($acta < $total_pagar) {
+                $cuenta = CuentaProveedor::find($value->id);
+                $cuenta->estado = 'PENDIENTE';
+                $cuenta->update();
+            } else {
+                $cuenta = CuentaProveedor::find($value->id);
+                $cuenta->estado = 'PAGADO';
+                $cuenta->update();
+            }
+            $cuenta_proveedor = CuentaProveedor::find($value->id);
             array_push($datos,array(
-                "id"=>$value->id,
-                "proveedor"=>$value->documento->proveedor->descripcion,
-                "numero_doc"=>$value->documento->serie_tipo.' - '.$value->documento->numero_tipo,
-                "fecha_doc"=>strval($value->documento->created_at) ,
-                "monto"=>$value->documento->total,
-                "acta"=>number_format(round($value->documento->total - $value->saldo, 2), 2),
-                "saldo"=>$value->saldo,
-                "estado"=>$value->estado
+                "id"=>$cuenta_proveedor->id,
+                "proveedor"=>$cuenta_proveedor->documento->proveedor->descripcion,
+                "numero_doc"=>$cuenta_proveedor->documento->serie_tipo.' - '.$cuenta_proveedor->documento->numero_tipo,
+                "fecha_doc"=>strval($cuenta_proveedor->documento->created_at),
+                "monto" => $cuenta_proveedor->documento->total - $cuenta_proveedor->documento->notas->sum("mtoImpVenta"),
+                "acta"=>number_format(round($acta, 2), 2),
+                "saldo"=>$cuenta_proveedor->saldo,
+                "estado"=>$cuenta_proveedor->estado
             ));
         }
         return DataTables::of($datos)->toJson();
@@ -97,6 +115,7 @@ class CuentaProveedorController extends Controller
         )->get();
             return $cuentas;
     }
+
     public function detallePago(Request $request)
     {
         $this->authorize('haveaccess','cuenta_proveedor.index');
@@ -107,6 +126,7 @@ class CuentaProveedorController extends Controller
             $detallepago=new DetalleCuentaProveedor();
             $detallepago->cuenta_proveedor_id=$cuentaProveedor->id;
             $detallepago->mcaja_id= movimientoUser()->id;
+            $detallepago->monto = $request->cantidad;
             $detallepago->observacion=$request->observacion;
             $detallepago->fecha=$request->fecha;
             $detallepago->importe=$request->importe_venta;
@@ -149,6 +169,7 @@ class CuentaProveedorController extends Controller
             $detallepago=new DetalleCuentaProveedor();
             $detallepago->cuenta_proveedor_id=$cuentaProveedor->id;
             $detallepago->mcaja_id= movimientoUser()->id;
+            $detallepago->monto = $request->cantidad;
             $detallepago->observacion=$request->observacion;
             $detallepago->fecha=$request->fecha;
             $detallepago->importe=$request->importe_venta;

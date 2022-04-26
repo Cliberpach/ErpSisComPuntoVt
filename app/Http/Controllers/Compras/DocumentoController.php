@@ -114,7 +114,9 @@ class DocumentoController extends Controller
                 'saldo' => $tipo_moneda.' '.number_format($saldo, 2, '.', ''),
                 'acuenta' => $tipo_moneda.' '.number_format($acuenta, 2, '.', ''),
                 'total' => $tipo_moneda.' '.number_format($decimal_total, 2, '.', ''),
+                'total_pagar' => $tipo_moneda.' '.number_format($documento->total_pagar, 2, '.', ''),
                 'modo' => $documento->modo_compra,
+                'notas' => count($documento->notas)
             ]);
         }
         return DataTables::of($coleccion)->toJson();
@@ -247,6 +249,7 @@ class DocumentoController extends Controller
             $documento->total_igv = (float) $request->get('monto_total_igv');
             $documento->percepcion = (float) $request->get('monto_percepcion');
             $documento->total = (float) $request->get('monto_total');
+            $documento->total_pagar = (float) $request->get('monto_total');
             //-------------------------------
             if($request->get('moneda') == 'DOLARES')
             {

@@ -305,6 +305,17 @@ function(){
         Route::get('/tipoPago/{id}','Compras\DocumentoController@TypePay')->name('compras.documento.tipo_pago.existente');
     });
 
+    //NOTAS DE CREDITO COMPRAS
+    Route::prefix('compras/notas')->group(function () {
+        Route::get('index/{id}', 'Compras\NotaController@index')->name('compras.notas');
+        Route::get('create', 'Compras\NotaController@create')->name('compras.notas.create');
+        Route::post('store', 'Compras\NotaController@store')->name('compras.notas.store');
+        Route::get('getNotes/{id}', 'Compras\NotaController@getNotes')->name('compras.getNotes');
+        Route::get('getDetalles/{id}', 'Compras\NotaController@getDetalles')->name('compras.getDetalles');
+        Route::get('show/{id}', 'Compras\NotaController@show')->name('compras.notas.show');
+        Route::get('show_dev/{id}', 'Compras\NotaController@show_dev')->name('compras.notas_dev.show');
+    });
+
     // Clientes
     Route::prefix('ventas/clientes')->group(function() {
 
@@ -648,6 +659,13 @@ function(){
 
     });
 
+    // Cosultas - Caja - Egreso
+    Route::prefix('consultas/pos/egreso')->group(function () {
+
+        Route::get('index', 'Consultas\Pos\EgresoController@index')->name('consultas.pos.egreso.index');
+        Route::post('getTable', 'Consultas\Pos\EgresoController@getTable')->name('consultas.pos.egreso.getTable');
+    });
+
     // Consultas - Utilidad
     Route::prefix('consultas/utilidad')->group(function(){
 
@@ -684,6 +702,10 @@ function(){
         Route::get('cajadiaria', 'Reportes\Pos\CajaController@index')->name('reporte.pos.cajadiaria');
         Route::post('cajadiaria/getTable', 'Reportes\Pos\CajaController@getTable')->name('reporte.pos.cajadiaria.getTable');
         Route::get('cajadiaria/getExcel', 'Reportes\Pos\CajaController@getExcel')->name('reporte.pos.cajadiaria.getExcel');
+
+        Route::get('egreso', 'Reportes\Pos\EgresoController@index')->name('reporte.pos.egreso');
+        Route::post('egreso/getTable', 'Reportes\Pos\EgresoController@getTable')->name('reporte.pos.egreso.getTable');
+        Route::get('egreso/getExcel', 'Reportes\Pos\EgresoController@getExcel')->name('reporte.pos.egreso.getExcel');
 
     });
 
@@ -748,7 +770,7 @@ Route::post('/getDocument','BuscarController@getDocumento')->name('buscar.getDoc
 
 Route::get('ruta', function () {
     actualizarStockProductos();
-    return "ok";
+    return "okkk";
     $comprobante = array(
         'ruc' => '11111111111',
         'tipo' => '',

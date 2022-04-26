@@ -22,6 +22,7 @@ class CreateDetalleCuentaProveedorTable extends Migration
             $table->text('observacion');
             $table->text('ruta_imagen')->nullable();
             $table->unsignedInteger('tipo_pago_id');
+            $table->unsignedDecimal('monto', 15, 2);
             $table->foreign('tipo_pago_id')->references('id')->on('tipos_pago')->onDelete('cascade');
             $table->unsignedDecimal('efectivo', 15, 2)->nullable()->default(0.00);
             $table->unsignedDecimal('importe', 15, 2)->nullable()->default(0.00);

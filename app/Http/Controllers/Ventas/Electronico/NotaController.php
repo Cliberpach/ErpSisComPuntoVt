@@ -212,7 +212,7 @@ class NotaController extends Controller
             $nota->totalImpuestos = $request->get('total_igv_nuevo');
             $nota->mtoImpVenta =  $request->get('total_nuevo');
 
-            $nota->value = self::convertirTotal($request->get('total'));
+            $nota->value = self::convertirTotal($request->get('total_nuevo'));
             $nota->code = '1000';
             $nota->user_id = auth()->user()->id;
             $nota->save();
@@ -534,6 +534,25 @@ class NotaController extends Controller
             ->select('nota_electronica.*','empresa_numeracion_facturaciones.*')
             ->orderBy('nota_electronica.correlativo','DESC')
             ->get();
+
+            if ($nota->tipDocAfectado == '04') {
+                $serie_comprobantes = DB::table('empresa_numeracion_facturaciones')
+                ->join('empresas', 'empresas.id', '=', 'empresa_numeracion_facturaciones.empresa_id')
+                ->join('cotizacion_documento', 'cotizacion_documento.empresa_id', '=', 'empresas.id')
+                ->join('nota_electronica', 'nota_electronica.documento_id', '=', 'cotizacion_documento.id')
+                ->when($nota->tipo_nota, function ($query, $request) {
+                    if ($request == '1') {
+                        return $query->where('empresa_numeracion_facturaciones.tipo_comprobante', 131);
+                    } else {
+                        return $query->where('empresa_numeracion_facturaciones.tipo_comprobante', 130);
+                    }
+                })
+                    ->where('empresa_numeracion_facturaciones.empresa_id', $nota->empresa_id)
+                    ->where('nota_electronica.tipDocAfectado', '04')
+                    ->select('nota_electronica.*', 'empresa_numeracion_facturaciones.*')
+                    ->orderBy('nota_electronica.correlativo', 'DESC')
+                    ->get();
+            }
 
 
             if (count($serie_comprobantes) === 1) {

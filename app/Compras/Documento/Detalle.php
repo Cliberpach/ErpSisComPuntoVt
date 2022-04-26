@@ -44,10 +44,16 @@ class Detalle extends Model
         'fecha_vencimiento'
     ];
 
+    public function detalles()
+    {
+        return $this->hasMany('App\Compras\NotaDetalle', 'detalle_id', 'id');
+    }
+
     public function documento()
     {
         return $this->belongsTo('App\Compras\Documento\Documento');
     }
+
     public function producto()
     {
         return $this->belongsTo('App\Almacenes\Producto');

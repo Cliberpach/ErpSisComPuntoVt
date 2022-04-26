@@ -154,7 +154,7 @@ $(document).ready(function() {
                 className: "text-left"
             },
             {
-                data: 'total',
+                data: 'total_pagar',
                 className: "text-center"
             },
             {
@@ -210,24 +210,28 @@ $(document).ready(function() {
                     var url_detalle = '{{ route("compras.documento.show", ":id")}}';
                     url_detalle = url_detalle.replace(':id', data.id);
 
+                    var url_nota = '{{ route("compras.notas", ":id") }}';
+                    url_nota = url_nota.replace(':id', data.id);
 
-
-                    return "<div class='btn-group' style='text-transform:capitalize;'><button data-toggle='dropdown' class='btn btn-primary btn-sm  dropdown-toggle'><i class='fa fa-bars'></i></button><ul class='dropdown-menu'>" +
-
-                        "<li><a class='dropdown-item' onclick='modificar("+data.orden_compra+","+data.id +")' title='Modificar' ><b><i class='fa fa-edit'></i> Modificar</a></b></li>" +
-                        "<li><a class='dropdown-item' href='" + url_detalle +
-                        "' title='Detalle'><b><i class='fa fa-eye'></i> Detalle</a></b></li>" +
-
-                        "<li><a class='dropdown-item' onclick='eliminar(" + data.id +
-                        ")' title='Eliminar'><b><i class='fa fa-trash'></i> Eliminar</a></b></li>" +
-                        "<li class='dropdown-divider d-none'></li>"
-                    "</ul></div>"
+                    var cadena = "<a class='btn btn-sm btn-primary m-1' href='#' style='color:white' onclick='modificar("+data.orden_compra+","+data.id +")' title='Modificar' ><b><i class='fa fa-edit'></i> Modificar</a>" + 
+                        "<a class='btn btn-sm btn-success m-1' style='color:white' href='" + url_detalle + "' title='Detalle'><b><i class='fa fa-eye'></i> Detalle</a>" + 
+                        "<a class='btn btn-sm btn-danger m-1 d-none'  style='color:white' href='#' onclick='eliminar(" + data.id + ")' title='Eliminar'><b><i class='fa fa-trash'></i> Eliminar</a>" +
+                        "<a class='btn btn-sm btn-warning m-1'  style='color:white' href='"+ url_nota +"'  title='Notas'><i class='fa fa-file-o'></i> Notas</a>" ;
+                            
+                    return cadena
                 }
             }
 
         ],
         "language": {
             "url": "{{asset('Spanish.json')}}"
+        },
+        "fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+
+            if(aData.notas > 0)
+            {
+                $('td', nRow).css('background-color', '#FDEBD0');
+            }
         },
         "order": [
             [0, "desc"]

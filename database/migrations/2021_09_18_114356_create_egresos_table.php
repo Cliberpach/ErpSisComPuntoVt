@@ -24,6 +24,9 @@ class CreateEgresosTable extends Migration
             $table->unsignedDecimal('monto',15,2)->default(0);
             $table->unsignedInteger('tipo_pago_id');
             $table->foreign('tipo_pago_id')->references('id')->on('tipos_pago')->onDelete('cascade');
+
+            $table->string("usuario")->nullable();
+            $table->integer("user_id")->nullable();
             $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
             $table->timestamps();
         });

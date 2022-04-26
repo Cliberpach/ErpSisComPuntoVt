@@ -26,20 +26,13 @@ class CuentaClienteController extends Controller
         $datos = array();
         $cuentaCliente = CuentaCliente::where('estado', '!=', 'ANULADO')->get();
         foreach ($cuentaCliente as $key => $value) {
-            $acta =  $value->monto - $value->saldo;
-            if($acta < $value->monto)
-            {
-                $cuenta = CuentaCliente::find($value->id);
-                $cuenta->estado='PENDIENTE';
-                $cuenta->update();
-            }
-            else{
-                $cuenta = CuentaCliente::find($value->id);
-                $cuenta->estado='PAGADO';
-                $cuenta->update();
-            }
-
             $detalle_ultimo = DetalleCuentaCliente::where('cuenta_cliente_id',$value->id)->get()->last();
+
+            $total_pagar = $value->documento->total - $value->documento->notas->sum("mtoImpVenta");
+
+            $nuevo_monto = $value->documento->total - $value->documento->notas->sum("mtoImpVenta") - $detalle_ultimo->monto;
+            $detalle_ultimo->saldo = $nuevo_monto;
+            $detalle_ultimo->update();
 
             if(!empty($detalle_ultimo))
             {
@@ -58,15 +51,28 @@ class CuentaClienteController extends Controller
                 }
             }
 
+            $acta =  $value->detalles->sum("monto");
+            if ($acta < $value->monto) {
+                $cuenta = CuentaCliente::find($value->id);
+                $cuenta->estado = 'PENDIENTE';
+                $cuenta->update();
+            } else {
+                $cuenta = CuentaCliente::find($value->id);
+                $cuenta->estado = 'PAGADO';
+                $cuenta->update();
+            }
+
+            $cuenta_cliente = CuentaCliente::find($value->id);
+
             array_push($datos,array(
-                "id"=>$value->id,
-                "cliente"=>$value->documento->clienteEntidad->nombre,
-                "numero_doc"=>$value->documento->serie.' - '.$value->documento->correlativo,
-                "fecha_doc"=>$value->fecha_doc,
-                "monto"=>$value->monto,
+                "id"=>$cuenta_cliente->id,
+                "cliente"=>$cuenta_cliente->documento->clienteEntidad->nombre,
+                "numero_doc"=>$cuenta_cliente->documento->serie.' - '.$cuenta_cliente->documento->correlativo,
+                "fecha_doc"=>$cuenta_cliente->fecha_doc,
+                "monto"=>$cuenta_cliente->documento->total - $cuenta_cliente->documento->notas->sum("mtoImpVenta"),
                 "acta"=> number_format(round($acta, 2), 2),
-                "saldo"=>$value->saldo,
-                "estado"=>$value->estado
+                "saldo"=>$cuenta_cliente->saldo,
+                "estado"=>$cuenta_cliente->estado
             ));
         }
         return DataTables::of($datos)->toJson();

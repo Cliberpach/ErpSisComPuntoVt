@@ -27,6 +27,7 @@ class EgresoController extends Controller
                 'descripcion' => $value->descripcion,
                 'monto' => $value->importe + $value->efectivo,
                 'estado' => $value->estado,
+                'usuario' => $value->usuario,
                 'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $value->created_at)->format('Y-m-d h:i:s'),
                 'tipoDocumento' => $value->tipoDocumento->descripcion,
                 'documento' => $value->documento == null ? "-" : $value->documento
@@ -45,6 +46,8 @@ class EgresoController extends Controller
         $egreso->importe = $request->importe;
         $egreso->efectivo = $request->efectivo;
         $egreso->tipo_pago_id = $request->modo_pago;
+        $egreso->usuario = Auth()->user()->usuario;
+        $egreso->user_id = auth()->user()->id;
         $egreso->save();
         $detalleMovimientoEgreso = new DetalleMovimientoEgresosCaja();
         $detalleMovimientoEgreso->mcaja_id = movimientoUser()->id;

@@ -12,6 +12,7 @@ class CuentaProveedor extends Model
             'compra_documento_id',
             'acta',
             'saldo',
+            'monto',
             'estado',
         ];
 

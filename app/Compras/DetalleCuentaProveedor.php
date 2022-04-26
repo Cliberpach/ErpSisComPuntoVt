@@ -14,6 +14,7 @@ class DetalleCuentaProveedor extends Model
         'observacion',
         'ruta_imagen',
         'tipo_pago_id',
+        'monto',
         'efectivo',
         'importe',
         'saldo'

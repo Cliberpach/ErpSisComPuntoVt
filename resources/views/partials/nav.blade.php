@@ -194,6 +194,9 @@
         @can('haveaccess','consulta_nota_ingreso.index')
         <li class="@yield('nota_ingreso_consulta-active')"><a href="{{ route('consultas.notas.ingreso.index') }}">Nota Ingreso</a></li>
         @endcan
+        @can('haveaccess','consulta_pos_egreso.index')
+        <li class="@yield('pos_egreso-active')"><a href="{{ route('consultas.pos.egreso.index') }}">Egreso</a></li>
+        @endcan
         @can('haveaccess','consulta_utilidad_bruta.index')
         <li class="@yield('utilidad_bruta-active')"><a href="{{ route('consultas.caja.utilidad.index') }}">Utilidad Bruta</a></li>
         @endcan
@@ -208,6 +211,9 @@
     <ul class="nav nav-second-level collapse">
         @can('haveaccess','reporte_cajadiaria.index')
         <li class="@yield('caja_diaria-active')"><a href="{{ route('reporte.pos.cajadiaria') }}">Caja Diaria</a></li>
+        @endcan
+        @can('haveaccess','reporte_egreso.index')
+        <li class="@yield('reporte_pos_egreso-active')"><a href="{{ route('reporte.pos.egreso') }}">Egreso</a></li>
         @endcan
         @can('haveaccess','reporte_venta.index')
         <li class="@yield('ventas_reporte-active')"><a href="{{ route('reporte.ventas.documento') }}">Ventas</a></li>

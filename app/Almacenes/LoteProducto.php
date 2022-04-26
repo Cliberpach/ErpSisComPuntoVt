@@ -51,9 +51,9 @@ class LoteProducto extends Model
         return $this->hasMany('App\Ventas\Documento\Detalle','lote_id','id');
     }
 
-    public function detalle_salida()
+    public function detalles_salida()
     {
-        return $this->hasOne('App\Almacenes\DetalleNotaSalidad','lote_id','id');
+        return $this->hasMany('App\Almacenes\DetalleNotaSalidad','lote_id','id');
     }
 
     public function documento_compra()

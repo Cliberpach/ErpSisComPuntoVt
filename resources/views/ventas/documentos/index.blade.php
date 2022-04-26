@@ -333,7 +333,7 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-info m-1' onclick='guia(" +data.id+ ")'  title='Guia Remisión'><i class='fa fa-file'></i> Guia</button>";
                     }
 
-                    if(data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado_pago == 'PAGADA')
+                    if((data.tipo_venta_id == 129 && data.condicion == 'CONTADO' && data.estado_pago == 'PAGADA') || (data.tipo_venta_id == 129 && (data.condicion == 'CREDITO' || data.condicion == 'CRÉDITO')))
                     {
                         cadena = cadena
                         + "<a class='btn btn-sm btn-warning m-1' href='"+ url_devolucion +"'  title='Devoluciones'><i class='fa fa-file-o'></i> Devoluciones</a>" ;

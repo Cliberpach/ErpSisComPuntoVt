@@ -34,6 +34,7 @@ class Documento extends Model
             'total_igv',
             'percepcion',
             'total',
+            'total_pagar',
 
             'sub_total_soles',
             'total_igv_soles',
@@ -58,6 +59,11 @@ class Documento extends Model
     public function empresa()
     {
         return $this->belongsTo('App\Mantenimiento\Empresa\Empresa');
+    }
+
+    public function notas()
+    {
+        return $this->hasMany('App\Compras\Nota', 'documento_id');
     }
 
     public function proveedor()
@@ -100,6 +106,7 @@ class Documento extends Model
                 $cuenta_proveedor->compra_documento_id = $documento->id;
                 $cuenta_proveedor->fecha_doc = $documento->fecha_emision;
                 $cuenta_proveedor->saldo = $documento->total;
+                $cuenta_proveedor->monto = $documento->total;
                 $cuenta_proveedor->acta = 'DOCUMENTO COMPRA';
                 $cuenta_proveedor->save();
             }
@@ -114,7 +121,7 @@ class Documento extends Model
                 {
                     $cuenta_proveedor->compra_documento_id = $documento->id;
                     $cuenta_proveedor->fecha_doc = $documento->fecha_emision;
-                    $cuenta_proveedor->saldo = $documento->total;
+                    $cuenta_proveedor->monto = $documento->total - $documento->notas->sum("mtoImpVenta");
                     $cuenta_proveedor->acta = 'DOCUMENTO COMPRA';
                     $cuenta_proveedor->update();
                 }
@@ -132,9 +139,17 @@ class Documento extends Model
                     $cuenta_proveedor = new CuentaProveedor();
                     $cuenta_proveedor->compra_documento_id = $documento->id;
                     $cuenta_proveedor->fecha_doc = $documento->fecha_emision;
-                    $cuenta_proveedor->saldo = $documento->total;
+                    $cuenta_proveedor->monto = $documento->total - $documento->notas->sum("mtoImpVenta");
                     $cuenta_proveedor->acta = 'DOCUMENTO COMPRA';
                     $cuenta_proveedor->save();
+                }
+            }
+
+            if ($documento->estado == 'ANULADO') {
+                if ($documento->cuenta) {
+                    $cuenta_proveedor = CuentaProveedor::find($documento->cuenta->id);
+                    $cuenta_proveedor->estado = 'ANULADO';
+                    $cuenta_proveedor->update();
                 }
             }
         });
