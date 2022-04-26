@@ -32,7 +32,7 @@ class CuentaProveedorController extends Controller
 
             $total_pagar = $value->documento->total - $value->documento->notas->sum("mtoImpVenta");
 
-            $nuevo_monto = $value->documento->total - $value->documento->notas->sum("mtoImpVenta") - $detalle_ultimo->monto;
+            $nuevo_monto = $total_pagar - $value->detalles->sum("monto");
             $detalle_ultimo->saldo = $nuevo_monto;
             $detalle_ultimo->update();
 
