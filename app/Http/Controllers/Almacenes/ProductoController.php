@@ -62,7 +62,7 @@ class ProductoController extends Controller
             // })],
             'codigo_barra' => ['nullable',Rule::unique('productos','codigo_barra')->where(function ($query) {
                 $query->whereIn('estado',["ACTIVO"]);
-            }),'min:8','max:8'],
+            }),'min:4','max:20'],
             'nombre' => 'required',
             'marca' => 'required',
             'categoria' => 'required',
@@ -189,7 +189,7 @@ class ProductoController extends Controller
             // })->ignore($id)],
             'codigo_barra' => ['nullable',Rule::unique('productos','codigo_barra')->where(function ($query) {
                 $query->whereIn('estado',["ACTIVO"]);
-            })->ignore($id),'min:8','max:8'],
+            })->ignore($id),'min:4','max:20'],
             'nombre' => 'required',
             'almacen' => 'required',
             'marca' => 'required',

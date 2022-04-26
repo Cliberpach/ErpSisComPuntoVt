@@ -56,42 +56,7 @@ class DocumentoController extends Controller
                 $nuevo_igv = $subtotal - $base;
                 $decimal_total = number_format($subtotal, 2, '.', '');
             }
-            //TIPO DE PAGO (OTROS)
-            //$otros = calcularMontosAcuentaDocumentos($documento->id);
-            //Pagos a cuenta
-            $pagos = DB::table('compra_documento_transferencia')
-            ->join('compra_documentos','compra_documento_transferencia.documento_id','=','compra_documentos.id')
-            ->select('compra_documento_transferencia.*','compra_documentos.moneda as moneda_orden')
-            ->where('compra_documento_transferencia.documento_id','=',$documento->id)
-            ->where('compra_documento_transferencia.estado','!=','ANULADO')
-            ->get();
-            // CALCULAR ACUENTA EN MONEDA
-            $acuenta = 0;
-            $soles = 0;
-            foreach($pagos as $pago){
-                $acuenta = $acuenta + $pago->monto;
-                if ($pago->moneda_orden == "SOLES") {
-                    $soles = $soles + $pago->monto;
-                }else{
-                    $soles = $soles + $pago->cambio;
-                }
-            }
-            $saldo = 0;
-            if ($documento->tipo_pago == '1') {
-                $saldo = $decimal_total - $acuenta;
-            }else{
-                 $saldo = $decimal_total;
-            }
-            //CALCULAR SALDO
-            // $saldo = $decimal_total - $acuenta;
-            //CAMBIAR ESTADO DE LA ORDEN A PAGADA
-            if ($saldo == 0.0) {
-                $documento->estado = "PAGADA";
-                $documento->update();
-            }else{
-                $documento->estado = "PENDIENTE";
-                $documento->update();
-            }
+            
             $coleccion->push([
                 'id' => $documento->id,
                 'tipo' => $documento->tipo_compra,
@@ -105,9 +70,7 @@ class DocumentoController extends Controller
                 // 'fecha_entrega' =>  Carbon::parse($documento->fecha_entrega)->format( 'd/m/Y'),
                 'estado' => $documento->estado,
                // 'otros' => $tipo_moneda.' '.number_format($otros, 2, '.', ''),
-                'otros' => $tipo_moneda,
-                'saldo' => $tipo_moneda.' '.number_format($saldo, 2, '.', ''),
-                'transferencia' => $tipo_moneda.' '.number_format($acuenta, 2, '.', ''),
+                'condicion' => $documento->condicion->descripcion,
                 'total' => $tipo_moneda.' '.number_format($decimal_total, 2, '.', ''),
             ]);
         }

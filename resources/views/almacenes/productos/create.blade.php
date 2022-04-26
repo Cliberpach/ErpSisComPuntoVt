@@ -89,7 +89,7 @@
                                             <div class="col-12 col-md-10">
                                                 <div class="form-group">
                                                     <label class="">Código de Barra</label>
-                                                    <input type="text" id="codigo_barra" class="form-control {{ $errors->has('codigo_barra') ? ' is-invalid' : '' }}" name="codigo_barra" value="{{ old('codigo_barra')}}">
+                                                    <input type="text" id="codigo_barra" class="form-control {{ $errors->has('codigo_barra') ? ' is-invalid' : '' }}" name="codigo_barra" value="{{ old('codigo_barra')}}" maxlength="20">
                                                     @if ($errors->has('codigo_barra'))
                                                         <span class="invalid-feedback" role="alert">
                                                             <strong>{{ $errors->first('codigo_barra') }}</strong>

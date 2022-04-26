@@ -54,9 +54,7 @@
                                     <th class="text-center">TIPO</th>
                                     <th class="text-center">PROVEEDOR</th>
                                     <th class="text-center">MONTO</th>
-                                    <th class="text-center">TRANSFERENCIA</th>
-                                    <th class="text-center">OTROS</th>
-                                    <th class="text-center">SALDO</th>
+                                    <th class="text-center">CONDICION</th>
                                     <th class="text-center">ESTADO</th>
                                 </tr>
                             </thead>
@@ -215,16 +213,7 @@ function loadTable()
                 className: "text-center"
             },
             {
-                data: 'transferencia',
-                className: "text-center"
-            },
-
-            {
-                data: 'otros',
-                className: "text-center"
-            },
-            {
-                data: 'saldo',
+                data: 'condicion',
                 className: "text-center"
             },
 
