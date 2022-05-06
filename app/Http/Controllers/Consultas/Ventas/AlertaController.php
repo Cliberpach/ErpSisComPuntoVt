@@ -839,7 +839,7 @@ class AlertaController extends Controller
                 DB::raw('ifnull((json_unquote(json_extract(guias_remision.getCdrResponse, "$.code"))),"-") as code'),
                 DB::raw('ifnull((json_unquote(json_extract(guias_remision.getCdrResponse, "$.description"))),"-") as description')
             )
-            ->where('guias_remision.estado', '!=', 'ANULADO')
+            ->where('guias_remision.estado', '!=', 'NULO')
             ->where('guias_remision.sunat', '0');
 
         if (!PuntoVenta() && !FullAccess()) {
