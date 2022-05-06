@@ -119,7 +119,7 @@ class GuiaController extends Controller
 
     public function getGuias()
     {
-        $guias = Guia::orderBy('id','DESC')->get();
+        $guias = Guia::where('estado', '!=', 'NULO')->orderBy('id','DESC')->get();
         $coleccion = collect([]);
         foreach($guias as $guia){
             $coleccion->push([
@@ -915,6 +915,45 @@ class GuiaController extends Controller
             $errorGuia->ecxepcion = $e->getMessage();
             $errorGuia->save();
             return array('success' => false,'mensaje' => 'Guia de remision no validado.');
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $guia = Guia::findOrFail($id);
+            if ($guia->documento) {
+                Session::flash('error', 'No puedes eliminar esta guia, ha sido creada a de un documento de venta.');
+                return redirect()->route('ventas.guiasremision.index')->with('guardar', 'error');
+            } else if ($guia->sunat == '1') {
+                Session::flash('error', 'No puedes eliminar esta guia, ya ha sido enviada a sunat.');
+                return redirect()->route('ventas.guiasremision.index')->with('guardar', 'error');
+            } else {
+                $nota = NotaSalidad::find($guia->nota_salida_id);
+                foreach ($guia->detalles as $detalle) {
+                    $nota_detalle = DetalleNotaSalidad::where('nota_salidad_id', $nota->id)->where('producto_id', $detalle->producto_id)->first();
+
+                    if ($nota_detalle) {
+                        $lote_producto = LoteProducto::findOrFail($nota_detalle->lote_id);
+
+                        $lote_producto->cantidad_logica = $lote_producto->cantidad_logica + $nota_detalle->cantidad;
+                        $lote_producto->cantidad = $lote_producto->cantidad + $nota_detalle->cantidad;
+                        $lote_producto->update();
+                    }
+                }
+
+                $guia->estado = "NULO";
+                $guia->update();
+
+                $nota->estado = "ANULADO";
+                $nota->update();
+
+                Session::flash('success', 'Guia eliminada correctamente.');
+                return redirect()->route('ventas.guiasremision.index')->with('guardar', 'success');
+            }
+        } catch (Exception $e) {
+            Session::flash('error', $e->getMessage());
+            return redirect()->route('ventas.guiasremision.index')->with('guardar', 'error');
         }
     }
 

@@ -419,7 +419,7 @@ function(){
         Route::get('create_new', 'Ventas\GuiaController@create_new')->name('ventas.guiasremision.create_new');
         Route::post('store', 'Ventas\GuiaController@store')->name('ventas.guiasremision.store');
         Route::put('update/{id}', 'Ventas\GuiaController@update')->name('ventas.guiasremision.update');
-        Route::get('destroy/{id}', 'Ventas\GuiaController@destroy')->name('ventas.guiasremision.destroy');
+        Route::get('destroy/{id}', 'Ventas\GuiaController@destroy')->name('ventas.guiasremision.delete');
         Route::get('show/{id}','Ventas\GuiaController@show')->name('ventas.guiasremision.show');
         Route::get('reporte/{id}','Ventas\GuiaController@report')->name('ventas.guiasremision.reporte');
         Route::get('tiendaDireccion/{id}', 'Ventas\GuiaController@tiendaDireccion')->name('ventas.guiasremision.tienda_direccion');

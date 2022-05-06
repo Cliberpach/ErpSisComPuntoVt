@@ -6,6 +6,7 @@ use App\Compras\CuentaProveedor;
 use App\Compras\Documento\Documento as DocumentoDocumento;
 use App\Ventas\CuentaCliente;
 use App\Ventas\Documento\Documento;
+use App\Ventas\Nota;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -66,8 +67,12 @@ class HomeController extends Controller
 
             $ventas = array();
             for ($j = 0; $j < count($meses_aux); $j++) {
-                $total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$meses_aux[$j]->mes)->whereYear('fecha_documento',$meses_aux[$j]->anio)->sum('total');
-                array_push($ventas, array("nombre" => $meses_aux[$j]->nombre, "total" => round($total,2)));
+                $total = Documento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $meses_aux[$j]->mes)->whereYear('fecha_documento', $meses_aux[$j]->anio)->sum('total');
+                $total_invalida = Documento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $meses_aux[$j]->mes)->whereYear('fecha_documento', $meses_aux[$j]->anio)->where('convertir', '!=', '')->where('tipo_venta', '!=', '129')->sum('total');
+                $total_notas = Nota::whereMonth('fechaEmision', $meses_aux[$j]->mes)->whereYear('fechaEmision', $meses_aux[$j]->anio)->sum('mtoImpVenta');
+                $total_ = (float)($total - $total_invalida - $total_notas);
+                //$total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$meses_aux[$j]->mes)->whereYear('fecha_documento',$meses_aux[$j]->anio)->sum('total');
+                array_push($ventas, array("nombre" => $meses_aux[$j]->nombre, "total" => round($total_,2)));
             }
 
             $compras = array();
