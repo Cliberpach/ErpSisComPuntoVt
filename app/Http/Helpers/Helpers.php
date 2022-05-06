@@ -1867,7 +1867,7 @@ if (!function_exists('refreshNotifications')) {
         ->select(
             'guias_remision.*',
         )
-        ->where('guias_remision.estado', '!=', 'ANULADO')
+        ->where('guias_remision.estado', '!=', 'NULO')
         ->where('guias_remision.sunat', '0');
 
         if (!PuntoVenta() && !FullAccess()) {
