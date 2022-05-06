@@ -79,15 +79,25 @@ class ProductoController extends Controller
 
     public function llenarSalidas($id)
     {
-        $salidas = DetalleNotaSalidad::orderBy('id', 'desc')->where('producto_id', $id)->get();
+        $salidas = DB::table('detalle_nota_salidad')
+        ->join('nota_salidad', 'nota_salidad.id', '=', 'detalle_nota_salidad.nota_salidad_id')
+        ->join('lote_productos', 'lote_productos.id', '=', 'detalle_nota_salidad.lote_id')
+        ->select(
+            'detalle_nota_salidad.cantidad',
+            'nota_salidad.origen',
+            'nota_salidad.destino',
+            'lote_productos.codigo_lote',
+            'detalle_nota_salidad.unidad',
+        )
+        ->where('nota_salidad.estado', '!=', 'ANULADO')->get();
         $coleccion = collect([]);
         foreach ($salidas as $salida) {
             $coleccion->push([
-                'origen' => $salida->nota_salidad->origen,
-                'destino' => $salida->nota_salidad->destino,
+                'origen' => $salida->origen,
+                'destino' => $salida->destino,
                 'cantidad' => $salida->cantidad,
-                'lote' => $salida->lote->codigo_lote,
-                'medida' => $salida->lote->producto->medidaCompleta(),
+                'lote' => $salida->codigo_lote,
+                'medida' => $salida->unidad,
             ]);
         }
         return DataTables::of($coleccion)->make(true);
