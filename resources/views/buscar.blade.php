@@ -102,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                    <p class="m-t"> <small>AGROENSANCHA &copy; 2021 </small> </p>
+                    <p class="m-t"> <small>SISCOM &copy; 2022 </small> </p>
                 </div>
             </div>
         </div>
