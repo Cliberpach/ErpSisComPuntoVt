@@ -35,7 +35,7 @@ class GuiaController extends Controller
     public function index()
     {
         $dato = "Message";
-        // broadcast(new NotifySunatEvent($dato));
+        broadcast(new NotifySunatEvent($dato));
         return view('ventas.guias.index');
     }
 
