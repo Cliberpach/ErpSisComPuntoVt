@@ -6,7 +6,7 @@
 <div class="row wrapper border-bottom white-bg page-heading">
 
     <div class="col-lg-12">
-       <h2  style="text-transform:uppercase"><b>REGISTRAR NUEVA GUIA DE REMISION</b></h2>
+        <h2 style="text-transform:uppercase"><b>REGISTRAR NUEVA GUIA DE REMISION</b></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="{{route('home')}}">Panel de Control</a>
@@ -106,15 +106,17 @@
                                             name="tipo_venta" id="tipo_venta" required disabled>
                                             <option></option>
 
-                                                @foreach (tipos_venta() as $tipo)
-                                                <option value="{{$tipo->descripcion}}" @if(old('tipo_venta',$documento->descripcionTipo())==$tipo->descripcion ) {{'selected'}} @endif >{{$tipo->nombre}}</option>
-                                                @endforeach
+                                            @foreach (tipos_venta() as $tipo)
+                                            <option value="{{$tipo->descripcion}}" @if(old('tipo_venta',$documento->
+                                                descripcionTipo())==$tipo->descripcion ) {{'selected'}} @endif
+                                                >{{$tipo->nombre}}</option>
+                                            @endforeach
 
-                                                @if ($errors->has('tipo_venta'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('tipo_venta') }}</strong>
-                                                </span>
-                                                @endif
+                                            @if ($errors->has('tipo_venta'))
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('tipo_venta') }}</strong>
+                                            </span>
+                                            @endif
 
 
 
@@ -123,7 +125,9 @@
 
                                     <div class="col-md-6 col-xs-12">
                                         <label class="required">Moneda:</label>
-                                        <select id="moneda" name="moneda" class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}" disabled >
+                                        <select id="moneda" name="moneda"
+                                            class="select2_form form-control {{ $errors->has('moneda') ? ' is-invalid' : '' }}"
+                                            disabled>
                                             <option selected>SOLES</option>
                                         </select>
 
@@ -133,13 +137,18 @@
 
                                 <div class="form-group">
                                     <label class="required">Cliente: </label>
-                                    <select class="select2_form form-control {{ $errors->has('proveedor_id') ? ' is-invalid' : '' }}" style="text-transform: uppercase; width:100%" value="{{old('cliente_id')}}" name="cliente_id" id="cliente_id" required disabled>
-                                    <option></option>
+                                    <select
+                                        class="select2_form form-control {{ $errors->has('proveedor_id') ? ' is-invalid' : '' }}"
+                                        style="text-transform: uppercase; width:100%" value="{{old('cliente_id')}}"
+                                        name="cliente_id" id="cliente_id" required disabled>
+                                        <option></option>
                                         @foreach ($clientes as $cliente)
 
-                                            <option value="{{$cliente->id}}" @if(old('cliente_id',$documento->cliente_id)==$cliente->id )
-                                                {{'selected'}} @endif >{{$cliente->tipo_documento.': '.$cliente->documento.' - '.$cliente->nombre}}
-                                            </option>
+                                        <option value="{{$cliente->id}}" @if(old('cliente_id',$documento->
+                                            cliente_id)==$cliente->id )
+                                            {{'selected'}} @endif >{{$cliente->tipo_documento.': '.$cliente->documento.'
+                                            - '.$cliente->nombre}}
+                                        </option>
 
                                         @endforeach
                                     </select>
@@ -148,21 +157,25 @@
                                 <div class="form-group row">
                                     <div class="col-lg-6 col-xs-12">
                                         <label class="required">Cantidad de Productos: </label>
-                                        <input type="number" name="cantidad_productos" id="cantidad_productos" value="{{old('peso_productos',$cantidad_productos)}}" readonly class="form-control {{ $errors->has('cantidad_productos') ? ' is-invalid' : '' }}">
+                                        <input type="number" name="cantidad_productos" id="cantidad_productos"
+                                            value="{{old('peso_productos',$cantidad_productos)}}" readonly
+                                            class="form-control {{ $errors->has('cantidad_productos') ? ' is-invalid' : '' }}">
                                         @if ($errors->has('cantidad_productos'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('cantidad_productos') }}</strong>
-                                            </span>
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $errors->first('cantidad_productos') }}</strong>
+                                        </span>
                                         @endif
                                     </div>
 
                                     <div class="col-md-6 col-xs-12">
                                         <label class="required">Peso Total de productos:</label>
-                                        <input type="number" name="peso_productos" id="peso_productos" readonly value="{{old('peso_productos',$pesos_productos)}}" class="form-control {{ $errors->has('peso_productos') ? ' is-invalid' : '' }}">
+                                        <input type="number" name="peso_productos" id="peso_productos" readonly
+                                            value="{{old('peso_productos',$pesos_productos)}}"
+                                            class="form-control {{ $errors->has('peso_productos') ? ' is-invalid' : '' }}">
                                         @if ($errors->has('peso_productos'))
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $errors->first('peso_productos') }}</strong>
-                                            </span>
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $errors->first('peso_productos') }}</strong>
+                                        </span>
                                         @endif
 
                                     </div>
@@ -182,20 +195,26 @@
                                     <div class="col-lg-8 col-xs-12">
                                         <label class="required">Empresa: </label>
 
-                                        <select class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}"
-                                                style="text-transform: uppercase; width:100%" value="{{old('empresa_id',$documento->empresa_id)}}"
-                                                name="empresa_id" id="empresa_id" required disabled>
-                                                <option></option>
-                                                @foreach ($empresas as $empresa)
-                                                <option value="{{$empresa->id}}" @if(old('empresa_id', $documento->empresa_id)==$empresa->id )
-                                                    {{'selected'}} @endif >{{$empresa->razon_social}}</option>
-                                                @endforeach
+                                        <select
+                                            class="select2_form form-control {{ $errors->has('empresa_id') ? ' is-invalid' : '' }}"
+                                            style="text-transform: uppercase; width:100%"
+                                            value="{{old('empresa_id',$documento->empresa_id)}}" name="empresa_id"
+                                            id="empresa_id" required disabled>
+                                            <option></option>
+                                            @foreach ($empresas as $empresa)
+                                            <option value="{{$empresa->id}}" @if(old('empresa_id', $documento->
+                                                empresa_id)==$empresa->id )
+                                                {{'selected'}} @endif >{{$empresa->razon_social}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
 
                                     <div class="col-lg-4 col-xs-12">
                                         <label class="required">Ubigeo: </label>
-                                        <input type="text" id="ubigeo_partida" class="form-control input-required {{ $errors->has('ubigeo_partida') ? ' is-invalid' : '' }}" required name="ubigeo_partida" value="{{ old('ubigeo_partida',$empresa->ubigeo)}}">
+                                        <input type="text" id="ubigeo_partida"
+                                            class="form-control input-required {{ $errors->has('ubigeo_partida') ? ' is-invalid' : '' }}"
+                                            required name="ubigeo_partida"
+                                            value="{{ old('ubigeo_partida',$empresa->ubigeo)}}">
                                         @if ($errors->has('ubigeo_partida'))
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $errors->first('ubigeo_partida') }}</strong>
@@ -210,7 +229,9 @@
                                     <label class="required">Dirección de la Empresa (Partida): </label>
                                     <textarea type="text" placeholder=""
                                         class="form-control input-required {{ $errors->has('direccion_tienda') ? ' is-invalid' : '' }}"
-                                        name="direccion_empresa" id="direccion_empresa" value="{{old('direccion_empresa',$direccion_empresa->direccion_fiscal)}}" required >{{old('direccion_empresa',$direccion_empresa->direccion_fiscal)}}</textarea>
+                                        name="direccion_empresa" id="direccion_empresa"
+                                        value="{{old('direccion_empresa',$direccion_empresa->direccion_fiscal)}}"
+                                        required>{{old('direccion_empresa',$direccion_empresa->direccion_fiscal)}}</textarea>
 
 
                                     @if ($errors->has('direccion_empresa'))
@@ -237,7 +258,9 @@
                                     <div class="col-lg-12 col-xs-12">
                                         <div class="form-group">
                                             <label class="">Tienda (Opcional): </label>
-                                            <input type="text" id="tienda" class="form-control {{ $errors->has('tienda') ? ' is-invalid' : '' }}"  name="tienda" value="{{ old('tienda')}}">
+                                            <input type="text" id="tienda"
+                                                class="form-control {{ $errors->has('tienda') ? ' is-invalid' : '' }}"
+                                                name="tienda" value="{{ old('tienda')}}">
                                             @if ($errors->has('tienda'))
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $errors->first('tienda') }}</strong>
@@ -254,18 +277,20 @@
                                                 style="width: 100%" required>
                                                 <option></option>
                                                 @foreach (departamentos() as $departamento)
-                                                    <option value="{{ $departamento->id }}"
-                                                        {{ (old('departamento') == $departamento->id ? 'selected' : '') }}>
-                                                        {{ $departamento->nombre }}</option>
+                                                <option value="{{ $departamento->id }}" {{
+                                                    (old('departamento')==$departamento->id ? 'selected' : '') }}>
+                                                    {{ $departamento->nombre }}</option>
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('departamento'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('departamento') }}</strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('departamento') }}</strong>
+                                            </span>
                                             @endif
                                             {{-- <label class="required">Ubigeo: </label>
-                                            <input type="text" id="ubigeo_llegada" class="form-control input-required {{ $errors->has('ubigeo_llegada') ? ' is-invalid' : '' }}" required  name="ubigeo_llegada" value="{{ old('ubigeo_llegada')}}">
+                                            <input type="text" id="ubigeo_llegada"
+                                                class="form-control input-required {{ $errors->has('ubigeo_llegada') ? ' is-invalid' : '' }}"
+                                                required name="ubigeo_llegada" value="{{ old('ubigeo_llegada')}}">
                                             @if ($errors->has('ubigeo_llegada'))
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $errors->first('ubigeo_llegada') }}</strong>
@@ -281,15 +306,15 @@
                                                 style="width: 100%" required>
                                                 <option></option>
                                                 @foreach (provincias() as $provincia)
-                                                    <option value="{{ $provincia->id }}"
-                                                        {{ (old('provincia') == $provincia->id ? 'selected' : '') }}>
-                                                        {{ $provincia->nombre }}</option>
+                                                <option value="{{ $provincia->id }}" {{ (old('provincia')==$provincia->
+                                                    id ? 'selected' : '') }}>
+                                                    {{ $provincia->nombre }}</option>
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('provincia'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('provincia') }}</strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('provincia') }}</strong>
+                                            </span>
                                             @endif
                                         </div>
                                     </div>
@@ -301,15 +326,15 @@
                                                 style="width: 100%" required>
                                                 <option></option>
                                                 @foreach (distritos() as $distrito)
-                                                    <option value="{{ $distrito->id }}"
-                                                        {{ (old('ubigeo_llegada') == $distrito->id ? 'selected' : '') }}>
-                                                        {{ $distrito->nombre }}</option>
+                                                <option value="{{ $distrito->id }}" {{
+                                                    (old('ubigeo_llegada')==$distrito->id ? 'selected' : '') }}>
+                                                    {{ $distrito->nombre }}</option>
                                                 @endforeach
                                             </select>
                                             @if ($errors->has('ubigeo_llegada'))
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $errors->first('ubigeo_llegada') }}</strong>
-                                                </span>
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $errors->first('ubigeo_llegada') }}</strong>
+                                            </span>
                                             @endif
                                         </div>
                                     </div>
@@ -320,7 +345,9 @@
                                     <label class="required">Dirección de la tienda o destino (Llegada): </label>
                                     <textarea type="text" placeholder=""
                                         class="form-control input-required {{ $errors->has('direccion_tienda') ? ' is-invalid' : '' }}"
-                                        name="direccion_tienda" id="direccion_tienda" value="{{old('direccion_tienda')}}"  required>{{old('direccion_tienda')}}</textarea>
+                                        name="direccion_tienda" id="direccion_tienda"
+                                        value="{{old('direccion_tienda')}}"
+                                        required>{{old('direccion_tienda')}}</textarea>
 
 
                                     @if ($errors->has('direccion_tienda'))
@@ -341,7 +368,9 @@
                                 <div class="form-group row">
                                     <div class="col-lg-6 col-xs-12">
                                         <label class="">Dni del Conductor: </label>
-                                        <input type="text" id="dni_conductor" class="form-control {{ $errors->has('dni_conductor') ? ' is-invalid' : '' }}" maxlength="8" name="dni_conductor" value="{{ old('dni_conductor')}}">
+                                        <input type="text" id="dni_conductor"
+                                            class="form-control {{ $errors->has('dni_conductor') ? ' is-invalid' : '' }}"
+                                            maxlength="8" name="dni_conductor" value="{{ old('dni_conductor')}}">
                                         @if ($errors->has('dni_conductor'))
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $errors->first('dni_conductor') }}</strong>
@@ -350,7 +379,9 @@
                                     </div>
                                     <div class="col-lg-6 col-xs-12">
                                         <label class="">Placa del Vehículo: </label>
-                                        <input type="text" id="placa_vehiculo" class="form-control {{ $errors->has('placa_vehiculo') ? ' is-invalid' : '' }}" name="placa_vehiculo" value="{{ old('placa_vehiculo')}}">
+                                        <input type="text" id="placa_vehiculo"
+                                            class="form-control {{ $errors->has('placa_vehiculo') ? ' is-invalid' : '' }}"
+                                            name="placa_vehiculo" value="{{ old('placa_vehiculo')}}">
                                         @if ($errors->has('placa_vehiculo'))
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $errors->first('placa_vehiculo') }}</strong>
@@ -360,10 +391,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label class="required">Motivo de Traslado</label>
-                                    <select name="motivo_traslado" id="motivo_traslado" class="select2_form form-control" required>
+                                    <select name="motivo_traslado" id="motivo_traslado"
+                                        class="select2_form form-control" required>
                                         <option value=""></option>
                                         @foreach (motivo_traslado() as $motivo)
-                                            <option value="{{ $motivo->id }}" {{ $motivo->simbolo == '01' ? 'selected' : ''}}>{{ $motivo->descripcion }}</option>
+                                        <option value="{{ $motivo->id }}" {{ $motivo->simbolo == '01' ? 'selected' :
+                                            ''}}>{{ $motivo->descripcion }}</option>
                                         @endforeach
                                     </select>
                                     @if ($errors->has('motivo_traslado'))
@@ -377,7 +410,7 @@
 
                                     <textarea type="text" placeholder=""
                                         class="form-control {{ $errors->has('observacion') ? ' is-invalid' : '' }}"
-                                        name="observacion" id="observacion"  onkeyup="return mayus(this)"
+                                        name="observacion" id="observacion" onkeyup="return mayus(this)"
                                         value="{{old('observacion')}}"></textarea>
 
 
@@ -422,36 +455,44 @@
                                                 <tbody>
 
                                                     @foreach($detalles as $detalle)
-                                                        <tr>
+                                                    <tr>
 
-                                                            <td>{{ $detalle->lote->producto->id }}</td>
-                                                            <td>-</td>
-                                                            <td>{{ $detalle->cantidad }}</td>
-                                                            <td>{{ $detalle->lote->producto->getMedida()}}</td>
-                                                            <td>{{ number_format($detalle->lote->producto->peso_producto *  $detalle->cantidad,2 , '.', '') }}</td>
-                                                            <td>{{ $detalle->lote->producto->nombre.' - '. $detalle->lote->codigo }}</td>
-                                                            <td>{{ $detalle->precio_nuevo }}</td>
-                                                            <td>{{ number_format($detalle->precio_nuevo *  $detalle->cantidad,2 , '.', '') }}</td>
-                                                            <td>{{ $detalle->lote->producto->medida }}</td>
-                                                        </tr>
+                                                        <td>{{ $detalle->lote->producto->id }}</td>
+                                                        <td>-</td>
+                                                        <td>{{ $detalle->cantidad }}</td>
+                                                        <td>{{ $detalle->lote->producto->getMedida()}}</td>
+                                                        <td>{{ number_format($detalle->lote->producto->peso_producto *
+                                                            $detalle->cantidad,2 , '.', '') }}</td>
+                                                        <td>{{ $detalle->lote->producto->nombre.' - '.
+                                                            $detalle->lote->codigo }}</td>
+                                                        <td>{{ $detalle->precio_nuevo }}</td>
+                                                        <td>{{ number_format($detalle->precio_nuevo *
+                                                            $detalle->cantidad,2 , '.', '') }}</td>
+                                                        <td>{{ $detalle->lote->producto->medida }}</td>
+                                                    </tr>
                                                     @endforeach
 
                                                 </tbody>
                                                 <tfoot style="display: none">
                                                     <tr>
                                                         <th colspan="7" class="text-center">Sub Total:</th>
-                                                        <th><span id="subtotal">{{ number_format($documento->sub_total,2 , '.', '') }}</span></th>
+                                                        <th><span id="subtotal">{{ number_format($documento->sub_total,2
+                                                                , '.', '') }}</span></th>
 
                                                     </tr>
                                                     <tr>
                                                         <th colspan="7" class="text-center">IGV 18% <span
                                                                 id="igv_int"></span>:</th>
-                                                        <th class="text-center"><span id="igv_monto">{{ number_format($documento->total_igv,2 , '.', '') }}</span></th>
+                                                        <th class="text-center"><span id="igv_monto">{{
+                                                                number_format($documento->total_igv,2 , '.', '')
+                                                                }}</span></th>
 
                                                     </tr>
                                                     <tr>
                                                         <th colspan="7" class="text-center">TOTAL:</th>
-                                                        <th class="text-center"><span id="total">{{ number_format($documento->total,2 , '.', '') }}</span></th>
+                                                        <th class="text-center"><span id="total">{{
+                                                                number_format($documento->total,2 , '.', '') }}</span>
+                                                        </th>
 
                                                     </tr>
                                                 </tfoot>
@@ -494,7 +535,8 @@
 
             </div>
         </div>
-
+        <input type="hidden" id="codigoProvincia">
+        <input type="hidden" id="codigoDistrito">
     </div>
 
 </div>
@@ -528,7 +570,6 @@
 
 
 <script>
-
     $('#cantidad').on('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '');
     });
@@ -568,9 +609,27 @@
                         if (!data.error) {
                             // Mostramos la información
                             if (data.provincias != null) {
-                                $("#provincia").select2({
-                                    data: data.provincias
-                                }).val($('#provincia').find(':selected').val()).trigger('change');
+                                $("#provincia").empty().trigger("change");
+                                let codigoProvincia = $("#codigoProvincia").val();
+                                if(codigoProvincia == ""){
+                                    $("#provincia").select2({
+                                        placeholder: "SELECCIONAR",
+                                        allowClear: true,
+                                        height: '200px',
+                                        width: '100%',
+                                        data: data.provincias
+                                    }).val($("#provincia").find(':selected').val()).trigger('change');
+                                }else{
+                                    $("#provincia").select2({
+                                        placeholder: "SELECCIONAR",
+                                        allowClear: true,
+                                        height: '200px',
+                                        width: '100%',
+                                        data: data.provincias
+                                    });
+                                    $("#provincia").select2("val", codigoProvincia);
+                                    $("#codigoProvincia").val("");
+                                }
                             }
                         } else {
                             toastr.error(data.message, 'Mensaje de Error', {
@@ -585,7 +644,7 @@
 
         function cargarDistritos() {
             var provincia_id = $("#provincia").val();
-            if (provincia_id !== "" || provincia_id.length > 0) {
+            if (provincia_id !== null && provincia_id.length > 0) {
                 $.ajax({
                     type: 'post',
                     dataType: 'json',
@@ -602,9 +661,30 @@
                             // Mostramos la información
                             if (data.distritos != null) {
                                 var selected = $('#ubigeo_llegada').find(':selected').val();
-                                $("#ubigeo_llegada").select2({
-                                    data: data.distritos
-                                });
+                                // $("#ubigeo_llegada").select2({
+                                //     data: data.distritos
+                                // });
+
+                                let codigoDistrito = $("#codigoDistrito").val();
+                                if(codigoDistrito == ""){
+                                    $("#ubigeo_llegada").select2({
+                                        placeholder: "SELECCIONAR",
+                                        allowClear: true,
+                                        height: '200px',
+                                        width: '100%',
+                                        data: data.distritos
+                                    }).val($("#ubigeo_llegada").find(':selected').val()).trigger('change');
+                                }else{
+                                    $("#ubigeo_llegada").select2({
+                                        placeholder: "SELECCIONAR",
+                                        allowClear: true,
+                                        height: '200px',
+                                        width: '100%',
+                                        data: data.distritos
+                                    });
+                                    $("#ubigeo_llegada").select2("val", codigoDistrito);
+                                    $("#codigoDistrito").val("");
+                                }
                             }
                         } else {
                             toastr.error(data.message, 'Mensaje de Error', {
@@ -806,6 +886,27 @@
 
 
 
-
+<script>
+    $(function(){
+        let cliente_id = $("#cliente_id").val();
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: {
+                _token: $('input[name=_token]').val(),
+                cliente_id
+            },
+            url: "{{ route('ventas.cliente.getcustomer') }}",
+            success: function(data) {
+                const { departamento_id, provincia_id, distrito_id,direccion } = data;
+                $("#codigoProvincia").val(Number(provincia_id));
+                $("#codigoDistrito").val(Number(distrito_id));
+                $("#departamento").select2("val", Number(departamento_id));
+                $("#direccion_tienda").val(direccion);
+                
+            }
+        });
+    });
+</script>
 
 @endpush

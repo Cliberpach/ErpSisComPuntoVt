@@ -1903,10 +1903,13 @@ if (!function_exists('codigoPrecioMenor')) {
         return $empresa;
     }
 }
-
-
-
-
-
-
-
+if (!function_exists('FechaActual')) {
+    function FechaActual()
+    {
+        $fecha_hoy = Carbon::now()->toDateString();
+        $fecha = Carbon::createFromFormat('Y-m-d', $fecha_hoy);
+        $fecha = Carbon::parse($fecha);
+        $fecha = $fecha->format("Y-m-d");
+        return $fecha;
+    }
+}

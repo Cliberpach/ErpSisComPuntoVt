@@ -468,7 +468,8 @@
 
             </div>
         </div>
-
+        <input type="hidden" id="codigoProvincia">
+        <input type="hidden" id="codigoDistrito">
     </div>
 
 </div>
@@ -535,9 +536,27 @@
                     if (!data.error) {
                         // Mostramos la información
                         if (data.provincias != null) {
-                            $("#provincia").select2({
-                                data: data.provincias
-                            }).val($('#provincia').find(':selected').val()).trigger('change');
+                            $("#provincia").empty().trigger("change");
+                            let codigoProvincia = $("#codigoProvincia").val();
+                            if(codigoProvincia == ""){
+                                $("#provincia").select2({
+                                    placeholder: "SELECCIONAR",
+                                    allowClear: true,
+                                    height: '200px',
+                                    width: '100%',
+                                    data: data.provincias
+                                }).val($("#provincia").find(':selected').val()).trigger('change');
+                            }else{
+                                $("#provincia").select2({
+                                    placeholder: "SELECCIONAR",
+                                    allowClear: true,
+                                    height: '200px',
+                                    width: '100%',
+                                    data: data.provincias
+                                });
+                                $("#provincia").select2("val", codigoProvincia);
+                                $("#codigoProvincia").val("");
+                            }
                         }
                     } else {
                         toastr.error(data.message, 'Mensaje de Error', {
@@ -552,7 +571,7 @@
 
     function cargarDistritos() {
         var provincia_id = $("#provincia").val();
-        if (provincia_id !== "" || provincia_id.length > 0) {
+        if (provincia_id !== null && provincia_id.length > 0) {
             $.ajax({
                 type: 'post',
                 dataType: 'json',
@@ -569,9 +588,27 @@
                         // Mostramos la información
                         if (data.distritos != null) {
                             var selected = $('#ubigeo_llegada').find(':selected').val();
-                            $("#ubigeo_llegada").select2({
-                                data: data.distritos
-                            });
+                           
+                            let codigoDistrito = $("#codigoDistrito").val();
+                            if(codigoDistrito == ""){
+                                $("#ubigeo_llegada").select2({
+                                    placeholder: "SELECCIONAR",
+                                    allowClear: true,
+                                    height: '200px',
+                                    width: '100%',
+                                    data: data.distritos
+                                }).val($("#ubigeo_llegada").find(':selected').val()).trigger('change');
+                            }else{
+                                $("#ubigeo_llegada").select2({
+                                    placeholder: "SELECCIONAR",
+                                    allowClear: true,
+                                    height: '200px',
+                                    width: '100%',
+                                    data: data.distritos
+                                });
+                                $("#ubigeo_llegada").select2("val", codigoDistrito);
+                                $("#codigoDistrito").val("");
+                            }
                         }
                     } else {
                         toastr.error(data.message, 'Mensaje de Error', {
@@ -980,5 +1017,29 @@
         }
     }
 
+</script>
+<script>
+    $(function(){
+        $("#cliente_id").on("change", function(){
+            $("#tienda").val("");
+            let cliente_id = $(this).val();
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    _token: $('input[name=_token]').val(),
+                    cliente_id
+                },
+                url: "{{ route('ventas.cliente.getcustomer') }}",
+                success: function(data) {
+                    const { departamento_id, provincia_id, distrito_id,direccion } = data;
+                    $("#codigoProvincia").val(Number(provincia_id));
+                    $("#codigoDistrito").val(Number(distrito_id));
+                    $("#departamento").select2("val",  Number(departamento_id));
+                    $("#direccion_tienda").val(direccion)
+                }
+            });
+        });
+    })
 </script>
 @endpush
