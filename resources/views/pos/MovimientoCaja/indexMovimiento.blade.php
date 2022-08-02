@@ -100,9 +100,10 @@
                                             <th></th>
                                             <th class="text-center">CAJA</th>
                                             <th class="text-center">CANTIDAD INICIAL</th>
-                                            <th class="text-center">CANTIDAD CIERRE</th>
                                             <th class="text-center">FECHA APERTURA</th>
                                             <th class="text-center">FECHA CIERRE</th>
+                                            <th class="text-center">CANTIDAD CIERRE</th>
+                                            <th class="text-center">VENTA DEL DIA</th>
                                             <th class="text-center">ACCIONES</th>
                                         </tr>
                                     </thead>
@@ -175,6 +176,7 @@
             },
             "columns": [
                 //Caja chica
+                //Caja chica
                 {
                     data: 'id',
                     className: "text-center",
@@ -185,13 +187,15 @@
                     className: "text-center"
                 },
                 {
-                    data: 'cantidad_inicial',
-                    className: "text-center"
+                    data: null,
+                    className: "text-center",
+                    render:function(data){
+                        const {cantidad_inicial} = data;
+                        let formato = formatoMoneda(cantidad_inicial);
+                        return formato;
+                    }
                 },
-                {
-                    data: 'cantidad_final',
-                    className: "text-center"
-                },
+                
                 {
                     data: 'fecha_Inicio',
                     className: "text-center"
@@ -199,6 +203,30 @@
                 {
                     data: 'fecha_Cierre',
                     className: "text-center"
+                },
+                {
+                    data: null,
+                    className: "text-center",
+                    render:function(data){
+                        const {cantidad_final} = data;
+                        if(!isNaN(Number(cantidad_final))){
+                            let formato = formatoMoneda(cantidad_final);
+                            return formato;
+                        }else{
+                            return cantidad_final;
+                        }
+                       
+                    }
+                },
+                {
+                    data: null,
+                    className: "text-center",
+                    render:function(data){
+                        const {totales} = data;
+                        const {TotalVentaDelDia} = totales;
+                        let formato = formatoMoneda(TotalVentaDelDia);
+                        return formato;
+                    }
                 },
                 {
                     data: null,
