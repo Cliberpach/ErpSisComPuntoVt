@@ -249,6 +249,9 @@ class NotaController extends Controller
 
                         $lote->cantidad = $lote->cantidad + $producto->cantidad;
                         $lote->cantidad_logica = $lote->cantidad_logica + $producto->cantidad;
+                        if ($lote->cantidad > 0) {
+                            $lote->estado = '1';
+                        }
                         $lote->update();
                     }
                 }
@@ -277,6 +280,11 @@ class NotaController extends Controller
 
                     $lote->cantidad = $lote->cantidad + $producto->cantidad;
                     $lote->cantidad_logica = $lote->cantidad_logica + $producto->cantidad;
+
+                    if ($lote->cantidad > 0) {
+                        $lote->estado = '1';
+                    }
+
                     $lote->update();
 
                     $documento->sunat = '2';
