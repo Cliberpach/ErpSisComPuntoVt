@@ -256,7 +256,7 @@ function loadTable()
                 render: function(data) {
                     let cadena = "";
 
-                    var dias = 1;//data.dias > 4 ? 0 : 4 - data.dias;
+                    var dias = data.dias > 4 ? 0 : 4 - data.dias;
 
                     if(data.code != '1033' && dias > 0)
                     {
