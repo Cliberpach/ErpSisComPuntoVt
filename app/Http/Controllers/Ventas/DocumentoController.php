@@ -2189,7 +2189,7 @@ class DocumentoController extends Controller
 
             if ((int) $documento->tipo_venta == 127 || (int) $documento->tipo_venta == 128) {
                 $dato = 'Actualizar';
-                // broadcast(new VentasCajaEvent($dato));
+                broadcast(new VentasCajaEvent($dato));
                 DB::commit();
                 if ($request->envio_sunat) {
                     $envio_ = self::sunat_valida($documento->id);
@@ -2202,7 +2202,7 @@ class DocumentoController extends Controller
                 ]);
             } else {
                 $dato = 'Actualizar';
-                // broadcast(new VentasCajaEvent($dato));
+                broadcast(new VentasCajaEvent($dato));
                 DB::commit();
                 //$vp = self::venta_comprobante($documento->id);
                 //$ve = self::venta_email($documento->id);
