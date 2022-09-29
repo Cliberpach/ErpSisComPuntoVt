@@ -5,7 +5,7 @@
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-12">
-        <h2 style="text-transform:uppercase"><b>EDITAR DOCUMENTO DE VENTA</b></h2>
+        <h2 style="text-transform:uppercase"><b>DUPLICAR DOCUMENTO DE VENTA</b></h2>
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
                 <a href="{{ route('home') }}">Panel de Control</a>
@@ -28,6 +28,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="ibox">
+                
                 <div class="ibox-content">
                     <input type="hidden" id='asegurarCierre'>
                     <form action="" method="POST" id="enviar_documento">
@@ -362,8 +363,8 @@
                     <div class="form-group row">
 
                         <div class="col-md-6 text-left" style="color:#fcbc6c">
-                            <i class="fa fa-exclamation-circle"></i> <small>Los campos marcados con asterisco
-                                (<label class="required"></label>) son obligatorios.</small>
+                            
+                            <h4><i class="fa fa-exclamation-circle pr-2"></i>No se descontará el stock de estos productos.</h4>
                         </div>
 
                         <div class="col-md-6 text-right">
