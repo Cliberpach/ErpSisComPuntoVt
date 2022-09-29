@@ -1961,8 +1961,16 @@ class DocumentoController extends Controller
                 
                 throw new \Exception("Este documento $documento->serie-$documento->correlativo ya fue cambiado por el documento $doc->serie-$doc->correlativo.");
             }
-
-           
+            if ($documento->sunat == '1') {
+                $doc = Documento::find($documento->duplicado);
+                
+                throw new \Exception("Este documento $documento->serie-$documento->correlativo ya fue enviado a SUNAT");
+            }
+            if ($documento->sunat == '2') {
+                $doc = Documento::find($documento->duplicado);
+                
+                throw new \Exception("Este documento $documento->serie-$documento->correlativo ya fue ANULADO");
+            }
 
             $empresas = Empresa::where('estado', 'ACTIVO')->get();
             $clientes = Cliente::where('estado', 'ACTIVO')->get();

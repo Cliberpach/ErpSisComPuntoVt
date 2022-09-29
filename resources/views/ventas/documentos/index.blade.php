@@ -366,7 +366,15 @@ $(document).ready(function() {
                     if((data.code == '1032' || data.code == 'HTTP' || data.code == '0100') && data.regularize == '1' && data.sunat == '0'  && data.contingencia == '0')
                     {
                         cadena  = cadena + `
-                        <button type="button" class="btn btn-sm btn-primary-cdr m-1 cdrDescription" title=="CDR">CDR</button>
+                        <button type="button" class="btn btn-sm btn-dark m-1 cdrDescription" title="Cambiar"><i class='fa fa-exchange'></i> Cambiar</button>
+                        `;
+                        // cadena = cadena +
+                        // "";
+                    }
+                    if(data.code == '1033' && data.regularize == '1' && data.sunat != '2'  && data.contingencia == '0')
+                    {
+                        cadena  = cadena + `
+                        <button type="button" class="btn btn-sm btn-primary-cdr m-1" onclick="cdr(${data.id})" title=="CDR">CDR</button>
                         `;
                         // cadena = cadena +
                         // "";
@@ -617,8 +625,7 @@ $(document).on("click","#EnviarCDR",function(e){
 });
 
 function cdr(data) {
-    alert("dd");
-    return false;
+    
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',
