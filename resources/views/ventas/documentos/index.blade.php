@@ -374,7 +374,7 @@ $(document).ready(function() {
 
                     if(dias <= 0 && data.contingencia == '0' && data.tipo_venta_id != '129' && data.sunat == '0')
                     {
-                        cadena = cadena + "<button type='button' class='btn btn-sm btn-warning m-1' onclick='contingencia(" +data.id+ ")'  title='Convertir a comprobante de contingencia'><i class='fa fa-exchange'></i> Contingencia</button>";
+                        // cadena = cadena + "<button type='button' class='btn btn-sm btn-warning m-1' onclick='contingencia(" +data.id+ ")'  title='Convertir a comprobante de contingencia'><i class='fa fa-exchange'></i> Contingencia</button>";
                     }
 
                     return cadena;
