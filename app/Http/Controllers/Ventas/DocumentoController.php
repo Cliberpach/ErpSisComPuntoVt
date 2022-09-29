@@ -2,46 +2,41 @@
 
 namespace App\Http\Controllers\Ventas;
 
-use App\Almacenes\LoteDetalle;
-use App\Almacenes\LoteProducto;
-use App\Almacenes\Producto;
-use App\Events\ComprobanteRegistrado;
-use App\Events\DocumentoNumeracion;
-use App\Events\NotifySunatEvent;
-use App\Events\VentasCajaEvent;
-use App\Http\Controllers\Controller;
-use App\Mantenimiento\Empresa\Empresa;
-use App\Mantenimiento\Empresa\Numeracion;
-use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
-use App\Pos\DetalleMovimientoVentaCaja;
-use App\Pos\MovimientoCaja;
+use stdClass;
+use Exception;
+use Carbon\Carbon;
 use App\Ventas\Cliente;
-use App\Mantenimiento\Condicion;
-use App\Mantenimiento\Empresa\Banco;
-use App\Notifications\FacturacionNotification;
 use App\Ventas\Cotizacion;
+use App\Ventas\ErrorVenta;
+use App\Almacenes\Producto;
+use Illuminate\Http\Request;
+use App\Almacenes\LoteProducto;
+use App\Events\VentasCajaEvent;
+use App\Events\NotifySunatEvent;
+use App\Mantenimiento\Condicion;
 use App\Ventas\CotizacionDetalle;
 use App\Ventas\Documento\Detalle;
-use App\Ventas\Documento\Documento;
-use App\Ventas\Documento\Pago\Transferencia;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade as PDF;
-use App\Ventas\ErrorVenta;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
-use Exception;
-use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use App\Events\DocumentoNumeracion;
+use App\Ventas\Documento\Documento;
+use App\Http\Controllers\Controller;
+use App\Mantenimiento\Empresa\Banco;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Events\ComprobanteRegistrado;
+use App\Mantenimiento\Empresa\Empresa;
+use App\Pos\DetalleMovimientoVentaCaja;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-//CONVERTIR DE NUMEROS A LETRAS
 use Luecano\NumeroALetras\NumeroALetras;
-use stdClass;
+use Yajra\DataTables\Facades\DataTables;
+//CONVERTIR DE NUMEROS A LETRAS
+use App\Mantenimiento\Empresa\Numeracion;
+use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 
 class DocumentoController extends Controller
 {
@@ -84,6 +79,7 @@ class DocumentoController extends Controller
                 'cotizacion_documento.regularize',
                 'cotizacion_documento.contingencia',
                 'cotizacion_documento.sunat_contingencia',
+                DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse,"$.description")) as cdrDescription'),
                 DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code")) as code'),
                 'cotizacion_documento.total',
                 DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
@@ -97,97 +93,19 @@ class DocumentoController extends Controller
 
         $documentos = $documentos->orderBy('id', 'desc');
 
+        // foreach($documentos as $key=>$value){
+        //     if($value->code == "1032"){
+        //         $split = explode("-",$value->cdrDescription);
+        //         $documentos[$key]->cdrDescription = $split[1];
+        //     }
+
+        // }
+
+        // return DataTables::of($documentos)->toJson();
         return datatables()->query(
             $documentos
         )->toJson();
-
-        /*$documentos = [];
-        if(FullAccess())
-        {
-
-            $documentos = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
-        }
-        else {
-
-            $documentos = Documento::where('estado','!=','ANULADO')->where('user_id',auth()->user()->id)->orderBy('id', 'desc')->get();
-        }
-        $coleccion = collect([]);
-
-        $hoy = Carbon::now();
-        foreach($documentos as $documento){
-
-            $transferencia = 0.00;
-            $otros = 0.00;
-            $efectivo = 0.00;
-
-            if($documento->tipo_pago_id)
-            {
-                if ($documento->tipo_pago_id == 1) {
-                    $efectivo = $documento->importe;
-                }
-                else if ($documento->tipo_pago_id == 2){
-                    $transferencia = $documento->importe ;
-                    $efectivo = $documento->efectivo;
-                }
-                else {
-                    $otros = $documento->importe;
-                    $efectivo = $documento->efectivo;
-                }
-            }
-
-            $fecha_v = $documento->created_at;
-            $diff =  $fecha_v->diffInDays($hoy);
-
-            $cantidad_notas = count($documento->notas);
-
-            $code = '-';
-            if(!empty($documento->getRegularizeResponse))
-            {
-                $json_data = json_decode($documento->getRegularizeResponse, false);
-                $code = $json_data->code;
-            }
-
-            $total = $documento->total;
-            if($documento->tipo_venta == 129)
-            {
-                $total = $documento->total - $documento->notas->sum('mtoImpVenta');
-            }
-
-            $coleccion->push([
-                'id' => $documento->id,
-                'tipo_venta' => $documento->nombreTipo(),
-                'tipo_venta_id' => $documento->tipo_venta,
-                'empresa' => $documento->empresaEntidad->razon_social,
-                'tipo_pago' => $documento->tipo_pago_id,
-                'numero_doc' =>  $documento->serie.'-'.$documento->correlativo,
-                'serie' => $documento->serie,
-                'correlativo' => $documento->correlativo,
-                'cliente' => $documento->tipo_documento_cliente.': '.$documento->documento_cliente.' - '.$documento->cliente,
-                'empresa' => $documento->empresa,
-                'empresa_id' => $documento->empresa_id,
-                'cliente_id' => $documento->cliente_id,
-                'cotizacion_venta' =>  $documento->cotizacion_venta,
-                'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format( 'd/m/Y'),
-                'estado' => $documento->estado_pago,
-                'condicion' => $documento->condicion->descripcion,
-                'condicion_id' => $documento->condicion_id,
-                'ruta_pago' => $documento->ruta_pago,
-                'cuenta_id' => $documento->banco_empresa_id,
-                'importe' => $documento->importe,
-                'efectivo' => $documento->efectivo,
-                'sunat' => $documento->sunat,
-                'regularize' => $documento->regularize,
-                'code' => $code,
-                'otros' => 'S/. '.number_format($otros, 2, '.', ''),
-                'efectivo' => 'S/. '.number_format($efectivo, 2, '.', ''),
-                'transferencia' => 'S/. '.number_format($transferencia, 2, '.', ''),
-                'total' => 'S/. '.number_format($total, 2, '.', ''),
-                'dias' => (int)(3 - $diff < 0 ? 0  : 3 - $diff),
-                'notas' => $cantidad_notas
-            ]);
-        }
-
-        return DataTables::of($coleccion)->toJson();*/
+        
     }
 
     public function getDocumentClient(Request $request)
@@ -215,7 +133,7 @@ class DocumentoController extends Controller
             }
 
             $fecha_v = $documento->created_at;
-            $diff =  $fecha_v->diffInDays($hoy);
+            $diff = $fecha_v->diffInDays($hoy);
 
             $cantidad_notas = count($documento->notas);
 
@@ -225,15 +143,15 @@ class DocumentoController extends Controller
                 'tipo_venta_id' => $documento->tipo_venta,
                 'empresa' => $documento->empresaEntidad->razon_social,
                 'tipo_pago' => $documento->tipo_pago_id,
-                'numero_doc' =>  $documento->serie . '-' . $documento->correlativo,
+                'numero_doc' => $documento->serie . '-' . $documento->correlativo,
                 'serie' => $documento->serie,
                 'correlativo' => $documento->correlativo,
                 'cliente' => $documento->tipo_documento_cliente . ': ' . $documento->documento_cliente . ' - ' . $documento->cliente,
                 'empresa' => $documento->empresa,
                 'empresa_id' => $documento->empresa_id,
                 'convertir' => $documento->convertir,
-                'cotizacion_venta' =>  $documento->cotizacion_venta,
-                'fecha_documento' =>  Carbon::parse($documento->fecha_documento)->format('d/m/Y'),
+                'cotizacion_venta' => $documento->cotizacion_venta,
+                'fecha_documento' => Carbon::parse($documento->fecha_documento)->format('d/m/Y'),
                 'estado' => $documento->estado_pago,
                 'condicion' => $documento->condicion->descripcion,
                 'sunat' => $documento->sunat,
@@ -241,14 +159,14 @@ class DocumentoController extends Controller
                 'efectivo' => 'S/. ' . number_format($efectivo, 2, '.', ''),
                 'transferencia' => 'S/. ' . number_format($transferencia, 2, '.', ''),
                 'total' => number_format($documento->total, 2, '.', ''),
-                'dias' => (int)(4 - $diff < 0 ? 0  : 4 - $diff),
-                'notas' => $cantidad_notas
+                'dias' => (int) (4 - $diff < 0 ? 0 : 4 - $diff),
+                'notas' => $cantidad_notas,
             ]);
         }
 
         return response()->json([
             'success' => true,
-            'ventas' => $coleccion
+            'ventas' => $coleccion,
         ]);
     }
 
@@ -268,16 +186,16 @@ class DocumentoController extends Controller
             $message = [
                 'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
                 'importe.required' => 'El campo importe es obligatorio.',
-                'efectivo.required' => 'El campo efectivo es obligatorio.'
+                'efectivo.required' => 'El campo efectivo es obligatorio.',
             ];
 
-            $validator =  Validator::make($data, $rules, $message);
+            $validator = Validator::make($data, $rules, $message);
 
             if ($validator->fails()) {
                 $clase = $validator->getMessageBag()->toArray();
                 $cadena = "";
                 foreach ($clase as $clave => $valor) {
-                    $cadena =  $cadena . "$valor[0] ";
+                    $cadena = $cadena . "$valor[0] ";
                 }
 
                 Session::flash('error', $cadena);
@@ -337,16 +255,16 @@ class DocumentoController extends Controller
             $message = [
                 'tipo_pago_id.required' => 'El campo modo de pago es obligatorio.',
                 'importe.required' => 'El campo importe es obligatorio.',
-                'efectivo.required' => 'El campo efectivo es obligatorio.'
+                'efectivo.required' => 'El campo efectivo es obligatorio.',
             ];
 
-            $validator =  Validator::make($data, $rules, $message);
+            $validator = Validator::make($data, $rules, $message);
 
             if ($validator->fails()) {
                 $clase = $validator->getMessageBag()->toArray();
                 $cadena = "";
                 foreach ($clase as $clave => $valor) {
-                    $cadena =  $cadena . "$valor[0] ";
+                    $cadena = $cadena . "$valor[0] ";
                 }
 
                 Session::flash('error', $cadena);
@@ -420,7 +338,7 @@ class DocumentoController extends Controller
         $cuentas = Banco::where('empresa_id', $request->empresa_id)->where('estado', 'ACTIVO')->get();
         return response()->json([
             'success' => true,
-            'cuentas' => $cuentas
+            'cuentas' => $cuentas,
         ]);
     }
 
@@ -462,7 +380,7 @@ class DocumentoController extends Controller
             //COLECCION DE ERRORES
             $errores = collect();
             $devolucion = false;
-            $cotizacion =  Cotizacion::findOrFail($request->get('cotizacion'));
+            $cotizacion = Cotizacion::findOrFail($request->get('cotizacion'));
             $detalles = CotizacionDetalle::where('cotizacion_id', $request->get('cotizacion'))->get();
             $lotes = self::cotizacionLote($detalles);
 
@@ -552,7 +470,7 @@ class DocumentoController extends Controller
         foreach ($devoluciones as $devolucion) {
             $lote = LoteProducto::findOrFail($devolucion->producto_id);
             $lote->cantidad_logica = $lote->cantidad_logica + $devolucion->cantidad;
-            $lote->cantidad =  $lote->cantidad_logica;
+            $lote->cantidad = $lote->cantidad_logica;
             $lote->estado = '1';
             $lote->update();
         }
@@ -650,7 +568,6 @@ class DocumentoController extends Controller
             }
         }
 
-
         return $nuevoDetalle;
     }
 
@@ -692,32 +609,31 @@ class DocumentoController extends Controller
                 'igv.numeric' => 'El campo Igv debe se numérico.',
             ];
 
-
-            $validator =  Validator::make($data, $rules, $message);
+            $validator = Validator::make($data, $rules, $message);
 
             if ($validator->fails()) {
                 return response()->json([
                     'errors' => true,
-                    'data' => array('mensajes' => $validator->getMessageBag()->toArray())
+                    'data' => array('mensajes' => $validator->getMessageBag()->toArray()),
                 ]);
             }
 
             $documento = new Documento();
             $documento->fecha_documento = $request->get('fecha_documento_campo');
-            $documento->fecha_atencion =  $request->get('fecha_atencion_campo');
-            $documento->fecha_vencimiento =  $request->get('fecha_vencimiento_campo');
+            $documento->fecha_atencion = $request->get('fecha_atencion_campo');
+            $documento->fecha_vencimiento = $request->get('fecha_vencimiento_campo');
             //EMPRESA
             $empresa = Empresa::findOrFail($request->get('empresa_id'));
-            $documento->ruc_empresa =  $empresa->ruc;
-            $documento->empresa =  $empresa->razon_social;
-            $documento->direccion_fiscal_empresa =  $empresa->direccion_fiscal;
+            $documento->ruc_empresa = $empresa->ruc;
+            $documento->empresa = $empresa->razon_social;
+            $documento->direccion_fiscal_empresa = $empresa->direccion_fiscal;
             $documento->empresa_id = $request->get('empresa_id'); //OBTENER NUMERACION DE LA EMPRESA
             //CLIENTE
             $cliente = Cliente::findOrFail($request->get('cliente_id'));
-            $documento->tipo_documento_cliente =  $cliente->tipo_documento;
-            $documento->documento_cliente =  $cliente->documento;
-            $documento->direccion_cliente =  $cliente->direccion;
-            $documento->cliente =  $cliente->nombre;
+            $documento->tipo_documento_cliente = $cliente->tipo_documento;
+            $documento->documento_cliente = $cliente->documento;
+            $documento->direccion_cliente = $cliente->direccion;
+            $documento->cliente = $cliente->nombre;
             $documento->cliente_id = $request->get('cliente_id'); //OBTENER TIENDA DEL CLIENTE
 
             $documento->tipo_venta = $request->get('tipo_venta');
@@ -765,7 +681,7 @@ class DocumentoController extends Controller
             if ($request->convertir) {
                 foreach ($productotabla as $producto) {
                     $lote = LoteProducto::findOrFail($producto->producto_id);
-                    $lote->cantidad =  $lote->cantidad + $producto->cantidad;
+                    $lote->cantidad = $lote->cantidad + $producto->cantidad;
                     $lote->update();
                 }
             }
@@ -788,9 +704,9 @@ class DocumentoController extends Controller
                     'valor_venta' => $producto->valor_venta,
                 ]);
 
-                $lote->cantidad =  $lote->cantidad - $producto->cantidad;
+                $lote->cantidad = $lote->cantidad - $producto->cantidad;
                 if ($lote->cantidad == 0) {
-                    $lote->estado =  '0';
+                    $lote->estado = '0';
                 }
                 $lote->update();
             }
@@ -822,10 +738,9 @@ class DocumentoController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'mensaje' => $envio_prev['mensaje']
+                    'mensaje' => $envio_prev['mensaje'],
                 ]);
             }
-
 
             $documento = Documento::find($documento->id);
             $documento->nombre_comprobante_archivo = $documento->serie . '-' . $documento->correlativo . '.pdf';
@@ -836,8 +751,8 @@ class DocumentoController extends Controller
             $gestion = "DOCUMENTO DE VENTA";
             crearRegistro($documento, $descripcion, $gestion);
 
-            if ((int)$documento->tipo_venta == 127 || (int)$documento->tipo_venta == 128) {
-                $dato =  'Actualizar';
+            if ((int) $documento->tipo_venta == 127 || (int) $documento->tipo_venta == 128) {
+                $dato = 'Actualizar';
                 broadcast(new VentasCajaEvent($dato));
                 DB::commit();
                 if ($request->envio_sunat) {
@@ -847,10 +762,10 @@ class DocumentoController extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'documento_id' => $documento->id
+                    'documento_id' => $documento->id,
                 ]);
             } else {
-                $dato =  'Actualizar';
+                $dato = 'Actualizar';
                 broadcast(new VentasCajaEvent($dato));
                 DB::commit();
                 //$vp = self::venta_comprobante($documento->id);
@@ -858,7 +773,7 @@ class DocumentoController extends Controller
                 Session::flash('success', 'Documento de venta creado.');
                 return response()->json([
                     'success' => true,
-                    'documento_id' => $documento->id
+                    'documento_id' => $documento->id,
                 ]);
             }
         } catch (Exception $e) {
@@ -866,7 +781,7 @@ class DocumentoController extends Controller
             return response()->json([
                 'success' => false,
                 'mensaje' => $e->getMessage(), //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
-                'excepcion' => $e->getMessage()
+                'excepcion' => $e->getMessage(),
             ]);
         }
     }
@@ -926,7 +841,7 @@ class DocumentoController extends Controller
                 'detalles' => $detalles,
                 'moneda' => $documento->simboloMoneda(),
                 'empresa' => $empresa,
-                "legends" =>  $legends,
+                "legends" => $legends,
             ])->setPaper('a4')->setWarnings(false)
                 ->save(public_path() . '/storage/comprobantessiscom/' . $documento->nombre_comprobante_archivo);
 
@@ -949,7 +864,7 @@ class DocumentoController extends Controller
         try {
             $documento = Documento::find($id);
 
-            if ((int)$documento->tipo_venta === 127 || (int)$documento->tipo_venta === 128) {
+            if ((int) $documento->tipo_venta === 127 || (int) $documento->tipo_venta === 128) {
                 if ($documento->clienteEntidad->correo_electronico) {
                     Mail::send('ventas.documentos.mail.cliente_mail', compact("documento"), function ($mail) use ($documento) {
                         $mail->to($documento->clienteEntidad->correo_electronico);
@@ -1028,12 +943,11 @@ class DocumentoController extends Controller
         $formatter = new NumeroALetras();
         $convertir = $formatter->toInvoice($documento->total, 2, 'SOLES');
 
-
         return view('ventas.documentos.show', [
             'documento' => $documento,
             'detalles' => $detalles,
             'nombre_completo' => $nombre_completo,
-            'cadena_valor' => $convertir
+            'cadena_valor' => $convertir,
         ]);
     }
 
@@ -1054,7 +968,6 @@ class DocumentoController extends Controller
             }
         }
 
-
         if (!$documento->igv) {
             $igv = $subtotal * 0.18;
             $total = $subtotal + $igv;
@@ -1069,8 +982,6 @@ class DocumentoController extends Controller
             $decimal_total = number_format($subtotal, 2, '.', '');
             $decimal_igv = number_format($nuevo_igv, 2, '.', '');
         }
-
-
 
         $presentaciones = presentaciones();
         $paper_size = array(0, 0, 360, 360);
@@ -1094,11 +1005,9 @@ class DocumentoController extends Controller
             ->join('cotizacion_documento_pago_cajas', 'cotizacion_documento_pago_cajas.id', '=', 'cotizacion_documento_pago_detalle_cajas.caja_id')
             ->select('cotizacion_documento_pago_cajas.*', 'cotizacion_documento_pagos.*')
             ->where('cotizacion_documento_pagos.documento_id', '=', $id)
-            // //ANULAR
+        // //ANULAR
             ->where('cotizacion_documento_pagos.estado', '!=', 'ANULADO')
             ->update(['cotizacion_documento_pago_cajas.estado' => 'ANULADO']);
-
-
 
         //TIPO DE DOCUMENTO
         $documento = Documento::findOrFail($id);
@@ -1129,7 +1038,7 @@ class DocumentoController extends Controller
             $qr = self::qr_code($id);
             $documento = Documento::findOrFail($id);
             $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->get();
-            if ((int)$documento->tipo_venta == 127 || (int)$documento->tipo_venta == 128) {
+            if ((int) $documento->tipo_venta == 127 || (int) $documento->tipo_venta == 128) {
                 if ($documento->sunat == '0' || $documento->sunat == '2') {
                     //ARREGLO COMPROBANTE
                     $arreglo_comprobante = array(
@@ -1146,14 +1055,14 @@ class DocumentoController extends Controller
                             "rznSocial" => $documento->cliente,
                             "address" => array(
                                 "direccion" => $documento->direccion_cliente,
-                            )
+                            ),
                         ),
                         "company" => array(
-                            "ruc" =>  $documento->ruc_empresa,
+                            "ruc" => $documento->ruc_empresa,
                             "razonSocial" => $documento->empresa,
                             "address" => array(
                                 "direccion" => $documento->direccion_fiscal_empresa,
-                            )
+                            ),
                         ),
                         "mtoOperGravadas" => $documento->sub_total,
                         "mtoOperExoneradas" => 0,
@@ -1164,7 +1073,7 @@ class DocumentoController extends Controller
                         "mtoImpVenta" => $documento->total,
                         "ublVersion" => "2.1",
                         "details" => self::obtenerProductos($documento->id),
-                        "legends" =>  self::obtenerLeyenda($documento),
+                        "legends" => self::obtenerLeyenda($documento),
                     );
 
                     $comprobante = json_encode($arreglo_comprobante);
@@ -1187,7 +1096,7 @@ class DocumentoController extends Controller
                             'detalles' => $detalles,
                             'moneda' => $documento->simboloMoneda(),
                             'empresa' => $empresa,
-                            "legends" =>  $legends,
+                            "legends" => $legends,
                         ])->setPaper([0, 0, 226.772, 651.95]);
                         return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
                     } else {
@@ -1197,7 +1106,7 @@ class DocumentoController extends Controller
                             'detalles' => $detalles,
                             'moneda' => $documento->simboloMoneda(),
                             'empresa' => $empresa,
-                            "legends" =>  $legends,
+                            "legends" => $legends,
                         ])->setPaper('a4')->setWarnings(false);
 
                         return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
@@ -1227,7 +1136,7 @@ class DocumentoController extends Controller
                             'detalles' => $detalles,
                             'moneda' => $documento->simboloMoneda(),
                             'empresa' => $empresa,
-                            "legends" =>  $legends,
+                            "legends" => $legends,
                         ])->setPaper([0, 0, 226.772, 651.95]);
                         return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
                     } else {
@@ -1237,7 +1146,7 @@ class DocumentoController extends Controller
                             'detalles' => $detalles,
                             'moneda' => $documento->simboloMoneda(),
                             'empresa' => $empresa,
-                            "legends" =>  $legends,
+                            "legends" => $legends,
                         ])->setPaper('a4')->setWarnings(false);
 
                         return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
@@ -1260,7 +1169,7 @@ class DocumentoController extends Controller
                         'detalles' => $detalles,
                         'moneda' => $documento->simboloMoneda(),
                         'empresa' => $empresa,
-                        "legends" =>  $legends,
+                        "legends" => $legends,
                     ])->setPaper([0, 0, 226.772, 651.95]);
                     return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
                 } else {
@@ -1270,7 +1179,7 @@ class DocumentoController extends Controller
                         'detalles' => $detalles,
                         'moneda' => $documento->simboloMoneda(),
                         'empresa' => $empresa,
-                        "legends" =>  $legends,
+                        "legends" => $legends,
                     ])->setPaper('a4')->setWarnings(false);
 
                     return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
@@ -1294,7 +1203,7 @@ class DocumentoController extends Controller
                     'detalles' => $detalles,
                     'moneda' => $documento->simboloMoneda(),
                     'empresa' => $empresa,
-                    "legends" =>  $legends,
+                    "legends" => $legends,
                 ])->setPaper([0, 0, 226.772, 651.95]);
                 return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
             } else {
@@ -1304,7 +1213,7 @@ class DocumentoController extends Controller
                     'detalles' => $detalles,
                     'moneda' => $documento->simboloMoneda(),
                     'empresa' => $empresa,
-                    "legends" =>  $legends,
+                    "legends" => $legends,
                 ])->setPaper('a4')->setWarnings(false);
 
                 return $pdf->stream($documento->serie . '-' . $documento->correlativo . '.pdf');
@@ -1316,7 +1225,7 @@ class DocumentoController extends Controller
     {
 
         $documento = Documento::findOrFail($id);
-        if ((int)$documento->tipo_venta === 127 || (int)$documento->tipo_venta === 128) {
+        if ((int) $documento->tipo_venta === 127 || (int) $documento->tipo_venta === 128) {
             if ($documento->sunat == '0' || $documento->sunat == '2') {
                 //ARREGLO COMPROBANTE
                 $arreglo_comprobante = array(
@@ -1333,14 +1242,14 @@ class DocumentoController extends Controller
                         "rznSocial" => $documento->cliente,
                         "address" => array(
                             "direccion" => $documento->direccion_cliente,
-                        )
+                        ),
                     ),
                     "company" => array(
-                        "ruc" =>  $documento->ruc_empresa,
+                        "ruc" => $documento->ruc_empresa,
                         "razonSocial" => $documento->empresa,
                         "address" => array(
                             "direccion" => $documento->direccion_fiscal_empresa,
-                        )
+                        ),
                     ),
                     "mtoOperGravadas" => $documento->sub_total,
                     "mtoOperExoneradas" => 0,
@@ -1351,7 +1260,7 @@ class DocumentoController extends Controller
                     "mtoImpVenta" => $documento->total,
                     "ublVersion" => "2.1",
                     "details" => self::obtenerProductos($documento->id),
-                    "legends" =>  self::obtenerLeyenda($documento),
+                    "legends" => self::obtenerLeyenda($documento),
                 );
 
                 $comprobante = json_encode($arreglo_comprobante);
@@ -1400,7 +1309,7 @@ class DocumentoController extends Controller
             if ($documento->contingencia == '0') {
                 $name_qr = $documento->serie . "-" . $documento->correlativo . '.svg';
             } else {
-                $name_qr  = $documento->serie_contingencia . "-" . $documento->correlativo . '.svg';
+                $name_qr = $documento->serie_contingencia . "-" . $documento->correlativo . '.svg';
             }
             if ($documento->sunat == '1') {
                 $arreglo_qr = array(
@@ -1410,9 +1319,9 @@ class DocumentoController extends Controller
                     "numero" => $documento->correlativo,
                     "emision" => self::obtenerFechaEmision($documento),
                     "igv" => 18,
-                    "total" => (float)$documento->total,
+                    "total" => (float) $documento->total,
                     "clienteTipo" => $documento->tipoDocumentoCliente(),
-                    "clienteNumero" => $documento->documento_cliente
+                    "clienteNumero" => $documento->documento_cliente,
                 );
 
                 /********************************/
@@ -1434,10 +1343,10 @@ class DocumentoController extends Controller
 
             if ($documento->sunat == '0' && $documento->contingencia == '0') {
                 $miQr = QrCode::format('svg')
-                    ->size(130)  //defino el tamaño
+                    ->size(130) //defino el tamaño
                     ->backgroundColor(0, 0, 0) //defino el fondo
                     ->color(255, 255, 255)
-                    ->margin(1)  //defino el margen
+                    ->margin(1) //defino el margen
                     ->generate($documento->ruc_empresa . '|' . $documento->tipoDocumento() . '|' . $documento->serie . '|' . $documento->correlativo . '|' . $documento->total_igv . '|' . $documento->total . '|' . getFechaFormato($documento->fecha_emision, 'd/m/Y'));
 
                 $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
@@ -1452,13 +1361,13 @@ class DocumentoController extends Controller
                 $documento->update();
                 return array('success' => false, 'mensaje' => 'Ya tiene QR');
             }
-            
+
             if ($documento->sunat_contingencia == '0' && $documento->contingencia == '1') {
                 $miQr = QrCode::format('svg')
-                    ->size(130)  //defino el tamaño
+                    ->size(130) //defino el tamaño
                     ->backgroundColor(0, 0, 0) //defino el fondo
                     ->color(255, 255, 255)
-                    ->margin(1)  //defino el margen
+                    ->margin(1) //defino el margen
                     ->generate($documento->ruc_empresa . '|' . $documento->tipoDocumento() . '|' . $documento->serie . '|' . $documento->correlativo . '|' . $documento->total_igv . '|' . $documento->total . '|' . getFechaFormato($documento->fecha_emision, 'd/m/Y'));
 
                 $pathToFile_qr = storage_path('app' . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'qrs' . DIRECTORY_SEPARATOR . $name_qr);
@@ -1487,14 +1396,14 @@ class DocumentoController extends Controller
         $arrayLeyenda = array();
         $arrayLeyenda[] = array(
             "code" => "1000",
-            "value" => $convertir
+            "value" => $convertir,
         );
         return $arrayLeyenda;
     }
 
     public function obtenerProductos($id)
     {
-        $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->where('estado','ACTIVO')->get();
+        $detalles = Detalle::where('documento_id', $id)->where('eliminado', '0')->where('estado', 'ACTIVO')->get();
         $arrayProductos = array();
         for ($i = 0; $i < count($detalles); $i++) {
 
@@ -1502,15 +1411,15 @@ class DocumentoController extends Controller
                 "codProducto" => $detalles[$i]->codigo_producto,
                 "unidad" => $detalles[$i]->unidad,
                 "descripcion" => $detalles[$i]->nombre_producto . ' - ' . $detalles[$i]->codigo_lote,
-                "cantidad" => (float)$detalles[$i]->cantidad,
-                "mtoValorUnitario" => (float)($detalles[$i]->precio_nuevo / 1.18),
-                "mtoValorVenta" => (float)($detalles[$i]->valor_venta / 1.18),
-                "mtoBaseIgv" => (float)($detalles[$i]->valor_venta / 1.18),
+                "cantidad" => (float) $detalles[$i]->cantidad,
+                "mtoValorUnitario" => (float) ($detalles[$i]->precio_nuevo / 1.18),
+                "mtoValorVenta" => (float) ($detalles[$i]->valor_venta / 1.18),
+                "mtoBaseIgv" => (float) ($detalles[$i]->valor_venta / 1.18),
                 "porcentajeIgv" => 18,
-                "igv" => (float)($detalles[$i]->valor_venta - ($detalles[$i]->valor_venta / 1.18)),
+                "igv" => (float) ($detalles[$i]->valor_venta - ($detalles[$i]->valor_venta / 1.18)),
                 "tipAfeIgv" => 10,
-                "totalImpuestos" =>  (float)($detalles[$i]->valor_venta - ($detalles[$i]->valor_venta / 1.18)),
-                "mtoPrecioUnitario" => (float)$detalles[$i]->precio_nuevo
+                "totalImpuestos" => (float) ($detalles[$i]->valor_venta - ($detalles[$i]->valor_venta / 1.18)),
+                "mtoPrecioUnitario" => (float) $detalles[$i]->precio_nuevo,
 
             );
         }
@@ -1573,9 +1482,9 @@ class DocumentoController extends Controller
                     "fecVencimiento" => self::obtenerFechaVencimiento($documento),
                     "observacion" => $documento->observacion,
                     "formaPago" => array(
-                        "moneda" =>  $documento->simboloMoneda(),
-                        "tipo" =>  $documento->forma_pago(),
-                        "monto" => (float)$documento->total,
+                        "moneda" => $documento->simboloMoneda(),
+                        "tipo" => $documento->forma_pago(),
+                        "monto" => (float) $documento->total,
                     ),
                     "cuotas" => self::obtenerCuotas($documento->id),
                     "tipoMoneda" => $documento->simboloMoneda(),
@@ -1585,26 +1494,26 @@ class DocumentoController extends Controller
                         "rznSocial" => $documento->cliente,
                         "address" => array(
                             "direccion" => $documento->direccion_cliente,
-                        )
+                        ),
                     ),
                     "company" => array(
-                        "ruc" =>  $documento->ruc_empresa,
+                        "ruc" => $documento->ruc_empresa,
                         "razonSocial" => $documento->empresa,
                         "address" => array(
                             "direccion" => $documento->direccion_fiscal_empresa,
-                        )
+                        ),
                     ),
-                    "mtoOperGravadas" => (float)$documento->sub_total,
+                    "mtoOperGravadas" => (float) $documento->sub_total,
                     "mtoOperExoneradas" => 0,
-                    "mtoIGV" => (float)$documento->total_igv,
+                    "mtoIGV" => (float) $documento->total_igv,
 
-                    "valorVenta" => (float)$documento->sub_total,
-                    "totalImpuestos" => (float)$documento->total_igv,
-                    "subTotal" => (float)$documento->total,
-                    "mtoImpVenta" => (float)$documento->total,
+                    "valorVenta" => (float) $documento->sub_total,
+                    "totalImpuestos" => (float) $documento->total_igv,
+                    "subTotal" => (float) $documento->total,
+                    "mtoImpVenta" => (float) $documento->total,
                     "ublVersion" => "2.1",
                     "details" => self::obtenerProductos($documento->id),
-                    "legends" =>  self::obtenerLeyenda($documento),
+                    "legends" => self::obtenerLeyenda($documento),
                 );
 
                 //OBTENER JSON DEL COMPROBANTE EL CUAL SE ENVIARA A SUNAT
@@ -1646,9 +1555,9 @@ class DocumentoController extends Controller
                             "numero" => $documento->correlativo,
                             "emision" => self::obtenerFechaEmision($documento),
                             "igv" => 18,
-                            "total" => (float)$documento->total,
+                            "total" => (float) $documento->total,
                             "clienteTipo" => $documento->tipoDocumentoCliente(),
-                            "clienteNumero" => $documento->documento_cliente
+                            "clienteNumero" => $documento->documento_cliente,
                         );
 
                         /********************************/
@@ -1682,7 +1591,6 @@ class DocumentoController extends Controller
                         $documento->ruta_comprobante_archivo = 'public/sunat/' . $name;
                         $documento->ruta_qr = 'public/qrs/' . $name_qr;
                         $documento->update();
-
 
                         //Registro de actividad
                         $descripcion = "SE AGREGÓ EL COMPROBANTE ELECTRONICO: " . $documento->serie . "-" . $documento->correlativo;
@@ -1801,7 +1709,7 @@ class DocumentoController extends Controller
             'empresa' => $empresa->razon_social,
         ];
 
-        return  response()->json($enviar);
+        return response()->json($enviar);
     }
 
     public function obtenerCuotas($id)
@@ -1812,22 +1720,22 @@ class DocumentoController extends Controller
         if (strtoupper($condicion->descripcion) == 'CREDITO' || strtoupper($condicion->descripcion) == 'CRÉDITO') {
             $arrayCuotas[] = array(
                 "moneda" => "PEN",
-                "monto" => (float)$documento->total,
-                "fechaPago" => self::obtenerFechaVencimiento($documento)
+                "monto" => (float) $documento->total,
+                "fechaPago" => self::obtenerFechaVencimiento($documento),
 
             );
         }
         /*if($documento->cuenta)
         {
-            foreach($documento->cuenta->detalles as $item)
-            {
-                $arrayCuotas[] = array(
-                    "moneda" => "PEN",
-                    "monto" => (float)$item->monto,
-                    "fechaPago" => self::obtenerFechaCuenta($item->fecha)
+        foreach($documento->cuenta->detalles as $item)
+        {
+        $arrayCuotas[] = array(
+        "moneda" => "PEN",
+        "monto" => (float)$item->monto,
+        "fechaPago" => self::obtenerFechaCuenta($item->fecha)
 
-                );
-            }
+        );
+        }
         }*/
 
         return $arrayCuotas;
@@ -1848,10 +1756,10 @@ class DocumentoController extends Controller
         $clientes = Cliente::where('estado', '!=', 'ANULADO')->get();
 
         $enviar = [
-            'clientes' => $clientes
+            'clientes' => $clientes,
         ];
 
-        return  response()->json($enviar);
+        return response()->json($enviar);
     }
 
     public function customers(Request $request)
@@ -1877,7 +1785,7 @@ class DocumentoController extends Controller
             'tipo' => $pun_tipo,
         ];
 
-        return  response()->json($enviar);
+        return response()->json($enviar);
     }
 
     //LOTES PARA BUSQUEDA
@@ -2036,6 +1944,280 @@ class DocumentoController extends Controller
             DB::rollBack();
             return response()->json([
                 'success' => false,
+            ]);
+        }
+    }
+    public function DuplicarDocumento($id)
+    {
+        try {
+            $this->authorize('haveaccess', 'documento_venta.index');
+            $documento = Documento::find($id);
+            if (!$documento) {
+                throw new \Exception("No hay documento.");
+            }
+
+            if ($documento->duplicado) {
+                $doc = Documento::find($documento->duplicado);
+                
+                throw new \Exception("Este documento $documento->serie-$documento->correlativo ya fue cambiado por el documento $doc->serie-$doc->correlativo.");
+            }
+
+           
+
+            $empresas = Empresa::where('estado', 'ACTIVO')->get();
+            $clientes = Cliente::where('estado', 'ACTIVO')->get();
+            $productos = Producto::where('estado', 'ACTIVO')->get();
+            $detalles = Detalle::where('documento_id', $id)->where('estado', 'ACTIVO')->with(['lote', 'lote.producto'])->get();
+            $condiciones = Condicion::where('estado', 'ACTIVO')->get();
+            $fullaccess = false;
+            $fecha_hoy = Carbon::now()->toDateString();
+
+            if (count(Auth::user()->roles) > 0) {
+                $cont = 0;
+                while ($cont < count(Auth::user()->roles)) {
+                    if (Auth::user()->roles[$cont]['full-access'] == 'SI') {
+                        $fullaccess = true;
+                        $cont = count(Auth::user()->roles);
+                    }
+                    $cont = $cont + 1;
+                }
+            }
+
+            return view('ventas.documentos.duplicado.index', [
+                'documento' => $documento,
+                'detalles' => $detalles,
+                'empresas' => $empresas,
+                'clientes' => $clientes,
+                'productos' => $productos,
+                'condiciones' => $condiciones,
+                'fullaccess' => $fullaccess,
+                'fecha_hoy' => $fecha_hoy,
+            ]);
+
+        } catch (\Exception $ex) {
+            Session::flash('error', $ex->getMessage());
+            return redirect()->route('ventas.documento.index');
+        }
+    }
+    public function storeDuplicado(Request $request)
+    {
+        $this->authorize('haveaccess', 'documento_venta.index');
+        ini_set("max_execution_time", 60000);
+        try {
+
+            DB::beginTransaction();
+            $data = $request->all();
+
+            $rules = [
+                'fecha_documento_campo' => 'required',
+                'fecha_atencion_campo' => 'required',
+                'tipo_venta' => 'required',
+                'tipo_pago_id' => 'nullable',
+                'efectivo' => 'required',
+                'importe' => 'required',
+                'empresa_id' => 'required',
+                'condicion_id' => 'required',
+                'cliente_id' => 'required',
+                'observacion' => 'nullable',
+                'igv' => 'required_if:igv_check,==,on|numeric|digits_between:1,3',
+
+            ];
+
+            $message = [
+                'fecha_documento_campo.required' => 'El campo Fecha de Emisión es obligatorio.',
+                'tipo_venta.required' => 'El campo tipo de venta es obligatorio.',
+                'condicion_id.required' => 'El campo condición de pago es obligatorio.',
+                'importe.required' => 'El campo importe es obligatorio.',
+                'efectivo.required' => 'El campo efectivo es obligatorio.',
+                'fecha_atencion_campo.required' => 'El campo Fecha de Entrega es obligatorio.',
+                'empresa_id.required' => 'El campo Empresa es obligatorio.',
+                'cliente_id.required' => 'El campo Cliente es obligatorio.',
+                'igv.required_if' => 'El campo Igv es obligatorio.',
+                'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
+                'igv.numeric' => 'El campo Igv debe se numérico.',
+            ];
+
+            $validator = Validator::make($data, $rules, $message);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'errors' => true,
+                    'data' => array('mensajes' => $validator->getMessageBag()->toArray()),
+                ]);
+            }
+
+            $documento = new Documento();
+            $documento->fecha_documento = $request->get('fecha_documento_campo');
+            $documento->fecha_atencion = $request->get('fecha_atencion_campo');
+            $documento->fecha_vencimiento = $request->get('fecha_vencimiento_campo');
+            //EMPRESA
+            $empresa = Empresa::findOrFail($request->get('empresa_id'));
+            $documento->ruc_empresa = $empresa->ruc;
+            $documento->empresa = $empresa->razon_social;
+            $documento->direccion_fiscal_empresa = $empresa->direccion_fiscal;
+            $documento->empresa_id = $request->get('empresa_id'); //OBTENER NUMERACION DE LA EMPRESA
+            //CLIENTE
+            $cliente = Cliente::findOrFail($request->get('cliente_id'));
+            $documento->tipo_documento_cliente = $cliente->tipo_documento;
+            $documento->documento_cliente = $cliente->documento;
+            $documento->direccion_cliente = $cliente->direccion;
+            $documento->cliente = $cliente->nombre;
+            $documento->cliente_id = $request->get('cliente_id'); //OBTENER TIENDA DEL CLIENTE
+
+            $documento->tipo_venta = $request->get('tipo_venta');
+
+            //CONDICION
+            $cadena = explode('-', $request->get('condicion_id'));
+            $condicion = Condicion::findOrFail($cadena[0]);
+            $documento->condicion_id = $condicion->id;
+
+            $documento->observacion = $request->get('observacion');
+            $documento->user_id = auth()->user()->id;
+            $documento->sub_total = $request->get('monto_sub_total');
+            $documento->total_igv = $request->get('monto_total_igv');
+            $documento->total = $request->get('monto_total');
+            $documento->igv = $request->get('igv') ? $request->get('igv') : 18;
+            $documento->moneda = 1;
+
+            $documento->tipo_pago_id = $request->get('tipo_pago_id');
+            $documento->importe = $request->get('importe');
+            $documento->efectivo = $request->get('efectivo');
+
+            if ($request->duplicado) {
+                $documento->duplicado = $request->duplicado;
+            } else {
+                $documento->duplicado = null;
+            }
+
+            if (!empty($request->get('tipo_pago_id')) && $condicion->descripcion == 'CONTADO') {
+                $documento->estado_pago = 'PAGADA';
+            }
+
+            if ($request->get('igv_check') == "on") {
+                $documento->igv_check = "1";
+            };
+
+            $documento->cotizacion_venta = $request->get('cotizacion_id');
+            $documento->save();
+
+            $numero_doc = $documento->id;
+            $documento->numero_doc = 'VENTA-' . $numero_doc;
+            $documento->update();
+            //Llenado de los articulos
+            $productosJSON = $request->get('productos_tabla');
+            $productotabla = json_decode($productosJSON);
+            if ($request->convertir) {
+                foreach ($productotabla as $producto) {
+                    $lote = LoteProducto::findOrFail($producto->producto_id);
+                    $lote->cantidad = $lote->cantidad + $producto->cantidad;
+                    $lote->update();
+                }
+            }
+            foreach ($productotabla as $producto) {
+                $lote = LoteProducto::findOrFail($producto->producto_id);
+                Detalle::create([
+                    'documento_id' => $documento->id,
+                    'lote_id' => $producto->producto_id, //LOTE
+                    'codigo_producto' => $lote->producto->codigo,
+                    'unidad' => $lote->producto->getMedida(),
+                    'nombre_producto' => $lote->producto->nombre,
+                    'codigo_lote' => $lote->codigo_lote,
+                    'cantidad' => $producto->cantidad,
+                    'precio_unitario' => $producto->precio_unitario,
+                    'precio_inicial' => $producto->precio_inicial,
+                    'precio_nuevo' => $producto->precio_nuevo,
+                    'dinero' => $producto->dinero,
+                    'descuento' => $producto->descuento,
+                    'valor_unitario' => $producto->valor_unitario,
+                    'valor_venta' => $producto->valor_venta,
+                ]);
+
+                $lote->cantidad = $lote->cantidad - $producto->cantidad;
+                if ($lote->cantidad == 0) {
+                    $lote->estado = '0';
+                }
+
+                $lote->update();
+            }
+
+            if ($request->duplicado) {
+                $doc_a_duplicado = Documento::find($request->duplicado);
+                $doc_a_duplicado->duplicado = $documento->id;
+                $doc_a_duplicado->update();
+
+                $documento = Documento::find($documento->id);
+                $documento->estado = $doc_a_duplicado->estado;
+                $documento->estado_pago = $doc_a_duplicado->estado_pago;
+                $documento->fecha_documento = Carbon::now()->toDateString();
+                $documento->duplicado = $doc_a_duplicado->id;
+                $documento->importe = $doc_a_duplicado->importe;
+                $documento->efectivo = $doc_a_duplicado->efectivo;
+                $documento->tipo_pago_id = $doc_a_duplicado->tipo_pago_id;
+
+                $documento->update();
+            }
+
+            $detalle = new DetalleMovimientoVentaCaja();
+            $detalle->cdocumento_id = $documento->id;
+            $detalle->mcaja_id = movimientoUser()->id;
+            $detalle->save();
+
+            $envio_prev = self::sunat($documento->id);
+            if (!$envio_prev['success']) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'mensaje' => $envio_prev['mensaje'],
+                ]);
+            }
+
+            $documento = Documento::find($documento->id);
+            $documento->nombre_comprobante_archivo = $documento->serie . '-' . $documento->correlativo . '.pdf';
+            $documento->update();
+
+            if ($request->duplicado) {
+                $doc_a_duplicado1 = Documento::find($request->duplicado);
+                $doc_a_duplicado1->estado="ANULADO";
+                $doc_a_duplicado1->observacion = "Se cambió por el documento $documento->serie-$documento->correlativo";
+                $doc_a_duplicado1->update();
+            }
+
+            //Registro de actividad
+            $descripcion = "SE AGREGÓ EL DOCUMENTO DE VENTA CON LA FECHA: " . Carbon::parse($documento->fecha_documento)->format('d/m/y');
+            $gestion = "DOCUMENTO DE VENTA";
+            crearRegistro($documento, $descripcion, $gestion);
+
+            if ((int) $documento->tipo_venta == 127 || (int) $documento->tipo_venta == 128) {
+                $dato = 'Actualizar';
+                // broadcast(new VentasCajaEvent($dato));
+                DB::commit();
+                if ($request->envio_sunat) {
+                    $envio_ = self::sunat_valida($documento->id);
+                }
+                Session::flash('success', 'Documento de venta creado.');
+
+                return response()->json([
+                    'success' => true,
+                    'documento_id' => $documento->id,
+                ]);
+            } else {
+                $dato = 'Actualizar';
+                // broadcast(new VentasCajaEvent($dato));
+                DB::commit();
+                //$vp = self::venta_comprobante($documento->id);
+                //$ve = self::venta_email($documento->id);
+                Session::flash('success', 'Documento de venta creado.');
+                return response()->json([
+                    'success' => true,
+                    'documento_id' => $documento->id,
+                ]);
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'mensaje' => $e->getMessage(), //'Ocurrio un error porfavor volver a intentar, si el error persiste comunicarse con el administrador del sistema.'
+                'excepcion' => $e->getMessage(),
             ]);
         }
     }

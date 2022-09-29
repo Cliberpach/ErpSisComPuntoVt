@@ -369,6 +369,9 @@ function(){
         Route::get('show/{id}','Ventas\DocumentoController@show')->name('ventas.documento.show');
         Route::get('reporte/{id}','Ventas\DocumentoController@report')->name('ventas.documento.reporte');
         Route::get('tipoPago/{id}','Ventas\DocumentoController@TypePay')->name('ventas.documento.tipo_pago.existente');
+        Route::get('duplicar/{id}','Ventas\DocumentoController@DuplicarDocumento')->name('ventas.documento.DuplicarDocumento');
+        Route::post('duplicar','Ventas\DocumentoController@storeDuplicado')->name('ventas.documento.storeDuplicado');
+
         // Route::get('comprobante/{id}','Ventas\DocumentoController@voucher')->name('ventas.documento.comprobante');
         // Route::get('xml/{id}','Ventas\DocumentoController@xml')->name('ventas.documento.xml');
 
@@ -408,6 +411,7 @@ function(){
         Route::get('contingencia/{id}','Ventas\Electronico\ComprobanteController@convertirContingencia')->name('ventas.documento.contingencia');
         Route::get('cdr/{id}','Ventas\Electronico\ComprobanteController@cdr')->name('ventas.documento.cdr');
         Route::post('/envio','Ventas\Electronico\ComprobanteController@email')->name('ventas.documento.envio');
+       
     });
 
     //GUIAS DE REMISION

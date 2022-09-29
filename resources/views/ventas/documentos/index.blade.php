@@ -114,7 +114,7 @@
         </div>
     </div>
 </div>
-
+@include("ventas.documentos.modalCDR")
 @include('ventas.documentos.modalVentas')
 @include('ventas.documentos.modalPago')
 @include('ventas.documentos.modalPagoShow')
@@ -363,10 +363,13 @@ $(document).ready(function() {
                         "<button type='button' class='btn btn-sm btn-primary m-1 pagar' title='Pagar'><i class='fa fa-money'></i> Pagar</button>";
                     }
 
-                    if(data.code == '1033' && data.regularize == '1' && data.sunat != '2'  && data.contingencia == '0')
+                    if((data.code == '1032' || data.code == 'HTTP' || data.code == '0100') && data.regularize == '1' && data.sunat == '0'  && data.contingencia == '0')
                     {
-                        cadena = cadena +
-                        "<button type='button' class='btn btn-sm btn-primary-cdr m-1' onclick='cdr(" + data.id + ")' title='CDR'>CDR</button>";
+                        cadena  = cadena + `
+                        <button type="button" class="btn btn-sm btn-primary-cdr m-1 cdrDescription" title=="CDR">CDR</button>
+                        `;
+                        // cadena = cadena +
+                        // "";
                     }
 
                     if(dias <= 0 && data.contingencia == '0' && data.tipo_venta_id != '129' && data.sunat == '0')
@@ -587,7 +590,35 @@ function xmlElectronico(id) {
 
 }
 
-function cdr(id) {
+$(document).on("click",".cdrDescription",function(e){
+    var table = $('.dataTables-documento').DataTable();
+    var data = table.row($(this).parents('tr')).data();
+    $("#iddocumento").val(data.id);
+    $("#title-header").text(data.tipo_venta);
+    $("#motivo").text(data.cdrDescription);
+    $("#modalCDR").modal({backdrop:"static",keyboard:false});
+});
+$(document).on("click","#EnviarCDR",function(e){
+    e.preventDefault();
+    let accion = $("input:radio[name=optionCDR]:checked").val();
+    let iddocumento = $("#iddocumento").val();
+
+    switch(accion){
+        case 'DUPLICAR':{
+            let url = "{{ route('ventas.documento.DuplicarDocumento',':id') }}";
+            location.href= url.replace(":id",iddocumento);
+            break;
+        }
+        case 'ANULAR':{
+            alert("ANULAR");
+            break;
+        }
+    }
+});
+
+function cdr(data) {
+    alert("dd");
+    return false;
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',

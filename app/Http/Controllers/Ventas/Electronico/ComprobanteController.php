@@ -628,19 +628,17 @@ class ComprobanteController extends Controller
         {
             $documento = Documento::findOrFail($id);
             $json_data = json_decode($documento->getRegularizeResponse, false);
-            if($documento->regularize == '1' && $json_data->code == '1033')
+            if($documento->regularize == '1' && ($json_data->code == '1032' || $json_data->code == '0100' || $json_data->code == 'HTTP'))
             {
                 $documento->regularize = '0';
                 $documento->sunat = '1';
                 $documento->update();
                 Session::flash('success','Documento de Venta regularizado con exito.');
                 return view('ventas.documentos.index',[
-
                     'id_sunat' => $documento->serie.'-'.$documento->correlativo,
                     'descripcion_sunat' => 'CDR regularizado.',
                     'notas_sunat' => '',
                     'sunat_exito' => true
-
                 ])->with('sunat_exito', 'success');
             }
             else
