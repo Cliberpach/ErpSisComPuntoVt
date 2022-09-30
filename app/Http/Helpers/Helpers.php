@@ -47,6 +47,8 @@ use App\Ventas\Documento\Detalle as DocumentoDetalle;
 use App\Ventas\Documento\Documento as DocumentoDocumento;
 use Luecano\NumeroALetras\NumeroALetras;
 use App\Ventas\Nota;
+use App\Ventas\NotaDetalle;
+
 // TABLAS-DETALLES
 
 if (!function_exists('tipos_moneda')) {
@@ -1293,7 +1295,7 @@ if (!function_exists('cuadreMovimientoDevoluciones')) {
                 $totalEgresos = $totalEgresos + ($item->egreso->efectivo + $item->egreso->importe);
             }
         }
-            return $totalEgresos;
+
         return $totalEgresos;
     }
 }
@@ -1503,8 +1505,17 @@ if (!function_exists('ventas_mensual_random')) {
     function ventas_mensual_random($mes,$anio)
     {
         $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
-        $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->where('convertir','!=','')->where('tipo_venta','!=','129')->sum('total');
-        $total_notas = Nota::whereMonth('fechaEmision', $mes)->whereYear('fechaEmision', $anio)->sum('mtoImpVenta');
+        $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')
+        ->whereMonth('fecha_documento',$mes)
+        ->whereYear('fecha_documento',$anio)
+        ->where('convertir','!=','')
+        ->where('tipo_venta','!=','129')
+        ->sum('total');
+
+        $total_notas = Nota::whereMonth('fechaEmision', $mes)
+        ->whereYear('fechaEmision', $anio)
+        ->sum('mtoImpVenta');
+        
         return (float)($total - $total_invalida - $total_notas);
     }
 }
@@ -1544,26 +1555,68 @@ if (!function_exists('utilidad_mensual')) {
 if (!function_exists('utilidad_mensual_random')) {
     function utilidad_mensual_random($mes,$anio)
     {
+        // $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
+        // $coleccion = collect();
+        // foreach ($ventas as $venta) {
+        //     if (ifNoConvertido($venta->id)) {
+        //         $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
+        //         foreach ($detalles as $detalle) {
+        //             $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
+        //             $coleccion->push([
+        //                 "fecha_doc" => $venta->fecha_documento,
+        //                 "cantidad" => $detalle->cantidad,
+        //                 "producto" => $detalle->lote->producto->nombre,
+        //                 "precio_venta" => $detalle->precio_nuevo,
+        //                 "precio_compra" => $precom,
+        //                 "utilidad" => $detalle->precio_nuevo - $precom,
+        //                 "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
+        //             ]);
+        //         }
+        //     }
+        // }
+
+        // $utilidad = $coleccion->sum('importe');
+        // return $utilidad;
+
         $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
         $coleccion = collect();
+       
         foreach ($ventas as $venta) {
-            if (ifNoConvertido($venta->id)) {
-                $detalles = DocumentoDetalle::where('estado', 'ACTIVO')->where('documento_id', $venta->id)->get();
-                foreach ($detalles as $detalle) {
-                    $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
+            $detalles = DocumentoDetalle::where('documento_id',$venta->id)->get();
+            foreach($detalles as $detalle)
+            {
+                $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
+                $utilidad =  number_format(($detalle->precio_nuevo - $precom),2);
+
+                $coleccion->push([
+                    "fecha_doc" => $venta->fecha_documento,
+                    "cantidad" => $detalle->cantidad,
+                    "producto" => $detalle->lote->producto->nombre,
+                    "precio_venta" => number_format($detalle->precio_nuevo,2),
+                    "precio_compra" => number_format($precom,2),
+                    "utilidad" =>$utilidad,
+                    "importe" => number_format(($detalle->cantidad) * $utilidad,2),
+                    "valorVenta"=>$detalle->valor_venta
+                ]);
+
+                $notaDetalle = NotaDetalle::where("detalle_id",$detalle->id)->get();
+                foreach($notaDetalle as $nota){
+                    $precom_nota = $nota->detalle->lote->detalle_compra ? ($nota->detalle->lote->detalle_compra->precio_soles + ($nota->detalle->lote->detalle_compra->costo_flete_soles / $nota->detalle->lote->detalle_compra->cantidad)) : $nota->detalle->lote->detalle_nota->costo_soles;
+                    $utilidad_nota =  number_format(($nota->mtoPrecioUnitario - $precom_nota),2);
+
                     $coleccion->push([
-                        "fecha_doc" => $venta->fecha_documento,
-                        "cantidad" => $detalle->cantidad,
-                        "producto" => $detalle->lote->producto->nombre,
-                        "precio_venta" => $detalle->precio_nuevo,
-                        "precio_compra" => $precom,
-                        "utilidad" => $detalle->precio_nuevo - $precom,
-                        "importe" => ($detalle->precio_nuevo - $precom) * $detalle->cantidad
+                        "fecha_doc" => $nota->nota_dev->fechaEmision,
+                        "cantidad" => $nota->cantidad,
+                        "producto" => $nota->detalle->lote->producto->nombre,
+                        "precio_venta" => number_format($nota->mtoPrecioUnitario,2),
+                        "precio_compra" => number_format($precom_nota,2),
+                        "utilidad" =>$utilidad_nota,
+                        "importe" => "-".number_format(($nota->cantidad) * $utilidad_nota,2),
+                        "valorVenta"=>number_format(($nota->cantidad) * $nota->mtoPrecioUnitario,2)
                     ]);
                 }
             }
         }
-
         $utilidad = $coleccion->sum('importe');
         return $utilidad;
     }

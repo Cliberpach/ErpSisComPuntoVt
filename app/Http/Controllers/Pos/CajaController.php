@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\DataTables;
 use Barryvdh\DomPDF\Facade as PDF;
+use App\Ventas\Nota;
 use Exception;
 
 class CajaController extends Controller
@@ -129,21 +130,10 @@ class CajaController extends Controller
                     $movimiento->fecha_cierre == null
                         ? '-'
                         : $movimiento->fecha_cierre,
-                'totales' => $this->ObtenerTotales($movimiento->id),
+                'totales' => $this->ObtenerTotales($movimiento->id,$movimiento->fecha_apertura),
             ]);
         }
-        // $datos = array();
-        // $movimientos = MovimientoCaja::where('estado','ACTIVO')->get();
-        // foreach ($movimientos as $key => $movimiento) {
-        //     array_push($datos, array(
-        //         'id' => $movimiento->id,
-        //         'caja' => $movimiento->caja->nombre,
-        //         'cantidad_inicial' => $movimiento->monto_inicial,
-        //         'cantidad_final' => $movimiento->monto_final == null ? "-" : $movimiento->monto_final,
-        //         'fecha_Inicio' => $movimiento->fecha_apertura,
-        //         'fecha_Cierre' => $movimiento->fecha_cierre == null ? "-" : $movimiento->fecha_cierre
-        //     ));
-        // }
+        
         return DataTables::of($datos)->toJson();
     }
 
@@ -279,14 +269,27 @@ class CajaController extends Controller
             ->setWarnings(false);
         return $pdf->stream();
     }
-    private function ObtenerTotales($id)
+    private function ObtenerTotales($id,$fecha)
     {
+        $anio= date('Y', strtotime($fecha));
+        $dia  =date('d', strtotime($fecha));
+        $mes =date('m', strtotime($fecha));
         $movimiento = MovimientoCaja::findOrFail($id);
-        $TotalVentaDelDia =
+        $TotalVentaDelDia1 =
             (float) cuadreMovimientoCajaIngresosVenta($movimiento) -
             (float) cuadreMovimientoDevoluciones($movimiento);
+
+           $TotalVentaDelDia = (float) cuadreMovimientoCajaIngresosVenta($movimiento) - $this->totalNotasElectronicas($dia,$mes,$anio);
         return [
             'TotalVentaDelDia' => $TotalVentaDelDia,
+            'TotalNotaElectronicas' => $this->totalNotasElectronicas($dia,$mes,$anio)
         ];
+    }
+    private function totalNotasElectronicas($dia,$mes,$anio){
+        $total_notas = Nota::whereDay('fechaEmision', $dia)
+        ->whereYear('fechaEmision', $anio)
+        ->whereMonth('fechaEmision', $mes)
+        ->sum('mtoImpVenta');
+        return $total_notas;
     }
 }
