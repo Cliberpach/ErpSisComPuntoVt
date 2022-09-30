@@ -89,6 +89,7 @@
         </div>
     </div>
 </div>
+@include("ventas.documentos.modalCDR")
 
 @stop
 @push('styles')
@@ -263,7 +264,15 @@ function loadTable()
                         cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
                     }
                     else {
+                        if((data.code == '1032' || data.code == 'HTTP' || data.code == '0100') && data.regularize == '1' && data.sunat == '0'  && data.contingencia == '0')
+                    {
+                        
                         cadena = cadena + "<span class='badge badge-warning'>FUERA DE FECHA</span>";
+                        cadena  = cadena + `
+                        <button type="button" class="btn btn-sm btn-dark m-1 cdrDescription" title="Cambiar"><i class='fa fa-exchange'></i> Cambiar</button>
+                        `;
+                        }
+                        cadena= cadena + ` <button type="button" class="btn btn-sm btn-danger m-1" title="Dar de baja"><i class='fa fa-times'></i> Dar da baja</button>`;
                     }
 
                     return cadena;
@@ -428,5 +437,32 @@ function enviarSunat(id , sunat) {
     window.open(url, "Comprobante SISCOM", "width=900, height=600")
 @endif
 
+$(document).on("click",".cdrDescription",function(e){
+    var table = $('.dataTables-envio').DataTable();
+    var data = table.row($(this).parents('tr')).data();
+    
+    $("#iddocumento").val(data.id);
+    $("#title-header").text(data.tipo);
+    $("#motivo").text(data.cdrDescription);
+    $("#modalCDR").modal({backdrop:"static",keyboard:false});
+});
+
+$(document).on("click","#EnviarCDR",function(e){
+    e.preventDefault();
+    let accion = $("input:radio[name=optionCDR]:checked").val();
+    let iddocumento = $("#iddocumento").val();
+
+    switch(accion){
+        case 'DUPLICAR':{
+            let url = "{{ route('ventas.documento.DuplicarDocumento',':id') }}";
+            location.href= url.replace(":id",iddocumento);
+            break;
+        }
+        case 'ANULAR':{
+            alert("ANULAR");
+            break;
+        }
+    }
+});
 </script>
 @endpush

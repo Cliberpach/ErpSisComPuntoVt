@@ -28,7 +28,7 @@ class AlertaController extends Controller
     public function envio()
     {
         $dato = "Message";
-        broadcast(new NotifySunatEvent($dato));
+        // broadcast(new NotifySunatEvent($dato));
         return view('consultas.ventas.alertas.envio');
     }
 
@@ -50,9 +50,13 @@ class AlertaController extends Controller
                 'cotizacion_documento.total as monto',
                 DB::raw('DATEDIFF( now(),cotizacion_documento.fecha_documento) as dias'),
                 'cotizacion_documento.sunat',
+                'cotizacion_documento.regularize',
+                'cotizacion_documento.contingencia',
+                'cotizacion_documento.sunat_contingencia',
                 'cotizacion_documento.getCdrResponse',
                 DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.code"))),"-") as code'),
-                DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.description"))),"-") as description')
+                DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.description"))),"-") as description'),
+                DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse,"$.description")) as cdrDescription')
             )
             ->orderBy('cotizacion_documento.id', 'DESC')
             ->whereIn('cotizacion_documento.tipo_venta', ['127', '128'])
