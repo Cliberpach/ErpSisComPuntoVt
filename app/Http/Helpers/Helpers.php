@@ -1858,6 +1858,7 @@ if (!function_exists('refreshNotifications')) {
         ->where('cotizacion_documento.estado', '!=','ANULADO')
         ->where('cotizacion_documento.sunat','0')
         ->where('cotizacion_documento.contingencia','0')
+        ->whereRaw("cotizacion_documento.duplicado is null")
         ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
         if(!PuntoVenta() && !FullAccess())
