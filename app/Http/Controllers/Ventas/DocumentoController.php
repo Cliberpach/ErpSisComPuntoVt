@@ -44,7 +44,7 @@ class DocumentoController extends Controller
     {
         $this->authorize('haveaccess', 'documento_venta.index');
         $dato = "Message";
-        // broadcast(new NotifySunatEvent($dato));
+        broadcast(new NotifySunatEvent($dato));
         return view('ventas.documentos.index');
     }
 

@@ -28,7 +28,7 @@ class AlertaController extends Controller
     public function envio()
     {
         $dato = "Message";
-        // broadcast(new NotifySunatEvent($dato));
+        broadcast(new NotifySunatEvent($dato));
         return view('consultas.ventas.alertas.envio');
     }
 
