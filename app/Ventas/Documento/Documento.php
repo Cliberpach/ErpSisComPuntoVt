@@ -66,7 +66,8 @@ class Documento extends Model
         'serie_contingencia',
         'getCdrResponse_contingencia',
         'getRegularizeResponse_contingencia',
-        'duplicado'
+        'duplicado',
+        'dar_baja'
     ];
 
 

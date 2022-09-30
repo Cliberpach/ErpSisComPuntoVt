@@ -39,7 +39,9 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
             "TRANSFERENCIA",
             "YAPE/PLIN",
             "ENVIADA",
-            "HASH"]
+            "HASH",
+            "OBSERVACION"
+            ]
         ];
     }
 
@@ -62,7 +64,8 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
     {
         if($this->tipo == 129 || $this->tipo == 128 || $this->tipo == 127)
         {
-            $consulta = Documento::where('estado','!=','ANULADO')->where('tipo_venta', $this->tipo);
+            // $consulta = Documento::where('estado','!=','ANULADO')->where('tipo_venta', $this->tipo);
+            $consulta = Documento::where('tipo_venta', $this->tipo);
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $consulta = $consulta->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
@@ -77,45 +80,91 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
 
             $coleccion = collect();
             foreach($consulta as $doc){
-                $transferencia = 0.00;
-                $otros = 0.00;
-                $efectivo = 0.00;
+               if($doc->estado=="ACTIVO" && !$doc->duplicado && $doc->dar_baja == 0){
+                    $transferencia = 0.00;
+                    $otros = 0.00;
+                    $efectivo = 0.00;
 
-                if($doc->tipo_pago_id)
-                {
-                    if ($doc->tipo_pago_id == 1) {
-                        $efectivo = $doc->importe;
+                    if($doc->tipo_pago_id)
+                    {
+                        if ($doc->tipo_pago_id == 1) {
+                            $efectivo = $doc->importe;
+                        }
+                        else if ($doc->tipo_pago_id == 2){
+                            $transferencia = $doc->importe ;
+                            $efectivo = $doc->efectivo;
+                        }
+                        else {
+                            $otros = $doc->importe;
+                            $efectivo = $doc->efectivo;
+                        }
                     }
-                    else if ($doc->tipo_pago_id == 2){
-                        $transferencia = $doc->importe ;
-                        $efectivo = $doc->efectivo;
+                    $coleccion->push([
+                        'RUC-EMISOR' => $doc->ruc_empresa,
+                        'DOC.' => $doc->nombreDocumento(),
+                        'CODIGO.DOC' => $doc->tipoDocumento(),
+                        'FECHA' => $doc->fecha_documento,
+                        'TICKET' => $doc->serie.'-'.$doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA '.$doc->serie_contingencia.'-'.$doc->correlativo.')'),
+                        'TIENDA' => $doc->empresa,
+                        'RUC/DNI' => $doc->documento_cliente,
+                        'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                        'CLIENTE' => $doc->cliente,
+                        'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
+                        'MONEDA' => $doc->simboloMoneda(),
+                        'MONTO' => $doc->total,
+                        'OP.GRAVADA' => $doc->sub_total,
+                        'IVG' => $doc->total_igv,
+                        'EFECTIVO' => $efectivo,
+                        'TRANSFERENCIA' => $transferencia,
+                        'YAPE/PLIN' => $otros,
+                        'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' || $doc->sunat == '2' ? 'SI' : 'NO ENVIADO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO ENVIADO'),
+                        'HASH' => $doc->hash,
+                        "OBSERVACION"=>$doc->observacion
+                    ]);
+               }
+
+               if($doc->duplicado || $doc->dar_baja==1 && $doc->tipo_venta!="129"){
+                    $transferencia = 0.00;
+                    $otros = 0.00;
+                    $efectivo = 0.00;
+
+                    if($doc->tipo_pago_id)
+                    {
+                        if ($doc->tipo_pago_id == 1) {
+                            $efectivo = $doc->importe;
+                        }
+                        else if ($doc->tipo_pago_id == 2){
+                            $transferencia = $doc->importe ;
+                            $efectivo = $doc->efectivo;
+                        }
+                        else {
+                            $otros = $doc->importe;
+                            $efectivo = $doc->efectivo;
+                        }
                     }
-                    else {
-                        $otros = $doc->importe;
-                        $efectivo = $doc->efectivo;
-                    }
-                }
-                $coleccion->push([
-                    'RUC-EMISOR' => $doc->ruc_empresa,
-                    'DOC.' => $doc->nombreDocumento(),
-                    'CODIGO.DOC' => $doc->tipoDocumento(),
-                    'FECHA' => $doc->fecha_documento,
-                    'TICKET' => $doc->serie.'-'.$doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA '.$doc->serie_contingencia.'-'.$doc->correlativo.')'),
-                    'TIENDA' => $doc->empresa,
-                    'RUC/DNI' => $doc->documento_cliente,
-                    'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
-                    'CLIENTE' => $doc->cliente,
-                    'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
-                    'MONEDA' => $doc->simboloMoneda(),
-                    'MONTO' => $doc->total,
-                    'OP.GRAVADA' => $doc->sub_total,
-                    'IVG' => $doc->total_igv,
-                    'EFECTIVO' => $efectivo,
-                    'TRANSFERENCIA' => $transferencia,
-                    'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' || $doc->sunat == '2' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
-                    'HASH' => $doc->hash
-                ]);
+                    $coleccion->push([
+                        'RUC-EMISOR' => $doc->ruc_empresa,
+                        'DOC.' => $doc->nombreDocumento(),
+                        'CODIGO.DOC' => $doc->tipoDocumento(),
+                        'FECHA' => $doc->fecha_documento,
+                        'TICKET' => $doc->serie.'-'.$doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA '.$doc->serie_contingencia.'-'.$doc->correlativo.')'),
+                        'TIENDA' => $doc->empresa,
+                        'RUC/DNI' => $doc->documento_cliente,
+                        'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                        'CLIENTE' => $doc->cliente,
+                        'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
+                        'MONEDA' => $doc->simboloMoneda(),
+                        'MONTO' => $doc->total,
+                        'OP.GRAVADA' => $doc->sub_total,
+                        'IVG' => $doc->total_igv,
+                        'EFECTIVO' => $efectivo,
+                        'TRANSFERENCIA' => $transferencia,
+                        'YAPE/PLIN' => $otros,
+                        'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1' || $doc->sunat == '2' ? 'SI' : 'NO ENVIADO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO ENVIADO'),
+                        'HASH' => $doc->hash,
+                        "OBSERVACION"=>$doc->observacion
+                    ]);
+               }
             }
 
             return $coleccion->sortBy('FECHA');
@@ -123,7 +172,8 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
 
         if($this->tipo == 126) //Ventas
         {
-            $ventas = Documento::where('estado','!=','ANULADO');
+            // $ventas = Documento::where('estado','!=','ANULADO');
+            $ventas = Documento::whereIn('estado',["ACTIVO","ANULADO"]);
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $ventas = $ventas->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
@@ -138,52 +188,100 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
 
             $coleccion = collect();
             foreach($ventas as $doc){
-                $transferencia = 0.00;
-                $otros = 0.00;
-                $efectivo = 0.00;
+                if($doc->estado=="ACTIVO" && !$doc->duplicado && $doc->dar_baja == 0){
+                    $transferencia = 0.00;
+                    $otros = 0.00;
+                    $efectivo = 0.00;
 
-                if($doc->tipo_pago_id)
-                {
-                    if ($doc->tipo_pago_id == 1) {
-                        $efectivo = $doc->importe;
+                    if($doc->tipo_pago_id)
+                    {
+                        if ($doc->tipo_pago_id == 1) {
+                            $efectivo = $doc->importe;
+                        }
+                        else if ($doc->tipo_pago_id == 2){
+                            $transferencia = $doc->importe ;
+                            $efectivo = $doc->efectivo;
+                        }
+                        else {
+                            $otros = $doc->importe;
+                            $efectivo = $doc->efectivo;
+                        }
                     }
-                    else if ($doc->tipo_pago_id == 2){
-                        $transferencia = $doc->importe ;
-                        $efectivo = $doc->efectivo;
-                    }
-                    else {
-                        $otros = $doc->importe;
-                        $efectivo = $doc->efectivo;
-                    }
+                    $coleccion->push([
+                        'RUC-EMISOR' => $doc->ruc_empresa,
+                        'DOC.' => $doc->nombreDocumento(),
+                        'CODIGO.DOC' => $doc->tipoDocumento(),
+                        'FECHA' => $doc->fecha_documento,
+                        'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
+                        'TIENDA' => $doc->empresa,
+                        'RUC/DNI' => $doc->documento_cliente,
+                        'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                        'CLIENTE' => $doc->cliente,
+                        'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
+                        'MONEDA' => $doc->simboloMoneda(),
+                        'MONTO' => $doc->total,
+                        'OP.GRAVADA' => $doc->sub_total,
+                        'IVG' => $doc->total_igv,
+                        'EFECTIVO' => $efectivo,
+                        'TRANSFERENCIA' => $transferencia,
+                        'YAPE/PLIN' => $otros,
+                        'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO ENVIADO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO ENVIADO'),
+                        'HASH' => $doc->hash,
+                        "OBSERVACION"=>$doc->observacion
+                    ]);
                 }
-                $coleccion->push([
-                    'RUC-EMISOR' => $doc->ruc_empresa,
-                    'DOC.' => $doc->nombreDocumento(),
-                    'CODIGO.DOC' => $doc->tipoDocumento(),
-                    'FECHA' => $doc->fecha_documento,
-                    'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
-                    'TIENDA' => $doc->empresa,
-                    'RUC/DNI' => $doc->documento_cliente,
-                    'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
-                    'CLIENTE' => $doc->cliente,
-                    'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
-                    'MONEDA' => $doc->simboloMoneda(),
-                    'MONTO' => $doc->total,
-                    'OP.GRAVADA' => $doc->sub_total,
-                    'IVG' => $doc->total_igv,
-                    'EFECTIVO' => $efectivo,
-                    'TRANSFERENCIA' => $transferencia,
-                    'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
-                    'HASH' => $doc->hash
-                ]);
+
+                if(($doc->duplicado || $doc->dar_baja==1) && $doc->tipo_venta!='129'){
+                    $transferencia = 0.00;
+                    $otros = 0.00;
+                    $efectivo = 0.00;
+
+                    if($doc->tipo_pago_id)
+                    {
+                        if ($doc->tipo_pago_id == 1) {
+                            $efectivo = $doc->importe;
+                        }
+                        else if ($doc->tipo_pago_id == 2){
+                            $transferencia = $doc->importe ;
+                            $efectivo = $doc->efectivo;
+                        }
+                        else {
+                            $otros = $doc->importe;
+                            $efectivo = $doc->efectivo;
+                        }
+                    }
+                    $coleccion->push([
+                        'RUC-EMISOR' => $doc->ruc_empresa,
+                        'DOC.' => $doc->nombreDocumento(),
+                        'CODIGO.DOC' => $doc->tipoDocumento(),
+                        'FECHA' => $doc->fecha_documento,
+                        'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
+                        'TIENDA' => $doc->empresa,
+                        'RUC/DNI' => $doc->documento_cliente,
+                        'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                        'CLIENTE' => $doc->cliente,
+                        'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
+                        'MONEDA' => $doc->simboloMoneda(),
+                        'MONTO' => $doc->total,
+                        'OP.GRAVADA' => $doc->sub_total,
+                        'IVG' => $doc->total_igv,
+                        'EFECTIVO' => $efectivo,
+                        'TRANSFERENCIA' => $transferencia,
+                        'YAPE/PLIN' => $otros,
+                        'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO ENVIADO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO ENVIADO'),
+                        'HASH' => $doc->hash,
+                        "OBSERVACION"=>$doc->observacion
+                    ]);
+                }
             }
             return $coleccion->sortBy('FECHA');
         }
 
         if($this->tipo == 125) //Fact, Boletas y Nota Crédito
         {
-            $ventas = Documento::where('estado','!=','ANULADO')->where('tipo_venta','!=',129);
+            // $ventas = Documento::where('estado','!=','ANULADO')->where('tipo_venta','!=',129);
+            $ventas = Documento::where('tipo_venta','!=',129);
+
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $ventas = $ventas->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);
@@ -199,45 +297,95 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
             $coleccion = collect();
 
             foreach($ventas as $doc){
-                $transferencia = 0.00;
-                $otros = 0.00;
-                $efectivo = 0.00;
+                if($doc->estado=="ACTIVO" && !$doc->duplicado && $doc->dar_baja == 0){
 
-                if($doc->tipo_pago_id)
-                {
-                    if ($doc->tipo_pago_id == 1) {
-                        $efectivo = $doc->importe;
+                    $transferencia = 0.00;
+                    $otros = 0.00;
+                    $efectivo = 0.00;
+
+                    if($doc->tipo_pago_id)
+                    {
+                        if ($doc->tipo_pago_id == 1) {
+                            $efectivo = $doc->importe;
+                        }
+                        else if ($doc->tipo_pago_id == 2){
+                            $transferencia = $doc->importe ;
+                            $efectivo = $doc->efectivo;
+                        }
+                        else {
+                            $otros = $doc->importe;
+                            $efectivo = $doc->efectivo;
+                        }
                     }
-                    else if ($doc->tipo_pago_id == 2){
-                        $transferencia = $doc->importe ;
-                        $efectivo = $doc->efectivo;
-                    }
-                    else {
-                        $otros = $doc->importe;
-                        $efectivo = $doc->efectivo;
-                    }
+                    $coleccion->push([
+                        'RUC-EMISOR' => $doc->ruc_empresa,
+                        'DOC.' => $doc->nombreDocumento(),
+                        'CODIGO.DOC' => $doc->tipoDocumento(),
+                        'FECHA' => Carbon::parse($doc->fecha_documento)->format( 'Y-m-d'),
+                        'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
+                        'TIENDA' => $doc->empresa,
+                        'RUC/DNI' => $doc->documento_cliente,
+                        'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                        'CLIENTE' => $doc->cliente,
+                        'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
+                        'MONEDA' => $doc->simboloMoneda(),
+                        'MONTO' => $doc->total,
+                        'OP.GRAVADA' => $doc->sub_total,
+                        'IVG' => $doc->total_igv,
+                        'EFECTIVO' => $efectivo,
+                        'TRANSFERENCIA' => $transferencia,
+                        'YAPE/PLIN' => $otros,
+                        'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO ENVIADO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO ENVIADO'),
+                        'HASH' => $doc->hash,
+                        "OBSERVACION"=>$doc->observacion
+                        
+                    ]);
                 }
-                $coleccion->push([
-                    'RUC-EMISOR' => $doc->ruc_empresa,
-                    'DOC.' => $doc->nombreDocumento(),
-                    'CODIGO.DOC' => $doc->tipoDocumento(),
-                    'FECHA' => Carbon::parse($doc->fecha_documento)->format( 'Y-m-d'),
-                    'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
-                    'TIENDA' => $doc->empresa,
-                    'RUC/DNI' => $doc->documento_cliente,
-                    'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
-                    'CLIENTE' => $doc->cliente,
-                    'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
-                    'MONEDA' => $doc->simboloMoneda(),
-                    'MONTO' => $doc->total,
-                    'OP.GRAVADA' => $doc->sub_total,
-                    'IVG' => $doc->total_igv,
-                    'EFECTIVO' => $efectivo,
-                    'TRANSFERENCIA' => $transferencia,
-                    'YAPE/PLIN' => $otros,
-                    'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO'),
-                    'HASH' => $doc->hash
-                ]);
+
+                if($doc->duplicado || $doc->dar_baja==1){
+                    
+                    $transferencia = 0.00;
+                    $otros = 0.00;
+                    $efectivo = 0.00;
+
+                    if($doc->tipo_pago_id)
+                    {
+                        if ($doc->tipo_pago_id == 1) {
+                            $efectivo = $doc->importe;
+                        }
+                        else if ($doc->tipo_pago_id == 2){
+                            $transferencia = $doc->importe ;
+                            $efectivo = $doc->efectivo;
+                        }
+                        else {
+                            $otros = $doc->importe;
+                            $efectivo = $doc->efectivo;
+                        }
+                    }
+                    $coleccion->push([
+                        'RUC-EMISOR' => $doc->ruc_empresa,
+                        'DOC.' => $doc->nombreDocumento(),
+                        'CODIGO.DOC' => $doc->tipoDocumento(),
+                        'FECHA' => Carbon::parse($doc->fecha_documento)->format( 'Y-m-d'),
+                        'TICKET' => $doc->serie . '-' . $doc->correlativo . ' ' . ($doc->contingencia == '0' ? '' : '(CONTINGENCIA ' . $doc->serie_contingencia . '-' . $doc->correlativo . ')'),
+                        'TIENDA' => $doc->empresa,
+                        'RUC/DNI' => $doc->documento_cliente,
+                        'TIPO.CLIENTE' => $doc->tipoDocumentoCliente(),
+                        'CLIENTE' => $doc->cliente,
+                        'ESTADO' => $doc->sunat == '2' ? "NULO" : "VALIDO",
+                        'MONEDA' => $doc->simboloMoneda(),
+                        'MONTO' => $doc->total,
+                        'OP.GRAVADA' => $doc->sub_total,
+                        'IVG' => $doc->total_igv,
+                        'EFECTIVO' => $efectivo,
+                        'TRANSFERENCIA' => $transferencia,
+                        'YAPE/PLIN' => $otros,
+                        'ENVIADA' => $doc->contingencia == '0' ? ($doc->sunat == '1'|| $doc->sunat == '2' ? 'SI' : 'NO ENVIADO') : ($doc->sunat_contingencia == '1' ? 'SI' : 'NO ENVIADO'),
+                        'HASH' => $doc->hash,
+                        "OBSERVACION"=>$doc->observacion
+                        
+                    ]);
+                }
             }
 
             $notas_electronicas = Nota::where('estado','!=','ANULADO')->where('tipo_nota',"0")->where('tipDocAfectado','!=','04');
@@ -268,7 +416,9 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'TRANSFERENCIA' => '-',
                     'YAPE/PLIN' => '-',
                     'ENVIADA' => $nota->sunat == '1' || $nota->sunat == '2' ? 'SI' : 'NO',
-                    'HASH' => $nota->hash
+                    'HASH' => $nota->hash,
+                    "OBSERVACION"=>$doc->observacion
+
                 ]);
             }
 
@@ -306,7 +456,9 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     'TRANSFERENCIA' => '-',
                     'YAPE/PLIN' => '-',
                     'ENVIADA' => $nota->sunat == '1' || $nota->sunat == '2' ? 'SI' : 'NO',
-                    'HASH' => $nota->hash
+                    'HASH' => $nota->hash,
+                    "OBSERVACION"=>$doc->observacion
+
                 ]);
             }
 
@@ -320,7 +472,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
 
             BeforeWriting::class => [self::class, 'beforeWriting'],
             AfterSheet::class    => function(AfterSheet $event) {
-                $event->sheet->getStyle('A1:S1')->applyFromArray([
+                $event->sheet->getStyle('A1:T1')->applyFromArray([
 
                         'fill' => [
                             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
@@ -337,7 +489,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                     ]
 
                 );
-                $event->sheet->getStyle('A1:S1')->applyFromArray([
+                $event->sheet->getStyle('A1:T1')->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_GRADIENT_LINEAR,
                         'rotation' => 90,
@@ -375,6 +527,8 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
                $event->sheet->getColumnDimension('Q')->setWidth(20);
                $event->sheet->getColumnDimension('R')->setWidth(20);
                $event->sheet->getColumnDimension('S')->setWidth(20);
+               $event->sheet->getColumnDimension('T')->setWidth(20);
+
 
             },
         ];
