@@ -575,6 +575,7 @@ function(){
         Route::get('guias', 'Consultas\Ventas\AlertaController@guias')->name('consultas.ventas.alerta.guias');
         Route::get('getTableguias', 'Consultas\Ventas\AlertaController@getTableGuias')->name('consultas.ventas.alerta.getTableGuias');
         Route::get('sunat_guias/{id}', 'Consultas\Ventas\AlertaController@sunat_guias')->name('consultas.ventas.alerta.sunat_guias');
+        Route::get('darBaja/{id}', 'Consultas\Ventas\AlertaController@DarBajaDocumento')->name('consultas.ventas.alerta.DarBajaDocumento');
     });
 
      // Consultas - Compras - Ordenes

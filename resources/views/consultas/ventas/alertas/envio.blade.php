@@ -272,7 +272,7 @@ function loadTable()
                         <button type="button" class="btn btn-sm btn-dark m-1 cdrDescription" title="Cambiar"><i class='fa fa-exchange'></i> Cambiar</button>
                         `;
                         }
-                        cadena= cadena + ` <button type="button" class="btn btn-sm btn-danger m-1" title="Dar de baja"><i class='fa fa-times'></i> Dar da baja</button>`;
+                        cadena= cadena + ` <button type="button" class="btn btn-sm btn-danger m-1 darDeBaja" title="Dar de baja"><i class='fa fa-times'></i> Dar da baja</button>`;
                     }
 
                     return cadena;
@@ -464,5 +464,48 @@ $(document).on("click","#EnviarCDR",function(e){
         }
     }
 });
+$(document).on("click",".darDeBaja",function(e){
+    e.preventDefault();
+    var table = $('.dataTables-envio').DataTable();
+    var data = table.row($(this).parents('tr')).data();
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger',
+        },
+        buttonsStyling: false
+    });
+
+    Swal.fire({
+        title: "Dar de baja",
+        text: "Este documento se dará de baja y ya no se volverá a utilizar la numeración.",
+        showCancelButton: true,
+        icon: 'info',
+        confirmButtonColor: "#1ab394",
+        confirmButtonText: 'Si, Confirmar',
+        cancelButtonText: "No, Cancelar",
+        // showLoaderOnConfirm: true,
+    }).then((result) => {
+        if (result.value) {
+
+            var url = '{{ route("consultas.ventas.alerta.DarBajaDocumento", ":id")}}';
+            url = url.replace(':id',data.id);
+
+            window.location.href = url
+
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            swalWithBootstrapButtons.fire(
+                'Cancelado',
+                'La Solicitud se ha cancelado.',
+                'error'
+            )
+        }
+    })
+});
 </script>
+
+
 @endpush

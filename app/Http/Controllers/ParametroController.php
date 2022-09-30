@@ -73,7 +73,7 @@ class ParametroController extends Controller
         foreach($notifications as $notify)
         {
             $data = $notify->data;
-            $data['time'] = timeago($data['body']['updated_at']);
+            $data['time'] = timeago($data['body']['created_at']);
             $notify->data = $data;
         }
         return response()->json([

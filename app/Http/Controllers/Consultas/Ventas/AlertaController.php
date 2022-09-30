@@ -65,6 +65,7 @@ class AlertaController extends Controller
             ->where('cotizacion_documento.sunat', '0')
             ->where('cotizacion_documento.contingencia', '0')
             ->whereRaw("cotizacion_documento.duplicado is null")
+            ->where("cotizacion_documento.dar_baja",'=',0)
             ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
         if (!PuntoVenta() && !FullAccess()) {
@@ -1083,5 +1084,19 @@ class AlertaController extends Controller
         }
 
         return $arrayProductos;
+    }
+    public function DarBajaDocumento($id){
+        try{
+            $documento = Documento::find($id);
+            $documento->dar_baja = 1;
+            $json_data = json_decode($documento->getRegularizeResponse, false);
+            $documento->observacion = "Este documento se dio de baja - $json_data->description";
+            $documento->update();
+            Session::flash('success', 'Documento de Venta dada de baja correctamente.');
+            return redirect()->route('consultas.ventas.alerta.envio');
+        }catch(\Exception $ex){
+            Session::flash('error', $ex->getMessage());
+            return redirect()->route('consultas.ventas.alerta.envio');
+        }
     }
 }
