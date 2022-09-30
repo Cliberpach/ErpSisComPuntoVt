@@ -54,6 +54,7 @@ class AlertaController extends Controller
                 'cotizacion_documento.contingencia',
                 'cotizacion_documento.sunat_contingencia',
                 'cotizacion_documento.getCdrResponse',
+                'cotizacion_documento.duplicado',
                 DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.code"))),"-") as code'),
                 DB::raw('ifnull((json_unquote(json_extract(cotizacion_documento.getCdrResponse, "$.description"))),"-") as description'),
                 DB::raw('json_unquote(json_extract(cotizacion_documento.getRegularizeResponse,"$.description")) as cdrDescription')
@@ -63,6 +64,7 @@ class AlertaController extends Controller
             ->where('cotizacion_documento.estado', '!=', 'ANULADO')
             ->where('cotizacion_documento.sunat', '0')
             ->where('cotizacion_documento.contingencia', '0')
+            ->whereRaw("cotizacion_documento.duplicado is null")
             ->whereRaw('ifnull((json_unquote(json_extract(cotizacion_documento.getRegularizeResponse, "$.code"))),"0000") != "1033"');
 
         if (!PuntoVenta() && !FullAccess()) {
