@@ -63,7 +63,7 @@ class CreateCotizacionDocumentoTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->mediumText('observacion')->nullable();
-            $table->enum('estado',['ACTIVO','ANULADO'])->default('ACTIVO');
+            $table->enum('estado',['ACTIVO','ANULADO','DUPLICADO'])->default('ACTIVO');
             $table->enum('estado_pago',['PAGADA','PENDIENTE','ADELANTO','CONCRETADA','VIGENTE','DEVUELTO'])->default('PENDIENTE');
 
             $table->enum('sunat',['0','1','2'])->default('0');

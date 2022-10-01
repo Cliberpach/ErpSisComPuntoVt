@@ -344,7 +344,8 @@
                 @foreach ($movimiento->detalleMovimientoVentas as $ventas)
                 {{-- $ventas->documento->sunat != '2' &&  --}}
                     @if ($ventas->documento->condicion_id == 1 && $ventas->documento->estado_pago == 'PAGADA' && ifNoConvertido($ventas->documento->id))
-                        <tr>
+                       @if ($ventas->documento->estado!="DUPLICADO")
+                            <tr>
                             <td style="text-align: center; border-right: 2px solid #52BE80">
                                 {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
                             <td style="text-align: center; border-right: 2px solid #52BE80">
@@ -384,7 +385,8 @@
                                     @endif
                                 @endif
                             @endforeach
-                        </tr>
+                            </tr>
+                       @endif
                     @endif
                 @endforeach
                 <tr>

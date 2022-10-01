@@ -2115,7 +2115,7 @@ class DocumentoController extends Controller
             //Llenado de los articulos
             $productosJSON = $request->get('productos_tabla');
             $productotabla = json_decode($productosJSON);
-            if ($request->convertir) {
+            if ($request->duplicado) {
                 foreach ($productotabla as $producto) {
                     $lote = LoteProducto::findOrFail($producto->producto_id);
                     $lote->cantidad = $lote->cantidad + $producto->cantidad;
@@ -2159,10 +2159,10 @@ class DocumentoController extends Controller
                 $documento->estado_pago = $doc_a_duplicado->estado_pago;
                 $documento->fecha_documento = Carbon::now()->toDateString();
                 $documento->duplicado = $doc_a_duplicado->id;
+                $documento->estado = "DUPLICADO";
                 $documento->importe = $doc_a_duplicado->importe;
                 $documento->efectivo = $doc_a_duplicado->efectivo;
                 $documento->tipo_pago_id = $doc_a_duplicado->tipo_pago_id;
-
                 $documento->update();
             }
 
@@ -2186,7 +2186,6 @@ class DocumentoController extends Controller
 
             if ($request->duplicado) {
                 $doc_a_duplicado1 = Documento::find($request->duplicado);
-                $doc_a_duplicado1->estado="ANULADO";
                 $doc_a_duplicado1->observacion = "Se cambió por el documento $documento->serie-$documento->correlativo";
                 $doc_a_duplicado1->update();
             }

@@ -1225,7 +1225,9 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
             if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
-                $totalIngresos = $totalIngresos + ($item->documento->importe + $item->documento->efectivo);
+                if($item->documento->estado!="DUPLICADO"){
+                    $totalIngresos = $totalIngresos + ($item->documento->importe + $item->documento->efectivo);
+                }
             }
         }
         return $totalIngresos;
@@ -1255,11 +1257,13 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
                 if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
-                    if ($item->documento->tipo_pago_id == $id) {
-                        $totalIngresos = $totalIngresos + $item->documento->importe;
-                    }
-                    else{
-                        $totalIngresos = $totalIngresos + $item->documento->efectivo;
+                    if($item->documento->estado!="DUPLICADO"){
+                        if ($item->documento->tipo_pago_id == $id) {
+                            $totalIngresos = $totalIngresos + $item->documento->importe;
+                        }
+                        else{
+                            $totalIngresos = $totalIngresos + $item->documento->efectivo;
+                        }
                     }
                 }
             }
@@ -1504,7 +1508,7 @@ if (!function_exists('ventas_mensual')) {
 if (!function_exists('ventas_mensual_random')) {
     function ventas_mensual_random($mes,$anio)
     {
-        $total = DocumentoDocumento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
+        $total = DocumentoDocumento::where('estado','!=','ANULADO')->where("estado","<>","DUPLICADO")->whereMonth('fecha_documento',$mes)->whereYear('fecha_documento',$anio)->sum('total');
         $total_invalida = DocumentoDocumento::where('estado','!=','ANULADO')
         ->whereMonth('fecha_documento',$mes)
         ->whereYear('fecha_documento',$anio)
@@ -1578,7 +1582,7 @@ if (!function_exists('utilidad_mensual_random')) {
         // $utilidad = $coleccion->sum('importe');
         // return $utilidad;
 
-        $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
+        $ventas = DocumentoDocumento::where('estado', '!=', 'ANULADO')->where("estado","<>","DUPLICADO")->whereMonth('fecha_documento', $mes)->whereYear('fecha_documento', $anio)->get();
         $coleccion = collect();
        
         foreach ($ventas as $venta) {
