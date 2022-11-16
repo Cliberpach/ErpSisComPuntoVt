@@ -32,9 +32,12 @@ class CuentaProveedorController extends Controller
 
             $total_pagar = $value->documento->total - $value->documento->notas->sum("mtoImpVenta");
 
-            $nuevo_monto = $total_pagar - $value->detalles->sum("monto");
-            $detalle_ultimo->saldo = $nuevo_monto;
-            $detalle_ultimo->update();
+            if($detalle_ultimo){
+                $nuevo_monto = $total_pagar - $value->detallePago->sum("monto");
+                $detalle_ultimo->saldo = $nuevo_monto;
+                $detalle_ultimo->update();
+            }
+           
 
             if(!empty($detalle_ultimo))
             {
@@ -70,7 +73,7 @@ class CuentaProveedorController extends Controller
                 "numero_doc"=>$cuenta_proveedor->documento->serie_tipo.' - '.$cuenta_proveedor->documento->numero_tipo,
                 "fecha_doc"=>strval($cuenta_proveedor->documento->created_at),
                 "monto" => $cuenta_proveedor->documento->total - $cuenta_proveedor->documento->notas->sum("mtoImpVenta"),
-                "acta"=>number_format(round($acta, 2), 2),
+                "acta"=>$cuenta_proveedor->acta,//number_format(round($acta, 2), 2),
                 "saldo"=>$cuenta_proveedor->saldo,
                 "estado"=>$cuenta_proveedor->estado
             ));

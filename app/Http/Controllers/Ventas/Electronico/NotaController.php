@@ -1019,4 +1019,5 @@ class NotaController extends Controller
             return array('success' => false, 'mensaje' => $e->getMessage());
         }
     }
+
 }
