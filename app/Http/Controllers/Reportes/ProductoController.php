@@ -81,14 +81,17 @@ class ProductoController extends Controller
     {
         $salidas = DB::table('detalle_nota_salidad')
         ->join('nota_salidad', 'nota_salidad.id', '=', 'detalle_nota_salidad.nota_salidad_id')
+        ->join('productos', 'productos.id','=', 'detalle_nota_salidad.producto_id')
+        ->join('tabladetalles', 'tabladetalles.id','=','productos.medida')
         ->join('lote_productos', 'lote_productos.id', '=', 'detalle_nota_salidad.lote_id')
         ->select(
             'detalle_nota_salidad.cantidad',
             'nota_salidad.origen',
             'nota_salidad.destino',
             'lote_productos.codigo_lote',
-            'detalle_nota_salidad.unidad',
+            'tabladetalles.descripcion as unidad'
         )
+        ->where('detalle_nota_salidad.producto_id', $id)    
         ->where('nota_salidad.estado', '!=', 'ANULADO')->get();
         $coleccion = collect([]);
         foreach ($salidas as $salida) {
