@@ -69,18 +69,32 @@ class CajaController extends Controller
     public function indexMovimiento()
     {
         $this->authorize('haveaccess', 'movimiento_caja.index');
-        $lstAnios = DB::table('lote_productos')
-            ->select(DB::raw('year(created_at) as value'))
-            ->distinct()
-            ->orderBy('value', 'desc')
-            ->get();
+        $lstAniosDB = DB::table('lote_productos')
+        ->select(DB::raw('year(created_at) as value'))
+        ->distinct()
+        ->orderBy('value', 'desc')
+        ->get();
+        $lstAnios = collect();
+        foreach($lstAniosDB as $item){
+            $lstAnios->push([
+                "value" =>$item->value
+            ]);
+        }
         $fecha_hoy = Carbon::now();
         $mes = date_format($fecha_hoy, 'm');
         $anio_ = date_format($fecha_hoy, 'Y');
-        return view(
-            'pos.MovimientoCaja.indexMovimiento',
-            compact('lstAnios', 'mes', 'anio_')
-        );
+        $search = array_search("$anio_",array_column($lstAnios->values()->all(),"value"));
+        if($search === false){
+            $lstAnios->push([
+                "value" =>(int)$anio_
+            ]);
+        }
+        
+        return view('pos.MovimientoCaja.indexMovimiento',[
+            'lstAnios'=>json_decode(json_encode($lstAnios->sortByDesc("value")->values())), 
+            'mes'=>$mes, 
+            'anio_'=>$anio_
+        ]);
     }
     public function getMovimientosCajas(Request $request)
     {
