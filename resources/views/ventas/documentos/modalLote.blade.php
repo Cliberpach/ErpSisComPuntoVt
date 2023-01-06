@@ -190,17 +190,21 @@
                             let porcentaje = 0;
                             let porcentaje_ = data.porcentaje_normal;
                             let precio_nuevo = 0;
+
+                            let totalCostoFlote = Number(data.costo_flete_soles) / Number(data.cantidad_comprada);
+                            let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
+
                             if(data.moneda_compra == 'DOLARES')
                             {
                                 if(data.igv_compra == 1)
                                 {
                                     precio = precio_ * cambio;
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = (precio * (1 + (porcentaje_ / 100))) + Number(costo_flete);
                                 }
                                 else
                                 {
                                     precio = (precio_ * cambio * 1.18)
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = (precio * (1 + (porcentaje_ / 100))) + Number(costo_flete)
                                 }
                             }
                             else
@@ -208,12 +212,12 @@
                                 if(data.igv_compra == 1)
                                 {
                                     precio = precio_;
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = (precio * (1 + (porcentaje_ / 100))) + Number(costo_flete)
                                 }
                                 else
                                 {
                                     precio = (precio_ * 1.18)
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = (precio * (1 + (porcentaje_ / 100))) + Number(costo_flete)
                                 }
                             }
                             return convertFloat(precio_nuevo).toFixed(2);
@@ -250,17 +254,20 @@
                             let porcentaje = 0;
                             let porcentaje_ = data.porcentaje_distribuidor;
                             let precio_nuevo = 0;
+
+                            let totalCostoFlote = Number(data.costo_flete_soles) / Number(data.cantidad_comprada);
+                            let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
                             if(data.moneda_compra == 'DOLARES')
                             {
                                 if(data.igv_compra == 1)
                                 {
                                     precio = precio_ * cambio;
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100)) + Number(costo_flete)
                                 }
                                 else
                                 {
                                     precio = (precio_ * cambio * 1.18)
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100)) + Number(costo_flete)
                                 }
                             }
                             else
@@ -268,12 +275,12 @@
                                 if(data.igv_compra == 1)
                                 {
                                     precio = precio_;
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100)) + Number(costo_flete)
                                 }
                                 else
                                 {
                                     precio = (precio_ * 1.18)
-                                    precio_nuevo = precio * (1 + (porcentaje_ / 100))
+                                    precio_nuevo = precio * (1 + (porcentaje_ / 100)) + Number(costo_flete)
                                 }
                             }
                             return convertFloat(precio_nuevo).toFixed(2);
@@ -383,17 +390,20 @@
             let precio_ = producto.precio_compra;
             let porcentaje_ = producto.porcentaje;
             let precio_nuevo = 0;
+
+            let totalCostoFlote = Number(producto.costo_flete_soles) / Number(producto.cantidad_comprada);
+            let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
             if(producto.moneda_compra == 'DOLARES')
             {
                 if(producto.igv_compra == 1)
                 {
                     precio = precio_ * cambio;
-                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100) + Number(costo_flete)
                 }
                 else
                 {
                     precio = (precio_ * cambio * 1.18)
-                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100) + Number(costo_flete)
                 }
             }
             else
@@ -401,12 +411,12 @@
                 if(producto.igv_compra == 1)
                 {
                     precio = precio_;
-                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100) + Number(costo_flete)
                 }
                 else
                 {
                     precio = (precio_ * 1.18)
-                    precio_nuevo  = precio * (1 + porcentaje_ / 100)
+                    precio_nuevo  = precio * (1 + porcentaje_ / 100) + Number(costo_flete)
                 }
             }
             return convertFloat(precio_nuevo).toFixed(2);
