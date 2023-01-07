@@ -1806,7 +1806,7 @@ class DocumentoController extends Controller
                 ->select(
                     'nota_ingreso.moneda as moneda_ingreso',
                     'compra_documentos.moneda as moneda_compra',
-                    'compra_documentos.dolar as dolar_compra',
+                    'compra_documentos.tipo_cambio as dolar_compra',
                     'compra_documentos.igv_check as igv_compra',
                     'compra_documento_detalles.precio_soles',
                     'compra_documento_detalles.precio as precio_compra',

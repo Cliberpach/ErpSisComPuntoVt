@@ -190,7 +190,7 @@
                             let porcentaje = 0;
                             let porcentaje_ = data.porcentaje_normal;
                             let precio_nuevo = 0;
-
+                            console.log({precio_,cambio,porcentaje_})
                             let totalCostoFlote = Number(data.costo_flete_soles) / Number(data.cantidad_comprada);
                             let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
 
