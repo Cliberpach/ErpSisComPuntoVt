@@ -2,30 +2,31 @@
 
 namespace App\Http\Controllers\Compras;
 
-use App\Almacenes\LoteProducto;
-use App\Almacenes\Producto;
-use App\Compras\CuentaProveedor;
-use App\Compras\Detalle as ComprasDetalle;
-use App\Compras\Documento\Detalle as DocumentoDetalle;
-use App\Compras\Documento\Documento;
-use App\Compras\Documento\Pago\Transferencia;
+use Exception;
+use Carbon\Carbon;
 use App\Compras\Orden;
-use App\Compras\Pago as ComprasPago;
 use App\Compras\Proveedor;
-use App\Http\Controllers\Controller;
+use App\Almacenes\Producto;
+use Illuminate\Http\Request;
+use App\Almacenes\LoteProducto;
+use App\Compras\CuentaProveedor;
 use App\Mantenimiento\Condicion;
+use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\DB;
+use App\Ventas\Documento\Pago\Pago;
+use Illuminate\Support\Facades\Log;
+use App\Compras\Documento\Documento;
+use App\Compras\Pago as ComprasPago;
+use App\Http\Controllers\Controller;
 use App\Mantenimiento\Empresa\Empresa;
 use App\Movimientos\MovimientoAlmacen;
-use App\Ventas\Documento\Pago\Pago;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
-use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Support\Facades\Validator;
+use App\Compras\Detalle as ComprasDetalle;
+use App\Compras\Documento\Pago\Transferencia;
 use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
-use Exception;
+use App\Compras\Documento\Detalle as DocumentoDetalle;
 
 class DocumentoController extends Controller
 {
@@ -35,10 +36,95 @@ class DocumentoController extends Controller
         return view('compras.documentos.index');
     }
 
-    public function getDocument(){
+    public function getDocument(Request $request){
         $this->authorize('haveaccess','documento_compra.index');
-        $documentos = Documento::where('estado','!=','ANULADO')->get();
-        $coleccion = collect([]);
+        $tamanio = $request->get("tamanio") ? $request->get("tamanio") : 10;
+        $documentos = Documento::where('estado','!=','ANULADO')
+        ->orderBy("id","DESC")
+        ->paginate($tamanio);
+
+        $documentos->each(function($doc){
+
+            $detalles = DocumentoDetalle::where('documento_id',$doc->id)->where('estado','ACTIVO')->get();
+            $documento = Documento::findOrFail($doc->id);
+            $subtotal = 0;
+            $igv = '';
+            $tipo_moneda = '';
+            foreach($detalles as $detalle){
+                $subtotal = ($detalle->cantidad * $detalle->precio) + $subtotal;
+            }
+
+            foreach(tipos_moneda() as $moneda){
+                if ($moneda->descripcion == $documento->moneda) {
+                    $tipo_moneda= $moneda->simbolo;
+                }
+            }
+
+            if (!$documento->igv) {
+                $igv = $subtotal * 0.18;
+                $total = $subtotal + $igv + $documento->percepcion;
+                $decimal_total = number_format($total, 2, '.', '');
+            }else{
+                $calcularIgv = $documento->igv/100;
+                $base = $subtotal / (1 + $calcularIgv);
+                $nuevo_igv = $subtotal - $base;
+                $decimal_total = number_format(($subtotal  + $documento->percepcion), 2, '.', '');
+            }
+            //TIPO DE PAGO (OTROS)
+
+            // CALCULAR ACUENTA EN MONEDA
+            $acuenta = 0;
+            $saldo = 0;
+
+            if($documento->cuenta)
+            {
+
+                $efectivo = $documento->cuenta->detallePago->sum('efectivo');
+                $importe = $documento->cuenta->detallePago->sum('importe');
+                $acuenta = $efectivo + $importe;
+            }
+            else
+            {
+                $acuenta = $decimal_total;
+            }
+
+            $documento->total = $decimal_total;
+            $documento->update();
+
+
+            $saldo = $decimal_total - $acuenta;
+            //CALCULAR SALDO
+            if ($saldo == 0.0) {
+                $documento->estado = "PAGADA";
+                $documento->update();
+            }else{
+                $documento->estado = "PENDIENTE";
+                $documento->update();
+            }
+
+            $doc->id =$documento->id;
+            $doc->tipo =$documento->tipo_compra;
+            $doc->tipo_pago =$documento->tipo_pago;
+            $doc->proveedor =$documento->proveedor->descripcion;
+            $doc->empresa =$documento->empresa->razon_social;
+            $doc->fecha_emision = Carbon::parse($documento->fecha_emision)->format( 'd/m/Y');
+            $doc->igv = $documento->igv;
+            $doc->numero_doc = $documento->serie_tipo.'-'.$documento->numero_tipo;
+            $doc->moneda = $documento->moneda;
+            $doc->tipo_cambio = $documento->tipo_cambio;
+            $doc->orden_compra = $documento->orden_compra;
+            $doc->subtotal =$tipo_moneda.' '.number_format($subtotal, 2, '.', '');
+            $doc->estado =$documento->estado;
+            $doc->saldo =$tipo_moneda.' '.number_format($saldo, 2, '.', '');
+            $doc->acuenta =$tipo_moneda.' '.number_format($acuenta, 2, '.', '');
+            $doc->total =$tipo_moneda.' '.number_format($decimal_total, 2, '.', '');
+            $doc->total_pagar =$tipo_moneda.' '.number_format($documento->total_pagar, 2, '.', '');
+            $doc->modo =$documento->modo_compra;
+            $doc->notas =count($documento->notas);
+            return $doc;
+        });
+
+        /**$coleccion = collect([]);
         foreach($documentos as $doc){
             $detalles = DocumentoDetalle::where('documento_id',$doc->id)->where('estado','ACTIVO')->get();
             $documento = Documento::findOrFail($doc->id);
@@ -118,8 +204,9 @@ class DocumentoController extends Controller
                 'modo' => $documento->modo_compra,
                 'notas' => count($documento->notas)
             ]);
-        }
-        return DataTables::of($coleccion)->toJson();
+        }*/
+        return response()->json($documentos);
+        // return DataTables::of($coleccion)->toJson();
     }
 
     public function create(Request $request)
@@ -384,8 +471,25 @@ class DocumentoController extends Controller
     public function edit($id)
     {
         $this->authorize('haveaccess','documento_compra.index');
+        $documento = Documento::findOrFail($id);
+        if(!$documento)
+            throw new Exception("Documento no existe");
+        return view('compras.documentos.edit',compact('documento'));
+    }
+    public function getTablesEdit($id){
         $empresas = Empresa::where('estado','ACTIVO')->get();
-        $detalles = DocumentoDetalle::where('documento_id', $id)->where('estado','ACTIVO')->get();
+        $detalles = DocumentoDetalle::with(['producto','loteProducto','loteProducto.detalles_venta'])
+        ->where('documento_id', $id)
+        ->where('estado','ACTIVO')
+        ->get()
+        ->each(function($detalle){
+            $detalle->fechaFormateada = $detalle->fechaFormateada();
+            $detalle->producto_nombre = $detalle->producto->nombre;
+            $detalle->totalVenta = count($detalle->loteProducto->detalles_venta);
+            unset($detalle->loteProducto);
+            unset($detalle->producto);
+            return $detalle;
+        });
         $proveedores = Proveedor::where('estado','ACTIVO')->get();
         $documento = Documento::findOrFail($id);
         $productos = producto::where('estado','ACTIVO')->get();
@@ -395,7 +499,7 @@ class DocumentoController extends Controller
         $fecha_actual = date("d/m/Y",strtotime($fecha_actual));
         $fecha_5 = date("d/m/Y",strtotime($fecha_hoy."+ 5 years"));
         $condiciones = Condicion::where('estado','ACTIVO')->get();
-        return view('compras.documentos.edit',[
+        return response()->json([
             'empresas' => $empresas,
             'proveedores' => $proveedores,
             'documento' => $documento,
@@ -406,213 +510,248 @@ class DocumentoController extends Controller
             'condiciones' => $condiciones,
             'fecha_5' => $fecha_5,
             'detalles' => $detalles,
+            'tipos_moneda' => tipos_moneda(),
+            'tipo_compra' => tipo_compra()
         ]);
     }
-
     public function update(Request $request, $id)
     {
         $this->authorize('haveaccess','documento_compra.index');
-        $data = $request->all();
-        $rules = [
-            'fecha_emision'=> 'required',
-            'fecha_entrega'=> 'required',
-            'tipo_compra'=> 'required',
-            'numero_tipo'=> 'required',
-            'serie_tipo'=> 'required',
-            'proveedor_id'=> 'required',
-            'condicion_id'=> 'required',
-            'observacion' => 'nullable',
-            'moneda' => 'nullable',
-            'tipo_cambio' => 'nullable|numeric',
-            'igv' => 'required_if:igv_check,==,on|numeric|digits_between:1,3',
-        ];
-        $message = [
-            'fecha_emision.required' => 'El campo Fecha de Emisión es obligatorio.',
-            'tipo_compra.required' => 'El campo Tipo es obligatorio.',
-            'fecha_entrega.required' => 'El campo Fecha de Entrega es obligatorio.',
-            'numero_tipo.required' => 'El campo Número es obligatorio.',
-            'serie_tipo.required' => 'El campo Serie es obligatorio.',
-            'proveedor_id.required' => 'El campo Proveedor es obligatorio.',
-            'condicion_id.required' => 'El campo Condicion es obligatorio.',
-            'moneda.required' => 'El campo Moneda es obligatorio.',
-            'igv.required_if' => 'El campo Igv es obligatorio.',
-            'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
-            'igv.numeric' => 'El campo Igv debe se numérico.',
-            'tipo_cambio.numeric' => 'El campo Tipo de Cambio debe se numérico.',
-        ];
-        Validator::make($data, $rules, $message)->validate();
-        $dolar_aux = json_encode(precio_dolar(), true);
-        $dolar_aux = json_decode($dolar_aux, true);
-
-        $dolar = (float)$dolar_aux['original']['venta'];
-
-        $documento = Documento::findOrFail($id);
-        $documento->fecha_emision = Carbon::createFromFormat('d/m/Y', $request->get('fecha_emision'))->format('Y-m-d');
-        $documento->fecha_entrega = Carbon::createFromFormat('d/m/Y', $request->get('fecha_entrega'))->format('Y-m-d');
-        $documento->sub_total = (float) $request->get('monto_sub_total');
-        $documento->total_igv = (float) $request->get('monto_total_igv');
-        $documento->percepcion = (float) $request->get('monto_percepcion');
-        $documento->total = (float) $request->get('monto_total');
-        //-------------------------------
-        if($request->get('moneda') === 'DOLARES')
-        {
-            $documento->sub_total_soles = (float) $request->get('monto_sub_total') * (float) $request->get('tipo_cambio');
-            $documento->total_igv_soles = (float) $request->get('monto_total_igv') * (float) $request->get('tipo_cambio');
-            $documento->percepcion_soles = (float) $request->get('monto_percepcion') * (float) $request->get('tipo_cambio');
-            $documento->total_soles = (float) $request->get('monto_total') * (float) $request->get('tipo_cambio');
-
-            $documento->sub_total_dolares = (float) $request->get('monto_sub_total');
-            $documento->total_igv_dolares = (float) $request->get('monto_total_igv');
-            $documento->percepcion_dolares = (float) $request->get('monto_percepcion') * (float) $request->get('tipo_cambio');
-            $documento->total_dolares = (float) $request->get('monto_total');
-        }
-        else
-        {
-            $documento->sub_total_soles = (float) $request->get('monto_sub_total');
-            $documento->total_igv_soles = (float) $request->get('monto_total_igv');
-            $documento->percepcion_soles = (float) $request->get('monto_percepcion');
-            $documento->total_soles = (float) $request->get('monto_total');
-
-            $documento->sub_total_dolares = (float) $request->get('monto_sub_total') / $dolar;
-            $documento->total_igv_dolares = (float) $request->get('monto_total_igv') / $dolar;
-
-            $documento->percepcion_soles = (float) $request->get('monto_percepcion') / $dolar;
-            $documento->total_dolares = (float) $request->get('monto_total') / $dolar;
-        }
+        try{
+            // $data = $request->all();
+            // $rules = [
+            //     'fecha_emision'=> 'required',
+            //     'fecha_entrega'=> 'required',
+            //     'tipo_compra'=> 'required',
+            //     'numero_tipo'=> 'required',
+            //     'serie_tipo'=> 'required',
+            //     'proveedor_id'=> 'required',
+            //     'condicion_id'=> 'required',
+            //     'observacion' => 'nullable',
+            //     'moneda' => 'nullable',
+            //     'tipo_cambio' => 'nullable|numeric',
+            //     'igv' => 'required_if:igv_check,==,true|numeric|digits_between:1,3',
+            // ];
+            // $message = [
+            //     'fecha_emision.required' => 'El campo Fecha de Emisión es obligatorio.',
+            //     'tipo_compra.required' => 'El campo Tipo es obligatorio.',
+            //     'fecha_entrega.required' => 'El campo Fecha de Entrega es obligatorio.',
+            //     'numero_tipo.required' => 'El campo Número es obligatorio.',
+            //     'serie_tipo.required' => 'El campo Serie es obligatorio.',
+            //     'proveedor_id.required' => 'El campo Proveedor es obligatorio.',
+            //     'condicion_id.required' => 'El campo Condicion es obligatorio.',
+            //     'moneda.required' => 'El campo Moneda es obligatorio.',
+            //     'igv.required_if' => 'El campo Igv es obligatorio.',
+            //     'igv.digits' => 'El campo Igv puede contener hasta 3 dígitos.',
+            //     'igv.numeric' => 'El campo Igv debe se numérico.',
+            //     'tipo_cambio.numeric' => 'El campo Tipo de Cambio debe se numérico.',
+            // ];
+            // Validator::make($data, $rules, $message)->validate();
+            DB::beginTransaction();
+            $dolar_aux = json_encode(precio_dolar(), true);
+            $dolar_aux = json_decode($dolar_aux, true);
+    
+            $dolar = (float)$dolar_aux['original']['venta'];
+    
+            $documento = Documento::findOrFail($id);
+            $documento->fecha_emision = Carbon::createFromFormat('d/m/Y', $request->get('fecha_emision'));
+            $documento->fecha_entrega = Carbon::createFromFormat('d/m/Y', $request->get('fecha_entrega'));
+            $documento->sub_total = (float) $request->get('monto_sub_total');
+            $documento->total_igv = (float) $request->get('monto_total_igv');
+            $documento->percepcion = (float) $request->get('monto_percepcion');
+            $documento->total = (float) $request->get('monto_total');
             //-------------------------------
-        $condicion = Condicion::find($request->get('condicion_id'));
-        $documento->empresa_id = '1';
-        $documento->proveedor_id = $request->get('proveedor_id');
-        $documento->condicion_id = $request->get('condicion_id');
-        $documento->modo_compra = $condicion->descripcion;
-        $documento->observacion = $request->get('observacion');
-        $documento->moneda = $request->get('moneda');
-        $documento->tipo_cambio = $request->get('tipo_cambio');
-        $documento->numero_tipo = $request->get('numero_tipo');
-        $documento->serie_tipo = $request->get('serie_tipo');
-        $documento->usuario_id = auth()->user()->id;
-        if ($request->get('igv_check') == "on") {
-            $documento->igv_check = "1";
-            $documento->igv = $request->get('igv');
-        }else{
-            $documento->igv_check = '';
-            $documento->igv = '';
-        }
-        $documento->tipo_compra = $request->get('tipo_compra');
-        $documento->update();
-        $productosJSON = $request->get('productos_tabla');
-        $productotabla = json_decode($productosJSON[0]);
-        if ($productotabla) {
-            foreach ($productotabla as $detalle) {
-                if($detalle->detalle_id == 0)
-                {
-                    $producto = Producto::findOrFail($detalle->producto_id);
-                    $precio_soles = $detalle->precio;
-                    $costo_flete_soles = $detalle->costo_flete;
-                    $precio_dolares = $detalle->precio;
-                    $costo_flete_dolares = $detalle->costo_flete;
-                    //-------------------------------
-                    if($request->get('moneda') === 'DOLARES')
+            if($request->get('moneda') === 'DOLARES')
+            {
+                $documento->sub_total_soles = (float) $request->get('monto_sub_total') * (float) $request->get('tipo_cambio');
+                $documento->total_igv_soles = (float) $request->get('monto_total_igv') * (float) $request->get('tipo_cambio');
+                $documento->percepcion_soles = (float) $request->get('monto_percepcion') * (float) $request->get('tipo_cambio');
+                $documento->total_soles = (float) $request->get('monto_total') * (float) $request->get('tipo_cambio');
+    
+                $documento->sub_total_dolares = (float) $request->get('monto_sub_total');
+                $documento->total_igv_dolares = (float) $request->get('monto_total_igv');
+                $documento->percepcion_dolares = (float) $request->get('monto_percepcion') * (float) $request->get('tipo_cambio');
+                $documento->total_dolares = (float) $request->get('monto_total');
+            }
+            else
+            {
+                $documento->sub_total_soles = (float) $request->get('monto_sub_total');
+                $documento->total_igv_soles = (float) $request->get('monto_total_igv');
+                $documento->percepcion_soles = (float) $request->get('monto_percepcion');
+                $documento->total_soles = (float) $request->get('monto_total');
+    
+                $documento->sub_total_dolares = (float) $request->get('monto_sub_total') / $dolar;
+                $documento->total_igv_dolares = (float) $request->get('monto_total_igv') / $dolar;
+    
+                $documento->percepcion_soles = (float) $request->get('monto_percepcion') / $dolar;
+                $documento->total_dolares = (float) $request->get('monto_total') / $dolar;
+            }
+                //-------------------------------
+            $condicion = Condicion::find($request->get('condicion_id'));
+            $documento->empresa_id = '1';
+            $documento->proveedor_id = $request->get('proveedor_id');
+            $documento->condicion_id = $request->get('condicion_id');
+            $documento->modo_compra = $condicion->descripcion;
+            $documento->observacion = $request->get('observacion');
+            $documento->moneda = $request->get('moneda');
+            $documento->tipo_cambio = $request->get('tipo_cambio');
+            $documento->numero_tipo = $request->get('numero_tipo');
+            $documento->serie_tipo = $request->get('serie_tipo');
+            $documento->usuario_id = auth()->user()->id;
+            if ($request->get('igv_check') == true) {
+                $documento->igv_check = "1";
+                $documento->igv = $request->get('igv');
+            }else{
+                $documento->igv_check = '';
+                $documento->igv = '';
+            }
+            $documento->tipo_compra = $request->get('tipo_compra');
+            $documento->update();
+            $productosJSON = $request->get('productos_tabla');
+            $productotabla = json_decode($productosJSON);
+           if ($productotabla) {
+                foreach ($productotabla as $detalle) {
+                    if($detalle->detalle_id == 0)
                     {
-                        $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
-                        $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
-                    }
-                    else
+                        $producto = Producto::findOrFail($detalle->producto_id);
+                        $precio_soles = $detalle->precio;
+                        $costo_flete_soles = $detalle->costo_flete;
+                        $precio_dolares = $detalle->precio;
+                        $costo_flete_dolares = $detalle->costo_flete;
+                        //-------------------------------
+                        if($request->get('moneda') === 'DOLARES')
+                        {
+                            $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
+                            $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
+                        }
+                        else
+                        {
+                            $precio_soles = (float) $detalle->precio;
+                            $costo_flete_soles = (float) $detalle->costo_flete;
+    
+                            $precio_dolares = (float) $detalle->precio / (float) $dolar;
+                            $costo_flete_dolares = (float) $detalle->costo_flete / (float) $dolar;
+                        }
+                        $precio_mas_igv_soles = $detalle->precio;
+                        $precio_mas_igv_dolares = $detalle->precio;
+                        if ($request->get('igv_check') == "on") {
+                            $precio_mas_igv_soles = $precio_soles;
+                            $precio_mas_igv_dolares = $precio_dolares;
+                        }else{
+                            $precio_mas_igv_soles = $precio_soles * (1.18);
+                            $precio_mas_igv_dolares = $precio_dolares * (1.18);
+                        }
+                        
+                        DocumentoDetalle::create([
+                            'documento_id' => $documento->id,
+                            'producto_id' => $detalle->producto_id,
+                            'descripcion_producto' => $producto->nombre,
+                            'presentacion_producto' => '-',
+                            'codigo_producto' => $producto->codigo,
+                            'medida_producto' => $producto->medida,
+                            'cantidad' => $detalle->cantidad,
+                            'precio' => $detalle->precio,
+                            'precio_mas_igv_soles' => $precio_mas_igv_soles,
+                            'precio_mas_igv_dolares' => $precio_mas_igv_dolares,
+                            'precio_soles' => $precio_soles,
+                            'precio_dolares' => $precio_dolares,
+                            'costo_flete' => $detalle->costo_flete,
+                            'costo_flete_soles' => $costo_flete_soles,
+                            'costo_flete_dolares' => $costo_flete_dolares,
+                            'fecha_vencimiento' =>  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d'),
+                            'lote' => $detalle->lote,
+                        ]);
+                    }else
                     {
-                        $precio_soles = (float) $detalle->precio;
-                        $costo_flete_soles = (float) $detalle->costo_flete;
 
-                        $precio_dolares = (float) $detalle->precio / (float) $dolar;
-                        $costo_flete_dolares = (float) $detalle->costo_flete / (float) $dolar;
-                    }
-                    $precio_mas_igv_soles = $detalle->precio;
-                    $precio_mas_igv_dolares = $detalle->precio;
-                    if ($request->get('igv_check') == "on") {
-                        $precio_mas_igv_soles = $precio_soles;
-                        $precio_mas_igv_dolares = $precio_dolares;
-                    }else{
-                        $precio_mas_igv_soles = $precio_soles * (1.18);
-                        $precio_mas_igv_dolares = $precio_dolares * (1.18);
-                    }
-                    DocumentoDetalle::create([
-                        'documento_id' => $documento->id,
-                        'producto_id' => $detalle->producto_id,
-                        'descripcion_producto' => $producto->nombre,
-                        'presentacion_producto' => '-',
-                        'codigo_producto' => $producto->codigo,
-                        'medida_producto' => $producto->medida,
-                        'cantidad' => $detalle->cantidad,
-                        'precio' => $detalle->precio,
-                        'precio_mas_igv_soles' => $precio_mas_igv_soles,
-                        'precio_mas_igv_dolares' => $precio_mas_igv_dolares,
-                        'precio_soles' => $precio_soles,
-                        'precio_dolares' => $precio_dolares,
-                        'costo_flete' => $detalle->costo_flete,
-                        'costo_flete_soles' => $costo_flete_soles,
-                        'costo_flete_dolares' => $costo_flete_dolares,
-                        'fecha_vencimiento' =>  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d'),
-                        'lote' => $detalle->lote,
-                    ]);
-                }else
-                {
-                    $producto = Producto::findOrFail($detalle->producto_id);
-                    $precio_soles = $detalle->precio;
-                    $costo_flete_soles = $detalle->costo_flete;
-                    $precio_dolares = $detalle->precio;
-                    $costo_flete_dolares = $detalle->costo_flete;
-                    //-------------------------------
-                    if($request->get('moneda') === 'DOLARES')
-                    {
-                        $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
-                        $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
-                    }
-                    else
-                    {
-                        $precio_soles = (float) $detalle->precio;
-                        $costo_flete_soles = (float) $detalle->costo_flete;
+                        if($detalle->eliminado){
+                            $detalle_update = DocumentoDetalle::find($detalle->detalle_id);
+                            $detalle_update->estado = "ANULADO";
+                            $detalle_update->update();
+                        }{
 
-                        $precio_dolares = (float) $detalle->precio / (float) $dolar;
-                        $costo_flete_dolares = (float) $detalle->costo_flete / (float) $dolar;
+                            $producto = Producto::findOrFail($detalle->producto_id);
+                            $precio_soles = $detalle->precio;
+                            $costo_flete_soles = $detalle->costo_flete;
+                            $precio_dolares = $detalle->precio;
+                            $costo_flete_dolares = $detalle->costo_flete;
+                            //-------------------------------
+                            if($request->get('moneda') === 'DOLARES')
+                            {
+                                $precio_soles = (float) $detalle->precio * (float) $request->get('tipo_cambio');
+                                $costo_flete_soles = (float) $detalle->costo_flete * (float) $request->get('tipo_cambio');
+                            }
+                            else
+                            {
+                                $precio_soles = (float) $detalle->precio;
+                                $costo_flete_soles = (float) $detalle->costo_flete;
+        
+                                $precio_dolares = (float) $detalle->precio / (float) $dolar;
+                                $costo_flete_dolares = (float) $detalle->costo_flete / (float) $dolar;
+                            }
+                            $precio_mas_igv_soles = $detalle->precio;
+                            $precio_mas_igv_dolares = $detalle->precio;
+                            if ($request->get('igv_check') == true) {
+                                $precio_mas_igv_soles = $precio_soles;
+                                $precio_mas_igv_dolares = $precio_dolares;
+                            }else{
+                                $precio_mas_igv_soles = $precio_soles * (1.18);
+                                $precio_mas_igv_dolares = $precio_dolares * (1.18);
+                            }
+                            $detalle_update = DocumentoDetalle::find($detalle->detalle_id);
+                            $detalle_update->documento_id = $documento->id;
+                            $detalle_update->producto_id = $detalle->producto_id;
+                            $detalle_update->descripcion_producto = $producto->nombre;
+                            $detalle_update->presentacion_producto = '-';
+                            $detalle_update->codigo_producto = $producto->codigo;
+                            $detalle_update->medida_producto = $producto->medida;
+                            $detalle_update->cantidad = $detalle->cantidad;
+                            $detalle_update->precio = $detalle->precio;
+                            $detalle_update->precio_mas_igv_soles = $precio_mas_igv_soles;
+                            $detalle_update->precio_mas_igv_dolares = $precio_mas_igv_dolares;
+                            $detalle_update->precio_soles = $precio_soles;
+                            $detalle_update->precio_dolares = $precio_dolares;
+                            $detalle_update->costo_flete = $detalle->costo_flete;
+                            $detalle_update->costo_flete_soles = $costo_flete_soles;
+                            $detalle_update->costo_flete_dolares = $costo_flete_dolares;
+                            $detalle_update->fecha_vencimiento =  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d');
+                            $detalle_update->lote = $detalle->lote;
+                            $detalle_update->update();
+
+                            //Actualizamos el lote
+                            $_loteproducto = LoteProducto::find($detalle->lote_id);
+                            $_loteproducto->cantidad = $detalle->cantidad;
+                            $_loteproducto->cantidad_logica = $detalle->cantidad;
+                            $_loteproducto->cantidad_inicial = $detalle->cantidad;
+                            $_loteproducto->update();
+                        }
                     }
-                    $precio_mas_igv_soles = $detalle->precio;
-                    $precio_mas_igv_dolares = $detalle->precio;
-                    if ($request->get('igv_check') == "on") {
-                        $precio_mas_igv_soles = $precio_soles;
-                        $precio_mas_igv_dolares = $precio_dolares;
-                    }else{
-                        $precio_mas_igv_soles = $precio_soles * (1.18);
-                        $precio_mas_igv_dolares = $precio_dolares * (1.18);
-                    }
-                    $detalle_update = DocumentoDetalle::find($detalle->detalle_id);
-                    $detalle_update->documento_id = $documento->id;
-                    $detalle_update->producto_id = $detalle->producto_id;
-                    $detalle_update->descripcion_producto = $producto->nombre;
-                    $detalle_update->presentacion_producto = '-';
-                    $detalle_update->codigo_producto = $producto->codigo;
-                    $detalle_update->medida_producto = $producto->medida;
-                    $detalle_update->cantidad = $detalle->cantidad;
-                    $detalle_update->precio = $detalle->precio;
-                    $detalle_update->precio_mas_igv_soles = $precio_mas_igv_soles;
-                    $detalle_update->precio_mas_igv_dolares = $precio_mas_igv_dolares;
-                    $detalle_update->precio_soles = $precio_soles;
-                    $detalle_update->precio_dolares = $precio_dolares;
-                    $detalle_update->costo_flete = $detalle->costo_flete;
-                    $detalle_update->costo_flete_soles = $costo_flete_soles;
-                    $detalle_update->costo_flete_dolares = $costo_flete_dolares;
-                    $detalle_update->fecha_vencimiento =  Carbon::createFromFormat('d/m/Y', $detalle->fecha_vencimiento)->format('Y-m-d');
-                    $detalle_update->lote = $detalle->lote;
-                    $detalle_update->update();
                 }
             }
-        }
-        //Registro de actividad
-        $descripcion = "SE MODIFICÓ EL DOCUMENTO DE COMPRA CON LA FECHA DE EMISION: ". Carbon::parse($documento->fecha_emision)->format('d/m/y');
-        $gestion = "DOCUMENTO DE COMPRA";
-        modificarRegistro($documento, $descripcion , $gestion);
-        Session::flash('success','Documento de Compra modificada.');
-        return redirect()->route('compras.documento.index')->with('modificar', 'success');
-    }
+            //Registro de actividad
+            $descripcion = "SE MODIFICÓ EL DOCUMENTO DE COMPRA CON LA FECHA DE EMISION: ". Carbon::parse($documento->fecha_emision)->format('d/m/y');
+            $gestion = "DOCUMENTO DE COMPRA";
+            modificarRegistro($documento, $descripcion , $gestion);
+            // Session::flash('success','Documento de Compra modificada.');
+            // return redirect()->route('compras.documento.index')->with('modificar', 'success');
+            // */
+            DB::commit();
+            return response()->json([
+                "success" => true,
+                "message" => $descripcion,
+                "productotabla" => $productotabla,
+                "documento" => $documento
+            ]);
 
+        }catch(\Exception $ex){
+            
+            DB::rollback();
+            return response()->json([
+                "success" => false,
+                "message" => $ex->getMessage()
+            ]);
+        }
+    }
     public function destroy($id)
     {
         $this->authorize('haveaccess','documento_compra.index');
@@ -671,7 +810,13 @@ class DocumentoController extends Controller
         Session::flash('success','Documento de Compra eliminada.');
         return redirect()->route('compras.documento.index')->with('eliminar', 'success');
     }
-
+    public function destroyItemProducto($id){
+        try{
+            
+        }catch(\Exception $ex){
+             
+        }
+    }
     public function show($id)
     {
         $this->authorize('haveaccess','documento_compra.index');

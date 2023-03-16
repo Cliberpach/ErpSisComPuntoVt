@@ -43,7 +43,7 @@ class Detalle extends Model
         'lote_id',
         'fecha_vencimiento'
     ];
-
+    
     public function detalles()
     {
         return $this->hasMany('App\Compras\NotaDetalle', 'detalle_id', 'id');

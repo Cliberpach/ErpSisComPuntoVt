@@ -142,69 +142,69 @@ class UtilidadController extends Controller
             }
         }
 
-        $utilidad_ventas = DB::table('cotizacion_documento_detalles')
-            ->join(
-                'cotizacion_documento',
-                'cotizacion_documento.id',
-                '=',
-                'cotizacion_documento_detalles.documento_id'
-            )
-            ->select(
-                DB::raw(
-                    'SUM(cast(cotizacion_documento_detalles.cantidad as decimal(15,4)) * (cast(cotizacion_documento_detalles.precio_nuevo as decimal(15,4)) - ifnull((select dni.costo_soles from lote_productos lp join detalle_nota_ingreso dni on lp.id = dni.lote_id where lp.id = cotizacion_documento_detalles.lote_id), (select (cdd.precio_soles + cdd.costo_flete_soles) from lote_productos lp_ join compra_documento_detalles cdd on lp_.id = cdd.lote_id where lp_.id = cotizacion_documento_detalles.lote_id)))) as utilidad'
-                )
-            )
-            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
-            ->where('cotizacion_documento_detalles.eliminado', '0')
-            ->whereMonth('cotizacion_documento.fecha_documento', $mes)
-            ->whereYear('cotizacion_documento.fecha_documento', $anio)
-            ->first();
+        // $utilidad_ventas = DB::table('cotizacion_documento_detalles')
+        //     ->join(
+        //         'cotizacion_documento',
+        //         'cotizacion_documento.id',
+        //         '=',
+        //         'cotizacion_documento_detalles.documento_id'
+        //     )
+        //     ->select(
+        //         DB::raw(
+        //             'SUM(cast(cotizacion_documento_detalles.cantidad as decimal(15,4)) * (cast(cotizacion_documento_detalles.precio_nuevo as decimal(15,4)) - ifnull((select dni.costo_soles from lote_productos lp join detalle_nota_ingreso dni on lp.id = dni.lote_id where lp.id = cotizacion_documento_detalles.lote_id), (select (cdd.precio_soles + cdd.costo_flete_soles) from lote_productos lp_ join compra_documento_detalles cdd on lp_.id = cdd.lote_id where lp_.id = cotizacion_documento_detalles.lote_id)))) as utilidad'
+        //         )
+        //     )
+        //     ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+        //     ->where('cotizacion_documento_detalles.eliminado', '0')
+        //     ->whereMonth('cotizacion_documento.fecha_documento', $mes)
+        //     ->whereYear('cotizacion_documento.fecha_documento', $anio)
+        //     ->first();
         
-        $resta_utilidad_devoluciones = DB::table('nota_electronica_detalle')
-        ->join(
-            'nota_electronica',
-            'nota_electronica.id',
-            '=',
-            'nota_electronica_detalle.nota_id'
-        )
-        ->join(
-            'cotizacion_documento_detalles',
-            'cotizacion_documento_detalles.id',
-            '=',
-            'nota_electronica_detalle.detalle_id'
-        )
-        ->select(
-            DB::raw(
-                'SUM(cast(nota_electronica_detalle.cantidad as decimal(15,4)) * (cast(nota_electronica_detalle.mtoPrecioUnitario as decimal(15,4)) - ifnull((select dni.costo_soles from lote_productos lp join detalle_nota_ingreso dni on lp.id = dni.lote_id where lp.id = cotizacion_documento_detalles.lote_id), (select (cdd.precio_soles + cdd.costo_flete_soles) from lote_productos lp_ join compra_documento_detalles cdd on lp_.id = cdd.lote_id where lp_.id = cotizacion_documento_detalles.lote_id)))) as utilidad'
-            )
-        )
-        ->where('nota_electronica.estado', '!=', 'ANULADO')
-        ->whereMonth('nota_electronica.fechaEmision', $mes)
-        ->whereYear('nota_electronica.fechaEmision', $anio)
-        ->first();
+        // $resta_utilidad_devoluciones = DB::table('nota_electronica_detalle')
+        // ->join(
+        //     'nota_electronica',
+        //     'nota_electronica.id',
+        //     '=',
+        //     'nota_electronica_detalle.nota_id'
+        // )
+        // ->join(
+        //     'cotizacion_documento_detalles',
+        //     'cotizacion_documento_detalles.id',
+        //     '=',
+        //     'nota_electronica_detalle.detalle_id'
+        // )
+        // ->select(
+        //     DB::raw(
+        //         'SUM(cast(nota_electronica_detalle.cantidad as decimal(15,4)) * (cast(nota_electronica_detalle.mtoPrecioUnitario as decimal(15,4)) - ifnull((select dni.costo_soles from lote_productos lp join detalle_nota_ingreso dni on lp.id = dni.lote_id where lp.id = cotizacion_documento_detalles.lote_id), (select (cdd.precio_soles + cdd.costo_flete_soles) from lote_productos lp_ join compra_documento_detalles cdd on lp_.id = cdd.lote_id where lp_.id = cotizacion_documento_detalles.lote_id)))) as utilidad'
+        //     )
+        // )
+        // ->where('nota_electronica.estado', '!=', 'ANULADO')
+        // ->whereMonth('nota_electronica.fechaEmision', $mes)
+        // ->whereYear('nota_electronica.fechaEmision', $anio)
+        // ->first();
 
        
-        $resta_utilidad_ventas_convertidas = DB::table(
-            'cotizacion_documento_detalles'
-        )
-            ->join(
-                'cotizacion_documento',
-                'cotizacion_documento.id',
-                '=',
-                'cotizacion_documento_detalles.documento_id'
-            )
-            ->select(
-                DB::raw(
-                    'SUM(cast(cotizacion_documento_detalles.cantidad as decimal(15,4)) * (cast(cotizacion_documento_detalles.precio_nuevo as decimal(15,4)) - ifnull((select dni.costo_soles from lote_productos lp join detalle_nota_ingreso dni on lp.id = dni.lote_id where lp.id = cotizacion_documento_detalles.lote_id), (select (cdd.precio_soles + cdd.costo_flete_soles) from lote_productos lp_ join compra_documento_detalles cdd on lp_.id = cdd.lote_id where lp_.id = cotizacion_documento_detalles.lote_id)))) as utilidad'
-                )
-            )
-            ->where('cotizacion_documento.estado', '!=', 'ANULADO')
-            ->where('cotizacion_documento.tipo_venta', '129')
-            ->where('cotizacion_documento.convertir', '!=', '')
-            ->where('cotizacion_documento_detalles.eliminado', '0')
-            ->whereMonth('cotizacion_documento.fecha_documento', $mes)
-            ->whereYear('cotizacion_documento.fecha_documento', $anio)
-            ->first();
+        // $resta_utilidad_ventas_convertidas = DB::table(
+        //     'cotizacion_documento_detalles'
+        // )
+        //     ->join(
+        //         'cotizacion_documento',
+        //         'cotizacion_documento.id',
+        //         '=',
+        //         'cotizacion_documento_detalles.documento_id'
+        //     )
+        //     ->select(
+        //         DB::raw(
+        //             'SUM(cast(cotizacion_documento_detalles.cantidad as decimal(15,4)) * (cast(cotizacion_documento_detalles.precio_nuevo as decimal(15,4)) - ifnull((select dni.costo_soles from lote_productos lp join detalle_nota_ingreso dni on lp.id = dni.lote_id where lp.id = cotizacion_documento_detalles.lote_id), (select (cdd.precio_soles + cdd.costo_flete_soles) from lote_productos lp_ join compra_documento_detalles cdd on lp_.id = cdd.lote_id where lp_.id = cotizacion_documento_detalles.lote_id)))) as utilidad'
+        //         )
+        //     )
+        //     ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+        //     ->where('cotizacion_documento.tipo_venta', '129')
+        //     ->where('cotizacion_documento.convertir', '!=', '')
+        //     ->where('cotizacion_documento_detalles.eliminado', '0')
+        //     ->whereMonth('cotizacion_documento.fecha_documento', $mes)
+        //     ->whereYear('cotizacion_documento.fecha_documento', $anio)
+        //     ->first();
         
         //----------------------------
 
@@ -213,10 +213,6 @@ class UtilidadController extends Controller
         $inversion_mensual = $this->InversionCompleja($fecini,$fecfin);
         $ventas_mensual = ventas_mensual_random($mes, $anio);
 
-        // $utilidad_mensual =
-        //     ($utilidad_ventas->utilidad ? (float)$utilidad_ventas->utilidad : 0) -
-        //     ($resta_utilidad_devoluciones->utilidad ? (float)$resta_utilidad_devoluciones->utilidad:0) -
-        //     ($resta_utilidad_ventas_convertidas->utilidad ? (float)$resta_utilidad_ventas_convertidas->utilidad: 0);
         $utilidad_mensual = utilidad_mensual_random($mes,$anio);
         $porcentaje = 0;
         if ($ventas_mensual > 0) {
@@ -239,10 +235,7 @@ class UtilidadController extends Controller
             'inversion_mensual_dolares' => $inversion_mensual_dolares,
             'ventas_mensual_dolares' => $ventas_mensual_dolares,
             'utilidad_mensual_dolares' => $utilidad_mensual_dolares,
-            'porcentaje' => $porcentaje,
-            "utilidad_ventasOtros"=>$utilidad_ventas,
-            "resta_utilidad_devolucionesOtros"=>$resta_utilidad_devoluciones,
-            "resta_utilidad_ventas_convertidasOtros"=>$resta_utilidad_ventas_convertidas
+            'porcentaje' => $porcentaje
         ]);
     }
     private function Inversion1($fecini){

@@ -61,7 +61,7 @@
         <li class="@yield('orden-compra-active')"><a href="{{ route('compras.orden.index') }}">Orden Compra</a></li>
         @endcan
         @can('haveaccess', 'documento_compra.index')
-        <li class="@yield('documento-active')"><a href="{{ route('compras.documento.index') }}">Doc. Compra</a></li>
+        <li class="@yield('documento-compra-active')"><a href="{{ route('compras.documento.index') }}">Doc. Compra</a></li>
         @endcan
     </ul>
 </li>

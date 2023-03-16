@@ -1,7 +1,7 @@
 @extends('layout') @section('content')
 
 @section('compras-active', 'active')
-@section('documento-active', 'active')
+@section('documento-compra-active', 'active')
 
 <div class="row wrapper border-bottom white-bg page-heading">
 

@@ -1,7 +1,7 @@
 @extends('layout') @section('content')
 
 @section('compras-active', 'active')
-@section('documento-active', 'active')
+@section('documento-compra-active', 'active')
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10 col-md-10">
@@ -22,50 +22,7 @@
     </div>
 </div>
 
-<div class="wrapper wrapper-content animated fadeInRight">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="ibox ">
-                <div class="ibox-content">
-                    <div class="table-responsive">
-                        <table class="table dataTables-orden table-striped table-bordered table-hover"
-                        style="text-transform:uppercase">
-                            <thead>
-                                <tr>
-
-                                    <th colspan="7" class="text-center">DOCUMENTO DE COMPRA</th>
-                                    <th colspan="2" class="text-center">FORMAS DE PAGO</th>
-                                    <th colspan="3" class="text-center"></th>
-
-                                </tr>
-                                <tr>
-                                    <th style="text-center">ID</th>
-                                    <th style="display:none;"></th>
-                                    <th class="text-center">O.C</th>
-                                    <th class="text-center">#Doc</th>
-                                    <th class="text-center">EMISION</th>
-                                    <th class="text-center">TIPO</th>
-                                    <th class="text-center">PROVEEDOR</th>
-                                    <th class="text-center">MODO</th>
-                                    <th class="text-center">MONTO</th>
-                                    <th class="text-center">MONEDA</th>
-                                    <th class="text-center">TIPO_CAMBIO</th>
-                                    <th class="text-center">A CUENTA</th>
-                                    <th class="text-center">SALDO</th>
-                                    <th class="text-center">ESTADO</th>
-                                    <th class="text-center">ACCIONES</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<compras-component></compras-component>
 
 @stop
 @push('styles')

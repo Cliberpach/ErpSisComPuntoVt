@@ -5481,6 +5481,7 @@ button.close {
   font-size: 0.875rem;
   word-wrap: break-word;
   opacity: 0;
+  background: red;
 }
 
 .tooltip.show {

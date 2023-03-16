@@ -301,7 +301,7 @@ function(){
         Route::get('/show/{id}','Compras\DocumentoController@show')->name('compras.documento.show');
         Route::get('/getProduct','Compras\DocumentoController@getProduct')->name('compras.documento.getProduct');
         Route::get('/reporte/{id}','Compras\DocumentoController@report')->name('compras.documento.reporte');
-
+        Route::get('/getTables/{id}','Compras\DocumentoController@getTablesEdit')->name('compras.documento.getTables');
         Route::get('/tipoPago/{id}','Compras\DocumentoController@TypePay')->name('compras.documento.tipo_pago.existente');
     });
 

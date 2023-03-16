@@ -1590,7 +1590,7 @@ if (!function_exists('utilidad_mensual_random')) {
             foreach($detalles as $detalle)
             {
                 $precom = $detalle->lote->detalle_compra ? ($detalle->lote->detalle_compra->precio_soles + ($detalle->lote->detalle_compra->costo_flete_soles / $detalle->lote->detalle_compra->cantidad)) : $detalle->lote->detalle_nota->costo_soles;
-                $utilidad =  number_format(($detalle->precio_nuevo - $precom),2);
+                $utilidad =  $detalle->precio_nuevo - $precom;
 
                 $coleccion->push([
                     "fecha_doc" => $venta->fecha_documento,
@@ -1599,7 +1599,7 @@ if (!function_exists('utilidad_mensual_random')) {
                     "precio_venta" => number_format($detalle->precio_nuevo,2),
                     "precio_compra" => number_format($precom,2),
                     "utilidad" =>$utilidad,
-                    "importe" => number_format(($detalle->cantidad) * $utilidad,2),
+                    "importe" => ($detalle->cantidad!="" ? $detalle->cantidad : 0) * $utilidad,
                     "valorVenta"=>$detalle->valor_venta
                 ]);
 
@@ -1615,7 +1615,7 @@ if (!function_exists('utilidad_mensual_random')) {
                         "precio_venta" => number_format($nota->mtoPrecioUnitario,2),
                         "precio_compra" => number_format($precom_nota,2),
                         "utilidad" =>$utilidad_nota,
-                        "importe" => "-".number_format(($nota->cantidad) * $utilidad_nota,2),
+                        "importe" => floatval($nota->cantidad!="" ? 0 : $nota->cantidad) * floatval($utilidad_nota!="" ? 0 : $utilidad_nota),
                         "valorVenta"=>number_format(($nota->cantidad) * $nota->mtoPrecioUnitario,2)
                     ]);
                 }
