@@ -53,6 +53,7 @@
                                 id="saldo_inicial" name="saldo_inicial" value="{{ old('saldo_inicial') }}" required>
                         </div>
                     </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <div class="col-md-6 text-left" style="color:#fcbc6c">
@@ -60,12 +61,12 @@
                             class="required"></label>) son obligatorios.</small>
                 </div>
                 <div class="col-md-6 text-right">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="submit" form="crear_caja_movimiento" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i
                             class="fa fa-times"></i> Cancelar</button>
                 </div>
             </div>
-            </form>
+            
         </div>
     </div>
 </div>

@@ -11,7 +11,7 @@
                 <small class="font-bold">Cerrar de Caja</small>
             </div>
             <div class="modal-body">
-                <form role="form" action="{{ route('Caja.cerrar') }}" method="POST" >
+                <form role="form" action="{{ route('Caja.cerrar') }}" method="POST" id="formCerrarCaja">
                     {{ csrf_field() }} {{ method_field('POST') }}
                     <input type="hidden" name="movimiento_id" id="movimiento_id" >
                     <div class="form-group">
@@ -46,6 +46,7 @@
                             <input type="text" name="saldo" id="saldo" class="form-control" >
                         </div>
                     </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <div class="col-md-6 text-left" style="color:#fcbc6c">
@@ -53,12 +54,12 @@
                             class="required"></label>) son obligatorios.</small>
                 </div>
                 <div class="col-md-6 text-right">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="submit" form="formCerrarCaja" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i
                             class="fa fa-times"></i> Cancelar</button>
                 </div>
             </div>
-            </form>
+            
         </div>
     </div>
 </div>

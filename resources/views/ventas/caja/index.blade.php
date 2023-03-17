@@ -3,7 +3,7 @@
 @section('ventas-active', 'active')
 @section('ventas-caja-active', 'active')
 <div id="app">
-    <ventas-component :modospago="{{ modos_pago() }}"></ventas-component>
+    <ventas-component modospago="{{ modos_pago() }}"></ventas-component>
 </div>
 @stop
 @section('vue-css')

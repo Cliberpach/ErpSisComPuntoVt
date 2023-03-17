@@ -206,7 +206,7 @@
                                         <input type="text" class="form-control" v-model="form.efectivo" id="efectivo" name="efectivo" onkeypress="return filterFloat(event, this);" @keyup="changeEfectivo()">
                                     </div>
                                     <div class="form-group">
-                                        <label class="col-form-label required">Modo de pago</label>
+                                        <label class="col-form-label required">Modo de pagos</label>
                                         <v-select
                                             :options="desc_pagos"
                                             placeholder="SELECCIONAR"
@@ -385,6 +385,7 @@ import Axios from "axios";
 import "datatables.net-bs4";
 import "datatables.net-buttons-bs4";
 export default {
+    name:"Ventas",
     props: ["modospago"],
     data() {
         return {
@@ -428,9 +429,10 @@ export default {
     },
     mounted() {
         let $this = this;
-        for(let i = 0; i < $this.modospago.length; i++)
+        let _tipoPagos = JSON.parse($this.modospago);
+        for(let i = 0; i < _tipoPagos.length; i++)
         {
-            let pago = {'code': $this.modospago[i].id, 'label': $this.modospago[i].descripcion}
+            let pago = {'code': _tipoPagos[i].id, 'label': _tipoPagos[i].descripcion}
             $this.desc_pagos.push(pago);
             $this.desc_pagos_show.push(pago);
         }
