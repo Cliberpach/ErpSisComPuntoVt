@@ -191,7 +191,8 @@
                             let porcentaje_ = data.porcentaje_normal;
                             let precio_nuevo = 0;
                             console.log({precio_,cambio,porcentaje_})
-                            let totalCostoFlote = Number(data.costo_flete_soles) / Number(data.cantidad_comprada);
+                            let totalCostoFlote = Number(data.costo_flete) / Number(data.cantidad_comprada);
+                            console.log({totalCostoFlote,nombre:data.nombre})
                             let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
 
                             if(data.moneda_compra == 'DOLARES')
@@ -255,7 +256,7 @@
                             let porcentaje_ = data.porcentaje_distribuidor;
                             let precio_nuevo = 0;
 
-                            let totalCostoFlote = Number(data.costo_flete_soles) / Number(data.cantidad_comprada);
+                            let totalCostoFlote = Number(data.costo_flete) / Number(data.cantidad_comprada);
                             let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
                             if(data.moneda_compra == 'DOLARES')
                             {
@@ -391,7 +392,7 @@
             let porcentaje_ = producto.porcentaje;
             let precio_nuevo = 0;
 
-            let totalCostoFlote = Number(producto.costo_flete_soles) / Number(producto.cantidad_comprada);
+            let totalCostoFlote = Number(producto.costo_flete) / Number(producto.cantidad_comprada);
             let costo_flete = convertFloat(totalCostoFlote * (1 + porcentaje_ / 100)).toFixed(2);
             if(producto.moneda_compra == 'DOLARES')
             {

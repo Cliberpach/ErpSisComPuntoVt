@@ -1812,6 +1812,7 @@ class DocumentoController extends Controller
                     'compra_documento_detalles.precio as precio_compra',
                     'compra_documento_detalles.costo_flete_soles',
                     'compra_documento_detalles.costo_flete_dolares',
+                    'compra_documento_detalles.costo_flete',
                     'compra_documento_detalles.cantidad as cantidad_comprada',
                     'detalle_nota_ingreso.costo as precio_ingreso',
                     'detalle_nota_ingreso.costo_soles as precio_ingreso_soles',
