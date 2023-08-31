@@ -235,7 +235,7 @@ class CotizacionController extends Controller
         modificarRegistro($cotizacion, $descripcion , $gestion);
 
         //ELIMINAR DOCUMENTO DE ORDEN DE COMPRA SI EXISTE
-        $documento = Documento::where('cotizacion_venta',$id)->where('estado','!=','ANULADO')->first();
+        $documento = Documento::where('cotizacion_venta',$id)->where('estado','=','ACIVO')->first();
         if ($documento) {
             $documento->estado = 'ANULADO';
             $documento->update();
@@ -351,7 +351,7 @@ class CotizacionController extends Controller
 
     public function document($id){
 
-        $documento = Documento::where('cotizacion_venta',$id)->where('estado','!=','ANULADO')->first();
+        $documento = Documento::where('cotizacion_venta',$id)->where('estado','=','ACTIVO')->first();
         if ($documento) {
             Session::flash('error', 'Esta cotizacion ya tiene un documento de venta generado.');
             return redirect()->route('ventas.cotizacion.index');
@@ -367,7 +367,7 @@ class CotizacionController extends Controller
 
 
     public function newDocument($id){
-        $documento_old =  Documento::where('cotizacion_venta',$id)->where('estado','!=','ANULADO')->first();
+        $documento_old =  Documento::where('cotizacion_venta',$id)->where('estado','=','ACTIVO')->first();
         if($documento_old->sunat == '1' && $documento_old->tipo_venta != '129')
         {
             Session::flash('error','Este documento ya fue informado a sunat, si desea reemplazarlo debe hacerle una nota de credito y crear un nuevo documento.');

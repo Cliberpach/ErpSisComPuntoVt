@@ -67,8 +67,8 @@ class HomeController extends Controller
 
             $ventas = array();
             for ($j = 0; $j < count($meses_aux); $j++) {
-                $total = Documento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $meses_aux[$j]->mes)->whereYear('fecha_documento', $meses_aux[$j]->anio)->sum('total');
-                $total_invalida = Documento::where('estado', '!=', 'ANULADO')->whereMonth('fecha_documento', $meses_aux[$j]->mes)->whereYear('fecha_documento', $meses_aux[$j]->anio)->where('convertir', '!=', '')->where('tipo_venta', '!=', '129')->sum('total');
+                $total = Documento::where('estado', '=', 'ACTIVO')->whereMonth('fecha_documento', $meses_aux[$j]->mes)->whereYear('fecha_documento', $meses_aux[$j]->anio)->sum('total');
+                $total_invalida = Documento::where('estado', '=', 'ACTIVO')->whereMonth('fecha_documento', $meses_aux[$j]->mes)->whereYear('fecha_documento', $meses_aux[$j]->anio)->where('convertir', '!=', '')->where('tipo_venta', '!=', '129')->sum('total');
                 $total_notas = Nota::whereMonth('fechaEmision', $meses_aux[$j]->mes)->whereYear('fechaEmision', $meses_aux[$j]->anio)->sum('mtoImpVenta');
                 $total_ = (float)($total - $total_invalida - $total_notas);
                 //$total = Documento::where('estado','!=','ANULADO')->whereMonth('fecha_documento',$meses_aux[$j]->mes)->whereYear('fecha_documento',$meses_aux[$j]->anio)->sum('total');

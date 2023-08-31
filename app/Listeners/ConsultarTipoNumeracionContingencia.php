@@ -24,7 +24,7 @@ class ConsultarTipoNumeracionContingencia
             $serie_comprobantes = DB::table('cotizacion_documento')
             ->join('empresas', 'empresas.id', '=', 'cotizacion_documento.empresa_id')
                 ->where('cotizacion_documento.tipo_venta', $documento->tipo_venta)
-                ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+                ->where('cotizacion_documento.estado', '=', 'ACTIVO')
                 ->where('cotizacion_documento.contingencia', '1')
                 ->select('cotizacion_documento.*')
                 ->orderBy('cotizacion_documento.correlativo_contingencia', 'DESC')

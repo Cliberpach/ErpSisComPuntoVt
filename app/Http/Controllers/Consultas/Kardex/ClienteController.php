@@ -17,7 +17,7 @@ class ClienteController extends Controller
 
     public function getTable(Request $request){
 
-        $consulta = Documento::where('estado','!=','ANULADO')->where('sunat','!=','2');
+        $consulta = Documento::where('estado','=','ACTIVO')->where('sunat','!=','2');
 
         if($request->fecha_desde && $request->fecha_hasta)
         {

@@ -37,7 +37,7 @@ class ConsultarTipoNumeracion
             ->where('empresa_numeracion_facturaciones.tipo_comprobante',$documento->tipo_venta)
             ->where('empresa_numeracion_facturaciones.empresa_id',$documento->empresa_id)
             ->where('cotizacion_documento.tipo_venta',$documento->tipo_venta)
-            ->where('cotizacion_documento.estado','!=','ANULADO')
+            ->where('cotizacion_documento.estado','=','ACTIVO')
             ->select('cotizacion_documento.*','empresa_numeracion_facturaciones.*')
             ->orderBy('cotizacion_documento.correlativo','DESC')
             ->get();

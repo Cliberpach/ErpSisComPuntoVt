@@ -128,7 +128,7 @@ class UtilidadController extends Controller
         $fecini = date('Y-m-d', strtotime($fecini));
         $fecfin = date('Y-m-d', strtotime($fecini . '+ 1 month'));
 
-        $ventas = Documento::where('estado','!=','ANULADO')->whereBetween('fecha_documento' , [$fecini, $fecfin])->orderBy('id', 'desc')->get();
+        $ventas = Documento::where('estado','=','ACTIVO')->whereBetween('fecha_documento' , [$fecini, $fecfin])->orderBy('id', 'desc')->get();
         $coleccionUtilidades = collect();
         foreach ($ventas as $venta) {
             $detalles = Detalle::where('estado','ACTIVO')->where('documento_id',$venta->id)->get();
@@ -270,7 +270,7 @@ class UtilidadController extends Controller
         ->join("cotizacion_documento as dv","dv.id","=","ddv.documento_id")
         ->select(DB::raw("SUM(ddv.cantidad * ddv.precio_nuevo) as total"))
         ->where("dv.fecha_documento","<",$fecini)
-        ->where("dv.estado","<>","ANULADO")
+        ->where("dv.estado","=","ACTIVO")
         ->where("ddv.eliminado","=",'0')
         ->first();
         return $inversion->total ? (float)$inversion->total : 0;
@@ -325,7 +325,7 @@ class UtilidadController extends Controller
         ->select(DB::raw("SUM(vdd.cantidad * vdd.precio_nuevo) as total"))
         ->where("vd.fecha_documento",">=",$fecini)
         ->where("vd.fecha_documento","<=",$fecfin)
-        ->where("vd.estado","<>","ANULADO")
+        ->where("vd.estado","=","ACTIVO")
         ->where("vdd.eliminado","=",'0')
         ->first();
 

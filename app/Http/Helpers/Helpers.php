@@ -1225,7 +1225,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVenta')) {
         $totalIngresos = 0;
         foreach ($movimiento->detalleMovimientoVentas as $item) {
             if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
-                if($item->documento->estado!="DUPLICADO" && $item->documento->estado!="NO ENVIADO"){
+                if($item->documento->estado!="DUPLICADO"){
                     $totalIngresos = $totalIngresos + ($item->documento->importe + $item->documento->efectivo);
                 }
             }
@@ -1257,7 +1257,7 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
                 if ($item->documento->condicion_id == 1 && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
-                    if($item->documento->estado!="DUPLICADO" && $item->documento->estado!="NO ENVIADO"){
+                    if($item->documento->estado!="DUPLICADO"){
                         if ($item->documento->tipo_pago_id == $id) {
                             $totalIngresos = $totalIngresos + $item->documento->importe;
                         }
@@ -1274,8 +1274,10 @@ if (!function_exists('cuadreMovimientoCajaIngresosVentaResum')) {
             $totalIngresos = 0;
             foreach ($movimiento->detalleMovimientoVentas as $item) {
                 if ($item->documento->condicion_id == 1  && ifNoConvertido($item->documento->id) && $item->documento->estado_pago == 'PAGADA') { // && $item->documento->sunat != '2'
-                    if ($item->documento->tipo_pago_id == $id) {
-                        $totalIngresos = $totalIngresos + $item->documento->importe;
+                    if($item->documento->estado!="DUPLICADO"){
+                        if ($item->documento->tipo_pago_id == $id) {
+                            $totalIngresos = $totalIngresos + $item->documento->importe;
+                        }
                     }
                 }
             }

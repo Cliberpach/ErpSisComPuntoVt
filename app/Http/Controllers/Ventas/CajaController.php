@@ -24,7 +24,7 @@ class CajaController extends Controller
     public function getDocument(){
 
         $fecha_hoy = Carbon::now()->toDateString();
-        $documentos = Documento::where('estado','!=','ANULADO')->whereBetween('fecha_documento', [$fecha_hoy, $fecha_hoy])->orderBy('id', 'desc')->get();
+        $documentos = Documento::where('estado','=','ACTIVO')->whereBetween('fecha_documento', [$fecha_hoy, $fecha_hoy])->orderBy('id', 'desc')->get();
         $coleccion = collect([]);
 
         $hoy = Carbon::now();
@@ -108,7 +108,7 @@ class CajaController extends Controller
     public function getDocumentClient(Request $request)
     {
         $fecha_hoy = Carbon::now()->toDateString();
-        $documentos = Documento::where('estado','!=','ANULADO')->where('cliente_id', $request->cliente_id)->where('estado_pago', 'PENDIENTE')->whereBetween('fecha_documento', [$fecha_hoy, $fecha_hoy])->where('condicion_id', $request->condicion_id)->orderBy('id', 'desc')->get();
+        $documentos = Documento::where('estado','=','ACTIVO')->where('cliente_id', $request->cliente_id)->where('estado_pago', 'PENDIENTE')->whereBetween('fecha_documento', [$fecha_hoy, $fecha_hoy])->where('condicion_id', $request->condicion_id)->orderBy('id', 'desc')->get();
         $coleccion = collect([]);
 
         $hoy = Carbon::now();

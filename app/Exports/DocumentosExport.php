@@ -173,7 +173,7 @@ class DocumentosExport implements FromCollection,WithHeadings,WithEvents
         if($this->tipo == 126) //Ventas
         {
             // $ventas = Documento::where('estado','!=','ANULADO');
-            $ventas = Documento::whereIn('estado',["ACTIVO","ANULADO"]);
+            $ventas = Documento::whereIn('estado',["ACTIVO","ANULADO", "NO ENVIADO"]);
             if($this->fecha_desde && $this->fecha_hasta)
             {
                 $ventas = $ventas->whereBetween('fecha_documento', [$this->fecha_desde, $this->fecha_hasta]);

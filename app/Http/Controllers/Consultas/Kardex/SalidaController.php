@@ -21,11 +21,11 @@ class SalidaController extends Controller
 
         if($request->fecha_desde && $request->fecha_hasta)
         {
-            $documentos = Documento::where('estado','!=','ANULADO')->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
+            $documentos = Documento::where('estado','=','ACTIVO')->whereBetween('fecha_documento', [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
         }
         else
         {
-            $documentos = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
+            $documentos = Documento::where('estado','=','ACTIVO')->orderBy('id', 'desc')->get();
         }
 
 

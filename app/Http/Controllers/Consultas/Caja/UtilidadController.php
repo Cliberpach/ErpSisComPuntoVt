@@ -20,11 +20,11 @@ class UtilidadController extends Controller
         {
             if($request->fecha_desde && $request->fecha_hasta)
             {
-                $ventas = Documento::where('estado','!=','ANULADO')->whereBetween('fecha_documento' , [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
+                $ventas = Documento::where('estado','=','ACTIVO')->whereBetween('fecha_documento' , [$request->fecha_desde, $request->fecha_hasta])->orderBy('id', 'desc')->get();
             }
             else
             {
-                $ventas = Documento::where('estado','!=','ANULADO')->orderBy('id', 'desc')->get();
+                $ventas = Documento::where('estado','=','ACTIVO')->orderBy('id', 'desc')->get();
             }
 
             $coleccion = collect();

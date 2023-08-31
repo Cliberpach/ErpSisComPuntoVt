@@ -55,7 +55,7 @@ class DocumentoController extends Controller
             if($tipo == 127 || $tipo == 128 || $tipo == 129)
             {
 
-                $consulta = Documento::where('estado','!=','ANULADO')->where('tipo_venta', $tipo);
+                $consulta = Documento::where('estado','=','ACTIVO')->where('tipo_venta', $tipo);
                 if($fecha_desde && $fecha_hasta)
                 {
                     $consulta = $consulta->whereBetween('fecha_documento', [$fecha_desde, $fecha_hasta]);
@@ -91,7 +91,7 @@ class DocumentoController extends Controller
             }
             else if($tipo == 125)
             {
-                $consulta = Documento::where('estado','!=','ANULADO')->where('tipo_venta','!=',129);
+                $consulta = Documento::where('estado','=','ACTIVO')->where('tipo_venta','!=',129);
                 if($fecha_desde && $fecha_hasta)
                 {
                     $consulta = $consulta->whereBetween('fecha_documento', [$fecha_desde, $fecha_hasta]);
@@ -152,7 +152,7 @@ class DocumentoController extends Controller
             }
             else if($tipo == 126)
             {
-                $ventas = Documento::where('estado','!=','ANULADO');
+                $ventas = Documento::where('estado','=','ACTIVO');
                 if($fecha_desde && $fecha_hasta)
                 {
                     $ventas = $ventas->whereBetween('fecha_documento', [$fecha_desde, $fecha_hasta]);
