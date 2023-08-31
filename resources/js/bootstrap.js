@@ -33,45 +33,46 @@ import Echo from 'laravel-echo';
 
 window.Pusher = require('pusher-js');
 
+console.log("BOOSTRAP", location.protocol);
+
 /*En el servidor*/
-// if(location.protocol == "http:"){
-//     window.Echo = new Echo({
-//         broadcaster: 'pusher',
-//         key: "whagCTww7nWWUcTou7as",
-//         wsHost: location.hostname,
-//         wsPort: 6001,
-//         wssPort: 6001,
-//         encrypted:false,
-//         disableStats:true,
-//         enabledTransports: ['ws', 'wss'],
-//         forceTLS: false
-//     });
+if(location.protocol == "http:"){
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: "ASDASF2121",
+        wsHost: location.hostname,
+        wsPort: 6001,
+        wssPort: 6001,
+        encrypted:false,
+        disableStats:true,
+        enabledTransports: ['ws', 'wss'],
+        forceTLS: false
+    });
 
-// }else{
+}else{
     
-//     window.Echo = new Echo({
-//         broadcaster: 'pusher',
-//         key: "ASDASF2121",
-//         wsHost: location.hostname,
-//         wsPort: 6001,
-//         wssPort: 6001,
-//         encrypted:false,
-//         disableStats:true,
-//         enabledTransports: ['ws', 'wss'],
-//         forceTLS: true
-//     });
-// }
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: "ASDASF2121",
+        wsHost: location.hostname,
+        wsPort: 6001,
+        encrypted:false,
+        disableStats:true,
+        enabledTransports: ['ws', 'wss'],
+        forceTLS: true
+    });
+}
 
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: 'ASDASF2121',
-    wsHost: window.location.hostname,
-    wssPort: 6001,
-    encrypted:false,
-    disableStats:true,
-    enabledTransports: ['ws', 'wss'],
-    //forceTLS:false,
-});
+// window.Echo = new Echo({
+//     broadcaster: 'pusher',
+//     key: 'ASDASF2121',
+//     wsHost: window.location.hostname,
+//     wssPort: 6001,
+//     encrypted:false,
+//     disableStats:true,
+//     enabledTransports: ['ws', 'wss'],
+//     //forceTLS:false,
+// });
 
 /*En el local
 window.Echo = new Echo({
