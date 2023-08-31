@@ -34,6 +34,8 @@ class CreateProductosTable extends Migration
             $table->unsignedDecimal('precio_venta_maximo', 15, 2)->nullable();
             $table->unsignedDecimal('peso_producto', 15, 2)->default(0);
             $table->boolean('igv');
+            
+            $table->enum('facturacion',['SI','NO'])->default('SI');
 
             $table->unsignedDecimal('porcentaje_normal', 15, 2)->default(0);
             $table->unsignedDecimal('porcentaje_distribuidor', 15, 2)->default(0);

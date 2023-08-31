@@ -344,47 +344,47 @@
                 @foreach ($movimiento->detalleMovimientoVentas as $ventas)
                 {{-- $ventas->documento->sunat != '2' &&  --}}
                     @if ($ventas->documento->condicion_id == 1 && $ventas->documento->estado_pago == 'PAGADA' && ifNoConvertido($ventas->documento->id))
-                       @if ($ventas->documento->estado!="DUPLICADO")
+                       @if ($ventas->documento->estado!="DUPLICADO" && $ventas->documento->estado!="NO ENVIADO")
                             <tr>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
-                                {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
+                                <td style="text-align: center; border-right: 2px solid #52BE80">
+                                    {{ $ventas->documento->serie . '-' . $ventas->documento->correlativo }}</td>
+                                <td style="text-align: center; border-right: 2px solid #52BE80">
                                 {{ $ventas->documento->clienteEntidad->nombre }}</td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80;">
-                                @if (count($ventas->documento->notas) > 0)
-                                <div class="cont-check">
-                                    <span class="checkmark">
-                                        <div class="checkmark_stem"></div>
-                                        <div class="checkmark_kick"></div>
-                                    </span>
-                                </div>
-                                @else
-                                <div class="cont-remove">
-                                    <span class="remove">
-                                        <div class="remove_stem"></div>
-                                        <div class="remove_kick"></div>
-                                    </span>
-                                </div>
-                                @endif
-                            </td>
-                            <td style="text-align: center; border-right: 2px solid #52BE80">
-                                {{ $ventas->documento->total }}
-                            </td>
-                            @foreach(tipos_pago() as $tipo)
-                                @if($tipo->id == 1)
-                                    @if($tipo->id == $ventas->documento->tipo_pago_id)
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->importe}}</td>';
+                                <td style="text-align: center; border-right: 2px solid #52BE80;">
+                                    @if (count($ventas->documento->notas) > 0)
+                                    <div class="cont-check">
+                                        <span class="checkmark">
+                                            <div class="checkmark_stem"></div>
+                                            <div class="checkmark_kick"></div>
+                                        </span>
+                                    </div>
                                     @else
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->efectivo}}</td>';
+                                    <div class="cont-remove">
+                                        <span class="remove">
+                                            <div class="remove_stem"></div>
+                                            <div class="remove_kick"></div>
+                                        </span>
+                                    </div>
                                     @endif
-                                @else
-                                    @if($tipo->id == $ventas->documento->tipo_pago_id)
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->importe}}</td>';
+                                </td>
+                                <td style="text-align: center; border-right: 2px solid #52BE80">
+                                    {{ $ventas->documento->total }}
+                                </td>
+                                @foreach(tipos_pago() as $tipo)
+                                    @if($tipo->id == 1)
+                                        @if($tipo->id == $ventas->documento->tipo_pago_id)
+                                            <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->importe}}</td>';
+                                        @else
+                                            <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->efectivo}}</td>';
+                                        @endif
                                     @else
-                                        <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>';
+                                        @if($tipo->id == $ventas->documento->tipo_pago_id)
+                                            <td style="text-align: center; border-right: 2px solid #52BE80">{{$ventas->documento->importe}}</td>';
+                                        @else
+                                            <td style="text-align: center; border-right: 2px solid #52BE80">0.00</td>';
+                                        @endif
                                     @endif
-                                @endif
-                            @endforeach
+                                @endforeach
                             </tr>
                        @endif
                     @endif

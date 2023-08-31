@@ -89,7 +89,6 @@
         </div>
     </div>
 </div>
-@include("ventas.documentos.modalCDR")
 
 @stop
 @push('styles')
@@ -258,21 +257,24 @@ function loadTable()
                     let cadena = "";
 
                     var dias = data.dias > 4 ? 0 : 4 - data.dias;
+                
+
+                    cadena = cadena + `
+                         <button type='button' class='btn btn-sm btn-danger m-1' onclick='anularVenta(${data.id})'
+                            title='ANULAR'>
+                            <i class='fa fa-times'></i> ANULAR
+                        </button>`;
 
                     if(data.code != '1033' && dias > 0)
                     {
-                        cadena = cadena + "<button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(" +data.id+ ")'  title='Enviar Sunat'><i class='fa fa-send'></i> Sunat</button>";
+                        cadena = cadena + `
+                        <button type='button' class='btn btn-sm btn-success m-1' onclick='enviarSunat(${data.id})'
+                            title='Enviar Sunat'>
+                            <i class='fa fa-send'></i> Sunat
+                        </button>`;
                     }
                     else {
-                        if((data.code == '1032' || data.code == 'HTTP' || data.code == '0100') && data.regularize == '1' && data.sunat == '0'  && data.contingencia == '0')
-                    {
-                        
                         cadena = cadena + "<span class='badge badge-warning'>FUERA DE FECHA</span>";
-                        cadena  = cadena + `
-                        <button type="button" class="btn btn-sm btn-dark m-1 cdrDescription" title="Cambiar"><i class='fa fa-exchange'></i> Cambiar</button>
-                        `;
-                        }
-                        cadena= cadena + ` <button type="button" class="btn btn-sm btn-danger m-1 darDeBaja" title="Dar de baja"><i class='fa fa-times'></i> Dar da baja</button>`;
                     }
 
                     return cadena;
@@ -355,6 +357,55 @@ function xmlElectronico(id) {
     })
 
 }
+function anularVenta(id) {
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger',
+        },
+        buttonsStyling: false
+    })
+
+    Swal.fire({
+        title: "Opción anular venta",
+        text: "¿Seguro que desea anular esta venta, esta acción es irreparable.?",
+        showCancelButton: true,
+        icon: 'info',
+        confirmButtonColor: "#1ab394",
+        confirmButtonText: 'Si, Confirmar',
+        cancelButtonText: "No, Cancelar",
+        // showLoaderOnConfirm: true,
+    }).then((result) => {
+        if (result.value) {
+
+            var url = '{{ route("consultas.ventas.alerta.anularVenta", ":id")}}';
+            url = url.replace(':id',id);
+
+            window.location.href = url
+
+            Swal.fire({
+                title: '¡Cargando!',
+                type: 'info',
+                text: 'Anulando la venta',
+                showConfirmButton: false,
+                onBeforeOpen: () => {
+                    Swal.showLoading()
+                }
+            })
+
+        } else if (
+            /* Read more about handling dismissals below */
+            result.dismiss === Swal.DismissReason.cancel
+        ) {
+            swalWithBootstrapButtons.fire(
+                'Cancelado',
+                'La Solicitud se ha cancelado.',
+                'error'
+            )
+        }
+    })
+
+}
 
 function enviarSunat(id , sunat) {
     const swalWithBootstrapButtons = Swal.mixin({
@@ -406,6 +457,26 @@ function enviarSunat(id , sunat) {
 
 }
 
+@if(Session::has('anulado_exito'))
+    Swal.fire({
+        icon: 'success',        
+        title: 'Anulación',
+        text: '{{ Session::get("correcto_anulado") }}',
+        showConfirmButton: false,
+        timer: 2500
+    })
+@endif
+
+@if(Session::has('anulado_error'))
+    Swal.fire({
+        icon: 'error',
+        title: 'Anulación',
+        text: '{{ Session::get("error_anulado") }}',
+        showConfirmButton: false,
+        timer: 5500
+    })
+@endif
+
 @if(Session::has('sunat_exito'))
     Swal.fire({
         icon: 'success',        
@@ -415,6 +486,8 @@ function enviarSunat(id , sunat) {
         timer: 2500
     })
 @endif
+
+
 
 @if(Session::has('sunat_error'))
     Swal.fire({
@@ -437,75 +510,5 @@ function enviarSunat(id , sunat) {
     window.open(url, "Comprobante SISCOM", "width=900, height=600")
 @endif
 
-$(document).on("click",".cdrDescription",function(e){
-    var table = $('.dataTables-envio').DataTable();
-    var data = table.row($(this).parents('tr')).data();
-    
-    $("#iddocumento").val(data.id);
-    $("#title-header").text(data.tipo);
-    $("#motivo").text(data.cdrDescription);
-    $("#modalCDR").modal({backdrop:"static",keyboard:false});
-});
-
-$(document).on("click","#EnviarCDR",function(e){
-    e.preventDefault();
-    let accion = $("input:radio[name=optionCDR]:checked").val();
-    let iddocumento = $("#iddocumento").val();
-
-    switch(accion){
-        case 'DUPLICAR':{
-            let url = "{{ route('ventas.documento.DuplicarDocumento',':id') }}";
-            location.href= url.replace(":id",iddocumento);
-            break;
-        }
-        case 'ANULAR':{
-            alert("ANULAR");
-            break;
-        }
-    }
-});
-$(document).on("click",".darDeBaja",function(e){
-    e.preventDefault();
-    var table = $('.dataTables-envio').DataTable();
-    var data = table.row($(this).parents('tr')).data();
-    const swalWithBootstrapButtons = Swal.mixin({
-        customClass: {
-            confirmButton: 'btn btn-success',
-            cancelButton: 'btn btn-danger',
-        },
-        buttonsStyling: false
-    });
-
-    Swal.fire({
-        title: "Dar de baja",
-        text: "Este documento se dará de baja y ya no se volverá a utilizar la numeración.",
-        showCancelButton: true,
-        icon: 'info',
-        confirmButtonColor: "#1ab394",
-        confirmButtonText: 'Si, Confirmar',
-        cancelButtonText: "No, Cancelar",
-        // showLoaderOnConfirm: true,
-    }).then((result) => {
-        if (result.value) {
-
-            var url = '{{ route("consultas.ventas.alerta.DarBajaDocumento", ":id")}}';
-            url = url.replace(':id',data.id);
-
-            window.location.href = url
-
-        } else if (
-            /* Read more about handling dismissals below */
-            result.dismiss === Swal.DismissReason.cancel
-        ) {
-            swalWithBootstrapButtons.fire(
-                'Cancelado',
-                'La Solicitud se ha cancelado.',
-                'error'
-            )
-        }
-    })
-});
 </script>
-
-
 @endpush

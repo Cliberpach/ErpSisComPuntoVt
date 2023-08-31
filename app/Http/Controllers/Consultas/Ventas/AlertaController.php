@@ -22,6 +22,10 @@ use Illuminate\Support\Facades\Session;
 use Luecano\NumeroALetras\NumeroALetras;
 use stdClass;
 use Barryvdh\DomPDF\Facade as PDF;
+use App\Almacenes\LoteProducto;
+use App\Pos\DetalleMovimientoEgresosCaja;
+use App\Pos\Egreso;
+use App\Mantenimiento\Tabla\Detalle as TablaDetalle;
 
 class AlertaController extends Controller
 {
@@ -62,6 +66,7 @@ class AlertaController extends Controller
             ->orderBy('cotizacion_documento.id', 'DESC')
             ->whereIn('cotizacion_documento.tipo_venta', ['127', '128'])
             ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('cotizacion_documento.estado', '!=', 'NO ENVIADO')
             ->where('cotizacion_documento.sunat', '0')
             ->where('cotizacion_documento.contingencia', '0')
             ->whereRaw("cotizacion_documento.duplicado is null")
@@ -218,6 +223,60 @@ class AlertaController extends Controller
         $fecha = $fecha_emision . 'T' . $hora_emision . '-05:00';
 
         return $fecha;
+    }
+
+    public function anularVenta($id){
+        try{
+
+            DB::beginTransaction();
+            $doc = Documento::find($id);
+            $doc->estado="NO ENVIADO";
+            $doc->update();
+
+            if($doc->estado_pago == 'PAGADA') {
+                $cuenta = TablaDetalle::find(165);
+                $cuentaT = $cuenta->descripcion == 'ANULACION' ? $cuenta : (TablaDetalle::where('descripcion','ANULACION')->where('tabla_id',32)->first() ? TablaDetalle::where('descripcion','ANULACION')->where('tabla_id',32)->first() : null);
+            
+
+                $egreso = new Egreso();
+                $egreso->tipodocumento_id = 120;
+                $egreso->cuenta_id = $cuentaT != null ? $cuentaT->id : 0;
+                $egreso->documento = $doc->serie . '-' . $doc->correlativo;
+                $egreso->descripcion = 'ANULACION';
+                $egreso->monto = $doc->total;
+                $egreso->importe = 0.0;
+                $egreso->efectivo = $doc->total;
+                $egreso->tipo_pago_id = 1;
+                $egreso->usuario = Auth()->user()->usuario;
+                $egreso->user_id = auth()->user()->id;
+                $egreso->save();
+                $detalleMovimientoEgreso = new DetalleMovimientoEgresosCaja();
+                $detalleMovimientoEgreso->mcaja_id = movimientoUser()->id;
+                $detalleMovimientoEgreso->egreso_id = $egreso->id;
+                $detalleMovimientoEgreso->save();
+            }
+
+            LoteProducto::join('productos as p', 'p.id', '=', 'lote_productos.producto_id')
+                ->join('cotizacion_documento_detalles as dd', 'lote_productos.id', '=', 'dd.lote_id')
+                ->join(DB::raw("(SELECT dd2.lote_id, SUM(dd2.cantidad) as total_cantidad
+                    FROM cotizacion_documento_detalles as dd2
+                    WHERE dd2.documento_id = $id
+                    GROUP BY dd2.lote_id) as subconsulta"), 'lote_productos.id', '=', 'subconsulta.lote_id')
+                ->update([
+                    'lote_productos.cantidad' => DB::raw('lote_productos.cantidad + subconsulta.total_cantidad'),
+                    'lote_productos.cantidad_logica' => DB::raw('lote_productos.cantidad_logica + subconsulta.total_cantidad'),
+                    'p.stock' => DB::raw('p.stock + subconsulta.total_cantidad'),
+                    'lote_productos.estado' => DB::raw("IF(lote_productos.cantidad = 0 AND lote_productos.cantidad_logica=0, '1', lote_productos.estado)"),
+                ]);
+            DB::commit();
+            Session::flash('correcto_anulado', 'Documento Anulado');
+            return redirect()->route('consultas.ventas.alerta.envio')->with('anulado_exito', 'success');
+        }catch(Exception $ex){
+            DB::rollBack();
+            dd($ex->getMessage());
+            Session::flash('error_anulado', "Ocurrió un error al anular");
+            return redirect()->route('consultas.ventas.alerta.envio')->with('anulado_error', $ex->getMessage());
+        }
     }
 
     public function sunat($id)

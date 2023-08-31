@@ -12,7 +12,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" name="marca_existe" id="marca_existe">
-                <form role="form" action="{{ route('almacenes.marcas.store') }}" method="POST" id="crear_marca">
+                <form role="form" action="{{ route('almacenes.marcas.store') }}" method="POST"  id="crear_marca">
                     {{ csrf_field() }} {{ method_field('POST') }}
 
                     <div class="form-group">

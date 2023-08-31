@@ -86,6 +86,7 @@ class DocumentoController extends Controller
                 DB::raw('(select count(id) from nota_electronica where documento_id = cotizacion_documento.id) as notas')
             )
             ->where('cotizacion_documento.estado', '!=', 'ANULADO')
+            ->where('cotizacion_documento.estado', '!=', 'NO ENVIADO')
             ->where("cotizacion_documento.dar_baja","=",0);
 
         if (!PuntoVenta() && !FullAccess()) {

@@ -16,5 +16,12 @@ mix.js('resources/js/app.js', 'public/js')
 
 mix.js('resources/js/appNotify.js', 'public/js')
     .sass('resources/sass/appNotify.scss', 'public/css');
-
+    
+mix.webpackConfig({
+    resolve: {
+        alias: {
+            '@sass': path.resolve(__dirname, 'resources/sass'),
+        }
+    }
+}).sourceMaps()
 mix.disableNotifications();

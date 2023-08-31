@@ -63,7 +63,7 @@ class CreateCotizacionDocumentoTable extends Migration
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->mediumText('observacion')->nullable();
-            $table->enum('estado',['ACTIVO','ANULADO','DUPLICADO'])->default('ACTIVO');
+            $table->enum('estado',['ACTIVO','ANULADO','DUPLICADO', 'NO ENVIADO'])->default('ACTIVO');
             $table->enum('estado_pago',['PAGADA','PENDIENTE','ADELANTO','CONCRETADA','VIGENTE','DEVUELTO'])->default('PENDIENTE');
 
             $table->enum('sunat',['0','1','2'])->default('0');
@@ -85,6 +85,8 @@ class CreateCotizacionDocumentoTable extends Migration
             $table->enum('sunat_contingencia', ['0', '1', '2'])->default('0');
             $table->json('getCdrResponse_contingencia')->nullable();
             $table->json('getRegularizeResponse_contingencia')->nullable();
+            $table->bigInteger('duplicado')->nullable();
+            $table->tinyInteger('dar_baja')->default(0);
             $table->timestamps();
         });
     }

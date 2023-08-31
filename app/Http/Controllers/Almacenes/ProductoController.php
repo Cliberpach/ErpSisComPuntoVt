@@ -112,6 +112,7 @@ class ProductoController extends Controller
             $producto->precio_venta_maximo = $request->get('precio_venta_maximo');
             $producto->peso_producto = $request->get('peso_producto');
             $producto->igv = $request->get('igv');
+            $producto->facturacion = $request->get('facturacion_producto') ? $request->get('facturacion_producto') : 'SI';
             $producto->save();
 
             $producto->codigo = 1000 + $producto->id;

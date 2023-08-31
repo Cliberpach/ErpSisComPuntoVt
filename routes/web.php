@@ -563,6 +563,7 @@ function(){
         Route::get('envio', 'Consultas\Ventas\AlertaController@envio')->name('consultas.ventas.alerta.envio');
         Route::get('getTableEnvio', 'Consultas\Ventas\AlertaController@getTableEnvio')->name('consultas.ventas.alerta.getTableEnvio');
         Route::get('sunat/{id}', 'Consultas\Ventas\AlertaController@sunat')->name('consultas.ventas.alerta.sunat');
+        Route::get('anular-venta/{id}', 'Consultas\Ventas\AlertaController@anularVenta')->name('consultas.ventas.alerta.anularVenta');
         
         Route::get('regularize','Consultas\Ventas\AlertaController@regularize')->name('consultas.ventas.alerta.regularize');
         Route::get('getTableRegularize','Consultas\Ventas\AlertaController@getTableRegularize')->name('consultas.ventas.alerta.getTableRegularize');

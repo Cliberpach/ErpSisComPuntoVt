@@ -1479,5 +1479,14 @@ class TablaDetalleSeeder extends Seeder
         $condicion->dias = 10;
         $condicion->save();
 
+        //CUENTAS
+        $detalle = new Detalle();
+        $detalle->descripcion = "ANULACION";
+        $detalle->simbolo = 'ANULACION';
+        $detalle->estado = 'ACTIVO';
+        $detalle->tabla_id = 32;
+        $detalle->editable = 1;
+        $detalle->save();
+
     }
 }
