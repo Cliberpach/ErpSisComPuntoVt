@@ -12,7 +12,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" name="marca_existe" id="marca_existe">
-                <form role="form" action="{{ route('almacenes.marcas.store') }}" method="POST"  id="crear_marca">
+                <form role="form" action="{{ route('almacenes.marcas.store') }}" method="POST" class="crear_marca"  id="crear_marca">
                     {{ csrf_field() }} {{ method_field('POST') }}
 
                     <div class="form-group">
@@ -41,6 +41,7 @@
                             </span>
                         @endif
                     </div>
+                </form>
             </div>
 
             <div class="modal-footer">
@@ -49,13 +50,11 @@
                             class="required"></label>) son obligatorios.</small>
                 </div>
                 <div class="col-md-6 text-right">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
+                    <button type="submit" form="crear_marca" class="btn btn-primary btn-sm"><i class="fa fa-save"></i> Guardar</button>
                     <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal"><i
                             class="fa fa-times"></i> Cancelar</button>
                 </div>
             </div>
-
-            </form>
         </div>
     </div>
 </div>
