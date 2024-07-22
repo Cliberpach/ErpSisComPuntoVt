@@ -66,6 +66,23 @@ class CreateGuiasRemisionTable extends Migration
             $table->json('getCdrResponse')->nullable();
             $table->json('getRegularizeResponse')->nullable();
             $table->enum('regularize', ['0', '1'])->default('0');
+
+            $table->string('response_code',10)->nullable();
+            $table->text('ticket')->nullable();
+            $table->text('cdrzip_name')->nullable();
+            $table->longText('ruta_cdr')->nullable();
+            $table->string('despatch_name')->nullable();
+            $table->longText('ruta_xml')->nullable();
+
+            $table->string('cdr_response_id',10)->nullable();
+            $table->string('cdr_response_code',10)->nullable();
+            $table->longText('cdr_response_description')->nullable();
+            $table->longText('cdr_response_notes')->nullable();
+            $table->longText('cdr_response_reference')->nullable();
+            $table->string('response_success',10)->nullable();
+            $table->longText('response_error')->nullable();
+            $table->longText('ruta_qr')->nullable();
+
             $table->timestamps();
         });
     }

@@ -29,14 +29,61 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use stdClass;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+use Greenter\Model\Client\Client;
+use Greenter\Model\Despatch\Despatch;
+use Greenter\Model\Despatch\DespatchDetail;
+use Greenter\Model\Despatch\Direction;
+use Greenter\Model\Despatch\Shipment;
+use Greenter\Model\Despatch\Transportist;
+use Greenter\Model\Response\CdrResponse;
+use Greenter\Model\Response\SummaryResult;
+use Greenter\Ws\Services\SunatEndpoints;
+use App\Greenter\Utils\Util;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response; 
 
 class GuiaController extends Controller
 {
     public function index()
     {
         $dato = "Message";
-        broadcast(new NotifySunatEvent($dato));
+        //broadcast(new NotifySunatEvent($dato));
         return view('ventas.guias.index');
+    }
+
+    public function getGuias()
+    {
+        $guias = Guia::where('estado', '!=', 'NULO')->orderBy('id','DESC')->get();
+        $coleccion = collect([]);
+        foreach($guias as $guia){
+            $coleccion->push([
+                'id' => $guia->id,
+                "numero" =>  $guia->documento ? (($guia->documento->serie && $guia->documento->correlativo) ? $guia->documento->serie.'-'.$guia->documento->correlativo : '-') : '-',
+                'tipo_venta' => $guia->documento ? (($guia->documento->sunat == '1') ? $guia->documento->descripcionTipo() : $guia->documento->nombreTipo()) : '-'  ,
+                'tipo_pago' => $guia->documento ? $guia->documento->tipo_pago : '-',
+                'cliente' => $guia->tipo_documento_cliente.': '.$guia->documento_cliente.' - '.$guia->cliente,
+                'fecha_documento' =>  Carbon::parse($guia->fecha_emision)->format( 'd/m/Y'),
+                'estado' => $guia->estado,
+                "serie_guia"    => $guia->serie.'-'.$guia->correlativo,
+                'cantidad'      => $guia->cantidad_productos. ' NIU',
+                'peso'          => $guia->peso_productos.' kG',
+                'ruta_comprobante_archivo'      => $guia->ruta_comprobante_archivo,
+                'nombre_comprobante_archivo'    => $guia->nombre_comprobante_archivo,
+                'sunat'             =>  $guia->sunat,
+                'estado_sunat'      =>  $guia->estado_sunat,
+                'regularize'        =>  $guia->regularize,
+                'ruta_xml'          =>  $guia->ruta_xml,
+                'ruta_cdr'          =>  $guia->ruta_cdr,
+                'cdr_response_code' =>  $guia->cdr_response_code,
+                'ticket'            =>  $guia->ticket
+            ]);
+        }
+
+        return DataTables::of($coleccion)->toJson();
+
     }
 
     public function create($id)
@@ -117,7 +164,157 @@ class GuiaController extends Controller
 
     }
 
-    public function getGuias()
+    public function consulta_ticket($id){
+        try {
+            //==== obtener la guía por su id =====
+            $guia   =   Guia::findOrFail($id);
+            $ticket =   $guia->ticket;
+
+            if($ticket){
+               
+                $util = Util::getInstance();
+                //===== iniciar greenter api ====
+                $api = $this->controlConfiguracionGreenter($util); 
+                //======== CONSULTANDO ESTADO DE LA GUÍA =====
+                $res = $api->getStatus($ticket);
+
+            
+                //======== response estructura =======
+                    /*  code: 99(envío con error)   |   cdrResponse (null o con contenido)
+                        code: 98(envío en proceso)  |   cdrResponse(aún sin cdr)
+                        code: 0(envío ok)           |   cdrResponse(con contenido)    
+                    */
+                $code_estado    =   $res->getCode();
+                $cdr_response   =   $res->getCdrResponse();
+                $descripcion    =   null;
+
+                $guia->response_success =   $res->isSuccess();
+
+                if($code_estado == 0){
+                    $descripcion            =   'ACEPTADA';
+                    $guia->sunat            =   '1';
+                    $guia->regularize       =   '0';
+                    $guia->response_code    =   $code_estado;
+                    
+
+                    //==== GUARDANDO DATOS DEL CDRZIP =====
+                    $guia->cdr_response_id          =   $cdr_response->getId();
+                    $guia->cdr_response_code        =   $cdr_response->getCode();
+                    $guia->cdr_response_description =   $cdr_response->getDescription();
+                    $guia->cdr_response_reference   =   $cdr_response->getReference();
+
+
+
+                    //========= GUARDANDO NOTES ======
+                    $response_notes =   '';
+                    foreach ($cdr_response->getNotes() as $note) {
+                       $response_notes.= '|'.$note.'|';
+                    }
+                    $guia->cdr_response_notes   =   $response_notes;
+                    
+                    
+                    //====== GUARDANDO CDR  =========== 
+                    $util->writeCdr(null, $res->getCdrZip(), "GUIA REMISION",$guia->despatch_name);
+                    $guia->ruta_cdr      =   'storage/greenter/guías_remisión/cdr/'.$guia->despatch_name.'.zip';
+                    
+
+                    //========= GENERANDO QR =========
+                    $miQr = QrCode::format('svg')
+                    ->size(130) //defino el tamaño
+                    ->backgroundColor(0, 0, 0) //defino el fondo
+                    ->color(255, 255, 255)
+                    ->margin(1) //defino el margen
+                    ->generate($cdr_response->getReference());
+
+                    $directoryPath = public_path('storage/greenter/guías_remisión/qrs');
+
+                    $fileName = $guia->despatch_name . '.svg';
+                    $pathToFile_qr = $directoryPath . DIRECTORY_SEPARATOR . $fileName;
+
+                    // Crea el directorio si no existe
+                    if (!File::exists($directoryPath)) {
+                        File::makeDirectory($directoryPath, 0755, true); 
+                    }
+
+                    File::put($pathToFile_qr, $miQr);
+
+                    
+                    $guia->ruta_qr  =   $pathToFile_qr;   
+                    $guia->update();
+                }
+
+                if($code_estado == 98){
+                    $descripcion            = 'EN PROCESO';
+                    $guia->sunat            = '1';
+                    $guia->regularize       = '0';
+                    $guia->response_code    = $code_estado;
+                    $guia->update();
+                }
+
+                if($code_estado == 99 && $cdr_response){
+                    $descripcion            = 'EN PROCESO';
+                    $guia->sunat            = '1';
+                    $guia->regularize       = '1';
+                    $guia->response_code    = $code_estado;
+                   
+
+                    $descripcion    =   'ENVÍO CON ERROR CON GENERACIÓN DE CDR';
+
+                    //==== GUARDANDO DATOS DEL CDRZIP =====
+                    $guia->cdr_response_id          =   $cdr_response->getId();
+                    $guia->cdr_response_code        =   $cdr_response->getCode();
+                    $guia->cdr_response_description =   $cdr_response->getDescription();
+                    $guia->cdr_response_reference   =   $cdr_response->getReference();
+  
+                    //========= GUARDANDO NOTES ======
+                    $response_notes =   '';
+                    foreach ($cdr_response->getNotes() as $note) {
+                        $response_notes.= '|'.$note.'|';
+                    }
+                    $guia->cdr_response_notes   =   $response_notes;
+                      
+                   //====== GUARDANDO CDR  =========== 
+                   $util->writeCdr(null, $res->getCdrZip(), "GUIA REMISION",$guia->despatch_name);
+                   $guia->ruta_cdr      =   'storage/greenter/guías_remisión/cdr/'.$guia->despatch_name.'.zip';
+                   $guia->update();
+                }
+
+                if($code_estado == '99' && !$cdr_response){
+                    $descripcion            =   'ENVÍO CON ERROR SIN GENERACIÓN DE CDR';
+                    $guia->sunat            =   '1';
+                    $guia->regularize       =   '1';
+                    $guia->response_code    =   $code_estado;
+                    $guia->update();
+                }
+
+                //======= ARCHIVO YA PRESENTADO ANTERIORMENTE ========
+                if($guia->cdr_response_code == 2223 ){
+                    //======== MARCAR COMO ENVIADO =======
+                    $guia->regularize       =   '0';
+                    $guia->sunat            =   '1';
+                    $guia->update();
+                }
+            
+
+                $response = [   'code_estado'       =>  $code_estado,
+                                'cdr'               =>  $cdr_response?1:0,
+                                'descripcion'       =>  $descripcion,
+                                'guia_actualizada'  =>  $guia];
+
+                return response()->json([  'type' => 'success','message' => $response ], 200);
+            }else{
+                return response()->json(['type' => 'error',
+                'message' => "La guía no contiene un ticket,debe enviar a sunat previamente" ], 333);
+            }
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+           
+            return response()->json(['type' => 'error','message' => 'Guía no encontrada'], 404);
+        }
+        
+    }
+
+    /*public function getGuias()
     {
         $guias = Guia::where('estado', '!=', 'NULO')->orderBy('id','DESC')->get();
         $coleccion = collect([]);
@@ -141,7 +338,7 @@ class GuiaController extends Controller
 
         return DataTables::of($coleccion)->toJson();
 
-    }
+    }*/
 
     public function store(Request $request)
     {
@@ -392,21 +589,27 @@ class GuiaController extends Controller
 
     public function obtenerProductos($guia)
     {
-        $detalles = DetalleGuia::where('guia_id',$guia->id)->get();
+        //====== OBTENER ID GUÍA ====
+        $guia_id    =   $guia->id;
+        //===== OBTENER DETALLE DE LA GUÍA =====
+        $guia_detalle   =   DB::select('select * from guia_detalles as gd   
+                            where gd.guia_id = ?',[$guia_id]);
+        
+        // $detalles = DetalleGuia::where('guia_id',$guia->id)->get();
 
-        $arrayProductos = Array();
-        for($i = 0; $i < count($detalles); $i++){
+        // $arrayProductos = Array();
+        // for($i = 0; $i < count($detalles); $i++){
 
-            $arrayProductos[] = array(
-                "codigo" => $detalles[$i]->codigo_producto,
-                "unidad" => $detalles[$i]->unidad,
-                "descripcion"=> $detalles[$i]->nombre_producto,
-                "cantidad" => $detalles[$i]->cantidad,
-                "codProdSunat" => '10',
-            );
-        }
+        //     $arrayProductos[] = array(
+        //         "codigo" => $detalles[$i]->codigo_producto,
+        //         "unidad" => $detalles[$i]->unidad,
+        //         "descripcion"=> $detalles[$i]->nombre_producto,
+        //         "cantidad" => $detalles[$i]->cantidad,
+        //         "codProdSunat" => '10',
+        //     );
+        // }
 
-        return $arrayProductos;
+        return $guia_detalle;
     }
 
     public function condicionReparto($guia)
@@ -432,7 +635,7 @@ class GuiaController extends Controller
         return $cadena;
     }
 
-    public function show($id)
+    /*public function show($id)
     {
         $guia = Guia::with(['documento','detalles','detalles.lote','detalles.lote.producto'])->findOrFail($id);
         if ($guia->sunat == '0' || $guia->sunat == '2' ) {
@@ -527,9 +730,9 @@ class GuiaController extends Controller
         }
 
 
-    }
+    }*/
 
-    public function sunat($id)
+/*    public function sunat($id)
     {
         $guia = Guia::findOrFail($id);
         //OBTENER CORRELATIVO DE LA GUIA DE REMISION
@@ -691,6 +894,233 @@ class GuiaController extends Controller
             return redirect()->route('ventas.guiasremision.index');
         }
     }
+*/
+
+public function show($id)
+{   
+    $guia = Guia::with(['documento', 'detalles'])->findOrFail($id);
+    $name = $guia->serie . "-" . $guia->correlativo . '.pdf';
+    
+    // Definir la ruta completa para el directorio PDF
+    $rutaPdfGuia = storage_path('app/public/greenter/guías_remisión/pdf');
+
+    // Crear directorio si no existe (usando File)
+    if (!File::exists($rutaPdfGuia)) {
+        File::makeDirectory($rutaPdfGuia, 0755, true, true);
+    }
+
+    // Generar el contenido del PDF
+    $pdfContent = PDF::loadView('ventas.guias.reportes.guia', [
+        'guia' => $guia,
+        'empresa' => Empresa::first(),
+    ])->setPaper('a4')->setWarnings(false)
+      ->output();
+
+    // Definir la ruta completa del archivo a guardar
+    $filePath = $rutaPdfGuia . '/' . $name;
+
+    // Guardar el PDF en la ubicación especificada
+    File::put($filePath, $pdfContent);
+
+    // Actualizar la guía con la ruta y nombre del archivo
+    $guia->nombre_comprobante_archivo = $name;
+    $guia->ruta_comprobante_archivo = 'greenter/guías_remisión/pdf/' . $name;
+    $guia->update();
+
+    // Retornar el archivo como respuesta
+    return response()->file($filePath);
+}
+
+public function sunat($id){
+
+    DB::beginTransaction();
+    try {
+        $guia = Guia::find($id);
+        
+        //OBTENER CORRELATIVO DE LA GUIA DE REMISION
+        $existe = event(new NumeracionGuiaRemision($guia));
+        if($existe[0]){
+            if ($existe[0]->get('existe') == true) {
+                if ($guia->sunat != '1') {
+                  
+                   
+                        $data_transportista =   self::condicionReparto($guia);
+
+                        $util = Util::getInstance();
+                      
+                        //========== Transportista ===========
+                        $transp = new Transportist();
+                        $transp->setTipoDoc($data_transportista['tipoDoc'])
+                            ->setNumDoc($data_transportista['numDoc'])
+                            ->setRznSocial($data_transportista['rznSocial'])
+                            ->setNroMtc($data_transportista['placa'])
+                            ->setplaca($data_transportista['placa'])
+                            ->setchoferTipoDoc($data_transportista['choferTipoDoc'])
+                            ->setchoferDoc($data_transportista['choferDoc']);
+
+                        //=========== Envío ================
+                        $envio = new Shipment();
+                        $envio
+                            ->setCodTraslado($guia->codTraslado()) // Cat.20 - Venta
+                            ->setdesTraslado($guia->desTraslado())
+                            ->setindTransbordo(false)
+                            ->setnumContenedor('XD-2232')
+                            ->setModTraslado('01') // Cat.18 - Transp. Publico
+                            ->setFecTraslado(new \DateTime(self::obtenerFecha($guia)))
+                            ->setPesoTotal(1)
+                            ->setUndPesoTotal('KGM')
+                            ->setNumBultos($guia->cantidad_productos) // Solo válido para importaciones
+                            ->setLlegada(new Direction($guia->ubigeo_llegada, self::limitarDireccion($guia->direccion_llegada,50,"...")))
+                            ->setPartida(new Direction($guia->ubigeo_partida, self::limitarDireccion($guia->direccion_empresa,50,"...")))
+                            ->setTransportista($transp);
+
+
+                        //===== despacho =======
+                            $despatch = new Despatch();
+                            $despatch->setVersion('2022')
+                                ->setTipoDoc('09')
+                                ->setSerie($existe[0]->get('numeracion')->serie)
+                                ->setCorrelativo($guia->correlativo)
+                                ->setFechaEmision(new \DateTime(self::obtenerFecha($guia)))
+                                ->setCompany($util->getGRECompany())
+                                ->setDestinatario((new Client())
+                                    ->setTipoDoc('6')
+                                    ->setNumDoc('20000000002')
+                                    ->setRznSocial('EMPRESA DEST 1'))
+                                ->setEnvio($envio);
+
+                                
+                            
+                        //===== LLENANDO DETALLE =======
+                        $productos= self::obtenerProductos($guia);
+                        $detalles   =   [];
+                        foreach ($productos as $producto) {
+                            
+                            $detail = new DespatchDetail();
+                            $detail->setCantidad($producto->cantidad)
+                                ->setUnidad($producto->unidad)
+                                ->setDescripcion($producto->nombre_producto)
+                                ->setCodigo($producto->codigo_producto);
+                                
+                            $detalles[] =   $detail;
+                        }
+
+                      
+                        $despatch->setDetails($detalles);
+
+                        //===== obteniendo configuración de envío ==========
+                        $api = $this->controlConfiguracionGreenter($util); 
+
+                        //======== CONSTRUYENDO XML Y ENVIANDO A SUNAT ==========
+                        $res = $api->send($despatch);
+                    
+                        //======== RESPONSE ESTRUCTURA ========
+                        // ticket(string) | success(boolean) | error
+                        //==== GUARDANDO XML ====
+                        $util->writeXml($despatch, $api->getLastXml(),"GUIA REMISION",null);
+                        $guia->ruta_xml      =   'storage/greenter/guías_remisión/xml/'.$despatch->getName().'.xml';
+
+                        
+                        //===== VERIFICANDO CONEXIÓN CON SUNAT =======
+                        if($res->isSuccess()){
+                            
+                            //==== OBTENER Y GUARDAR TICKET ====
+                            $ticket                 =   $res->getTicket();
+                            $guia->ticket           =   $ticket;
+                            $guia->sunat            =   '1';
+                            $guia->regularize       =   '0';
+                            $guia->despatch_name    =   $despatch->getName();
+                            $guia->update();
+                            
+                            Session::flash('guia_exito', 'Guia de remisión enviada a Sunat.');            
+                            DB::commit();                   
+                            return redirect()->route('ventas.guiasremision.index');
+                        } else{
+
+                            //COMO SUNAT NO LO ADMITE VUELVE A SER 0
+                            $guia->sunat        = '0';
+                            $guia->regularize   = '1';
+                            $guia->despatch_name    =   $despatch->getName();
+                            $guia->update();
+
+                            Session::flash('error_guia_remision', 'Guia de remision sin exito en el envio a sunat.');  
+                            DB::commit();                   
+                            return redirect()->route('ventas.guiasremision.index');
+                        }
+                   
+                }else{
+                    $guia->sunat = '1';
+                    $guia->update();
+                    Session::flash('error_guia_remision','Guia de remision ya fue enviado a Sunat.');
+                    DB::commit();                   
+                    return redirect()->route('ventas.guiasremision.index');
+                }
+
+            }else{
+                Session::flash('error','Guia de remision no se encuentra registrado en la empresa.');
+                DB::commit();                   
+                return redirect()->route('ventas.guiasremision.index');
+            }
+        }else{
+            Session::flash('error','Empresa sin parametros para emitir Guia de remisión remitente electrónica.');
+            DB::commit();                   
+            return redirect()->route('ventas.guiasremision.index');
+        }
+
+
+    } catch (\Throwable $th) {
+        dd($th->getMessage());
+        Session::flash('error_guia_remision', $th->getMessage());     
+        DB::rollBack();                
+        return redirect()->route('ventas.guiasremision.index');
+    }
+}
+
+public function controlConfiguracionGreenter($util){
+    //==== OBTENIENDO CONFIGURACIÓN DE GREENTER ======
+    $greenter_config    =   DB::select('select gc.ruta_certificado,gc.id_api_guia_remision,gc.modo,
+      gc.clave_api_guia_remision,e.ruc,e.razon_social,e.direccion_fiscal,e.ubigeo,
+      e.direccion_llegada,gc.sol_user,gc.sol_pass
+      from greenter_config as gc
+      inner join empresas as e on e.id=gc.empresa_id
+      inner join configuracion as c on c.propiedad = gc.modo
+      where gc.empresa_id=1 and c.slug="AG"');
+
+
+
+    if(count($greenter_config) === 0){
+        throw new Exception('NO SE ENCONTRÓ NINGUNA CONFIGURACIÓN PARA GREENTER');
+    }
+
+    if(!$greenter_config[0]->sol_user){
+        throw new Exception('DEBE ESTABLECER LA CREDENCIAL SOL_USER');
+    }
+    if(!$greenter_config[0]->id_api_guia_remision){
+        throw new Exception('DEBE ESTABLECER EL ID API GUÍA DE REMISIÓN');
+    }
+    if(!$greenter_config[0]->clave_api_guia_remision){
+        throw new Exception('DEBE ESTABLECER LA CLAVE API GUÍA DE REMISIÓN');
+    }
+    if(!$greenter_config[0]->sol_pass){
+        throw new Exception('DEBE ESTABLECER LA CREDENCIAL SOL_PASS');
+    }
+    if ($greenter_config[0]->modo !== "BETA" && $greenter_config[0]->modo !== "PRODUCCION") {
+        throw new Exception('NO SE HA CONFIGURADO EL AMBIENTE BETA O PRODUCCIÓN PARA GREENTER');
+    }
+
+    $see    =   null;
+    if($greenter_config[0]->modo === "BETA"){
+
+        $see = $util->getSeeApi($greenter_config[0]);
+    }
+
+   
+    if(!$see){
+        throw new Exception('ERROR EN LA CONFIGURACIÓN DE GREENTER, SEE ES NULO');
+    }
+
+    return $see;
+}
 
     public function sunat_prev($id)
     {
@@ -955,6 +1385,29 @@ class GuiaController extends Controller
             Session::flash('error', $e->getMessage());
             return redirect()->route('ventas.guiasremision.index')->with('guardar', 'error');
         }
+    }
+
+    public function getXml($guia_id){
+        $guia        =   Guia::find($guia_id);
+        $nombreArchivo  =   basename($guia->ruta_xml);
+        
+
+        $headers = [
+            'Content-Type' => 'text/xml',
+        ];
+    
+        return Response::download($guia->ruta_xml, $nombreArchivo, $headers);
+    }
+
+    public function getCdr($guia_id){
+        $guia           =   Guia::find($guia_id);
+        $nombreArchivo  =   basename($guia->ruta_cdr);
+
+        $headers = [
+            'Content-Type' => 'text/xml',
+        ];
+    
+        return Response::download($guia->ruta_cdr, $nombreArchivo, $headers);
     }
 
 }

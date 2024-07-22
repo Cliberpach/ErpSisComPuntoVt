@@ -17,5 +17,11 @@ class ConfiguracionSeeder extends Seeder
             'descripcion' => 'Cobrar en caja',
             'propiedad' => 'SI'
         ]);
+
+        Configuracion::create([
+            'slug'          => 'AG',
+            'descripcion'   => 'AMBIENTE GREENTER',
+            'propiedad'     => 'BETA'
+        ]);
     }
 }

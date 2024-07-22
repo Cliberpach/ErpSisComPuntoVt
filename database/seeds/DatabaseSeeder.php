@@ -5,6 +5,7 @@ use App\Mantenimiento\Persona\Persona;
 use App\Mantenimiento\Vendedor\Vendedor;
 use App\PersonaTrabajador;
 use App\Pos\Caja;
+use Database\Seeders\GreenterSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -82,5 +83,7 @@ class DatabaseSeeder extends Seeder
         $vendedor->tipo_banco = '';
         $vendedor->numero_cuenta = '';
         $vendedor->save();
+
+        $this->call(GreenterSeeder::class);
     }
 }

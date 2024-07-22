@@ -7,54 +7,57 @@ use Illuminate\Database\Eloquent\Model;
 class Guia extends Model
 {
     protected $table = 'guias_remision';
-    protected $fillable = [
-        'documento_id',
-        'nota_salida_id',
-        'cantidad_productos',
-        'peso_productos',
 
-        'tienda_id',
+    protected $guarded  =   [''];
+    
+    // protected $fillable = [
+    //     'documento_id',
+    //     'nota_salida_id',
+    //     'cantidad_productos',
+    //     'peso_productos',
 
-        'direccion_llegada',
-        // 'direccion_partida', //EMPRESA DOCUMENTO DE VENTA PLANO
+    //     'tienda_id',
 
-        //OFICINA
-        'ruc_transporte_oficina',
-        'nombre_transporte_oficina',
-        //DOMICILIO
-        'ruc_transporte_domicilio',
-        'nombre_transporte_domicilio',
+    //     'direccion_llegada',
+    //     // 'direccion_partida', //EMPRESA DOCUMENTO DE VENTA PLANO
 
-        'observacion',
-        'ubigeo_llegada',
-        'ubigeo_partida',
-        'estado',
-        'sunat',
-        'correlativo',
-        'serie',
-        'ruta_comprobante_archivo',
-        'nombre_comprobante_archivo',
-        'dni_conductor',
-        'placa_vehiculo',
+    //     //OFICINA
+    //     'ruc_transporte_oficina',
+    //     'nombre_transporte_oficina',
+    //     //DOMICILIO
+    //     'ruc_transporte_domicilio',
+    //     'nombre_transporte_domicilio',
 
-        'fecha_emision',
-        'ruc_empresa',
-        'empresa',
-        'empresa_id',
-        'direccion_empresa',
+    //     'observacion',
+    //     'ubigeo_llegada',
+    //     'ubigeo_partida',
+    //     'estado',
+    //     'sunat',
+    //     'correlativo',
+    //     'serie',
+    //     'ruta_comprobante_archivo',
+    //     'nombre_comprobante_archivo',
+    //     'dni_conductor',
+    //     'placa_vehiculo',
 
-        'motivo_traslado',
+    //     'fecha_emision',
+    //     'ruc_empresa',
+    //     'empresa',
+    //     'empresa_id',
+    //     'direccion_empresa',
 
-        'tipo_documento_cliente',
-        'documento_cliente',
-        'cliente',
-        'cliente_id',
-        'user_id',
+    //     'motivo_traslado',
 
-        'getCdrResponse',
-        'regularize',
-        'getRegularizeResponse',
-    ];
+    //     'tipo_documento_cliente',
+    //     'documento_cliente',
+    //     'cliente',
+    //     'cliente_id',
+    //     'user_id',
+
+    //     'getCdrResponse',
+    //     'regularize',
+    //     'getRegularizeResponse',
+    // ];
 
     public function documento()
     {

@@ -273,6 +273,7 @@
     })
 
     $('#crear_categoria').submit(function(e){
+        
         e.preventDefault();
         const swalWithBootstrapButtons = Swal.mixin({
             customClass: {

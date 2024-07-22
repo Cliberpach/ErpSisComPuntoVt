@@ -278,8 +278,8 @@
                     @for($i = 0; $i < count($guia->detalles); $i++)
                     <tr>
                         <td style="text-align: center"><p class="m-0 p-0">{{ $i + 1 }}</p></td>
-                        <td style="text-align: center">{{ $guia->detalles[$i]->codigo_producto }}</td>
-                        <td>{{ $guia->detalles[$i]->nombre_producto }}</td>
+                        <td style="text-align: center">{{ $guia->detalles[$i]->codigo_producto}}</td>
+                        <td>{{ $guia->detalles[$i]->nombre_producto.'-'.$guia->detalles[$i]->nombre_color.'-'.$guia->detalles[$i]->nombre_talla }}</td>
                         <td style="text-align: center">{{ $guia->detalles[$i]->unidad }}</td>
                         <td style="text-align: center">{{ $guia->detalles[$i]->cantidad }}</td>
                     </tr>
@@ -300,6 +300,12 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="comprobante-aux">
+            @if($guia->ruta_qr)
+                <img src="{{ $guia->ruta_qr }}">
+                {{-- <img src="{{ base_path() . '/storage/app/'.$guia->ruta_qr }}"> --}}
+            @endif        
         </div>
     </body>
 </html>
