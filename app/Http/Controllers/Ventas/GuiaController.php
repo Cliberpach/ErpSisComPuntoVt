@@ -1109,10 +1109,10 @@ public function controlConfiguracionGreenter($util){
     }
 
     $see    =   null;
-    if($greenter_config[0]->modo === "BETA"){
+    $see    =   $util->getSeeApi($greenter_config[0]);
 
-        $see = $util->getSeeApi($greenter_config[0]);
-    }
+    //if($greenter_config[0]->modo === "BETA"){   
+    //}
 
    
     if(!$see){
