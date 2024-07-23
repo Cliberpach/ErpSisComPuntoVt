@@ -99,7 +99,7 @@ final class Util
         }
 
         if($greenter_config->modo === "PRODUCCION"){
-            $see = new \Greenter\Api([
+            $api = new \Greenter\Api([
                 'auth' => 'https://api-seguridad.sunat.gob.pe/v1',
                 'cpe' => 'https://api-cpe.sunat.gob.pe/v1',
             ]);
