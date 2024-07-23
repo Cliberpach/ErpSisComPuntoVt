@@ -1020,7 +1020,7 @@ public function sunat($id){
                         $util->writeXml($despatch, $api->getLastXml(),"GUIA REMISION",null);
                         $guia->ruta_xml      =   'storage/greenter/guías_remisión/xml/'.$despatch->getName().'.xml';
 
-                        dd($res);
+                     
                         //===== VERIFICANDO CONEXIÓN CON SUNAT =======
                         if($res->isSuccess()){
                             
