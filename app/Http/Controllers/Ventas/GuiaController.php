@@ -958,6 +958,7 @@ public function sunat($id){
                             ->setchoferTipoDoc($data_transportista['choferTipoDoc'])
                             ->setchoferDoc($data_transportista['choferDoc']);
 
+                        //====== MODOS TRASLADO:  PUBLICO 01 - PRIVADO 02 ======
                         //=========== Envío ================
                         $envio = new Shipment();
                         $envio
@@ -965,7 +966,7 @@ public function sunat($id){
                             ->setdesTraslado($guia->desTraslado())
                             ->setindTransbordo(false)
                             ->setnumContenedor('XD-2232')
-                            ->setModTraslado('01') // Cat.18 - Transp. Publico
+                            ->setModTraslado('02') // Cat.18 - Transp. Privado
                             ->setFecTraslado(new \DateTime(self::obtenerFecha($guia)))
                             ->setPesoTotal(1)
                             ->setUndPesoTotal('KGM')
@@ -974,6 +975,15 @@ public function sunat($id){
                             ->setPartida(new Direction($guia->ubigeo_partida, self::limitarDireccion($guia->direccion_empresa,50,"...")))
                             ->setTransportista($transp);
 
+
+                        $tipo_documento_cliente =   $guia->tipo_documento_cliente; 
+                        $tipo_doc               =   null;
+                        if($tipo_documento_cliente === "RUC"){
+                            $tipo_doc   =   '6';
+                        }
+                        if($tipo_documento_cliente === "DNI"){
+                            $tipo_doc   =   '1';
+                        }
 
                         //===== despacho =======
                             $despatch = new Despatch();
@@ -984,9 +994,9 @@ public function sunat($id){
                                 ->setFechaEmision(new \DateTime(self::obtenerFecha($guia)))
                                 ->setCompany($util->getGRECompany())
                                 ->setDestinatario((new Client())
-                                    ->setTipoDoc('6')
-                                    ->setNumDoc('20000000002')
-                                    ->setRznSocial('EMPRESA DEST 1'))
+                                    ->setTipoDoc($tipo_doc)
+                                    ->setNumDoc($guia->documento_cliente)
+                                    ->setRznSocial($guia->cliente))
                                 ->setEnvio($envio);
 
                                 
@@ -1007,7 +1017,7 @@ public function sunat($id){
 
                       
                         $despatch->setDetails($detalles);
-                        
+
 
                         //===== obteniendo configuración de envío ==========
                         $api = $this->controlConfiguracionGreenter($util); 

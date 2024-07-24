@@ -144,8 +144,8 @@ final class Util
     public function getGRECompany(): \Greenter\Model\Company\Company
     {
         return (new \Greenter\Model\Company\Company())
-            ->setRuc('20161515648')
-            ->setRazonSocial('GREENTER S.A.C.');
+            ->setRuc('20608741578')
+            ->setRazonSocial('CORPORACION DE REPUESTOS ELECTROMOTRICES VALVERDE E.I.R.L.');
     }
 
     public function showResponse(DocumentInterface $document, CdrResponse $cdr): void
