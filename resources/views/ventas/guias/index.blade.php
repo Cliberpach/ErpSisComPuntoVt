@@ -161,13 +161,13 @@ $(document).ready(function() {
                     if(data.sunat == '1'){
                         //====== SI TIENE CDR ====
                         if(data.cdr_response_code){
-                            if(data.cdr_response_code == 0){
+                            if(data.response_code == 0){
                                 return "<span class='badge badge-warning' d-block>ACEPTADO</span>";
                             }
-                            if(data.cdr_response_code == 99){
+                            if(data.response_code == 99){
                                 return "<span class='badge badge-warning' d-block>ACEPTADO CON ERRORES</span>";
                             }
-                            if(data.cdr_response_code == 98){
+                            if(data.response_code == 98){
                                 return "<span class='badge badge-warning' d-block>EN PROCESO</span>";
                             }
                         }else{
