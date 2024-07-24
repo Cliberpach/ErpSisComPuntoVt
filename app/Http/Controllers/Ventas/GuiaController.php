@@ -51,7 +51,7 @@ class GuiaController extends Controller
     public function index()
     {
         $dato = "Message";
-        broadcast(new NotifySunatEvent($dato));
+        //broadcast(new NotifySunatEvent($dato));
         return view('ventas.guias.index');
     }
 
@@ -359,6 +359,9 @@ class GuiaController extends Controller
                 'ubigeo_llegada'=> 'required',
                 'ubigeo_partida'=> 'required',
                 'motivo_traslado'=> 'required',
+                'dni_conductor'=> 'required',
+                'placa_vehiculo'=> 'required',
+
             ];
             $message = [
                 'direccion_empresa.required' => 'El campo direccion de llegada es obligatorio.',
@@ -367,6 +370,9 @@ class GuiaController extends Controller
                 'ubigeo_llegada.required' => 'El campo Ubigeo es obligatorio.',
                 'ubigeo_partida.required' => 'El campo Ubigeo es obligatorio.',
                 'motivo_traslado.required' => 'El campo Motivo de traslado es obligatorio.',
+                'dni_conductor.required' => 'El campo Dni del conductor es obligatorio.',
+                'placa_vehiculo.required' => 'El campo Placa del vehículo es obligatorio.',
+
             ];
             Validator::make($data, $rules, $message)->validate();
 

@@ -367,7 +367,7 @@
                                 </div>
                                 <div class="form-group row">
                                     <div class="col-lg-6 col-xs-12">
-                                        <label class="">Dni del Conductor: </label>
+                                        <label class="required">Dni del Conductor: </label>
                                         <input type="text" id="dni_conductor"
                                             class="form-control {{ $errors->has('dni_conductor') ? ' is-invalid' : '' }}"
                                             maxlength="8" name="dni_conductor" value="{{ old('dni_conductor')}}">
@@ -378,7 +378,7 @@
                                         @endif
                                     </div>
                                     <div class="col-lg-6 col-xs-12">
-                                        <label class="">Placa del Vehículo: </label>
+                                        <label class="required">Placa del Vehículo: </label>
                                         <input type="text" id="placa_vehiculo"
                                             class="form-control {{ $errors->has('placa_vehiculo') ? ' is-invalid' : '' }}"
                                             name="placa_vehiculo" value="{{ old('placa_vehiculo')}}">
