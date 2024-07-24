@@ -37,7 +37,8 @@ use Greenter\Model\Despatch\Despatch;
 use Greenter\Model\Despatch\DespatchDetail;
 use Greenter\Model\Despatch\Direction;
 use Greenter\Model\Despatch\Shipment;
-use Greenter\Model\Despatch\Transportist;
+use Greenter\Model\Despatch\Vehicle;
+use Greenter\Model\Despatch\Driver;
 use Greenter\Model\Response\CdrResponse;
 use Greenter\Model\Response\SummaryResult;
 use Greenter\Ws\Services\SunatEndpoints;
@@ -948,16 +949,28 @@ public function sunat($id){
                         $data_transportista =   self::condicionReparto($guia);
 
                         $util = Util::getInstance();
+
+                        //===== VEHÍCULO =====
+                        $vehiculoPrincipal = (new Vehicle())
+                        ->setPlaca($guia->placa_vehiculo);
+
+                        $chofer = (new Driver())
+                        ->setTipo('Principal')
+                        ->setTipoDoc('1')
+                        ->setNroDoc($guia->dni_conductor)
+                        ->setLicencia('-')
+                        ->setNombres('-')
+                        ->setApellidos('-');
                       
                         //========== Transportista ===========
-                        $transp = new Transportist();
+                        /*$transp = new Transportist();
                         $transp->setTipoDoc($data_transportista['tipoDoc'])
                             ->setNumDoc($data_transportista['numDoc'])
                             ->setRznSocial($data_transportista['rznSocial'])
                             ->setNroMtc($data_transportista['placa'])
                             ->setplaca($data_transportista['placa'])
                             ->setchoferTipoDoc($data_transportista['choferTipoDoc'])
-                            ->setchoferDoc($data_transportista['choferDoc']);
+                            ->setchoferDoc($data_transportista['choferDoc']);*/
 
                         //====== MODOS TRASLADO:  PUBLICO 01 - PRIVADO 02 ======
                         //=========== Envío ================
@@ -971,10 +984,11 @@ public function sunat($id){
                             ->setFecTraslado(new \DateTime(self::obtenerFecha($guia)))
                             ->setPesoTotal(1)
                             ->setUndPesoTotal('KGM')
+                            ->setVehiculo($vehiculoPrincipal)
+                            ->setChoferes([$chofer])
                             ->setNumBultos($guia->cantidad_productos) // Solo válido para importaciones
                             ->setLlegada(new Direction($guia->ubigeo_llegada, self::limitarDireccion($guia->direccion_llegada,50,"...")))
-                            ->setPartida(new Direction($guia->ubigeo_partida, self::limitarDireccion($guia->direccion_empresa,50,"...")))
-                            ->setTransportista($transp);
+                            ->setPartida(new Direction($guia->ubigeo_partida, self::limitarDireccion($guia->direccion_empresa,50,"...")));
 
 
                         $tipo_documento_cliente =   $guia->tipo_documento_cliente; 
