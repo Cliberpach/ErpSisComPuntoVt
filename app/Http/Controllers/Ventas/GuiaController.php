@@ -178,7 +178,7 @@ class GuiaController extends Controller
                 //======== CONSULTANDO ESTADO DE LA GUÍA =====
                 $res = $api->getStatus($ticket);
 
-            
+                dd($res);
                 //======== response estructura =======
                     /*  code: 99(envío con error)   |   cdrResponse (null o con contenido)
                         code: 98(envío en proceso)  |   cdrResponse(aún sin cdr)
@@ -1020,7 +1020,8 @@ public function sunat($id){
                         $util->writeXml($despatch, $api->getLastXml(),"GUIA REMISION",null);
                         $guia->ruta_xml      =   'storage/greenter/guías_remisión/xml/'.$despatch->getName().'.xml';
 
-                     
+                        
+
                         //===== VERIFICANDO CONEXIÓN CON SUNAT =======
                         if($res->isSuccess()){
                             
