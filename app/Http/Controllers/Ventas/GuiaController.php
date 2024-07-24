@@ -78,6 +78,7 @@ class GuiaController extends Controller
                 'ruta_xml'          =>  $guia->ruta_xml,
                 'ruta_cdr'          =>  $guia->ruta_cdr,
                 'cdr_response_code' =>  $guia->cdr_response_code,
+                'response_code'     =>  $guia->response_code,
                 'ticket'            =>  $guia->ticket
             ]);
         }
