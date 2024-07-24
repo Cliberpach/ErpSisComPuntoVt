@@ -989,7 +989,7 @@ public function sunat($id){
                             $despatch = new Despatch();
                             $despatch->setVersion('2022')
                                 ->setTipoDoc('09')
-                                ->setSerie($existe[0]->get('numeracion')->serie)
+                                ->setSerie($guia->serie)
                                 ->setCorrelativo($guia->correlativo)
                                 ->setFechaEmision(new \DateTime(self::obtenerFecha($guia)))
                                 ->setCompany($util->getGRECompany())
