@@ -179,7 +179,7 @@ class GuiaController extends Controller
                 $api = $this->controlConfiguracionGreenter($util); 
                 //======== CONSULTANDO ESTADO DE LA GUÍA =====
                 $res = $api->getStatus($ticket);
-
+                dd($res);
               
                 //======== response estructura =======
                     /*  code: 99(envío con error)   |   cdrResponse (null o con contenido)
@@ -191,6 +191,7 @@ class GuiaController extends Controller
                 $descripcion    =   null;
 
                 $guia->response_success =   $res->isSuccess();
+                
 
                 if($code_estado == 0){
                     $descripcion            =   'ACEPTADA';
