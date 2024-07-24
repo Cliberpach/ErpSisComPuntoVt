@@ -1007,19 +1007,24 @@ public function sunat($id){
                             $tipo_doc   =   '1';
                         }
 
-                        //===== despacho =======
-                            $despatch = new Despatch();
-                            $despatch->setVersion('2022')
-                                ->setTipoDoc('09')
-                                ->setSerie($guia->serie)
-                                ->setCorrelativo($guia->correlativo)
-                                ->setFechaEmision(new \DateTime(self::obtenerFecha($guia)))
-                                ->setCompany($util->getGRECompany())
-                                ->setDestinatario((new Client())
-                                    ->setTipoDoc($tipo_doc)
-                                    ->setNumDoc($guia->documento_cliente)
-                                    ->setRznSocial($guia->cliente))
-                                ->setEnvio($envio);
+                        //====== DEFINIENDO COMPAÑÍA =====
+                        $company_guia   =   new \Greenter\Model\Company\Company();
+                        $company_guia->setRuc($guia->ruc_empresa)
+                        ->setRazonSocial($guia->empresa);
+
+                        //===== GUIA =======
+                        $despatch = new Despatch();
+                        $despatch->setVersion('2022')
+                            ->setTipoDoc('09')
+                            ->setSerie($guia->serie)
+                            ->setCorrelativo($guia->correlativo)
+                            ->setFechaEmision(new \DateTime(self::obtenerFecha($guia)))
+                            ->setCompany($company_guia)
+                            ->setDestinatario((new Client())
+                                ->setTipoDoc($tipo_doc)
+                                ->setNumDoc($guia->documento_cliente)
+                                ->setRznSocial($guia->cliente))
+                            ->setEnvio($envio);
 
                                 
                             
