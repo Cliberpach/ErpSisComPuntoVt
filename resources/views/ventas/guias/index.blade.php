@@ -162,7 +162,7 @@ $(document).ready(function() {
                         //====== SI TIENE CDR ====
                         if(data.cdr_response_code){
                             if(data.response_code == 0){
-                                return "<span class='badge badge-warning' d-block>ACEPTADO</span>";
+                                return "<span class='badge badge-success' d-block>ACEPTADO</span>";
                             }
                             if(data.response_code == 99){
                                 return "<span class='badge badge-warning' d-block>ACEPTADO CON ERRORES</span>";
