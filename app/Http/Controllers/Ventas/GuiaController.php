@@ -178,7 +178,7 @@ class GuiaController extends Controller
                 //======== CONSULTANDO ESTADO DE LA GUÍA =====
                 $res = $api->getStatus($ticket);
 
-                dd($res);
+              
                 //======== response estructura =======
                     /*  code: 99(envío con error)   |   cdrResponse (null o con contenido)
                         code: 98(envío en proceso)  |   cdrResponse(aún sin cdr)
