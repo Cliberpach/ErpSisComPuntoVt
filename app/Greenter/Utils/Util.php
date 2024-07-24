@@ -123,7 +123,7 @@ final class Util
         //     throw new Exception('No se pudo cargar el certificado');
         // }
         
-           
+           dd($ruc);
         return $api->setBuilderOptions([
                 'strict_variables' => true,
                 'optimizations' => 0,

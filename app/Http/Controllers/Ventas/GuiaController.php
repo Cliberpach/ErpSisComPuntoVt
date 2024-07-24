@@ -1007,6 +1007,7 @@ public function sunat($id){
 
                       
                         $despatch->setDetails($detalles);
+                        
 
                         //===== obteniendo configuración de envío ==========
                         $api = $this->controlConfiguracionGreenter($util); 
