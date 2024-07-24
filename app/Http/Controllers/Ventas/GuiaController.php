@@ -946,7 +946,7 @@ public function sunat($id){
                 if ($guia->sunat != '1') {
                   
                    
-                        $data_transportista =   self::condicionReparto($guia);
+                        //$data_transportista =   self::condicionReparto($guia);
 
                         $util = Util::getInstance();
 
